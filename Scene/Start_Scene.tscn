@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cwo1rlpvmqn1m"]
+[gd_scene load_steps=3 format=3 uid="uid://d2rbfnaviwwmi"]
 
-[ext_resource type="Script" path="res://Scripts/start_scene.gd" id="1_fnmpy"]
+[ext_resource type="Script" uid="uid://da1p1qbu85qub" path="res://Scripts/start_scene.gd" id="1_fnmpy"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_gq4ui"]
 
