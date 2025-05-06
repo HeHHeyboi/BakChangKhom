@@ -14,6 +14,7 @@ func _ready():
 
 
 # เอาไว้เรียกจาก Scene อื่นๆ
+# อันนี้น่าจะแก้เป็นชื่อไฟล์ text
 func show_dialog(list: Array[String]):
 	pass
 
@@ -64,3 +65,8 @@ func next_text() -> void:
 
 func click_choice() -> void:
 	ChoiceContainer.visible = false
+	dialog_index += 1
+	if dialog_index >= len(DialogList):
+		self.visible = false
+	else:
+		show_text(DialogList[dialog_index])
