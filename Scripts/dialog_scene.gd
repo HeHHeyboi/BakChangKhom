@@ -4,8 +4,9 @@ extends Control
 var dialog_index: int = 0
 @export var TextBox: RichTextLabel
 @export var NameBox: Label
-
-enum DialogType { Dialog, Choice }
+@export var ChoiceContainer: VBoxContainer
+var select_Choice: String
+enum DialogType { Dialog, Choice, SelectChoice }
 
 
 func _ready():
@@ -17,18 +18,32 @@ func show_dialog(list: Array[String]):
 	pass
 
 
+# TODO:
+# 	1. Parse header "Choice"
+# 	2. other thing too
+
+
 func show_text(text: String):
-	var parse_text = parse_text(text)
-	NameBox.text = parse_text[0]
-	TextBox.text = parse_text[1]
+	var parse = parse_text(text)
+	match parse["type"]:
+		DialogType.Dialog:
+			NameBox.text = parse["name"]
+			TextBox.text = parse["dialog"]
 
 
 func parse_text(text: String):
 	var p = text.split(":")
 	var header = p[0]
-	var body = p[1]
+	var body: String = p[1]
 	body.trim_prefix(" ")
-	return [header, body]
+	match header:
+		"Dialog":
+			var split_body = body.split(",")
+			return {"type": DialogType.Dialog, "name": split_body[0], "dialog": split_body[1]}
+		"Choice":
+			pass
+		select_Choice:
+			pass
 
 
 func _input(event: InputEvent) -> void:
