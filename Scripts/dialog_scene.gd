@@ -2,7 +2,7 @@ extends Control
 
 @export var DialogList: Array[String]
 var dialog_index: int = 0
-@export var TextBox: RichTextLabel
+@export var TextBox: Label
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
 var select_Choice: String
@@ -29,27 +29,38 @@ func show_text(text: String):
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
 			TextBox.text = parse["dialog"]
+		DialogType.Choice:
+			ChoiceContainer.visible = true
 
 
 func parse_text(text: String):
 	var p = text.split(":")
-	var header = p[0]
-	var body: String = p[1]
-	body.trim_prefix(" ")
+	var header = p.get(0)
+	var body := p.get(1).split(",")
 	match header:
 		"Dialog":
-			var split_body = body.split(",")
-			return {"type": DialogType.Dialog, "name": split_body[0], "dialog": split_body[1]}
+			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
 		"Choice":
-			pass
+			for choice in body:
+				var button = Button.new()
+				button.connect("pressed", click_choice)
+				button.text = choice
+				ChoiceContainer.add_child(button)
+			return {"type": DialogType.Choice}
 		select_Choice:
 			pass
 
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("next_text"):
-		dialog_index += 1
-		if dialog_index >= len(DialogList):
-			self.visible = false
-		else:
-			show_text(DialogList[dialog_index])
+# func _input(event: InputEvent) -> void:
+
+
+func next_text() -> void:
+	dialog_index += 1
+	if dialog_index >= len(DialogList):
+		self.visible = false
+	else:
+		show_text(DialogList[dialog_index])
+
+
+func click_choice() -> void:
+	ChoiceContainer.visible = false
