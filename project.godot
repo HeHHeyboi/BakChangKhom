@@ -27,6 +27,10 @@ next_text={
 ]
 }
 
+[memory]
+
+limits/message_queue/max_size_mb=128
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
