@@ -1,9 +1,9 @@
 extends Control
 
-@export var DialogList: Array[String]
 @export var TextBox: Label
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
+@export var test_file: String
 
 enum DialogType { Dialog, Choice, SelectChoice }
 
@@ -14,29 +14,43 @@ var select_index = 0
 var select_Choice: String
 var ChoiceDict := {}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
+var DialogList: Array[String]
 
 
+# NOTE: มีไว้ test
 func _ready():
+	read_file(test_file)
 	show_text(DialogList[dialog_index])
 
 
-# will change to file name?
-func show_dialog(list: Array[String]):
+# NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
+func show_dialog(file_name: StringName):
 	pass
 
 
-func read_file(list: Array[String]):
-	for i in list:
-		var split = i.split(":")
+func read_file(file_name: StringName):
+	var file = FileAccess.open(file_name, FileAccess.READ)
+	while !file.eof_reached():
+		var line = file.get_line()
+		if line.find("#") > 0:
+			continue
+		var split = line.split(":")
 		var header = split.get(0).to_lower()
-		var body = split.get(1)
 		match header:
-			DIALOG, CHOICE:
-				DialogList.append(i)
-			_:
-				if !ChoiceDict.has(header):
-					ChoiceDict[header] = [] as Array[String]
-				ChoiceDict[header].append(body)
+			DIALOG:
+				DialogList.append(line)
+	file.close()
+	# for i in list:
+	# 	var split = i.split(":")
+	# 	var header = split.get(0).to_lower()
+	# 	var body = split.get(1)
+	# 	match header:
+	# 		DIALOG, CHOICE:
+	# 			DialogList.append(i)
+	# 		_:
+	# 			if !ChoiceDict.has(header):
+	# 				ChoiceDict[header] = [] as Array[String]
+	# 			ChoiceDict[header].append(body)
 
 
 # TODO:
@@ -72,9 +86,6 @@ func parse_text(text: String):
 			return {"type": DialogType.Choice}
 		select_Choice:
 			pass
-
-
-# func _input(event: InputEvent) -> void:
 
 
 func next_text() -> void:
