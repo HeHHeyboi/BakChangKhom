@@ -3,24 +3,25 @@ extends Control
 @export var TextBox: Label
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
+@export var DialogButton: Button
 @export var test_file: String
 
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
 const CHOICE = "choice"
-var dialog_index: int = 0
-var select_index = 0
+const TXT_PATH = "res://Assets/"
+var dialog_stack: Array[int] = [0]
 var select_Choice: String
 var ChoiceDict := {}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
-var DialogList: Array[String]
+var MainDialog: Array[String]
 
 
 # NOTE: มีไว้ test
 func _ready():
-	read_file(test_file)
-	show_text(DialogList[dialog_index])
+	read_file(TXT_PATH + test_file)
+	show_text(MainDialog[dialog_stack[-1]])
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
@@ -30,27 +31,31 @@ func show_dialog(file_name: StringName):
 
 func read_file(file_name: StringName):
 	var file = FileAccess.open(file_name, FileAccess.READ)
+	var type = "dialog"
 	while !file.eof_reached():
 		var line = file.get_line()
-		if line.find("#") > 0:
+		line = line.rstrip(" ")
+		if line.findn("#") == 0:
 			continue
 		var split = line.split(":")
 		var header = split.get(0).to_lower()
 		match header:
-			DIALOG:
-				DialogList.append(line)
+			DIALOG, CHOICE:
+				if type == "dialog":
+					MainDialog.append(line)
+				else:
+					ChoiceDict[type].append(line)
+			_:
+				if header == "":
+					type = "dialog"
+					continue
+				if !ChoiceDict.has(header):
+					ChoiceDict[header] = []
+					type = header
+					continue
+	print(MainDialog)
+	print(ChoiceDict)
 	file.close()
-	# for i in list:
-	# 	var split = i.split(":")
-	# 	var header = split.get(0).to_lower()
-	# 	var body = split.get(1)
-	# 	match header:
-	# 		DIALOG, CHOICE:
-	# 			DialogList.append(i)
-	# 		_:
-	# 			if !ChoiceDict.has(header):
-	# 				ChoiceDict[header] = [] as Array[String]
-	# 			ChoiceDict[header].append(body)
 
 
 # TODO:
@@ -60,12 +65,14 @@ func read_file(file_name: StringName):
 
 func show_text(text: String):
 	var parse = parse_text(text)
+	DialogButton.disabled = false
 	match parse["type"]:
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
 			TextBox.text = parse["dialog"]
 		DialogType.Choice:
 			ChoiceContainer.visible = true
+			DialogButton.disabled = true
 
 
 func parse_text(text: String):
@@ -73,7 +80,7 @@ func parse_text(text: String):
 	var header = p.get(0)
 	var body = p.get(1).split(",")
 	for i in range(len(body)):
-		body[i] = body.get(i).trim_prefix(" ")
+		body[i] = body.get(i).lstrip(" ")
 	match header:
 		"Dialog":
 			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
@@ -89,19 +96,32 @@ func parse_text(text: String):
 
 
 func next_text() -> void:
-	dialog_index += 1
-	if dialog_index >= len(DialogList):
-		self.visible = false
+	dialog_stack[-1] += 1
+	var current_dialog = MainDialog
+	var has_selectChoice = ChoiceDict.has(select_Choice)
+	if has_selectChoice:
+		current_dialog = ChoiceDict[select_Choice]
+	if dialog_stack[-1] >= len(current_dialog):
+		if len(dialog_stack) > 1:
+			dialog_stack.pop_back()
+			select_Choice = ""
+			current_dialog = MainDialog
+			dialog_stack[-1] += 1
+			show_text(current_dialog[dialog_stack[-1]])
+		else:
+			self.visible = false
 	else:
-		show_text(DialogList[dialog_index])
+		show_text(current_dialog[dialog_stack[-1]])
 
 
 func click_choice(button: Button) -> void:
 	select_Choice = button.text
 	print(select_Choice)
+	dialog_stack.append(0)
+	show_text(ChoiceDict[select_Choice][dialog_stack[-1]])
 	ChoiceContainer.visible = false
 	# dialog_index += 1
-	# if dialog_index >= len(DialogList):
+	# if dialog_index >= len(MainDialog):
 	# 	self.visible = false
 	# else:
-	# 	show_text(DialogList[dialog_index])
+	# 	show_text(MainDialog[dialog_index])
