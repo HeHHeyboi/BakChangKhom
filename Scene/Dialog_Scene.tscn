@@ -1,0 +1,85 @@
+[gd_scene load_steps=7 format=3 uid="uid://bibe6lb5jiu8t"]
+
+[ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wcj4s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycqtm"]
+bg_color = Color(0.757969, 0.757969, 0.757969, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pf8gr"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7wtc"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="DialogScene" type="Control" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wcj4s")
+TextBox = NodePath("PanelContainer/TextBox")
+NameBox = NodePath("PanelContainer/NameBox")
+ChoiceContainer = NodePath("ChoiceContainer")
+DialogButton = NodePath("PanelContainer")
+test_file = "Chapter10Village.txt"
+
+[node name="PanelContainer" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -575.0
+offset_top = -204.0
+offset_right = 577.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_wcj4s")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ycqtm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pf8gr")
+theme_override_styles/normal = SubResource("StyleBoxFlat_p7wtc")
+
+[node name="NameBox" type="Label" parent="PanelContainer"]
+layout_mode = 2
+offset_right = 1150.0
+offset_bottom = 55.0
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "sdsfsdfsfdsdfsfdsfsdfsf"
+
+[node name="TextBox" type="Label" parent="PanelContainer"]
+layout_mode = 2
+offset_top = 59.0
+offset_right = 1150.0
+offset_bottom = 204.0
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "kjhkjhkjh"
+
+[node name="ChoiceContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.362
+anchor_right = 0.5
+anchor_bottom = 0.362
+offset_left = -244.0
+offset_top = -19.576
+offset_right = 234.0
+offset_bottom = 24.424
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="pressed" from="PanelContainer" to="." method="next_text"]
