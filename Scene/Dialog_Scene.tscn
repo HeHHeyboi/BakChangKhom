@@ -28,7 +28,7 @@ TextBox = NodePath("PanelContainer/TextBox")
 NameBox = NodePath("PanelContainer/NameBox")
 ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
-test_file = "Chapter10Village.txt"
+test_file = "Chapter9School.txt"
 
 [node name="PanelContainer" type="Button" parent="."]
 layout_mode = 1

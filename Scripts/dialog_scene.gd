@@ -11,17 +11,19 @@ enum DialogType { Dialog, Choice, SelectChoice }
 const DIALOG = "dialog"
 const CHOICE = "choice"
 const TXT_PATH = "res://Assets/"
-var dialog_stack: Array[int] = [0]
-var select_Choice: String
-var ChoiceDict := {}
+
+var dialog_stack: Array[String] = [DIALOG]
+var index_stack: Array[int] = [0]
+var current_dialog: Array
+var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
-var MainDialog: Array[String]
 
 
 # NOTE: มีไว้ test
 func _ready():
 	read_file(TXT_PATH + test_file)
-	show_text(MainDialog[dialog_stack[-1]])
+	current_dialog = DialogDict[dialog_stack[-1]]
+	show_text(current_dialog[index_stack[-1]])
 	# print("MainDialog Size: ", len(MainDialog))
 
 
@@ -45,28 +47,23 @@ func read_file(file_name: StringName):
 		var header = split.get(0).to_lower()
 		match header:
 			DIALOG, CHOICE:
-				if type == "dialog":
-					MainDialog.append(line)
-				else:
-					ChoiceDict[type].append(line)
+				DialogDict[type].append(line)
 			_:
 				if header == "":
 					type = "dialog"
 					continue
-				if !ChoiceDict.has(header):
-					ChoiceDict[header] = []
+				if !DialogDict.has(header):
+					DialogDict[header] = []
 					type = header
 					continue
 	# print(MainDialog)
-	# print(ChoiceDict)
+	print(DialogDict)
 	file.close()
 
 
 # TODO:
 # 	1. Parse header "Choice"
 # 	2. other thing too
-
-
 func show_text(text: String):
 	var parse = parse_text(text)
 	DialogButton.disabled = false
@@ -102,42 +99,28 @@ func parse_text(text: String):
 
 
 func next_text() -> void:
-	dialog_stack[-1] += 1
-	var current_dialog = MainDialog
-	# print("Start", current_dialog)
-	var has_selectChoice = ChoiceDict.has(select_Choice)
-	print(dialog_stack)
+	index_stack[-1] += 1
+	while index_stack.size() > 0 and index_stack[-1] >= current_dialog.size():
+		index_stack.pop_back()
+		dialog_stack.pop_back()
+		if dialog_stack.size() == 0:
+			self.visible = false
+			return
 
-	if has_selectChoice:
-		current_dialog = ChoiceDict[select_Choice]
+		current_dialog = DialogDict[dialog_stack[-1]]
 
-		# for i in range(len(dialog_stack) - 1, -1, -1):
-		# print(i)
-	for i in range(len(dialog_stack) - 1, -1, -1):
-		if dialog_stack[-1] >= len(current_dialog):
-			dialog_stack.pop_back()
-			select_Choice = ""
-			current_dialog = MainDialog
-
-	if len(dialog_stack) == 0:
-		self.visible = false
-		return
-	show_text(current_dialog[dialog_stack[-1]])
+	show_text(current_dialog[index_stack[-1]])
 
 
 func click_choice(button: Button) -> void:
-	select_Choice = button.text
-	# print(select_Choice)
+	var select_Choice = button.text
 
-	dialog_stack[-1] += 1
-	dialog_stack.append(0)
+	index_stack[-1] += 1
+	index_stack.append(0)
+	dialog_stack.append(select_Choice)
+	current_dialog = DialogDict[dialog_stack[-1]]
 
-	show_text(ChoiceDict[select_Choice][dialog_stack[-1]])
+	show_text(current_dialog[index_stack[-1]])
 	ChoiceContainer.visible = false
 	for i in ChoiceContainer.get_children():
-		ChoiceContainer.remove_child(i)
-	# dialog_index += 1
-	# if dialog_index >= len(MainDialog):
-	# 	self.visible = false
-	# else:
-	# 	show_text(MainDialog[dialog_index])
+		i.queue_free()
