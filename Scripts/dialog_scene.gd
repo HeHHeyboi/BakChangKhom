@@ -12,12 +12,12 @@ const DIALOG = "dialog"
 const CHOICE = "choice"
 const TXT_PATH = "res://Assets/"
 
-var dialog_stack: Array[String] = [DIALOG]
-var index_stack: Array[int] = [0]
+var dialog_stack: Array[String] = []
+var index_stack: Array[int] = []
 var current_dialog: Array
 var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
-
+var curPlayer: Player = null
 
 # NOTE: มีไว้ test
 # func _ready():
@@ -28,17 +28,24 @@ var choiceButton = preload("res://Scene/DialogChoice.tscn")
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_path: StringName):
+func show_dialog(file_path: StringName, player: Player):
+	curPlayer = player
+	curPlayer.isDialogShow = true
+
+	dialog_stack.append(DIALOG)
+	index_stack.append(0)
 	self.visible = true
 	read_file(file_path)
 	current_dialog = DialogDict[dialog_stack[-1]]
 	show_text(current_dialog[index_stack[-1]])
 	pass
 
+
 # HACK: อาจจะเปลี่ยนที่หลัง
 func _ready() -> void:
 	self.visible = false
 	self.call_deferred("move_to_front")
+
 
 func read_file(file_path: StringName):
 	var file = FileAccess.open(file_path, FileAccess.READ)
@@ -119,9 +126,15 @@ func next_text() -> void:
 
 	show_text(current_dialog[index_stack[-1]])
 
+
 # NOTE: maybe this is a signal
-func dialog_end()->void:
+func dialog_end() -> void:
 	self.visible = false
+	curPlayer.isDialogShow = false
+	DialogDict.clear()
+	DialogDict[DIALOG] = []
+	index_stack.clear()
+
 
 func click_choice(button: Button) -> void:
 	var select_Choice = button.text

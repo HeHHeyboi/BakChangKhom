@@ -3,22 +3,27 @@ class_name Player extends CharacterBody2D
 const speed = 300
 
 var Dir = Vector2(0, 0)
+var isDialogShow = false
 
 # TODO: เมื่อเข้า Dialog อาจจะต้อง Disable Player Input ทั้งหมด
 # อาจจะต้องใช้ Signal หรือ GameManager
 
+
 func _physics_process(_delta: float) -> void:
+	if isDialogShow:
+		return
+
 	Dir = Vector2.ZERO
-	if Input.is_action_pressed("up",true):
-		Dir.y -=1
-	elif Input.is_action_pressed("down",true):
+	if Input.is_action_pressed("up", true):
+		Dir.y -= 1
+	elif Input.is_action_pressed("down", true):
 		Dir.y += 1
-	elif Input.is_action_pressed("left",true):
+	elif Input.is_action_pressed("left", true):
 		Dir.x -= 1
-	elif Input.is_action_pressed("right",true):
+	elif Input.is_action_pressed("right", true):
 		Dir.x += 1
 
-	var Vspeed = Dir.normalized() * speed 
+	var Vspeed = Dir.normalized() * speed
 	# Vspeed *= abs(Vspeed.normalized())
 
 	self.velocity = Vspeed
