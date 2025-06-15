@@ -20,20 +20,28 @@ var choiceButton = preload("res://Scene/DialogChoice.tscn")
 
 
 # NOTE: มีไว้ test
-func _ready():
-	read_file(TXT_PATH + test_file)
-	current_dialog = DialogDict[dialog_stack[-1]]
-	show_text(current_dialog[index_stack[-1]])
-	# print("MainDialog Size: ", len(MainDialog))
+# func _ready():
+# 	read_file(TXT_PATH + test_file)
+# 	current_dialog = DialogDict[dialog_stack[-1]]
+# 	show_text(current_dialog[index_stack[-1]])
+# 	print("MainDialog Size: ", len(MainDialog))
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_name: StringName):
+func show_dialog(file_path: StringName):
+	self.visible = true
+	read_file(file_path)
+	current_dialog = DialogDict[dialog_stack[-1]]
+	show_text(current_dialog[index_stack[-1]])
 	pass
 
+# HACK: อาจจะเปลี่ยนที่หลัง
+func _ready() -> void:
+	self.visible = false
+	self.call_deferred("move_to_front")
 
-func read_file(file_name: StringName):
-	var file = FileAccess.open(file_name, FileAccess.READ)
+func read_file(file_path: StringName):
+	var file = FileAccess.open(file_path, FileAccess.READ)
 	var type = "dialog"
 
 	while !file.eof_reached():
@@ -104,13 +112,16 @@ func next_text() -> void:
 		index_stack.pop_back()
 		dialog_stack.pop_back()
 		if dialog_stack.size() == 0:
-			self.visible = false
+			dialog_end()
 			return
 
 		current_dialog = DialogDict[dialog_stack[-1]]
 
 	show_text(current_dialog[index_stack[-1]])
 
+# NOTE: maybe this is a signal
+func dialog_end()->void:
+	self.visible = false
 
 func click_choice(button: Button) -> void:
 	var select_Choice = button.text

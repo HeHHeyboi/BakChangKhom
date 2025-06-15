@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://dlkgqk55eh46n"]
+
+[ext_resource type="Script" uid="uid://chp8hsqmxbpb3" path="res://Scripts/simple_npc.gd" id="1_6na30"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_sfnd0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sfnd0"]
+size = Vector2(438, 450)
+
+[sub_resource type="TextMesh" id="TextMesh_6na30"]
+text = "Press E to show Dialog"
+font_size = 24
+
+[node name="SimpleNpc" type="Node2D"]
+script = ExtResource("1_6na30")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+scale = Vector2(34, 106)
+mesh = SubResource("BoxMesh_sfnd0")
+
+[node name="DialogArea" type="Area2D" parent="."]
+
+[node name="Shape" type="CollisionShape2D" parent="DialogArea"]
+shape = SubResource("RectangleShape2D_sfnd0")
+
+[node name="TextHelp" type="MeshInstance2D" parent="."]
+position = Vector2(-1.19209e-07, -83.3998)
+scale = Vector2(73.8252, -149.332)
+mesh = SubResource("TextMesh_6na30")
+
+[connection signal="body_entered" from="DialogArea" to="." method="_on_dialog_area_body_entered"]
+[connection signal="body_exited" from="DialogArea" to="." method="_on_dialog_area_body_exited"]

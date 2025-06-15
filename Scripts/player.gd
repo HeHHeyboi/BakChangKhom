@@ -1,8 +1,11 @@
-extends CharacterBody2D
+class_name Player extends CharacterBody2D
 
 const speed = 300
 
 var Dir = Vector2(0, 0)
+
+# TODO: เมื่อเข้า Dialog อาจจะต้อง Disable Player Input ทั้งหมด
+# อาจจะต้องใช้ Signal หรือ GameManager
 
 func _physics_process(_delta: float) -> void:
 	Dir = Vector2.ZERO

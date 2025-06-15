@@ -1,8 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bv27tmq83wldi"]
+[gd_scene load_steps=4 format=3 uid="uid://bv27tmq83wldi"]
 
 [ext_resource type="Script" uid="uid://bgcojx67cfifn" path="res://Scripts/player.gd" id="1_6l3be"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_j8lcb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6l3be"]
+size = Vector2(36, 76)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_6l3be")
@@ -10,3 +13,6 @@ script = ExtResource("1_6l3be")
 [node name="PlayerSprite" type="MeshInstance2D" parent="."]
 scale = Vector2(36, 76)
 mesh = SubResource("BoxMesh_j8lcb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_6l3be")
