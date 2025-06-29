@@ -56,7 +56,7 @@ func read_file(file_path: StringName):
 		line = line.rstrip(" ").lstrip(" ")
 		if line.findn("#") == 0:
 			continue
-		print(line)
+		# print(line)
 
 		var split = line.split(":")
 		var header = split.get(0).to_lower()
@@ -72,7 +72,7 @@ func read_file(file_path: StringName):
 					type = header
 					continue
 	# print(MainDialog)
-	print(DialogDict)
+	# print(DialogDict)
 	file.close()
 
 
