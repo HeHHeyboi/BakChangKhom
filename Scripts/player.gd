@@ -24,7 +24,6 @@ func _physics_process(_delta: float) -> void:
 	elif Input.is_action_pressed("right", true):
 		Dir.x += 1
 
-	print(bool(-1))
 	if Dir.x < 0:
 		sprite.flip_h = true
 	elif Dir.x > 0:

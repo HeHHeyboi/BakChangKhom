@@ -5,12 +5,15 @@ extends Control
 @export var ChoiceContainer: VBoxContainer
 @export var DialogButton: Button
 @export var test_file: String
+@export var BG_img: Texture2D
+@export var Test: bool
 
+@onready var bg_node = $"BG"
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
 const CHOICE = "choice"
-const TXT_PATH = "res://Assets/"
+const AssetDir = "res://Assets/"
 
 var dialog_stack: Array[String] = []
 var index_stack: Array[int] = []
@@ -19,32 +22,34 @@ var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
 var curPlayer: Player = null
 
+
 # NOTE: มีไว้ test
-# func _ready():
-# 	read_file(TXT_PATH + test_file)
-# 	current_dialog = DialogDict[dialog_stack[-1]]
-# 	show_text(current_dialog[index_stack[-1]])
-# 	print("MainDialog Size: ", len(MainDialog))
+func _ready():
+	if Test:
+		read_file(AssetDir + test_file)
+		bg_node.texture = BG_img
+		dialog_stack.append(DIALOG)
+		index_stack.append(0)
+		current_dialog = DialogDict[dialog_stack[-1]]
+		show_text(current_dialog[index_stack[-1]])
+		return
+
+	self.visible = false
+	self.call_deferred("move_to_front")
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_path: StringName, player: Player):
+func show_dialog(file_path: StringName, player: Player, bg: ImageTexture):
 	curPlayer = player
 	curPlayer.isDialogShow = true
 
+	bg_node.texture = bg
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
 	self.visible = true
 	read_file(file_path)
 	current_dialog = DialogDict[dialog_stack[-1]]
 	show_text(current_dialog[index_stack[-1]])
-	pass
-
-
-# HACK: อาจจะเปลี่ยนที่หลัง
-func _ready() -> void:
-	self.visible = false
-	self.call_deferred("move_to_front")
 
 
 func read_file(file_path: StringName):
@@ -82,6 +87,8 @@ func read_file(file_path: StringName):
 func show_text(text: String):
 	var parse = parse_text(text)
 	DialogButton.disabled = false
+	# print("current", dialog_stack)
+	# print("current", index_stack)
 
 	match parse["type"]:
 		DialogType.Dialog:
@@ -124,16 +131,19 @@ func next_text() -> void:
 
 		current_dialog = DialogDict[dialog_stack[-1]]
 
+	prints(index_stack)
 	show_text(current_dialog[index_stack[-1]])
 
 
 # NOTE: maybe this is a signal
 func dialog_end() -> void:
 	self.visible = false
-	curPlayer.isDialogShow = false
 	DialogDict.clear()
-	DialogDict[DIALOG] = []
 	index_stack.clear()
+	dialog_stack.clear()
+	DialogDict[DIALOG] = []
+	if !Test:
+		curPlayer.isDialogShow = false
 
 
 func click_choice(button: Button) -> void:

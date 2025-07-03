@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://bibe6lb5jiu8t"]
+[gd_scene load_steps=8 format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
+[ext_resource type="Texture2D" uid="uid://b55oyvcho4pj6" path="res://Assets/Chapter2_bg.jpg" id="2_ycqtm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
 bg_color = Color(1, 1, 1, 1)
@@ -28,7 +29,12 @@ TextBox = NodePath("PanelContainer/TextBox")
 NameBox = NodePath("PanelContainer/NameBox")
 ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
-test_file = "Chapter9School.txt"
+test_file = "Chapter1ReturnHome.txt"
+BG_img = ExtResource("2_ycqtm")
+
+[node name="BG" type="Sprite2D" parent="."]
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
 
 [node name="PanelContainer" type="Button" parent="."]
 layout_mode = 1
@@ -39,7 +45,7 @@ anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -575.0
 offset_top = -204.0
-offset_right = 577.0
+offset_right = 575.0
 offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 0
