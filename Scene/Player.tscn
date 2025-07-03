@@ -1,8 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bv27tmq83wldi"]
 
 [ext_resource type="Script" uid="uid://bgcojx67cfifn" path="res://Scripts/player.gd" id="1_6l3be"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_j8lcb"]
+[ext_resource type="Texture2D" uid="uid://dq5jqn8qpy53p" path="res://Assets/Idle.png" id="2_3eeal"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6l3be"]
 size = Vector2(36, 76)
@@ -10,9 +9,10 @@ size = Vector2(36, 76)
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_6l3be")
 
-[node name="PlayerSprite" type="MeshInstance2D" parent="."]
-scale = Vector2(36, 76)
-mesh = SubResource("BoxMesh_j8lcb")
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_6l3be")
+
+[node name="Idle" type="Sprite2D" parent="."]
+position = Vector2(4.76837e-07, 3.8147e-06)
+scale = Vector2(0.0833333, 0.0964286)
+texture = ExtResource("2_3eeal")
