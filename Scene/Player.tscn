@@ -13,6 +13,10 @@ script = ExtResource("1_6l3be")
 shape = SubResource("RectangleShape2D_6l3be")
 
 [node name="Idle" type="Sprite2D" parent="."]
+texture_filter = 1
 position = Vector2(4.76837e-07, 3.8147e-06)
 scale = Vector2(0.0833333, 0.0964286)
 texture = ExtResource("2_3eeal")
+hframes = 5
+vframes = 4
+region_rect = Rect2(0, 0, 500, 500)
