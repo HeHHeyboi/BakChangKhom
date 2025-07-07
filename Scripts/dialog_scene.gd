@@ -40,10 +40,13 @@ func _ready():
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
 func show_dialog(file_path: StringName, player: Player, bg: ImageTexture):
-	curPlayer = player
-	curPlayer.isDialogShow = true
+	if player != null:
+		curPlayer = player
+		curPlayer.isDialogShow = true
 
-	bg_node.texture = bg
+	if bg != null:
+		bg_node.texture = bg
+
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
 	self.visible = true
@@ -142,7 +145,7 @@ func dialog_end() -> void:
 	index_stack.clear()
 	dialog_stack.clear()
 	DialogDict[DIALOG] = []
-	if !Test:
+	if !Test && curPlayer != null:
 		curPlayer.isDialogShow = false
 
 

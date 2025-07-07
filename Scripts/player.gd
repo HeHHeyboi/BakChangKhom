@@ -17,6 +17,10 @@ func _ready() -> void:
 	sprite.vframes = 4
 
 
+func _process(_delta: float) -> void:
+	anima_play(Dir)
+
+
 func _physics_process(_delta: float) -> void:
 	if isDialogShow:
 		return
@@ -31,12 +35,6 @@ func _physics_process(_delta: float) -> void:
 	elif Input.is_action_pressed("right", true):
 		Dir.x += 1
 
-	if Dir != Vector2.ZERO:
-		anim.play("Walk")
-	else:
-		anim.stop()
-		sprite.texture = idle
-
 	if Dir.x < 0:
 		sprite.flip_h = true
 	elif Dir.x > 0:
@@ -47,3 +45,14 @@ func _physics_process(_delta: float) -> void:
 
 	self.velocity = Vspeed
 	move_and_slide()
+
+
+func anima_play(dir: Vector2) -> void:
+	if dir != Vector2.ZERO:
+		anim.play("Walk")
+	else:
+		anim.stop()
+		sprite.texture = idle
+		sprite.hframes = 5
+		sprite.vframes = 4
+		sprite.region_enabled = false

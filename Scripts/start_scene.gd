@@ -11,4 +11,5 @@ func _on_option_button_pressed() -> void:
 
 func _on_start_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scene/MainGame.tscn")
+	DialogScene.show_dialog("res://Assets/Chapter1ReturnHome.txt", null, null)
 	self.hide()
