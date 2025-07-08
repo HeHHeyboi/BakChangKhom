@@ -12,11 +12,6 @@ var isDialogShow = false
 # อาจจะต้องใช้ Signal หรือ GameManager
 
 
-func _ready() -> void:
-	sprite.hframes = 5
-	sprite.vframes = 4
-
-
 func _process(_delta: float) -> void:
 	anima_play(Dir)
 
@@ -51,8 +46,9 @@ func anima_play(dir: Vector2) -> void:
 	if dir != Vector2.ZERO:
 		anim.play("Walk")
 	else:
-		anim.stop()
-		sprite.texture = idle
-		sprite.hframes = 5
-		sprite.vframes = 4
-		sprite.region_enabled = false
+		if anim.is_playing():
+			anim.stop()
+			sprite.texture = idle
+			sprite.hframes = 5
+			sprite.vframes = 4
+			sprite.region_enabled = false
