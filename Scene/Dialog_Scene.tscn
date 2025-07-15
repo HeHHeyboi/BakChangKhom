@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://bibe6lb5jiu8t"]
+[gd_scene load_steps=9 format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
 [ext_resource type="Texture2D" uid="uid://b55oyvcho4pj6" path="res://Assets/Chapter2_bg.jpg" id="2_ycqtm"]
+[ext_resource type="Texture2D" uid="uid://dq5jqn8qpy53p" path="res://Assets/CharacterSprite/Idle.png" id="3_pf8gr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
 bg_color = Color(1, 1, 1, 1)
@@ -17,7 +18,7 @@ bg_color = Color(1, 1, 1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7wtc"]
 bg_color = Color(1, 1, 1, 1)
 
-[node name="DialogScene" type="Control" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
+[node name="DialogScene" type="Control" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton", "ShowSprites")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,10 +32,29 @@ ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
 test_file = "Chapter1ReturnHome.txt"
 BG_img = ExtResource("2_ycqtm")
+Test = true
+ShowSprites = NodePath("CharacterSprite")
 
 [node name="BG" type="Sprite2D" parent="."]
 position = Vector2(576, 324)
 scale = Vector2(0.6, 0.6)
+texture = ExtResource("3_pf8gr")
+
+[node name="CharacterSprite" type="Node2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="Sprite1" type="Marker2D" parent="CharacterSprite"]
+position = Vector2(345, 78)
+scale = Vector2(0.966627, 32.879)
+
+[node name="Sprite2" type="Marker2D" parent="CharacterSprite"]
+position = Vector2(-417, 78)
+
+[node name="Sprite3" type="Marker2D" parent="CharacterSprite"]
+position = Vector2(469, 75)
+
+[node name="Sprite4" type="Marker2D" parent="CharacterSprite"]
+position = Vector2(-530, 78)
 
 [node name="PanelContainer" type="Button" parent="."]
 layout_mode = 1

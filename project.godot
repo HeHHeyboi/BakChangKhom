@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 DialogScene="*res://Scene/Dialog_Scene.tscn"
+Global="*res://Scene/Global.tscn"
 
 [dotnet]
 

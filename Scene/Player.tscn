@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bgcojx67cfifn" path="res://Scripts/player.gd" id="1_6l3be"]
 [ext_resource type="Texture2D" uid="uid://f8hat001vjxm" path="res://Assets/SpriteSheets/Walk_Khom.png" id="2_3eeal"]
-[ext_resource type="Texture2D" uid="uid://dq5jqn8qpy53p" path="res://Assets/SpriteSheets/Idle.png" id="2_jvxg0"]
+[ext_resource type="Texture2D" uid="uid://cdaxj3mqcyefs" path="res://Assets/SpriteSheets/Idle.png" id="2_jvxg0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6l3be"]
 size = Vector2(52, 131)
@@ -31,7 +31,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0]
+"values": [1]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -155,6 +155,7 @@ scale = Vector2(0.25, 0.29)
 texture = ExtResource("2_jvxg0")
 hframes = 5
 vframes = 4
+frame = 1
 region_rect = Rect2(0, 0, 500, 3496)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Idle"]

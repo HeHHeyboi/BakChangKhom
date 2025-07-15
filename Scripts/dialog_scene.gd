@@ -7,8 +7,9 @@ extends Control
 @export var test_file: String
 @export var BG_img: Texture2D
 @export var Test: bool
+@export var ShowSprites: Node2D
 
-@onready var bg_node = $"BG"
+@onready var bg_node = $"BG" as Sprite2D
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
@@ -21,6 +22,7 @@ var current_dialog: Array
 var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
 var curPlayer: Player = null
+var curSprite: CharacterSprite = null
 
 
 # NOTE: มีไว้ test
@@ -31,6 +33,12 @@ func _ready():
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
 		current_dialog = DialogDict[dialog_stack[-1]]
+		var playerSprite = CharacterSprite.new(Global.getCharacterTexture("ขม"), "ขม")
+		var grandma = CharacterSprite.new(Global.getCharacterTexture("ยาย"), "ยาย")
+		ShowSprites.add_child(playerSprite)
+		ShowSprites.add_child(grandma)
+		playerSprite.position = ShowSprites.get_child(1).position
+		grandma.position = ShowSprites.get_child(0).position
 		show_text(current_dialog[index_stack[-1]])
 		return
 
@@ -90,13 +98,16 @@ func read_file(file_path: StringName):
 func show_text(text: String):
 	var parse = parse_text(text)
 	DialogButton.disabled = false
-	# print("current", dialog_stack)
-	# print("current", index_stack)
 
 	match parse["type"]:
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
 			TextBox.text = parse["dialog"]
+			for n in ShowSprites.get_children():
+				if n.name == parse["name"]:
+					curSprite = n as CharacterSprite
+					curSprite.highlight()
+					break
 		DialogType.Choice:
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
@@ -125,6 +136,7 @@ func parse_text(text: String):
 
 func next_text() -> void:
 	index_stack[-1] += 1
+	curSprite.fade()
 	while index_stack.size() > 0 and index_stack[-1] >= current_dialog.size():
 		index_stack.pop_back()
 		dialog_stack.pop_back()
@@ -145,6 +157,11 @@ func dialog_end() -> void:
 	index_stack.clear()
 	dialog_stack.clear()
 	DialogDict[DIALOG] = []
+	for n in ShowSprites.get_children():
+		if n.has_meta("destroy"):
+			# print_rich("Destroy ", n.name)
+			n.queue_free()
+
 	if !Test && curPlayer != null:
 		curPlayer.isDialogShow = false
 
