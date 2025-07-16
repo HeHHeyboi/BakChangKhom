@@ -23,6 +23,7 @@ var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
 var curPlayer: Player = null
 var curSprite: CharacterSprite = null
+var charSprite: Array[CharacterSprite]
 
 
 # NOTE: มีไว้ test
@@ -35,8 +36,11 @@ func _ready():
 		current_dialog = DialogDict[dialog_stack[-1]]
 		var playerSprite = CharacterSprite.new(Global.getCharacterTexture("ขม"), "ขม")
 		var grandma = CharacterSprite.new(Global.getCharacterTexture("ยาย"), "ยาย")
-		ShowSprites.add_child(playerSprite)
-		ShowSprites.add_child(grandma)
+		charSprite.append_array([playerSprite, grandma])
+		# ShowSprites.add_child(playerSprite)
+		# ShowSprites.add_child(grandma)
+		for c in charSprite:
+			ShowSprites.add_child(c)
 		playerSprite.position = ShowSprites.get_child(1).position
 		grandma.position = ShowSprites.get_child(0).position
 		show_text(current_dialog[index_stack[-1]])
@@ -96,6 +100,7 @@ func read_file(file_path: StringName):
 # 	1. Parse header "Choice"
 # 	2. other thing too
 func show_text(text: String):
+	curSprite = null
 	var parse = parse_text(text)
 	DialogButton.disabled = false
 
@@ -103,7 +108,7 @@ func show_text(text: String):
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
 			TextBox.text = parse["dialog"]
-			for n in ShowSprites.get_children():
+			for n in charSprite:
 				if n.name == parse["name"]:
 					curSprite = n as CharacterSprite
 					curSprite.highlight()
@@ -136,7 +141,8 @@ func parse_text(text: String):
 
 func next_text() -> void:
 	index_stack[-1] += 1
-	curSprite.fade()
+	if curSprite != null:
+		curSprite.fade()
 	while index_stack.size() > 0 and index_stack[-1] >= current_dialog.size():
 		index_stack.pop_back()
 		dialog_stack.pop_back()
