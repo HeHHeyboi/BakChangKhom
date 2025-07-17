@@ -7,9 +7,10 @@ extends Control
 @export var test_file: String
 @export var BG_img: Texture2D
 @export var Test: bool
-@export var ShowSprites: Node2D
+# @export var ShowSprites: Node2D
 
 @onready var bg_node = $"BG" as Sprite2D
+@onready var ShowSprites = $"CharacterPos" as CharacterPos
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
@@ -29,7 +30,8 @@ var charSprite: Array[CharacterSprite]
 # NOTE: มีไว้ test
 func _ready():
 	if Test:
-		read_file(AssetDir + test_file)
+		read_file2(AssetDir + test_file)
+		print_rich(DialogDict)
 		bg_node.texture = BG_img
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
@@ -39,10 +41,12 @@ func _ready():
 		charSprite.append_array([playerSprite, grandma])
 		# ShowSprites.add_child(playerSprite)
 		# ShowSprites.add_child(grandma)
-		for c in charSprite:
-			ShowSprites.add_child(c)
-		playerSprite.position = ShowSprites.get_child(1).position
-		grandma.position = ShowSprites.get_child(0).position
+		# for c in charSprite:
+		# 	ShowSprites.add_child(c)
+		ShowSprites.addCharacterSprite(playerSprite)
+		ShowSprites.addCharacterSprite(grandma)
+		# playerSprite.position = ShowSprites.get_child(1).position
+		# grandma.position = ShowSprites.get_child(0).position
 		show_text(current_dialog[index_stack[-1]])
 		return
 
@@ -96,12 +100,47 @@ func read_file(file_path: StringName):
 	file.close()
 
 
+func read_file2(file_path: StringName):
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	var type = DIALOG
+
+	while !file.eof_reached():
+		var line = file.get_line()
+		line = line.rstrip(" ").lstrip(" ")
+
+		if line == "":
+			type = DIALOG
+			continue
+		if line.findn("#") == 0:
+			continue
+		# print(line)
+
+		# var header = ""
+		if line.find(":") > -1:
+			var split = line.split(":")
+			var header = split.get(0).to_lower()
+			if header != CHOICE:
+				type = header
+		match type:
+			CHOICE, DIALOG:
+				DialogDict[type].append(line)
+			_:
+				if !DialogDict.has(type):
+					DialogDict[type] = []
+					continue
+
+				DialogDict[type].append(line)
+	# print(MainDialog)
+	# print(DialogDict)
+	file.close()
+
+
 # TODO:
 # 	1. Parse header "Choice"
 # 	2. other thing too
 func show_text(text: String):
 	curSprite = null
-	var parse = parse_text(text)
+	var parse = parse_text2(text)
 	DialogButton.disabled = false
 
 	match parse["type"]:
@@ -139,6 +178,34 @@ func parse_text(text: String):
 			return {"type": DialogType.Choice}
 
 
+func parse_text2(text: String):
+	var header
+	var body
+	if text.find(":") > -1:
+		var p = text.split(":")
+		header = p.get(0)
+
+		body = p.get(1).split(",")
+		for i in range(len(body)):
+			body[i] = body.get(i).lstrip(" ")
+	else:
+		body = text.split(",")
+		for i in range(len(body)):
+			body[i] = body.get(i).lstrip(" ")
+
+	match header:
+		"Choice":
+			for choice in body:
+				var button = choiceButton.instantiate()
+				button.connect("get_choice", click_choice)
+				button.text = choice
+				ChoiceContainer.add_child(button)
+
+			return {"type": DialogType.Choice}
+		_:
+			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
+
+
 func next_text() -> void:
 	index_stack[-1] += 1
 	if curSprite != null:
@@ -163,10 +230,7 @@ func dialog_end() -> void:
 	index_stack.clear()
 	dialog_stack.clear()
 	DialogDict[DIALOG] = []
-	for n in ShowSprites.get_children():
-		if n.has_meta("destroy"):
-			# print_rich("Destroy ", n.name)
-			n.queue_free()
+	ShowSprites.reset()
 
 	if !Test && curPlayer != null:
 		curPlayer.isDialogShow = false
