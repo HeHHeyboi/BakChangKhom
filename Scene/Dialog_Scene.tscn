@@ -32,7 +32,6 @@ ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
 test_file = "Chapter1ReturnHome.txt"
 BG_img = ExtResource("2_ycqtm")
-Test = true
 
 [node name="BG" type="Sprite2D" parent="."]
 position = Vector2(576, 324)

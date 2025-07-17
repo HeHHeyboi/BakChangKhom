@@ -22,7 +22,6 @@ var index_stack: Array[int] = []
 var current_dialog: Array
 var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
-var curPlayer: Player = null
 var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
 
@@ -30,8 +29,8 @@ var charSprite: Array[CharacterSprite]
 # NOTE: มีไว้ test
 func _ready():
 	if Test:
-		read_file2(AssetDir + test_file)
-		print_rich(DialogDict)
+		read_file(AssetDir + test_file)
+		# print_rich(DialogDict)
 		bg_node.texture = BG_img
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
@@ -39,14 +38,8 @@ func _ready():
 		var playerSprite = CharacterSprite.new(Global.getCharacterTexture("ขม"), "ขม")
 		var grandma = CharacterSprite.new(Global.getCharacterTexture("ยาย"), "ยาย")
 		charSprite.append_array([playerSprite, grandma])
-		# ShowSprites.add_child(playerSprite)
-		# ShowSprites.add_child(grandma)
-		# for c in charSprite:
-		# 	ShowSprites.add_child(c)
 		ShowSprites.addCharacterSprite(playerSprite)
 		ShowSprites.addCharacterSprite(grandma)
-		# playerSprite.position = ShowSprites.get_child(1).position
-		# grandma.position = ShowSprites.get_child(0).position
 		show_text(current_dialog[index_stack[-1]])
 		return
 
@@ -55,14 +48,12 @@ func _ready():
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_path: StringName, player: Player, bg: ImageTexture):
-	if player != null:
-		curPlayer = player
-		curPlayer.isDialogShow = true
+func show_dialog(file_path: StringName, player: Player, bg: StringName):
+	Global.showDialog()
 
 	if bg != null:
-		bg_node.texture = bg
-
+		# var loadImg = Image.load_from_file(bg)
+		bg_node.texture = load("res://Assets/Chapter2_bg.jpg") as Texture2D
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
 	self.visible = true
@@ -72,35 +63,6 @@ func show_dialog(file_path: StringName, player: Player, bg: ImageTexture):
 
 
 func read_file(file_path: StringName):
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	var type = "dialog"
-
-	while !file.eof_reached():
-		var line = file.get_line()
-		line = line.rstrip(" ").lstrip(" ")
-		if line.findn("#") == 0:
-			continue
-		# print(line)
-
-		var split = line.split(":")
-		var header = split.get(0).to_lower()
-		match header:
-			DIALOG, CHOICE:
-				DialogDict[type].append(line)
-			_:
-				if header == "":
-					type = "dialog"
-					continue
-				if !DialogDict.has(header):
-					DialogDict[header] = []
-					type = header
-					continue
-	# print(MainDialog)
-	# print(DialogDict)
-	file.close()
-
-
-func read_file2(file_path: StringName):
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	var type = DIALOG
 
@@ -140,7 +102,7 @@ func read_file2(file_path: StringName):
 # 	2. other thing too
 func show_text(text: String):
 	curSprite = null
-	var parse = parse_text2(text)
+	var parse = parse_text(text)
 	DialogButton.disabled = false
 
 	match parse["type"]:
@@ -158,27 +120,6 @@ func show_text(text: String):
 
 
 func parse_text(text: String):
-	var p = text.split(":")
-	var header = p.get(0)
-
-	var body = p.get(1).split(",")
-	for i in range(len(body)):
-		body[i] = body.get(i).lstrip(" ")
-
-	match header:
-		"Dialog":
-			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
-
-		"Choice":
-			for choice in body:
-				var button = choiceButton.instantiate()
-				button.connect("get_choice", click_choice)
-				button.text = choice
-				ChoiceContainer.add_child(button)
-			return {"type": DialogType.Choice}
-
-
-func parse_text2(text: String):
 	var header
 	var body
 	if text.find(":") > -1:
@@ -219,21 +160,19 @@ func next_text() -> void:
 
 		current_dialog = DialogDict[dialog_stack[-1]]
 
-	prints(index_stack)
+	# prints(index_stack)
 	show_text(current_dialog[index_stack[-1]])
 
 
 # NOTE: maybe this is a signal
 func dialog_end() -> void:
+	Global.hideDialog()
 	self.visible = false
 	DialogDict.clear()
 	index_stack.clear()
 	dialog_stack.clear()
 	DialogDict[DIALOG] = []
 	ShowSprites.reset()
-
-	if !Test && curPlayer != null:
-		curPlayer.isDialogShow = false
 
 
 func click_choice(button: Button) -> void:

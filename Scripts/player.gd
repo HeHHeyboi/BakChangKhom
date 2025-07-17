@@ -6,7 +6,6 @@ const speed = 300
 @onready var anim = $"Idle/AnimationPlayer"
 @onready var idle = preload("res://Assets/SpriteSheets/Idle.png")
 var Dir = Vector2(0, 0)
-var isDialogShow = false
 
 # TODO: เมื่อเข้า Dialog อาจจะต้อง Disable Player Input ทั้งหมด
 # อาจจะต้องใช้ Signal หรือ GameManager
@@ -17,7 +16,7 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if isDialogShow:
+	if Global.isDialogShown():
 		return
 
 	Dir = Vector2.ZERO
