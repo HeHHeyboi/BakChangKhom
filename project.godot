@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 DialogScene="*res://Scene/Dialog_Scene.tscn"
 Global="*res://Scene/Global.tscn"
 
+[display]
+
+window/size/mode=2
+window/stretch/mode="canvas_items"
+
 [dotnet]
 
 project/assembly_name="BakChangKhom"
