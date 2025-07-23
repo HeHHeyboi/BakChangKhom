@@ -1,12 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://debihuht6oauq"]
+[gd_scene load_steps=12 format=3 uid="uid://debihuht6oauq"]
 
 [ext_resource type="Texture2D" uid="uid://dqtco46bmjijd" path="res://Assets/Background/HomeBG.jpg" id="1_tekh6"]
 [ext_resource type="Texture2D" uid="uid://547gtgdpt7to" path="res://Assets/Home/pc_down.png" id="2_1fhy5"]
+[ext_resource type="Script" uid="uid://f601kgx8e3pv" path="res://Scripts/Home/map_place_holder.gd" id="2_b6yaw"]
 [ext_resource type="Texture2D" uid="uid://dlvbr2ai1w71k" path="res://Assets/Home/pc_up.png" id="3_1fhy5"]
 [ext_resource type="Texture2D" uid="uid://c5ou3sav10i66" path="res://Assets/Home/door.png" id="3_2laig"]
 [ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/GrandmaNormal.png" id="4_2laig"]
 [ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="5_kxrpy"]
 [ext_resource type="Texture2D" uid="uid://bf5v5byfa0ih2" path="res://Assets/CharacterSprite/GradmaHighlight.png" id="7_4rgag"]
+[ext_resource type="Script" uid="uid://bsle73rovxv1y" path="res://Scripts/Home/close.gd" id="9_krlp8"]
+[ext_resource type="Script" uid="uid://miykyr7ul1kg" path="res://Scripts/Home/market.gd" id="10_jge13"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rgag"]
+bg_color = Color(1, 1, 1, 1)
 
 [node name="Home" type="Control"]
 layout_mode = 3
@@ -37,6 +43,7 @@ offset_top = 271.0
 offset_right = -801.0
 offset_bottom = -324.648
 text = "Map"
+script = ExtResource("2_b6yaw")
 metadata/_edit_lock_ = true
 
 [node name="PC" type="TextureButton" parent="."]
@@ -73,7 +80,76 @@ texture_hover = ExtResource("7_4rgag")
 metadata/_edit_lock_ = true
 
 [node name="Map" type="Control" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Map"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 149.0
+offset_top = 60.0
+offset_right = -149.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4rgag")
+
+[node name="หมู่บ้าน" type="Button" parent="Map/Panel"]
+layout_mode = 0
+offset_left = 295.0
+offset_top = 56.0
+offset_right = 538.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 32
+text = "หมู่บ้าน"
+
+[node name="Close" type="Button" parent="Map/Panel" node_paths=PackedStringArray("map")]
+layout_mode = 0
+offset_left = 738.0
+offset_top = 15.0
+offset_right = 842.0
+offset_bottom = 68.0
+theme_override_font_sizes/font_size = 32
+text = "Close
+"
+script = ExtResource("9_krlp8")
+map = NodePath("../..")
+
+[node name="market" type="Button" parent="Map/Panel"]
+layout_mode = 0
+offset_left = 295.0
+offset_top = 211.0
+offset_right = 538.0
+offset_bottom = 287.0
+theme_override_font_sizes/font_size = 32
+text = "ตลาด"
+script = ExtResource("10_jge13")
+
+[node name="บ้าน" type="Button" parent="Map/Panel"]
+layout_mode = 0
+offset_left = 538.0
+offset_top = 354.0
+offset_right = 781.0
+offset_bottom = 430.0
+theme_override_font_sizes/font_size = 32
+text = "บ้าน"
+
+[node name="เมือง" type="Button" parent="Map/Panel"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 354.0
+offset_right = 324.0
+offset_bottom = 430.0
+theme_override_font_sizes/font_size = 32
+text = "เมือง"
+
+[connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]
+[connection signal="pressed" from="Map/Panel/Close" to="Map/Panel/Close" method="_on_close_button_pressed"]
+[connection signal="pressed" from="Map/Panel/market" to="Map/Panel/market" method="_on_market_pressed"]

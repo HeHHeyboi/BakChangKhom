@@ -1,11 +1,11 @@
-extends Control
+extends CanvasLayer
 
 @export var TextBox: Label
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
 @export var DialogButton: Button
 @export var test_file: String
-@export var BG_img: Texture2D
+# @export var BG_img: Texture2D
 @export var Test: bool
 # @export var ShowSprites: Node2D
 
@@ -31,7 +31,7 @@ func _ready():
 	if Test:
 		read_file(AssetDir + test_file)
 		# print_rich(DialogDict)
-		bg_node.texture = BG_img
+		# bg_node.texture = BG_img
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
 		current_dialog = DialogDict[dialog_stack[-1]]
@@ -44,7 +44,7 @@ func _ready():
 		return
 
 	self.visible = false
-	self.call_deferred("move_to_front")
+	# self.call_deferred("move_to_front")
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
@@ -53,7 +53,7 @@ func show_dialog(file_path: StringName, player: Player, bg: StringName):
 
 	if bg != null:
 		# var loadImg = Image.load_from_file(bg)
-		bg_node.texture = load("res://Assets/Chapter2_bg.jpg") as Texture2D
+		bg_node.texture = load(bg) as Texture2D
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
 	self.visible = true

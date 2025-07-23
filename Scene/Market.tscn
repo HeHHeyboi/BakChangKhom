@@ -1,3 +1,10 @@
-[gd_scene format=3 uid="uid://cdd6joa1wt3t0"]
+[gd_scene load_steps=2 format=3 uid="uid://cdd6joa1wt3t0"]
+
+[ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
 
 [node name="Market" type="Node2D"]
+
+[node name="Market" type="Sprite2D" parent="."]
+position = Vector2(576, 324)
+scale = Vector2(0.597917, 0.594445)
+texture = ExtResource("1_rr2rx")

@@ -1,19 +1,26 @@
-[gd_scene load_steps=6 format=3 uid="uid://d2rbfnaviwwmi"]
+[gd_scene load_steps=9 format=3 uid="uid://d2rbfnaviwwmi"]
 
-[ext_resource type="Script" uid="uid://da1p1qbu85qub" path="res://Scripts/start_scene.gd" id="1_fnmpy"]
+[ext_resource type="Script" uid="uid://da1p1qbu85qub" path="res://Scripts/StartMenu/start_scene.gd" id="1_fnmpy"]
 [ext_resource type="Texture2D" uid="uid://dc6wwrj7n5uve" path="res://Assets/Background/stargBG2.jpg" id="2_w1s5t"]
 [ext_resource type="StyleBox" uid="uid://dqrxqilntke7q" path="res://Assets/ButtonStyle/StartMenu/button_hover.stylebox" id="3_ws62b"]
 [ext_resource type="StyleBox" uid="uid://dsgh2r2r8hbx3" path="res://Assets/ButtonStyle/StartMenu/button_press.stylebox" id="4_syklm"]
 [ext_resource type="StyleBox" uid="uid://86j51x0n2dyx" path="res://Assets/ButtonStyle/StartMenu/button_normal.stylebox" id="5_pqbye"]
+[ext_resource type="Texture2D" uid="uid://qwywwguxnpwl" path="res://Assets/Background/tutorial.jpg" id="6_pqbye"]
+[ext_resource type="Texture2D" uid="uid://ddqsjm26hsw5t" path="res://Assets/Background/settingBG.jpg" id="7_x8fdo"]
+[ext_resource type="Script" uid="uid://dy8qq50jrvugu" path="res://Scripts/StartMenu/return.gd" id="8_x8fdo"]
 
-[node name="StartScene" type="Control"]
+[node name="StartScene" type="Control" node_paths=PackedStringArray("SettingScene", "Tutorial")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 1.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fnmpy")
+SettingScene = NodePath("Setting")
+Tutorial = NodePath("Tutorial")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -69,6 +76,41 @@ theme_override_styles/normal = ExtResource("5_pqbye")
 disabled = true
 text = "Quit"
 
+[node name="Tutorial" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_right = 1.0
+offset_bottom = 6.0
+texture = ExtResource("6_pqbye")
+metadata/_edit_lock_ = true
+
+[node name="Setting" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_right = 1.0
+offset_bottom = 6.0
+texture = ExtResource("7_x8fdo")
+
+[node name="Return" type="Button" parent="Setting"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.145
+anchor_bottom = 0.085
+offset_right = -0.0400085
+offset_bottom = -0.0800018
+text = "Return
+"
+script = ExtResource("8_x8fdo")
+
 [connection signal="pressed" from="Start_Button" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Option_Button" to="." method="_on_option_button_pressed"]
 [connection signal="pressed" from="Quit_Button" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="Setting/Return" to="Setting/Return" method="_on_pressed"]
