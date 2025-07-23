@@ -10,7 +10,13 @@ var moveRight = true
 var moving = true
 var goalPos
 var curPos
+var clikTime = 0
 var t = 1.0
+var RamIMG = [
+	load("res://Assets/MiniGame/ramSligtDirty.png"), load("res://Assets/MiniGame/ram.png")
+]
+
+enum RamStatus { BETTER = 10, CLEAN = 15 }
 
 
 func _ready() -> void:
@@ -28,6 +34,12 @@ func _physics_process(delta: float) -> void:
 			moving = false
 		eraser.position = curPos.lerp(goalPos, t)
 
+	match clikTime:
+		RamStatus.BETTER:
+			ram.texture = RamIMG[0]
+		RamStatus.CLEAN:
+			ram.texture = RamIMG[1]
+
 
 func _on_button_pressed() -> void:
 	if moveRight:
@@ -39,4 +51,5 @@ func _on_button_pressed() -> void:
 	t = 1.0 - t
 	moveRight = !moveRight
 	moving = true
-	pass
+
+	clikTime += 1

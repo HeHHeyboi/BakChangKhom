@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dlkgqk55eh46n"]
 
 [ext_resource type="Script" uid="uid://chp8hsqmxbpb3" path="res://Scripts/simple_npc.gd" id="1_6na30"]
-[ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/พื้นหลัง dfcb4696-4ccc-4978-8a1d-50080af4b8ca ถูกเอาออก.png" id="2_641i6"]
+[ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/GrandmaNormal.png" id="2_641i6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sfnd0"]
 size = Vector2(438, 450)
