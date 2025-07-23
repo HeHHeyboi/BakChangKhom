@@ -1,10 +1,57 @@
-[gd_scene load_steps=2 format=3 uid="uid://cdd6joa1wt3t0"]
+[gd_scene load_steps=6 format=3 uid="uid://cdd6joa1wt3t0"]
 
 [ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
+[ext_resource type="PackedScene" uid="uid://bv27tmq83wldi" path="res://Scene/Player.tscn" id="2_wpv1i"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wpv1i"]
+size = Vector2(63, 653)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5w0dp"]
+size = Vector2(403.5, 1157)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_806qg"]
+size = Vector2(86.5, 1157)
 
 [node name="Market" type="Node2D"]
 
 [node name="Market" type="Sprite2D" parent="."]
-position = Vector2(576, 324)
-scale = Vector2(0.597917, 0.594445)
+position = Vector2(576, 325.5)
+scale = Vector2(0.597917, 0.597223)
 texture = ExtResource("1_rr2rx")
+
+[node name="Player" parent="." instance=ExtResource("2_wpv1i")]
+position = Vector2(74, 471)
+
+[node name="Wall" type="StaticBody2D" parent="."]
+position = Vector2(-33, 322)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_wpv1i")
+
+[node name="Wall3" type="StaticBody2D" parent="."]
+position = Vector2(1186, 325)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3"]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_wpv1i")
+
+[node name="Wall2" type="StaticBody2D" parent="."]
+position = Vector2(359, 238)
+rotation = -1.5708
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
+position = Vector2(32.75, 216.5)
+shape = SubResource("RectangleShape2D_5w0dp")
+
+[node name="Wall4" type="StaticBody2D" parent="."]
+position = Vector2(368, 791)
+rotation = -1.5708
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4"]
+position = Vector2(191.25, 216.5)
+shape = SubResource("RectangleShape2D_806qg")
