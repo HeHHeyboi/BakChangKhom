@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5bab8vnl55n1"
-path="res://.godot/imported/ramSligtDirty.png-e8008fc4fa7fb36ed6ff4672e9ec9da8.ctex"
+uid="uid://b55oyvcho4pj6"
+path="res://.godot/imported/Chapter2_bg.jpg-878b06c9822e6279096b0efeda05a2a6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/MiniGameAssets/ramSligtDirty.png"
-dest_files=["res://.godot/imported/ramSligtDirty.png-e8008fc4fa7fb36ed6ff4672e9ec9da8.ctex"]
+source_file="res://Assets/Background/Chapter2_bg.jpg"
+dest_files=["res://.godot/imported/Chapter2_bg.jpg-878b06c9822e6279096b0efeda05a2a6.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddxjtd4na5sen"
-path="res://.godot/imported/stargBG.jpg-41be6641bd1d4abc9d13fb5f0d233b78.ctex"
+uid="uid://dc6wwrj7n5uve"
+path="res://.godot/imported/stargBG2.jpg-c35b4ee1ffcbe3f92c14039adf314bb4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/stargBG.jpg"
-dest_files=["res://.godot/imported/stargBG.jpg-41be6641bd1d4abc9d13fb5f0d233b78.ctex"]
+source_file="res://Assets/Background/stargBG2.jpg"
+dest_files=["res://.godot/imported/stargBG2.jpg-c35b4ee1ffcbe3f92c14039adf314bb4.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coqvtlitytxxr"
-path="res://.godot/imported/eraser.png-f50d554cf09774a786f806bd7cf67e9f.ctex"
+uid="uid://b52s4tlqgsvrn"
+path="res://.godot/imported/doorHighlight.png-236987c796db2b0964ecca661328193f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/MiniGameAssets/eraser.png"
-dest_files=["res://.godot/imported/eraser.png-f50d554cf09774a786f806bd7cf67e9f.ctex"]
+source_file="res://Assets/Home/doorHighlight.png"
+dest_files=["res://.godot/imported/doorHighlight.png-236987c796db2b0964ecca661328193f.ctex"]
 
 [params]
 

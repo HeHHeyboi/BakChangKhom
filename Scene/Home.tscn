@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3 uid="uid://debihuht6oauq"]
+
+[ext_resource type="Texture2D" uid="uid://dqtco46bmjijd" path="res://Assets/Background/HomeBG.jpg" id="1_tekh6"]
+[ext_resource type="Texture2D" uid="uid://547gtgdpt7to" path="res://Assets/Home/pc_down.png" id="2_1fhy5"]
+[ext_resource type="Texture2D" uid="uid://dlvbr2ai1w71k" path="res://Assets/Home/pc_up.png" id="3_1fhy5"]
+[ext_resource type="Texture2D" uid="uid://c5ou3sav10i66" path="res://Assets/Home/door.png" id="3_2laig"]
+[ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/พื้นหลัง dfcb4696-4ccc-4978-8a1d-50080af4b8ca ถูกเอาออก.png" id="4_2laig"]
+[ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="5_kxrpy"]
+[ext_resource type="Texture2D" uid="uid://bf5v5byfa0ih2" path="res://Assets/CharacterSprite/GradmaHighlight.png" id="7_4rgag"]
+
+[node name="Home" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 784.0
+offset_bottom = 441.0
+scale = Vector2(0.595, 0.595)
+texture = ExtResource("1_tekh6")
+metadata/_edit_lock_ = true
+
+[node name="MapPlaceHolder" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.001
+offset_left = 230.0
+offset_top = 271.0
+offset_right = -801.0
+offset_bottom = -324.648
+text = "Map"
+metadata/_edit_lock_ = true
+
+[node name="PC" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 695.0
+offset_top = 239.0
+offset_right = 1509.0
+offset_bottom = 753.0
+scale = Vector2(0.53, 0.53)
+texture_normal = ExtResource("2_1fhy5")
+texture_hover = ExtResource("3_1fhy5")
+metadata/_edit_lock_ = true
+
+[node name="Door" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 1040.0
+offset_top = 511.0
+offset_right = 1634.0
+offset_bottom = 1391.0
+scale = Vector2(0.145, 0.145)
+texture_normal = ExtResource("3_2laig")
+texture_hover = ExtResource("5_kxrpy")
+metadata/_edit_lock_ = true
+
+[node name="Grandma" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 477.0
+offset_top = 363.0
+offset_right = 712.0
+offset_bottom = 784.0
+scale = Vector2(0.535, 0.535)
+texture_normal = ExtResource("4_2laig")
+texture_hover = ExtResource("7_4rgag")
+metadata/_edit_lock_ = true

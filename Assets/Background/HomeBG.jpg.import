@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dn0y7pqs6871s"
-path="res://.godot/imported/ram.png-54a92bc9e0e204a2bbf91c605f7e9fb4.ctex"
+uid="uid://dqtco46bmjijd"
+path="res://.godot/imported/HomeBG.jpg-ef89610d8e4ed577ee1f91ddc8fe3ed3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/MiniGameAssets/ram.png"
-dest_files=["res://.godot/imported/ram.png-54a92bc9e0e204a2bbf91c605f7e9fb4.ctex"]
+source_file="res://Assets/Background/HomeBG.jpg"
+dest_files=["res://.godot/imported/HomeBG.jpg-ef89610d8e4ed577ee1f91ddc8fe3ed3.ctex"]
 
 [params]
 

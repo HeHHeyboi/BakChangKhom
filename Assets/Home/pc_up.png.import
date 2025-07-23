@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://31buooj7rm87"
-path="res://.godot/imported/ramDirty.png-f14d49102242c76cbcf3bce63cb2cb63.ctex"
+uid="uid://dlvbr2ai1w71k"
+path="res://.godot/imported/pc_up.png-57f073162d930c52a1d40d4cdb56b439.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/MiniGameAssets/ramDirty.png"
-dest_files=["res://.godot/imported/ramDirty.png-f14d49102242c76cbcf3bce63cb2cb63.ctex"]
+source_file="res://Assets/Home/pc_up.png"
+dest_files=["res://.godot/imported/pc_up.png-57f073162d930c52a1d40d4cdb56b439.ctex"]
 
 [params]
 
