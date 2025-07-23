@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://d2rbfnaviwwmi"]
+[gd_scene load_steps=6 format=3 uid="uid://d2rbfnaviwwmi"]
 
 [ext_resource type="Script" uid="uid://da1p1qbu85qub" path="res://Scripts/start_scene.gd" id="1_fnmpy"]
-[ext_resource type="Texture2D" uid="uid://ddxjtd4na5sen" path="res://Assets/stargBG.jpg" id="2_w1s5t"]
+[ext_resource type="Texture2D" uid="uid://dc6wwrj7n5uve" path="res://Assets/stargBG2.jpg" id="2_w1s5t"]
+[ext_resource type="StyleBox" uid="uid://dqrxqilntke7q" path="res://Assets/ButtonStyle/StartMenu/button_hover.stylebox" id="3_ws62b"]
+[ext_resource type="StyleBox" uid="uid://dsgh2r2r8hbx3" path="res://Assets/ButtonStyle/StartMenu/button_press.stylebox" id="4_syklm"]
+[ext_resource type="StyleBox" uid="uid://86j51x0n2dyx" path="res://Assets/ButtonStyle/StartMenu/button_normal.stylebox" id="5_pqbye"]
 
 [node name="StartScene" type="Control"]
 layout_mode = 3
@@ -17,43 +20,55 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -19.0
-offset_top = 5.0
-offset_right = 19.0
-offset_bottom = -5.0
+offset_left = -24.0
+offset_top = -1.0
+offset_right = 27.0
+offset_bottom = 3.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_w1s5t")
 expand_mode = 1
 stretch_mode = 5
+metadata/_edit_lock_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -195.0
-offset_top = -157.5
-offset_right = 195.0
-offset_bottom = 157.5
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Start_Button" type="Button" parent="VBoxContainer"]
+[node name="Start_Button" type="Button" parent="."]
 layout_mode = 2
+offset_left = 62.0
+offset_top = 439.0
+offset_right = 361.0
+offset_bottom = 523.0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = ExtResource("3_ws62b")
+theme_override_styles/pressed = ExtResource("4_syklm")
+theme_override_styles/normal = ExtResource("5_pqbye")
 text = "Start Game"
 
-[node name="Option_Button" type="Button" parent="VBoxContainer"]
+[node name="Option_Button" type="Button" parent="."]
 layout_mode = 2
+offset_left = 65.0
+offset_top = 572.0
+offset_right = 363.0
+offset_bottom = 635.0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = ExtResource("3_ws62b")
+theme_override_styles/pressed = ExtResource("4_syklm")
+theme_override_styles/normal = ExtResource("5_pqbye")
 text = "Options"
 
-[node name="Quit_Button" type="Button" parent="VBoxContainer"]
+[node name="Quit_Button" type="Button" parent="."]
+visible = false
 layout_mode = 2
+offset_left = 68.0
+offset_top = 576.0
+offset_right = 357.0
+offset_bottom = 634.0
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = ExtResource("3_ws62b")
+theme_override_styles/pressed = ExtResource("4_syklm")
+theme_override_styles/normal = ExtResource("5_pqbye")
+disabled = true
 text = "Quit"
 
-[connection signal="pressed" from="VBoxContainer/Start_Button" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Option_Button" to="." method="_on_option_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Quit_Button" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="Start_Button" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Option_Button" to="." method="_on_option_button_pressed"]
+[connection signal="pressed" from="Quit_Button" to="." method="_on_quit_button_pressed"]
