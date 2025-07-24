@@ -1,7 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bibe6lb5jiu8t"]
+[gd_scene load_steps=9 format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
 [ext_resource type="Script" uid="uid://dpstm5yjpiome" path="res://Scripts/character_pos.gd" id="3_pf8gr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mslf0"]
+bg_color = Color(0.323495, 0.323495, 0.323495, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
 bg_color = Color(1, 1, 1, 1)
@@ -62,6 +65,7 @@ offset_right = 575.0
 offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_styles/disabled = SubResource("StyleBoxFlat_mslf0")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
 theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_wcj4s")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ycqtm")

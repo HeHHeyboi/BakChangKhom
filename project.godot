@@ -19,10 +19,10 @@ config/icon="res://icon.svg"
 
 DialogScene="*res://Scene/Dialog_Scene.tscn"
 Global="*res://Scene/Global.tscn"
+EventManager="*res://Scripts/EventManager.gd"
 
 [display]
 
-window/size/mode=2
 window/stretch/mode="canvas_items"
 
 [dotnet]

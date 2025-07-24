@@ -5,7 +5,7 @@ var hl = false
 
 func _init(t, n: String):
 	self.texture = t
-	self.self_modulate = self.self_modulate.darkened(1)
+	self.self_modulate = self.self_modulate.darkened(0.7)
 	self.name = n
 	self.set_meta("destroy", true)
 
@@ -17,5 +17,5 @@ func highlight():
 
 
 func fade():
-	self.self_modulate = self.self_modulate.darkened(1)
+	self.self_modulate = self.self_modulate.darkened(0.7)
 	hl = false

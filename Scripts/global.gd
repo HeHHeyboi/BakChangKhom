@@ -13,6 +13,12 @@ func getCharacterTexture(t_name: String):
 	return _CharacterMap[t_name]
 
 
+func getCharacterSprite(char_name: String) -> CharacterSprite:
+	var texture = _CharacterMap[char_name]
+	var new_char = CharacterSprite.new(texture, char_name)
+	return new_char
+
+
 func isDialogShown() -> bool:
 	return dialogShown
 

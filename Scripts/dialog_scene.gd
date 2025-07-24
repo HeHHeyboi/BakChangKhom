@@ -47,9 +47,18 @@ func _ready():
 	# self.call_deferred("move_to_front")
 
 
+func addCharcter(chars: Array):
+	for char_name in chars:
+		var c = Global.getCharacterSprite(char_name)
+		print(c.name)
+		ShowSprites.addCharacterSprite(c)
+
+
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_path: StringName, player: Player, bg: StringName):
+func show_dialog(file_path: StringName, bg: StringName, chars: Array = []):
 	Global.showDialog()
+	if !chars.is_empty():
+		addCharcter(chars)
 
 	if bg != null:
 		# var loadImg = Image.load_from_file(bg)
@@ -109,7 +118,7 @@ func show_text(text: String):
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
 			TextBox.text = parse["dialog"]
-			for n in charSprite:
+			for n in ShowSprites.get_children():
 				if n.name == parse["name"]:
 					curSprite = n as CharacterSprite
 					curSprite.highlight()
