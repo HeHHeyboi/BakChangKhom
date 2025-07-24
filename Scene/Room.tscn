@@ -1,0 +1,60 @@
+[gd_scene load_steps=9 format=3 uid="uid://cglek35w4b64v"]
+
+[ext_resource type="Texture2D" uid="uid://0abmohme5tku" path="res://Assets/Background/RoomBG.jpg" id="1_snhtf"]
+[ext_resource type="Texture2D" uid="uid://b5ri4126q8qtv" path="res://Assets/MiniGame/caution.png" id="2_wb11x"]
+[ext_resource type="Texture2D" uid="uid://btw3iosijf6qn" path="res://Assets/MiniGame/cautionPress.png" id="3_a8t5d"]
+[ext_resource type="Texture2D" uid="uid://bwbxjsvuogqfq" path="res://Assets/MiniGame/cautionHover.png" id="4_nfwx1"]
+[ext_resource type="Script" uid="uid://r6vr4rw4rxuw" path="res://Scripts/Room/event.gd" id="5_nfwx1"]
+[ext_resource type="Texture2D" uid="uid://c5ou3sav10i66" path="res://Assets/Home/door.png" id="6_sym6q"]
+[ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="7_yuu8g"]
+[ext_resource type="Script" uid="uid://cwpxqyxdgbtjd" path="res://Scripts/Room/door.gd" id="8_yuu8g"]
+
+[node name="Room" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_snhtf")
+expand_mode = 1
+metadata/_edit_lock_ = true
+
+[node name="Event" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 175.0
+offset_top = 360.0
+offset_right = 243.0
+offset_bottom = 435.0
+scale = Vector2(1.45, 1.45)
+action_mode = 0
+texture_normal = ExtResource("2_wb11x")
+texture_pressed = ExtResource("3_a8t5d")
+texture_hover = ExtResource("4_nfwx1")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("5_nfwx1")
+
+[node name="Door" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 646.0
+offset_top = 435.0
+offset_right = 781.0
+offset_bottom = 635.0
+texture_normal = ExtResource("6_sym6q")
+texture_hover = ExtResource("7_yuu8g")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("8_yuu8g")
+
+[connection signal="pressed" from="Event" to="Event" method="_on_pressed"]
+[connection signal="pressed" from="Door" to="Door" method="_on_pressed"]

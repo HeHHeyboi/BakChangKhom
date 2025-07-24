@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://debihuht6oauq"]
+[gd_scene load_steps=13 format=3 uid="uid://debihuht6oauq"]
 
 [ext_resource type="Texture2D" uid="uid://dqtco46bmjijd" path="res://Assets/Background/HomeBG.jpg" id="1_tekh6"]
 [ext_resource type="Texture2D" uid="uid://547gtgdpt7to" path="res://Assets/Home/pc_down.png" id="2_1fhy5"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/GrandmaNormal.png" id="4_2laig"]
 [ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="5_kxrpy"]
 [ext_resource type="Texture2D" uid="uid://bf5v5byfa0ih2" path="res://Assets/CharacterSprite/GradmaHighlight.png" id="7_4rgag"]
+[ext_resource type="Script" uid="uid://rvwxhf8keb70" path="res://Scripts/Home/door.gd" id="7_c1wnw"]
 [ext_resource type="Script" uid="uid://bsle73rovxv1y" path="res://Scripts/Home/close.gd" id="9_krlp8"]
 [ext_resource type="Script" uid="uid://miykyr7ul1kg" path="res://Scripts/Home/market.gd" id="10_jge13"]
 
@@ -66,6 +67,7 @@ offset_bottom = 1391.0
 scale = Vector2(0.145, 0.145)
 texture_normal = ExtResource("3_2laig")
 texture_hover = ExtResource("5_kxrpy")
+script = ExtResource("7_c1wnw")
 metadata/_edit_lock_ = true
 
 [node name="Grandma" type="TextureButton" parent="."]
@@ -151,5 +153,6 @@ theme_override_font_sizes/font_size = 32
 text = "เมือง"
 
 [connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]
+[connection signal="pressed" from="Door" to="Door" method="_on_pressed"]
 [connection signal="pressed" from="Map/Panel/Close" to="Map/Panel/Close" method="_on_close_button_pressed"]
 [connection signal="pressed" from="Map/Panel/market" to="Map/Panel/market" method="_on_market_pressed"]
