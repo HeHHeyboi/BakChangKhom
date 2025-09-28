@@ -3,7 +3,7 @@ extends TextureButton
 @onready var notify = $"caution"
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if EventManager.currentEvent == EventManager.MainEvent.GRANDMA:
 		notify.show()
 	else:
@@ -17,3 +17,4 @@ func _on_pressed() -> void:
 		DialogScene.show_dialog(
 			"res://Assets/Chapter1ReturnHome.txt", "res://Assets/Background/Chapter2_bg.jpg", arr
 		)
+		DialogScene.set_title("บ้านของยาย")

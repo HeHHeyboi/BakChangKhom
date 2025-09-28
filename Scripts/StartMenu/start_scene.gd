@@ -10,8 +10,9 @@ func _input(event: InputEvent) -> void:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT and showTutorial:
 			get_tree().change_scene_to_file("res://Scene/Home.tscn")
 			DialogScene.show_dialog(
-				"res://Assets/Prolouge.txt", null, "res://Assets/Background/Chapter2_bg.jpg"
+				"res://Assets/Prolouge.txt", "res://Assets/Background/Chapter2_bg.jpg"
 			)
+			DialogScene.set_title("ออฟฟิส")
 			self.hide()
 
 

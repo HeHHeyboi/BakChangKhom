@@ -11,6 +11,7 @@ extends CanvasLayer
 
 @onready var bg_node = $"BG" as Sprite2D
 @onready var ShowSprites = $"CharacterPos" as CharacterPos
+@onready var Title = $"Title" as Label
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
@@ -24,6 +25,10 @@ var DialogDict := {DIALOG: []}
 var choiceButton = preload("res://Scene/DialogChoice.tscn")
 var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
+
+
+func set_title(title: String):
+	Title.text = title
 
 
 # NOTE: มีไว้ test
