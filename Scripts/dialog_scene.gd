@@ -60,14 +60,15 @@ func addCharcter(chars: Array):
 
 
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
-func show_dialog(file_path: StringName, bg: StringName, chars: Array = []):
+func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 	Global.showDialog()
 	if !chars.is_empty():
 		addCharcter(chars)
 
-	if bg != null:
+	if !bg_name.is_empty():
 		# var loadImg = Image.load_from_file(bg)
-		bg_node.texture = load(bg) as Texture2D
+		bg_node.texture = load(bg_name) as Texture2D
+
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
 	self.visible = true
