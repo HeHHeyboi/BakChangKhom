@@ -4,6 +4,11 @@ extends TextureButton
 
 
 func _process(_delta: float) -> void:
+	if DialogScene.visible:
+		self.disabled = true
+	else:
+		self.disabled = false
+
 	if EventManager.currentEvent == EventManager.MainEvent.GRANDMA:
 		notify.show()
 	else:
@@ -12,7 +17,7 @@ func _process(_delta: float) -> void:
 
 func _on_pressed() -> void:
 	if EventManager.currentEvent == EventManager.MainEvent.GRANDMA:
-		EventManager.currentEvent = EventManager.MainEvent.GOTO_ROOM
+		EventManager.currentEvent = EventManager.MainEvent.CLEAN_RAM
 		var arr = ["ขม", "ยาย"]
 		DialogScene.show_dialog(
 			"res://Assets/Chapter1ReturnHome.txt", "res://Assets/Background/Chapter2_bg.jpg", arr

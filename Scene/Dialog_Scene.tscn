@@ -3,22 +3,22 @@
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
 [ext_resource type="Script" uid="uid://dpstm5yjpiome" path="res://Scripts/character_pos.gd" id="3_pf8gr"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mslf0"]
-bg_color = Color(0.323495, 0.323495, 0.323495, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7wtc"]
 bg_color = Color(1, 1, 1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wcj4s"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycqtm"]
-bg_color = Color(0.757969, 0.757969, 0.757969, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pf8gr"]
 bg_color = Color(1, 1, 1, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7wtc"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycqtm"]
+bg_color = Color(0.757969, 0.757969, 0.757969, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wcj4s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
 bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mslf0"]
+bg_color = Color(0.323495, 0.323495, 0.323495, 1)
 
 [node name="DialogScene" type="CanvasLayer" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
 layer = 128
@@ -37,8 +37,9 @@ scale = Vector2(0.6, 0.6)
 layout_direction = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 23.0
+offset_bottom = 49.0
 grow_horizontal = 2
+theme_override_font_sizes/font_size = 60
 horizontal_alignment = 1
 
 [node name="CharacterPos" type="Node2D" parent="."]
@@ -73,15 +74,15 @@ offset_right = 575.0
 offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_styles/disabled = SubResource("StyleBoxFlat_mslf0")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_wcj4s")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ycqtm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pf8gr")
 theme_override_styles/normal = SubResource("StyleBoxFlat_p7wtc")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pf8gr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ycqtm")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_wcj4s")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_mslf0")
 
 [node name="NameBox" type="Label" parent="PanelContainer"]
-layout_mode = 2
+layout_mode = 0
 offset_right = 1150.0
 offset_bottom = 55.0
 size_flags_vertical = 1
@@ -90,7 +91,7 @@ theme_override_font_sizes/font_size = 40
 text = "sdsfsdfsfdsdfsfdsfsdfsf"
 
 [node name="TextBox" type="Label" parent="PanelContainer"]
-layout_mode = 2
+layout_mode = 0
 offset_top = 59.0
 offset_right = 1150.0
 offset_bottom = 204.0

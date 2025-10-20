@@ -3,7 +3,7 @@ extends TextureButton
 var minigame = Global.ReturnMiniGame("MiniGame1") as Node2D
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if EventManager.currentEvent == EventManager.MainEvent.CLEAN_RAM:
 		self.show()
 	else:
