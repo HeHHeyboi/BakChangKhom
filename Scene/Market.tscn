@@ -1,7 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cdd6joa1wt3t0"]
+[gd_scene load_steps=9 format=3 uid="uid://cdd6joa1wt3t0"]
 
 [ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
+[ext_resource type="Script" uid="uid://godvt5jylxpk" path="res://Scripts/Market/market.gd" id="1_xtt0p"]
 [ext_resource type="PackedScene" uid="uid://bv27tmq83wldi" path="res://Scene/Player.tscn" id="2_wpv1i"]
+[ext_resource type="PackedScene" uid="uid://ddqejrf1gml67" path="res://Scene/map.tscn" id="3_5w0dp"]
+[ext_resource type="Script" uid="uid://bb02p754hgi5d" path="res://Scripts/Market/button.gd" id="3_806qg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wpv1i"]
 size = Vector2(63, 653)
@@ -13,16 +16,18 @@ size = Vector2(403.5, 1157)
 size = Vector2(86.5, 1157)
 
 [node name="Market" type="Node2D"]
+script = ExtResource("1_xtt0p")
 
 [node name="Market" type="Sprite2D" parent="."]
-position = Vector2(576, 325.5)
-scale = Vector2(0.597917, 0.597223)
+position = Vector2(578.9998, 324.0002)
+scale = Vector2(0.60104185, 0.60000044)
 texture = ExtResource("1_rr2rx")
 
 [node name="Player" parent="." instance=ExtResource("2_wpv1i")]
 position = Vector2(74, 471)
 
 [node name="Wall" type="StaticBody2D" parent="."]
+visible = false
 position = Vector2(-33, 322)
 collision_layer = 2
 
@@ -31,6 +36,7 @@ position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_wpv1i")
 
 [node name="Wall3" type="StaticBody2D" parent="."]
+visible = false
 position = Vector2(1186, 325)
 collision_layer = 2
 
@@ -39,6 +45,7 @@ position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_wpv1i")
 
 [node name="Wall2" type="StaticBody2D" parent="."]
+visible = false
 position = Vector2(359, 238)
 rotation = -1.5708
 collision_layer = 2
@@ -48,6 +55,7 @@ position = Vector2(32.75, 216.5)
 shape = SubResource("RectangleShape2D_5w0dp")
 
 [node name="Wall4" type="StaticBody2D" parent="."]
+visible = false
 position = Vector2(368, 791)
 rotation = -1.5708
 collision_layer = 2
@@ -55,3 +63,20 @@ collision_layer = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4"]
 position = Vector2(191.25, 216.5)
 shape = SubResource("RectangleShape2D_806qg")
+
+[node name="Button" type="Button" parent="."]
+offset_left = 42.0
+offset_top = 564.0
+offset_right = 219.0
+offset_bottom = 622.0
+text = "Map"
+script = ExtResource("3_806qg")
+
+[node name="Map" parent="." instance=ExtResource("3_5w0dp")]
+visible = false
+offset_left = 159.0
+offset_top = 115.0
+offset_right = 159.0
+offset_bottom = 115.0
+
+[connection signal="pressed" from="Button" to="Button" method="_on_pressed"]

@@ -1,0 +1,86 @@
+[gd_scene load_steps=6 format=3 uid="uid://ddqejrf1gml67"]
+
+[ext_resource type="Script" uid="uid://bsle73rovxv1y" path="res://Scripts/Home/close.gd" id="1_81yfc"]
+[ext_resource type="Script" uid="uid://desjp04mfica7" path="res://Scripts/Map/map.gd" id="1_ex5br"]
+[ext_resource type="Script" uid="uid://bgnh8eyn41s7s" path="res://Scripts/Map/market.gd" id="3_5mejs"]
+[ext_resource type="Script" uid="uid://gbrnyyjqivlk" path="res://Scripts/Map/Home.gd" id="4_5mejs"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rgag"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="Map" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ex5br")
+
+[node name="Panel" type="Panel" parent="."]
+top_level = true
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 149.0
+offset_top = 60.0
+offset_right = -149.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4rgag")
+
+[node name="หมู่บ้าน" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 295.0
+offset_top = 56.0
+offset_right = 538.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 32
+text = "หมู่บ้าน"
+
+[node name="Close" type="Button" parent="Panel" node_paths=PackedStringArray("map")]
+layout_mode = 0
+offset_left = 738.0
+offset_top = 15.0
+offset_right = 842.0
+offset_bottom = 68.0
+theme_override_font_sizes/font_size = 32
+text = "Close
+"
+script = ExtResource("1_81yfc")
+map = NodePath("../..")
+
+[node name="market" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 295.0
+offset_top = 211.0
+offset_right = 538.0
+offset_bottom = 287.0
+theme_override_font_sizes/font_size = 32
+text = "ตลาด"
+script = ExtResource("3_5mejs")
+
+[node name="บ้าน" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 538.0
+offset_top = 354.0
+offset_right = 781.0
+offset_bottom = 430.0
+theme_override_font_sizes/font_size = 32
+text = "บ้าน"
+script = ExtResource("4_5mejs")
+
+[node name="เมือง" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 354.0
+offset_right = 324.0
+offset_bottom = 430.0
+theme_override_font_sizes/font_size = 32
+text = "เมือง"
+
+[connection signal="pressed" from="Panel/Close" to="Panel/Close" method="_on_close_button_pressed"]
+[connection signal="pressed" from="Panel/market" to="Panel/market" method="_on_market_pressed"]
+[connection signal="pressed" from="Panel/บ้าน" to="Panel/บ้าน" method="_on_pressed"]
