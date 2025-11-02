@@ -1,10 +1,15 @@
-class_name MapPanel extends Control
+extends CanvasLayer
+
+signal show_map(m: Location)
+
+enum Location { HOME, MARKET }
 
 
 func _ready() -> void:
 	self.visible = false
-	Global.show_map.connect(_hide_map)
+	self.hide()
 
 
-func _hide_map(_m) -> void:
+func showmap(m: Location) -> void:
+	emit_signal("show_map", m)
 	self.hide()

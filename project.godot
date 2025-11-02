@@ -21,6 +21,7 @@ DialogScene="*res://Scene/Dialog_Scene.tscn"
 Global="*res://Scene/Global.tscn"
 EventManager="*res://Scripts/EventManager.gd"
 Market="*res://Scene/Market.tscn"
+MapPanel="*res://Scene/map.tscn"
 
 [display]
 

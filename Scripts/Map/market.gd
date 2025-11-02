@@ -5,7 +5,7 @@ var root: Node
 
 func _ready() -> void:
 	root = get_tree().root
-	Global.show_map.connect(_on_map_show_map)
+	# MapPanel.show_map.connect(_on_map_show_map)
 
 
 func _process(delta: float) -> void:
@@ -17,11 +17,11 @@ func _process(delta: float) -> void:
 
 func _on_market_pressed() -> void:
 	Market.move_to_front()
-	Global.showmap(Global.Map.MARKET)
+	MapPanel.showmap(MapPanel.Location.MARKET)
 
 
-func _on_map_show_map(m: Global.Map) -> void:
-	if m == Global.Map.MARKET:
+func _on_map_show_map(m: MapPanel.Location) -> void:
+	if m == MapPanel.Location.MARKET:
 		Market.show()
 	else:
 		Market.hide()

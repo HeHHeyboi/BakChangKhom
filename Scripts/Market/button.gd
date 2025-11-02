@@ -1,15 +1,13 @@
 extends Button
 
-@onready var map = $"../Map"
-
 
 func _process(delta: float) -> void:
-	if map.visible:
+	if MapPanel.visible:
 		self.disabled = true
 	else:
 		self.disabled = false
 
 
 func _on_pressed() -> void:
-	if !map.visible:
-		map.visible = true
+	if !MapPanel.visible:
+		MapPanel.visible = true

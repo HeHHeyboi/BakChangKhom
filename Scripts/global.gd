@@ -1,16 +1,8 @@
 extends Node2D
 @export var _CharacterMap: Dictionary
 @export var MiniGames: Dictionary
-signal show_map(m: Global.Map)
 
 var dialogShown = false
-
-enum Map { HOME, MARKET }
-
-
-func showmap(m: Global.Map) -> void:
-	emit_signal("show_map", m)
-	self.hide()
 
 
 func ReturnMiniGame(minigame_name: String) -> Variant:

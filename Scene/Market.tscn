@@ -1,9 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://cdd6joa1wt3t0"]
+[gd_scene load_steps=8 format=3 uid="uid://cdd6joa1wt3t0"]
 
 [ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
 [ext_resource type="Script" uid="uid://godvt5jylxpk" path="res://Scripts/Market/market.gd" id="1_xtt0p"]
 [ext_resource type="PackedScene" uid="uid://bv27tmq83wldi" path="res://Scene/Player.tscn" id="2_wpv1i"]
-[ext_resource type="PackedScene" uid="uid://ddqejrf1gml67" path="res://Scene/map.tscn" id="3_5w0dp"]
 [ext_resource type="Script" uid="uid://bb02p754hgi5d" path="res://Scripts/Market/button.gd" id="3_806qg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wpv1i"]
@@ -71,12 +70,5 @@ offset_right = 219.0
 offset_bottom = 622.0
 text = "Map"
 script = ExtResource("3_806qg")
-
-[node name="Map" parent="." instance=ExtResource("3_5w0dp")]
-visible = false
-offset_left = 159.0
-offset_top = 115.0
-offset_right = 159.0
-offset_bottom = 115.0
 
 [connection signal="pressed" from="Button" to="Button" method="_on_pressed"]

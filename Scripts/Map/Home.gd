@@ -2,9 +2,8 @@ extends Button
 
 @onready var root = get_tree().root as Node
 
-
-func _ready() -> void:
-	Global.show_map.connect(_on_map_show_map)
+# func _ready() -> void:
+# 	MapPanel.show_map.connect(_on_map_show_map)
 
 
 func _process(delta: float) -> void:
@@ -25,14 +24,14 @@ func _on_pressed() -> void:
 	if node == null:
 		return
 	node.move_to_front()
-	Global.showmap(Global.Map.HOME)
+	MapPanel.showmap(MapPanel.Location.HOME)
 
 
-func _on_map_show_map(m: Global.Map) -> void:
+func _on_map_show_map(m: MapPanel.Location) -> void:
 	var node = root.get_node("Home") as Control
 	if node == null:
 		return
-	if m == Global.Map.HOME:
+	if m == MapPanel.Location.HOME:
 		node.show()
 	else:
 		node.hide()
