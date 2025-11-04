@@ -23,5 +23,7 @@ func _on_market_pressed() -> void:
 func _on_map_show_map(m: MapPanel.Location) -> void:
 	if m == MapPanel.Location.MARKET:
 		Market.show()
+		Market.process_mode = Node.PROCESS_MODE_INHERIT
 	else:
 		Market.hide()
+		Market.process_mode = Node.PROCESS_MODE_DISABLED

@@ -21,6 +21,7 @@ bg_color = Color(1, 1, 1, 1)
 bg_color = Color(0.323495, 0.323495, 0.323495, 1)
 
 [node name="DialogScene" type="CanvasLayer" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
+process_mode = 3
 layer = 128
 script = ExtResource("1_wcj4s")
 TextBox = NodePath("PanelContainer/TextBox")

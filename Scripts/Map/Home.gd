@@ -2,36 +2,38 @@ extends Button
 
 @onready var root = get_tree().root as Node
 
-# func _ready() -> void:
-# 	MapPanel.show_map.connect(_on_map_show_map)
+
+func getHomeNode() -> Control:
+	if !root.has_node("Home"):
+		return null
+	var node = root.get_node("Home") as Control
+	if node == null:
+		return null
+	return node
 
 
 func _process(delta: float) -> void:
-	if !root.has_node("Home"):
+	var home = getHomeNode()
+	if home == null:
 		return
 
-	var node = root.get_node("Home") as Control
-	if node == null:
-		return
-	if node.visible:
+	if home.visible:
 		self.disabled = true
 	else:
 		self.disabled = false
 
 
 func _on_pressed() -> void:
-	var node = root.get_node("Home") as Control
-	if node == null:
-		return
-	node.move_to_front()
+	var home = getHomeNode()
+	assert(home != null)
+	home.move_to_front()
 	MapPanel.showmap(MapPanel.Location.HOME)
 
 
 func _on_map_show_map(m: MapPanel.Location) -> void:
-	var node = root.get_node("Home") as Control
-	if node == null:
-		return
+	var home = getHomeNode()
+	assert(home != null)
 	if m == MapPanel.Location.HOME:
-		node.show()
+		home.show()
 	else:
-		node.hide()
+		home.hide()
