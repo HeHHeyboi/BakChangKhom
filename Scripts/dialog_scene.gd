@@ -11,7 +11,7 @@ extends CanvasLayer
 
 @onready var bg_node = $"BG" as Sprite2D
 @onready var ShowSprites = $"CharacterPos" as CharacterPos
-@onready var Title = $"Title" as Label
+@onready var Title = $"Title" as RichTextLabel
 enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
@@ -28,7 +28,8 @@ var charSprite: Array[CharacterSprite]
 
 
 func set_title(title: String):
-	Title.text = title
+	Title.clear()
+	Title.add_text(title)
 
 
 # NOTE: มีไว้ test

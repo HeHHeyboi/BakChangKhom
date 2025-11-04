@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bibe6lb5jiu8t"]
+[gd_scene load_steps=10 format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
 [ext_resource type="Script" uid="uid://dpstm5yjpiome" path="res://Scripts/character_pos.gd" id="3_pf8gr"]
@@ -20,6 +20,9 @@ bg_color = Color(1, 1, 1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mslf0"]
 bg_color = Color(0.323495, 0.323495, 0.323495, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_68vdo"]
+bg_color = Color(1, 1, 1, 1)
+
 [node name="DialogScene" type="CanvasLayer" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
 process_mode = 3
 layer = 128
@@ -34,13 +37,15 @@ test_file = "Chapter1ReturnHome.txt"
 position = Vector2(576, 324)
 scale = Vector2(0.6, 0.6)
 
-[node name="Title" type="Label" parent="."]
+[node name="Title" type="RichTextLabel" parent="."]
 layout_direction = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 49.0
+offset_bottom = 83.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 60
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/normal_font_size = 64
 horizontal_alignment = 1
 
 [node name="CharacterPos" type="Node2D" parent="."]
@@ -69,10 +74,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -575.0
-offset_top = -204.0
-offset_right = 575.0
-offset_bottom = -4.0
+offset_left = -576.0
+offset_top = -200.0
+offset_right = 576.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_p7wtc")
@@ -81,6 +85,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_ycqtm")
 theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_wcj4s")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_mslf0")
+theme_override_styles/focus = SubResource("StyleBoxFlat_68vdo")
 
 [node name="NameBox" type="Label" parent="PanelContainer"]
 layout_mode = 0
@@ -90,6 +95,7 @@ size_flags_vertical = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "sdsfsdfsfdsdfsfdsfsdfsf"
+metadata/_edit_lock_ = true
 
 [node name="TextBox" type="Label" parent="PanelContainer"]
 layout_mode = 0
@@ -101,6 +107,7 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 25
 text = "kjhkjhkjh"
 autowrap_mode = 3
+metadata/_edit_lock_ = true
 
 [node name="ChoiceContainer" type="VBoxContainer" parent="."]
 anchors_preset = -1
