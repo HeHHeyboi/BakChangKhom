@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-@export var TextBox: Label
+@export var TextBox: RichTextLabel
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
 @export var DialogButton: Button
