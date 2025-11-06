@@ -10,9 +10,10 @@ bg_color = Color(1, 1, 1, 1)
 bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycqtm"]
-bg_color = Color(0.757969, 0.757969, 0.757969, 1)
+bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wcj4s"]
+bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfeuh"]
 bg_color = Color(1, 1, 1, 1)
@@ -71,9 +72,10 @@ metadata/flip = true
 [node name="PanelContainer" type="Button" parent="."]
 anchors_preset = -1
 anchor_top = 0.69100004
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.69100004
 offset_top = 0.23196411
+offset_right = 1152.0
+offset_bottom = 200.23196
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_p7wtc")
@@ -93,16 +95,30 @@ offset_bottom = 200.0
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 32
 text = "sdsfsdfsfdsdfsfdsfsdfsf"
-metadata/_edit_lock_ = true
 
 [node name="TextBox" type="RichTextLabel" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+mouse_filter = 2
+mouse_behavior_recursive = 1
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 24
 text = "kjhkjhkjh"
 text_direction = 1
-metadata/_edit_lock_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 2
+
+[node name="Skip" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Skip"
 
 [node name="ChoiceContainer" type="VBoxContainer" parent="."]
 anchors_preset = -1
@@ -118,3 +134,4 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [connection signal="pressed" from="PanelContainer" to="." method="next_text"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Skip" to="." method="_on_skip_pressed"]

@@ -124,7 +124,8 @@ func show_text(text: String):
 	match parse["type"]:
 		DialogType.Dialog:
 			NameBox.text = parse["name"]
-			TextBox.text = parse["dialog"]
+			TextBox.clear()
+			TextBox.add_text(parse["dialog"])
 			for n in ShowSprites.get_children():
 				if n.name == parse["name"]:
 					curSprite = n as CharacterSprite
@@ -203,3 +204,7 @@ func click_choice(button: Button) -> void:
 	ChoiceContainer.visible = false
 	for i in ChoiceContainer.get_children():
 		i.queue_free()
+
+
+func _on_skip_pressed():
+	dialog_end()
