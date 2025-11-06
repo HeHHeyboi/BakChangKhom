@@ -12,7 +12,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	updateTime(cur_time)
+	# updateTime(cur_time)
+	if Global.in_minigame:
+		self.hide()
+	else:
+		self.show()
 
 
 func change_time(t: TIME) -> void:

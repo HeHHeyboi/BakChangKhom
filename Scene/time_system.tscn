@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://dglblhypmpmth"]
+[gd_scene load_steps=3 format=3 uid="uid://dglblhypmpmth"]
 
 [ext_resource type="Script" uid="uid://kt7fp2rokrmr" path="res://Scripts/TimeSystem/time_system.gd" id="1_nyd0s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nyd0s"]
+bg_color = Color(0.22845358, 0.22845358, 0.22845358, 1)
 
 [node name="TimeSystem" type="CanvasLayer"]
 process_mode = 3
@@ -19,6 +22,7 @@ grow_vertical = 2
 layout_mode = 0
 offset_right = 266.0
 offset_bottom = 91.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="Control/PanelContainer"]
 layout_mode = 2

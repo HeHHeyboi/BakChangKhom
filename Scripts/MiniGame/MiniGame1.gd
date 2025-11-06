@@ -82,4 +82,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
+	Global.in_minigame = false
+	EventManager.currentEvent = EventManager.MainEvent.MAIN_FINISH
+	TimeSystem.change_time(TimeSystem.TIME.NOON)
 	get_tree().root.remove_child(self)

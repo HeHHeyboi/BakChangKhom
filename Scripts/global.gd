@@ -3,6 +3,7 @@ extends Node2D
 @export var MiniGames: Dictionary
 
 var dialogShown = false
+var in_minigame = false
 
 
 func ReturnMiniGame(minigame_name: String) -> Variant:
@@ -21,6 +22,10 @@ func getCharacterSprite(char_name: String) -> CharacterSprite:
 
 func isDialogShown() -> bool:
 	return dialogShown
+
+
+func isInMinigame() -> bool:
+	return in_minigame
 
 
 func hideDialog():
