@@ -207,4 +207,24 @@ func click_choice(button: Button) -> void:
 
 
 func _on_skip_pressed():
-	dialog_end()
+	var choice
+	for i in range(index_stack[-1], current_dialog.size()):
+		choice = parse_text(current_dialog[i])
+		if choice["type"] == DialogType.Choice:
+			var dialog = parse_text(current_dialog[i - 1])
+			index_stack[-1] = i
+			ChoiceContainer.visible = true
+			DialogButton.disabled = true
+			NameBox.text = dialog["name"]
+			TextBox.clear()
+			TextBox.add_text(dialog["dialog"])
+
+			for n in ShowSprites.get_children():
+				if n.name == dialog["name"]:
+					curSprite = n as CharacterSprite
+					curSprite.highlight()
+					break
+			return
+
+	if choice["type"] == DialogType.Dialog:
+		dialog_end()
