@@ -32,7 +32,8 @@ TextBox = NodePath("PanelContainer/VBoxContainer/TextBox")
 NameBox = NodePath("PanelContainer/VBoxContainer/NameBox")
 ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
-test_file = "Chapter1ReturnHome.txt"
+test_file = "Chapter9School"
+Test = true
 
 [node name="BG" type="Sprite2D" parent="."]
 position = Vector2(576, 324)

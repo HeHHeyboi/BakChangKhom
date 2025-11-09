@@ -35,7 +35,7 @@ func set_title(title: String):
 # NOTE: มีไว้ test
 func _ready():
 	if Test:
-		read_file(AssetDir + test_file)
+		read_file(AssetDir + test_file + ".txt")
 		# print_rich(DialogDict)
 		# bg_node.texture = BG_img
 		dialog_stack.append(DIALOG)

@@ -30,6 +30,7 @@ expand_mode = 1
 metadata/_edit_lock_ = true
 
 [node name="Event" type="TextureButton" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 175.0
 offset_top = 360.0
