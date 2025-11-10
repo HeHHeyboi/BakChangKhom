@@ -1,7 +1,11 @@
 extends CanvasLayer
 
-@onready var textBox = $Control/PanelContainer/RichTextLabel as RichTextLabel
+@onready var timeText = $PanelContainer/HBoxContainer/Time as RichTextLabel
+@onready var dateText = $PanelContainer/HBoxContainer/Date as RichTextLabel
 @export var cur_time = TIME.MORNING
+
+var current_day = 1
+var current_month = 1
 
 enum TIME { MORNING, NOON, EVENING }
 signal time_update(t: TIME)
@@ -9,6 +13,7 @@ signal time_update(t: TIME)
 
 func _ready() -> void:
 	updateTime(cur_time)
+	dateText.add_text("วันที่ %d เดือน %d" % [current_day, current_month])
 
 
 func _process(delta: float) -> void:
@@ -27,17 +32,17 @@ func change_time(t: TIME) -> void:
 func updateTime(t: TIME) -> void:
 	match t:
 		TIME.MORNING:
-			textBox.clear()
-			textBox.push_color(Color.LIGHT_YELLOW)
-			textBox.append_text("เช้า")
-			textBox.pop()
+			timeText.clear()
+			timeText.push_color(Color.LIGHT_YELLOW)
+			timeText.append_text("เช้า")
+			timeText.pop()
 		TIME.NOON:
-			textBox.clear()
-			textBox.push_color(Color.YELLOW)
-			textBox.append_text("เที่ยง")
-			textBox.pop()
+			timeText.clear()
+			timeText.push_color(Color.YELLOW)
+			timeText.append_text("เที่ยง")
+			timeText.pop()
 		TIME.EVENING:
-			textBox.clear()
-			textBox.push_color(Color.NAVY_BLUE)
-			textBox.append_text("เย็น")
-			textBox.pop()
+			timeText.clear()
+			timeText.push_color(Color.NAVY_BLUE)
+			timeText.append_text("เย็น")
+			timeText.pop()
