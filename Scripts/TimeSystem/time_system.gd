@@ -18,7 +18,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	# updateTime(cur_time)
-	if Global.in_minigame:
+	if Global.in_minigame || Global.on_start:
 		self.hide()
 	else:
 		self.show()

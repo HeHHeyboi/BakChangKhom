@@ -4,6 +4,7 @@ extends Node2D
 
 var dialogShown = false
 var in_minigame = false
+var on_start = true
 
 
 func ReturnMiniGame(minigame_name: String) -> Variant:

@@ -19,7 +19,5 @@ func _on_pressed() -> void:
 	if EventManager.currentEvent == EventManager.MainEvent.GRANDMA:
 		EventManager.currentEvent = EventManager.MainEvent.CLEAN_RAM
 		var arr = ["ขม", "ยาย"]
-		DialogScene.show_dialog(
-			"res://Assets/Chapter1ReturnHome.txt", "res://Assets/Background/Chapter2_bg.jpg", arr
-		)
+		DialogScene.show_dialog("res://Assets/Chapter1ReturnHome.txt", "Chapter2_bg.jpg", arr)
 		DialogScene.set_title("บ้านของยาย")
