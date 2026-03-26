@@ -28,6 +28,7 @@ Market="*res://Scene/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 TimeSystem="*res://Scene/time_system.tscn"
 Navi="*uid://bja1x08mhvwfx"
+PauseMenu="*res://Scene/PauseMenu.tscn"
 
 [display]
 

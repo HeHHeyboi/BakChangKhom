@@ -30,6 +30,22 @@ func _ready() -> void:
 	goalPos = pos1.position
 	curPos = pos1.position
 	eraser.position = curPos
+	
+	# แสดงยางลบตั้งแต่แรกเพื่อให้คลิกได้
+	eraser.show()
+	startText.text = "คลิกที่ยางลบเพื่อเริ่ม"
+	
+	# ปรับขนาดตัวอักษรให้เล็กลง (เปลี่ยนจากค่าเดิมที่อาจจะใหญ่ไป)
+	startText.add_theme_font_size_override("font_size", 42)
+	# ปรับให้ข้อความอยู่ตรงกลาง (เผื่อกล่องขยายเกินจอ)
+	startText.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+
+	# ปรับขนาดตัวอักษรของปุ่ม Return to Room ที่ซ่อนอยู่ (เผื่อใหญ่เกินกรอบ)
+	for n in miniGameBG.get_children():
+		if n is Button:
+			n.add_theme_font_size_override("font_size", 30)
+	
 	# Antigravity: แสดง Progress Bar และสอนซ่อมเมื่อเข้ามินิเกม
 	if get_tree().root.has_node("Navi"):
 		Navi.guide_repair()
@@ -39,13 +55,15 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if !isStart:
+			# เช็คว่าคลิกคลิกซ้าย และตำแหน่งเมาส์อยู่ในกรอบขอบเขตของยาบลบ
 			if event.pressed && event.button_index == MOUSE_BUTTON_LEFT:
-				isStart = true
-				ram.show()
-				eraser.show()
-				button.show()
-				miniGameBG.show()
-				startText.hide()
+				var local_pos = eraser.get_local_mouse_position()
+				if eraser.get_rect().has_point(local_pos):
+					isStart = true
+					ram.show()
+					button.show()
+					miniGameBG.show()
+					startText.hide()
 
 
 func _physics_process(delta: float) -> void:

@@ -4,6 +4,9 @@ extends Control
 @export var Tutorial: TextureRect
 var showTutorial = false
 
+func _ready():
+	# เวลาโดนโยนกลับมาจากในเกม ให้แน่ใจว่ากลับสถานะว่าอยู่หน้าเริ่ม
+	Global.on_start = true
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

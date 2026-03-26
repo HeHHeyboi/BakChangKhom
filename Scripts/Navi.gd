@@ -40,7 +40,7 @@ func _build_tip_ui():
 	message_box.anchor_top    = 0.0
 	message_box.anchor_right  = 1.0
 	message_box.anchor_bottom = 0.0
-	message_box.offset_left   = -260  # ความกว้าง = 260-16 = 244px
+	message_box.offset_left   = -300  # ความกว้าง = 260-16 = 244px
 	message_box.offset_top    = 16
 	message_box.offset_right  = -16
 	message_box.offset_bottom = 66    # ความสูง = 66-16 = 50px
@@ -62,12 +62,10 @@ func _build_tip_ui():
 
 	label = RichTextLabel.new()
 	label.bbcode_enabled = true
-	label.fit_content = false
+	label.fit_content = true
 	label.scroll_active = false
-	label.clip_contents = true
+	label.clip_contents = false
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# กำหนด min/max ของ label: สูงสุด ~3 บรรทัด
-	label.custom_minimum_size = Vector2(0, 36)
 	margin.add_child(label)
 
 	sprite = Sprite2D.new()
@@ -130,13 +128,20 @@ func show_tip(text: String, duration: float = 6.0, tip_id: String = ""):
 	if tip_id != "" and tips_shown.has(tip_id): return
 	if tip_id != "": tips_shown[tip_id] = true
 
-	# ไม่ใช้ [center] เพราะทำให้กล่องยืด
 	label.text = text
+	# รอ 1 frame แล้วอ่านขนาดจริงจาก content แล้ว resize
+	call_deferred("_fit_tip_height")
 	if tween: tween.kill()
 	tween = create_tween().set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
 	tween.tween_property(message_box, "modulate:a", 1.0, 0.5)
 	tween.tween_interval(duration)
 	tween.tween_property(message_box, "modulate:a", 0.0, 0.5)
+
+func _fit_tip_height():
+	# อ่านความสูงขั้นต่ำของ content แล้วตั้ง offset_bottom
+	var min_h = message_box.get_combined_minimum_size().y
+	var new_bottom = message_box.offset_top + max(min_h, 50.0)
+	message_box.offset_bottom = new_bottom
 
 ## === Quest stubs (ไม่ทำงาน เพื่อไม่ให้ code อื่น error) ===
 

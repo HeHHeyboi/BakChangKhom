@@ -18,7 +18,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	# updateTime(cur_time)
-	if Global.in_minigame || Global.on_start:
+	var current_scene_name = get_tree().current_scene.name if get_tree().current_scene else ""
+	if Global.in_minigame || Global.on_start || current_scene_name == "StartScene":
 		self.hide()
 	else:
 		self.show()

@@ -8,6 +8,23 @@
 [ext_resource type="Texture2D" uid="uid://qwywwguxnpwl" path="res://Assets/Background/tutorial.jpg" id="6_pqbye"]
 [ext_resource type="Texture2D" uid="uid://ddqsjm26hsw5t" path="res://Assets/Background/settingBG.jpg" id="7_x8fdo"]
 [ext_resource type="Script" uid="uid://dy8qq50jrvugu" path="res://Scripts/StartMenu/return.gd" id="8_x8fdo"]
+[ext_resource type="Script" uid="uid://btrlekvw50ywr" path="res://Scripts/StartMenu/setting_menu.gd" id="9_setting"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+content_margin_left = 40.0
+content_margin_top = 40.0
+content_margin_right = 40.0
+content_margin_bottom = 40.0
+bg_color = Color(0, 0, 0, 0.7)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.8)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
 
 [node name="StartScene" type="Control" unique_id=1947018895 node_paths=PackedStringArray("SettingScene", "Tutorial")]
 layout_mode = 3
@@ -98,6 +115,56 @@ offset_top = 2.0
 offset_right = 1.0
 offset_bottom = 6.0
 texture = ExtResource("7_x8fdo")
+script = ExtResource("9_setting")
+
+[node name="PanelContainer" type="PanelContainer" parent="Setting" unique_id=537930383]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -100.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/PanelContainer" unique_id=1692143690]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="MasterVolume" type="HBoxContainer" parent="Setting/PanelContainer/VBoxContainer" unique_id=1175997092]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/PanelContainer/VBoxContainer/MasterVolume" unique_id=689968838]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Master Volume"
+
+[node name="HSlider" type="HSlider" parent="Setting/PanelContainer/VBoxContainer/MasterVolume" unique_id=1192664776]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="Fullscreen" type="HBoxContainer" parent="Setting/PanelContainer/VBoxContainer" unique_id=1183571752]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/PanelContainer/VBoxContainer/Fullscreen" unique_id=1196714344]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fullscreen"
+
+[node name="CheckButton" type="CheckButton" parent="Setting/PanelContainer/VBoxContainer/Fullscreen" unique_id=1560581662]
+layout_mode = 2
+size_flags_vertical = 4
 
 [node name="Return" type="Button" parent="Setting" unique_id=1808195468]
 layout_mode = 1
@@ -113,4 +180,6 @@ script = ExtResource("8_x8fdo")
 [connection signal="pressed" from="Start_Button" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Option_Button" to="." method="_on_option_button_pressed"]
 [connection signal="pressed" from="Quit_Button" to="." method="_on_quit_button_pressed"]
+[connection signal="value_changed" from="Setting/PanelContainer/VBoxContainer/MasterVolume/HSlider" to="Setting" method="_on_master_volume_changed"]
+[connection signal="toggled" from="Setting/PanelContainer/VBoxContainer/Fullscreen/CheckButton" to="Setting" method="_on_fullscreen_toggled"]
 [connection signal="pressed" from="Setting/Return" to="Setting/Return" method="_on_pressed"]

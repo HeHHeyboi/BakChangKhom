@@ -1,0 +1,125 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/PauseMenu.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+bg_color = Color(0, 0, 0, 0.7)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.8)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+content_margin_left = 40.0
+content_margin_top = 40.0
+content_margin_right = 40.0
+content_margin_bottom = 40.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gear"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 100
+script = ExtResource("1_script")
+
+[node name="GearButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 80.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 48
+theme_override_styles/focus = SubResource("StyleBoxEmpty_gear")
+text = "⚙️"
+flat = true
+
+[node name="PausePanel" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="PanelContainer" type="PanelContainer" parent="PausePanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -250.0
+offset_right = 350.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="Title" type="Label" parent="PausePanel/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1
+text = "Paused / Options"
+
+[node name="MasterVolume" type="HBoxContainer" parent="PausePanel/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PausePanel/PanelContainer/VBoxContainer/MasterVolume"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Master Volume"
+
+[node name="HSlider" type="HSlider" parent="PausePanel/PanelContainer/VBoxContainer/MasterVolume"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="Fullscreen" type="HBoxContainer" parent="PausePanel/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PausePanel/PanelContainer/VBoxContainer/Fullscreen"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fullscreen"
+
+[node name="CheckButton" type="CheckButton" parent="PausePanel/PanelContainer/VBoxContainer/Fullscreen"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Buttons" type="HBoxContainer" parent="PausePanel/PanelContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 40
+
+[node name="ResumeButton" type="Button" parent="PausePanel/PanelContainer/VBoxContainer/Buttons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "  Resume Game  "
+
+[node name="MainMenuButton" type="Button" parent="PausePanel/PanelContainer/VBoxContainer/Buttons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "  Main Menu  "
+
+[connection signal="pressed" from="GearButton" to="." method="_on_gear_button_pressed"]
+[connection signal="value_changed" from="PausePanel/PanelContainer/VBoxContainer/MasterVolume/HSlider" to="." method="_on_master_volume_changed"]
+[connection signal="toggled" from="PausePanel/PanelContainer/VBoxContainer/Fullscreen/CheckButton" to="." method="_on_fullscreen_toggled"]
+[connection signal="pressed" from="PausePanel/PanelContainer/VBoxContainer/Buttons/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="PausePanel/PanelContainer/VBoxContainer/Buttons/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
