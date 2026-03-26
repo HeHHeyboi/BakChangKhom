@@ -72,7 +72,8 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 		bg_node.texture = load("res://Assets/Background/" + bg_name) as Texture2D
 		var bgSize = bg_node.texture.get_size()
 		if(bgSize > MaxBGSize):
-			bg_node.scale = MaxBGSize / bgSize
+			# Antigravity: ใช้ abs() ป้องกันค่าติดลบที่อาจทำให้เกิด Rect2i error
+			bg_node.scale = (MaxBGSize / bgSize).abs()
 
 	dialog_stack.append(DIALOG)
 	index_stack.append(0)
@@ -109,7 +110,7 @@ func read_file(file_path: StringName):
 			_:
 				if !DialogDict.has(type):
 					DialogDict[type] = []
-					continue
+					continue # Antigravity: กลับมาใช้ continue เพื่อข้ามบรรทัดที่เป็นหัวข้อ (Header)
 
 				DialogDict[type].append(line)
 	# print(MainDialog)
@@ -122,7 +123,8 @@ func read_file(file_path: StringName):
 # 	2. other thing too
 func show_text(text: String):
 	curSprite = null
-	var parse = parse_text(text)
+	# Antigravity: ใส่ true เพื่อให้สร้างปุ่ม UI เฉพาะตอนโชว์ข้อความจริงๆ
+	var parse = parse_text(text, true)
 	DialogButton.disabled = false
 
 	match parse["type"]:
@@ -140,7 +142,7 @@ func show_text(text: String):
 			DialogButton.disabled = true
 
 
-func parse_text(text: String):
+func parse_text(text: String, apply_ui: bool = false):
 	var header
 	var body
 	if text.find(":") > -1:
@@ -151,20 +153,31 @@ func parse_text(text: String):
 		for i in range(len(body)):
 			body[i] = body.get(i).lstrip(" ")
 	else:
-		body = text.split(",")
+		# Antigravity: Fixed bug where commas in the text would break the dialog parsing
+		body = text.split(",", true, 1)
 		for i in range(len(body)):
-			body[i] = body.get(i).lstrip(" ")
+			body[i] = body[i].lstrip(" ")
 
 	match header:
 		"Choice":
-			for choice in body:
-				var button = choiceButton.instantiate()
-				button.connect("get_choice", click_choice)
-				button.text = choice
-				ChoiceContainer.add_child(button)
+			# Antigravity: สร้างปุ่มเฉพาะเมื่อสั่ง apply_ui เท่านั้น ป้องกันปุ่มซ้ำซ้อนเวลา Skip
+			if apply_ui:
+				# Antigravity: คอยล้างปุ่มเก่าออกก่อนเสมอ เพื่อไม่ให้มีปุ่มงอกใหม่ซ้อนกัน
+				for child in ChoiceContainer.get_children():
+					child.queue_free()
+					
+				for choice in body:
+					var button = choiceButton.instantiate()
+					button.connect("get_choice", click_choice)
+					button.text = choice
+					ChoiceContainer.add_child(button)
 
 			return {"type": DialogType.Choice}
 		_:
+			# Antigravity: เพิ่มตัวป้องกันกรณีบรรทัดไม่มีเครื่องหมายคอมม่า (,)
+			if body.size() < 2:
+				return {"type": DialogType.Dialog, "name": "System", "dialog": "[Error: บรรทัดนี้ไม่มีเครื่องหมายคอมม่า] " + text}
+				
 			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
 
 
@@ -213,8 +226,11 @@ func click_choice(button: Button) -> void:
 func _on_skip_pressed():
 	var choice
 	for i in range(index_stack[-1], current_dialog.size()):
-		choice = parse_text(current_dialog[i])
+		# Antigravity: ส่งล้าง (false) เพื่อให้แค่เช็คประเภท โดยไม่สร้างปุ่ม UI ซ้ำ
+		choice = parse_text(current_dialog[i], false)
 		if choice["type"] == DialogType.Choice:
+			# Antigravity: เรียก parse_text อีกครั้งแบบใส่ true เพื่อสร้างปุ่ม Choice ให้แสดงผล
+			parse_text(current_dialog[i], true)
 			var dialog = parse_text(current_dialog[i - 1])
 			index_stack[-1] = i
 			ChoiceContainer.visible = true

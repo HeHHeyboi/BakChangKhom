@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bibe6lb5jiu8t"]
+[gd_scene format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
 [ext_resource type="Script" uid="uid://dpstm5yjpiome" path="res://Scripts/character_pos.gd" id="3_pf8gr"]
@@ -24,7 +24,7 @@ bg_color = Color(1, 1, 1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_68vdo"]
 bg_color = Color(1, 1, 1, 1)
 
-[node name="DialogScene" type="CanvasLayer" node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
+[node name="DialogScene" type="CanvasLayer" unique_id=1581132916 node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
 process_mode = 3
 layer = 128
 script = ExtResource("1_wcj4s")
@@ -34,10 +34,10 @@ ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
 test_file = "Chapter9School"
 
-[node name="BG" type="Sprite2D" parent="."]
+[node name="BG" type="Sprite2D" parent="." unique_id=1294596746]
 position = Vector2(576, 324)
 
-[node name="Title" type="RichTextLabel" parent="."]
+[node name="Title" type="RichTextLabel" parent="." unique_id=1402061021]
 layout_direction = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -48,27 +48,27 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/normal_font_size = 64
 horizontal_alignment = 1
 
-[node name="CharacterPos" type="Node2D" parent="."]
+[node name="CharacterPos" type="Node2D" parent="." unique_id=196601069]
 position = Vector2(576, 324)
 script = ExtResource("3_pf8gr")
 
-[node name="Left1" type="Marker2D" parent="CharacterPos"]
+[node name="Left1" type="Marker2D" parent="CharacterPos" unique_id=752524797]
 position = Vector2(-417, 78)
 metadata/flip = false
 
-[node name="Right1" type="Marker2D" parent="CharacterPos"]
+[node name="Right1" type="Marker2D" parent="CharacterPos" unique_id=1170541611]
 position = Vector2(345, 78)
 scale = Vector2(0.966627, 32.879)
 metadata/flip = true
 
-[node name="Left2" type="Marker2D" parent="CharacterPos"]
+[node name="Left2" type="Marker2D" parent="CharacterPos" unique_id=1597454538]
 position = Vector2(-530, 78)
 
-[node name="Right2" type="Marker2D" parent="CharacterPos"]
+[node name="Right2" type="Marker2D" parent="CharacterPos" unique_id=1689757440]
 position = Vector2(469, 75)
 metadata/flip = true
 
-[node name="PanelContainer" type="Button" parent="."]
+[node name="PanelContainer" type="Button" parent="." unique_id=1479877712]
 anchors_preset = -1
 anchor_top = 0.69100004
 anchor_bottom = 0.69100004
@@ -85,19 +85,19 @@ theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sfeuh")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_mslf0")
 theme_override_styles/focus = SubResource("StyleBoxFlat_68vdo")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=438484069]
 layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 200.0
 
-[node name="NameBox" type="Label" parent="PanelContainer/VBoxContainer"]
+[node name="NameBox" type="Label" parent="PanelContainer/VBoxContainer" unique_id=659362533]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
 text = "sdsfsdfsfdsdfsfdsfsdfsf"
 
-[node name="TextBox" type="RichTextLabel" parent="PanelContainer/VBoxContainer"]
+[node name="TextBox" type="RichTextLabel" parent="PanelContainer/VBoxContainer" unique_id=1705179372]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
@@ -108,18 +108,18 @@ theme_override_font_sizes/normal_font_size = 24
 text = "kjhkjhkjh"
 text_direction = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=696128182]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 2
 
-[node name="Skip" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="Skip" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=433042218]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
 text = "Skip"
 
-[node name="ChoiceContainer" type="VBoxContainer" parent="."]
+[node name="ChoiceContainer" type="VBoxContainer" parent="." unique_id=1803568563]
 anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.362

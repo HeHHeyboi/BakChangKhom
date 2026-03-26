@@ -16,8 +16,10 @@ func _input(event: InputEvent) -> void:
 		event = event as InputEventKey
 		if event.is_pressed() && playerEnter:
 			if event.keycode == KEY_E:
-				DialogScene.visible = !DialogScene.visible
-				DialogScene.show_dialog("res://Assets/Chapter1ReturnHome.txt", player, ["ขม,ยาย"])
+				# Antigravity: Fixed bug where 'player' object was passed as bg_name string
+				# and changed character list to separate elements ["ขม", "ยาย"]
+				DialogScene.show_dialog("res://Assets/Chapter1ReturnHome.txt", "", ["ขม", "ยาย"])
+				DialogScene.visible = true
 
 
 func _on_dialog_area_body_entered(body: Node2D) -> void:

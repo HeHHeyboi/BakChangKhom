@@ -19,6 +19,10 @@ func _physics_process(_delta: float) -> void:
 	if Global.isDialogShown():
 		return
 
+	# Antigravity: เรียกให้ Navi สอนเดินเมื่อเริ่มเดินในแมพเป็นครั้งแรก
+	if get_tree().root.has_node("Navi"):
+		Navi.guide_movement()
+	
 	Dir = Vector2.ZERO
 	if Input.is_action_pressed("up", true):
 		Dir.y -= 1

@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://dglblhypmpmth"]
+[gd_scene format=3 uid="uid://dglblhypmpmth"]
 
 [ext_resource type="Script" uid="uid://kt7fp2rokrmr" path="res://Scripts/TimeSystem/time_system.gd" id="1_nyd0s"]
 
@@ -9,21 +9,21 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
-[node name="TimeSystem" type="CanvasLayer"]
+[node name="TimeSystem" type="CanvasLayer" unique_id=1472452141]
 process_mode = 3
 layer = 100
 visible = false
 script = ExtResource("1_nyd0s")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=112634155]
 offset_right = 467.0
 offset_bottom = 91.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer" unique_id=122135149]
 layout_mode = 2
 
-[node name="Time" type="RichTextLabel" parent="PanelContainer/HBoxContainer"]
+[node name="Time" type="RichTextLabel" parent="PanelContainer/HBoxContainer" unique_id=1976573759]
 clip_contents = false
 layout_direction = 2
 layout_mode = 2
@@ -35,12 +35,12 @@ scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="PanelContainer/HBoxContainer"]
+[node name="ColorRect" type="ColorRect" parent="PanelContainer/HBoxContainer" unique_id=1549569577]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Date" type="RichTextLabel" parent="PanelContainer/HBoxContainer"]
+[node name="Date" type="RichTextLabel" parent="PanelContainer/HBoxContainer" unique_id=717721356]
 clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3

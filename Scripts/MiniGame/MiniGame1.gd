@@ -30,7 +30,10 @@ func _ready() -> void:
 	goalPos = pos1.position
 	curPos = pos1.position
 	eraser.position = curPos
-	pass
+	# Antigravity: แสดง Progress Bar และสอนซ่อมเมื่อเข้ามินิเกม
+	if get_tree().root.has_node("Navi"):
+		Navi.guide_repair()
+		Navi.show_progress(RamStatus.CLEAN)
 
 
 func _input(event: InputEvent) -> void:
@@ -74,9 +77,18 @@ func _on_button_pressed() -> void:
 	moving = true
 
 	clikTime += 1
+	# Antigravity: อัปเดต Progress Bar ทุกครั้งที่คลิก
+	if get_tree().root.has_node("Navi"):
+		Navi.update_progress(clikTime)
+
 	if clikTime == RamStatus.CLEAN:
 		isFinish = true
 		button.hide()
+		# Antigravity: ซ่อน Progress Bar และซ่อน Quest เมื่อซ่อมเสร็จ
+		if get_tree().root.has_node("Navi"):
+			Navi.hide_progress()
+			Navi.hide_quest()
+			Navi.show_tip("เยี่ยมเลยครับ! ซ่อม RAM เสร็จแล้ว ✨ กลับไปรายงานยายได้เลย", 6.0)
 		for n in miniGameBG.get_children():
 			n.show()
 

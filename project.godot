@@ -27,6 +27,7 @@ EventManager="*res://Scripts/EventManager.gd"
 Market="*res://Scene/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 TimeSystem="*res://Scene/time_system.tscn"
+Navi="*uid://bja1x08mhvwfx"
 
 [display]
 
@@ -36,6 +37,10 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="BakChangKhom"
+
+[editor]
+
+version_control/autoload_on_startup=true
 
 [input]
 
