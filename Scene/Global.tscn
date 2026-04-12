@@ -1,11 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://ccvaog4q8nihx"]
+[gd_scene format=3 uid="uid://ccvaog4q8nihx"]
 
 [ext_resource type="Script" uid="uid://dckx3i78ijukx" path="res://Scripts/global.gd" id="1_lwo08"]
 [ext_resource type="Texture2D" uid="uid://dq5jqn8qpy53p" path="res://Assets/CharacterSprite/Idle.png" id="2_fsv5w"]
 [ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/GrandmaNormal.png" id="3_vhnd1"]
 [ext_resource type="PackedScene" uid="uid://cqbdth68hbcay" path="res://Scene/Computer_test.scn" id="4_2wdq4"]
 
-[node name="Global" type="Node2D"]
+[node name="Global" type="Node2D" unique_id=280335373]
 scale = Vector2(0.998061, 0.994891)
 script = ExtResource("1_lwo08")
 _CharacterMap = {

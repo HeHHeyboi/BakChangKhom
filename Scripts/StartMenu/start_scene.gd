@@ -1,9 +1,12 @@
 extends Control
 
-@export var showDialogEvent: Event
 @export var SettingScene: TextureRect
 @export var Tutorial: TextureRect
 var showTutorial = false
+
+
+func _enter_tree() -> void:
+	EventManager.hideTimeUI(true)
 
 
 func _input(event: InputEvent) -> void:
@@ -12,6 +15,7 @@ func _input(event: InputEvent) -> void:
 			get_tree().change_scene_to_file("res://Scene/Home.tscn")
 			EventManager.show_dialog("ออฟฟิส", "res://Assets/Prolouge.txt", "placeholder.png")
 			Global.on_start = false
+			EventManager.hideTimeUI(false)
 			self.hide()
 
 

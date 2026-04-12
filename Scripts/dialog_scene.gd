@@ -1,6 +1,5 @@
 extends CanvasLayer
 
-@export var showDialogEvent: Event
 @export var TextBox: RichTextLabel
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
@@ -33,6 +32,14 @@ func set_title(title: String):
 	Title.add_text(title)
 
 
+func _enter_tree() -> void:
+	EventManager.showDialogEvent.connect(show_dialog)
+
+
+func _exit_tree() -> void:
+	EventManager.showDialogEvent.disconnect(show_dialog)
+
+
 # NOTE: มีไว้ test
 func _ready():
 	if Test:
@@ -51,7 +58,6 @@ func _ready():
 		return
 
 	self.visible = false
-	showDialogEvent.add_listener(show_dialog)
 	# self.call_deferred("move_to_front")
 
 
@@ -114,8 +120,7 @@ func read_file(file_path: StringName):
 					continue
 
 				DialogDict[type].append(line)
-	# print(MainDialog)
-	# print(DialogDict)
+
 	file.close()
 
 
@@ -161,7 +166,7 @@ func parse_text(text: String):
 		"Choice":
 			for choice in body:
 				var button = choiceButton.instantiate()
-				button.connect("get_choice", click_choice)
+				button.get_choice.connect(click_choice)
 				button.text = choice
 				ChoiceContainer.add_child(button)
 
@@ -174,6 +179,7 @@ func next_text() -> void:
 	index_stack[-1] += 1
 	if curSprite != null:
 		curSprite.fade()
+
 	while index_stack.size() > 0 and index_stack[-1] >= current_dialog.size():
 		index_stack.pop_back()
 		dialog_stack.pop_back()

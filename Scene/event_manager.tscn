@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://cjpenoqg41ftl"]
-
-[ext_resource type="Script" uid="uid://42fc4luvfmv" path="res://Scripts/EventManager.gd" id="1_ivfdk"]
-[ext_resource type="Resource" uid="uid://b04kb8rq7cgai" path="res://Resources/show_dialog.tres" id="2_3fpgi"]
-
-[node name="EventManager" type="Node2D" unique_id=1701487737]
-script = ExtResource("1_ivfdk")
-showDialogEvent = ExtResource("2_3fpgi")

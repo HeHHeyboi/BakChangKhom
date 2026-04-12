@@ -30,6 +30,7 @@ func _ready() -> void:
 	goalPos = pos1.position
 	curPos = pos1.position
 	eraser.position = curPos
+	EventManager.hideTimeUI(true)
 	pass
 
 
@@ -82,7 +83,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	Global.in_minigame = false
 	EventManager.currentEvent = EventManager.MainEvent.MAIN_FINISH
-	TimeSystem.change_time(TimeSystem.TIME.NOON)
+	EventManager.next_period.emit()
+	EventManager.hideTimeUI(false)
 	get_tree().root.remove_child(self)
