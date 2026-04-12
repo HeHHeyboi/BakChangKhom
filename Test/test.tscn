@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bfrmwvuwi2t7m"]
+
+[ext_resource type="Script" uid="uid://7fkmqnsw02rm" path="res://Test/show_greet.gd" id="1_6uqi0"]
+[ext_resource type="Script" uid="uid://du6c4fhd4qent" path="res://Test/button_hello.gd" id="2_ppyta"]
+[ext_resource type="Resource" uid="uid://dbgltlqfa24k3" path="res://Resources/print_greeting.tres" id="2_ykrsh"]
+[ext_resource type="Script" uid="uid://8fyb5i410m40" path="res://Test/button_2.gd" id="3_ykrsh"]
+
+[node name="Node2D" type="CanvasLayer" unique_id=1700902621]
+
+[node name="Label" type="Label" parent="." unique_id=227072427]
+offset_left = 246.0
+offset_top = 273.0
+offset_right = 661.0
+offset_bottom = 337.0
+theme_override_font_sizes/font_size = 26
+text = "Place Holder"
+script = ExtResource("1_6uqi0")
+print_event = ExtResource("2_ykrsh")
+
+[node name="Button" type="Button" parent="." unique_id=125458959]
+offset_left = 246.0
+offset_top = 138.0
+offset_right = 727.0
+offset_bottom = 191.0
+text = "Print Hello"
+script = ExtResource("2_ppyta")
+print_event = ExtResource("2_ykrsh")
+
+[node name="Button2" type="Button" parent="." unique_id=1832928158]
+offset_left = 246.0
+offset_top = 191.0
+offset_right = 727.0
+offset_bottom = 244.0
+text = "Print HI"
+script = ExtResource("3_ykrsh")
+print_event = ExtResource("2_ykrsh")
+
+[connection signal="button_down" from="Button" to="Button" method="_on_button_down"]
+[connection signal="button_down" from="Button2" to="Button2" method="_on_button_down"]
