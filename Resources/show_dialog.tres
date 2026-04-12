@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="ThreeArgsEvent" format=3 uid="uid://b04kb8rq7cgai"]
+
+[ext_resource type="Script" uid="uid://cpn3h6mnjm30x" path="res://Scripts/Resources/ThreeArgsEvent.gd" id="1_revu8"]
+
+[resource]
+script = ExtResource("1_revu8")

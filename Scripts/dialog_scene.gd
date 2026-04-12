@@ -1,5 +1,6 @@
 extends CanvasLayer
 
+@export var showDialogEvent: Event
 @export var TextBox: RichTextLabel
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
@@ -17,7 +18,7 @@ enum DialogType { Dialog, Choice, SelectChoice }
 const DIALOG = "dialog"
 const CHOICE = "choice"
 const AssetDir = "res://Assets/"
-const MaxBGSize = Vector2(1152.0,648.0)
+const MaxBGSize = Vector2(1152.0, 648.0)
 var dialog_stack: Array[String] = []
 var index_stack: Array[int] = []
 var current_dialog: Array
@@ -50,6 +51,7 @@ func _ready():
 		return
 
 	self.visible = false
+	showDialogEvent.add_listener(show_dialog)
 	# self.call_deferred("move_to_front")
 
 
@@ -63,7 +65,7 @@ func addCharcter(chars: Array):
 # NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
 func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 	Global.showDialog()
-	bg_node.scale = Vector2(1,1)
+	bg_node.scale = Vector2(1, 1)
 	if !chars.is_empty():
 		addCharcter(chars)
 
@@ -71,7 +73,7 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 		# var loadImg = Image.load_from_file(bg)
 		bg_node.texture = load("res://Assets/Background/" + bg_name) as Texture2D
 		var bgSize = bg_node.texture.get_size()
-		if(bgSize > MaxBGSize):
+		if bgSize > MaxBGSize:
 			bg_node.scale = MaxBGSize / bgSize
 
 	dialog_stack.append(DIALOG)
