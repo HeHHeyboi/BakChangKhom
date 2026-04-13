@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://debihuht6oauq"]
+[gd_scene format=3 uid="uid://debihuht6oauq"]
 
 [ext_resource type="Texture2D" uid="uid://dqtco46bmjijd" path="res://Assets/Background/HomeBG.jpg" id="1_tekh6"]
 [ext_resource type="Texture2D" uid="uid://547gtgdpt7to" path="res://Assets/Home/pc_down.png" id="2_1fhy5"]
@@ -12,7 +12,7 @@
 [ext_resource type="Script" uid="uid://ber64ekrxxe8b" path="res://Scripts/Home/grandma.gd" id="10_k7bem"]
 [ext_resource type="Texture2D" uid="uid://b5ri4126q8qtv" path="res://Assets/MiniGame/caution.png" id="10_vgjmv"]
 
-[node name="Home" type="Control"]
+[node name="Home" type="Control" unique_id=767628668]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="BG" type="TextureRect" parent="."]
+[node name="BG" type="TextureRect" parent="." unique_id=98894313]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -31,7 +31,7 @@ scale = Vector2(0.595, 0.595)
 texture = ExtResource("1_tekh6")
 metadata/_edit_lock_ = true
 
-[node name="MapPlaceHolder" type="Button" parent="."]
+[node name="MapPlaceHolder" type="Button" parent="." unique_id=1436856254]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -44,7 +44,7 @@ text = "Map"
 script = ExtResource("2_b6yaw")
 metadata/_edit_lock_ = true
 
-[node name="PC" type="TextureButton" parent="."]
+[node name="PC" type="TextureButton" parent="." unique_id=810260725]
 layout_mode = 0
 offset_left = 695.0
 offset_top = 239.0
@@ -55,7 +55,7 @@ texture_normal = ExtResource("2_1fhy5")
 texture_hover = ExtResource("3_1fhy5")
 metadata/_edit_lock_ = true
 
-[node name="Door" type="TextureButton" parent="."]
+[node name="Door" type="TextureButton" parent="." unique_id=1209763448 node_paths=PackedStringArray("notify")]
 layout_mode = 0
 offset_left = 1040.0
 offset_top = 511.0
@@ -65,8 +65,9 @@ scale = Vector2(0.145, 0.145)
 texture_normal = ExtResource("3_2laig")
 texture_hover = ExtResource("5_kxrpy")
 script = ExtResource("7_c1wnw")
+notify = NodePath("caution")
 
-[node name="caution" type="TextureRect" parent="Door"]
+[node name="caution" type="TextureRect" parent="Door" unique_id=1891896817]
 visible = false
 layout_mode = 0
 offset_right = 297.0
@@ -74,7 +75,7 @@ offset_bottom = 297.0
 texture = ExtResource("10_vgjmv")
 expand_mode = 1
 
-[node name="Grandma" type="TextureButton" parent="."]
+[node name="Grandma" type="TextureButton" parent="." unique_id=1162435037]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.414
@@ -90,7 +91,7 @@ texture_normal = ExtResource("4_2laig")
 texture_hover = ExtResource("7_4rgag")
 script = ExtResource("10_k7bem")
 
-[node name="caution" type="TextureRect" parent="Grandma"]
+[node name="caution" type="TextureRect" parent="Grandma" unique_id=1231386048]
 visible = false
 layout_mode = 0
 offset_right = 77.0

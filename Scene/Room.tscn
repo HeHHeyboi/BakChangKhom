@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cglek35w4b64v"]
+[gd_scene format=3 uid="uid://cglek35w4b64v"]
 
 [ext_resource type="Texture2D" uid="uid://0abmohme5tku" path="res://Assets/Background/RoomBG.jpg" id="1_snhtf"]
 [ext_resource type="Texture2D" uid="uid://b5ri4126q8qtv" path="res://Assets/MiniGame/caution.png" id="2_wb11x"]
@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="7_yuu8g"]
 [ext_resource type="Script" uid="uid://cwpxqyxdgbtjd" path="res://Scripts/Room/door.gd" id="8_yuu8g"]
 
-[node name="Room" type="Control"]
+[node name="Room" type="Control" unique_id=346166324]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_lock_ = true
 
-[node name="BG" type="TextureRect" parent="."]
+[node name="BG" type="TextureRect" parent="." unique_id=2067211465]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -29,7 +29,7 @@ texture = ExtResource("1_snhtf")
 expand_mode = 1
 metadata/_edit_lock_ = true
 
-[node name="Event" type="TextureButton" parent="."]
+[node name="Event" type="TextureButton" parent="." unique_id=2067414409]
 visible = false
 layout_mode = 0
 offset_left = 175.0
@@ -45,7 +45,7 @@ ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("5_nfwx1")
 
-[node name="Door" type="TextureButton" parent="."]
+[node name="Door" type="TextureButton" parent="." unique_id=2032888040]
 layout_mode = 0
 offset_left = 646.0
 offset_top = 435.0

@@ -83,7 +83,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	EventManager.currentEvent = EventManager.MainEvent.MAIN_FINISH
+	EventManager.update_event()
 	EventManager.next_period.emit()
 	EventManager.hideTimeUI(false)
 	get_tree().root.remove_child(self)
