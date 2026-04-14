@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bibe6lb5jiu8t"]
 
 [ext_resource type="Script" uid="uid://djwn8uysrfhyn" path="res://Scripts/dialog_scene.gd" id="1_wcj4s"]
-[ext_resource type="Resource" uid="uid://b04kb8rq7cgai" path="res://Resources/show_dialog.tres" id="2_pf8gr"]
 [ext_resource type="Script" uid="uid://dpstm5yjpiome" path="res://Scripts/character_pos.gd" id="3_pf8gr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7wtc"]
@@ -29,7 +28,6 @@ bg_color = Color(1, 1, 1, 1)
 process_mode = 3
 layer = 128
 script = ExtResource("1_wcj4s")
-showDialogEvent = ExtResource("2_pf8gr")
 TextBox = NodePath("PanelContainer/VBoxContainer/TextBox")
 NameBox = NodePath("PanelContainer/VBoxContainer/NameBox")
 ChoiceContainer = NodePath("ChoiceContainer")

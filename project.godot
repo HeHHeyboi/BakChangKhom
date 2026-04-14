@@ -26,7 +26,7 @@ Global="*res://Scene/Global.tscn"
 Market="*res://Scene/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 TimeSystem="*res://Scene/time_system.tscn"
-EventManager="*uid://42fc4luvfmv"
+EventManager="*uid://cjpenoqg41ftl"
 
 [display]
 

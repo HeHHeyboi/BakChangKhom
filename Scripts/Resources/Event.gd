@@ -1,7 +1,16 @@
-@abstract
-# NOTE: Child Class must implement emit() or Invoke() function
 class_name Event extends Resource
 
-@abstract func add_listener(arg: Callable)
-@abstract func remove_listener(arg: Callable) -> bool
-@abstract func emit(...args)
+@export var name: String = "UnknowEvent"
+@export var totalTask: int = 1
+
+var currentStep = 1
+var isActive: bool = false
+var isDone: bool = false
+
+
+func next_step() -> int:
+	currentStep += 1
+	if currentStep >= totalTask:
+		isDone = true
+
+	return currentStep

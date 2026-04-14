@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://d2rbfnaviwwmi"]
 
 [ext_resource type="Script" uid="uid://da1p1qbu85qub" path="res://Scripts/StartMenu/start_scene.gd" id="1_fnmpy"]
-[ext_resource type="Resource" uid="uid://b04kb8rq7cgai" path="res://Resources/show_dialog.tres" id="2_tyour"]
 [ext_resource type="Texture2D" uid="uid://dc6wwrj7n5uve" path="res://Assets/Background/stargBG2.jpg" id="2_w1s5t"]
 [ext_resource type="StyleBox" uid="uid://dqrxqilntke7q" path="res://Assets/ButtonStyle/StartMenu/button_hover.stylebox" id="3_ws62b"]
 [ext_resource type="StyleBox" uid="uid://dsgh2r2r8hbx3" path="res://Assets/ButtonStyle/StartMenu/button_press.stylebox" id="4_syklm"]
@@ -20,7 +19,6 @@ offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fnmpy")
-showDialogEvent = ExtResource("2_tyour")
 SettingScene = NodePath("Setting")
 Tutorial = NodePath("Tutorial")
 

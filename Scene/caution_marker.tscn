@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://wvisrff7ykkt"]
+
+[ext_resource type="Texture2D" uid="uid://b5ri4126q8qtv" path="res://Assets/MiniGame/caution.png" id="1_8nk20"]
+[ext_resource type="Script" uid="uid://da74ptrbiypa" path="res://Scripts/caution_marker.gd" id="2_yj820"]
+
+[node name="caution" type="TextureRect" unique_id=1040492477]
+offset_right = 77.0
+offset_bottom = 77.0
+texture = ExtResource("1_8nk20")
+expand_mode = 1
+script = ExtResource("2_yj820")

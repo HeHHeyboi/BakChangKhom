@@ -1,9 +1,4 @@
 extends Node
-
-enum MainEvent { GRANDMA, CLEAN_RAM, MAIN_FINISH }
-
-var eventSeq = [MainEvent.GRANDMA, MainEvent.CLEAN_RAM, MainEvent.MAIN_FINISH]
-var currentEvent: MainEvent = eventSeq.pop_front()
 signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
 signal next_period
 signal next_day
@@ -13,10 +8,30 @@ signal show_time
 
 signal sendUpdatedEvent
 
+# enum MainEvent { GRANDMA, CLEAN_RAM, MAIN_FINISH }
+# enum SubEvent { TASK_1, TASK_2 }
+#
+# var eventSeq = [MainEvent.GRANDMA, MainEvent.CLEAN_RAM, MainEvent.MAIN_FINISH]
+@export var eventList: Array[Event]
+var currentEvent: Event
+
+
+func _ready() -> void:
+	if eventList.size() <= 0:
+		return
+	currentEvent = eventList[0]
+
 
 func update_event():
-	currentEvent = eventSeq.pop_front()
+	if currentEvent == null:
+		return
+	currentEvent.next_step()
 	sendUpdatedEvent.emit()
+
+
+func event_finished(event: Event):
+	if currentEvent == event:
+		currentEvent = null
 
 
 func show_dialog(title: String, file_path: StringName, bg_name: String, chars: Array = []):
