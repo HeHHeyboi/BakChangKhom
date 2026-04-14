@@ -8,10 +8,6 @@ signal show_time
 
 signal sendUpdatedEvent
 
-# enum MainEvent { GRANDMA, CLEAN_RAM, MAIN_FINISH }
-# enum SubEvent { TASK_1, TASK_2 }
-#
-# var eventSeq = [MainEvent.GRANDMA, MainEvent.CLEAN_RAM, MainEvent.MAIN_FINISH]
 @export var eventList: Array[Event]
 var currentEvent: Event
 
