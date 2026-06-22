@@ -8,7 +8,7 @@ func _ready() -> void:
 	# MapPanel.show_map.connect(_on_map_show_map)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Market.visible:
 		self.disabled = true
 	else:

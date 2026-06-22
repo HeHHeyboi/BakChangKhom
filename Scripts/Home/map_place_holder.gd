@@ -1,7 +1,7 @@
 extends Button
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Global.isDialogShown():
 		self.disabled = true
 	else:

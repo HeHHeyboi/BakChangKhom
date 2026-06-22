@@ -12,7 +12,7 @@ func getHomeNode() -> Control:
 	return node
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var home = getHomeNode()
 	if home == null:
 		return

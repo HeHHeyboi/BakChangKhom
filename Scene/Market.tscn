@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cdd6joa1wt3t0"]
+[gd_scene format=3 uid="uid://cdd6joa1wt3t0"]
 
 [ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
 [ext_resource type="Script" uid="uid://godvt5jylxpk" path="res://Scripts/Market/market.gd" id="1_xtt0p"]
@@ -14,56 +14,56 @@ size = Vector2(403.5, 1157)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_806qg"]
 size = Vector2(86.5, 1157)
 
-[node name="Market" type="Node2D"]
+[node name="Market" type="Node2D" unique_id=1087055904]
 script = ExtResource("1_xtt0p")
 
-[node name="Market" type="Sprite2D" parent="."]
+[node name="Market" type="Sprite2D" parent="." unique_id=849862107]
 position = Vector2(578.9998, 324.0002)
 scale = Vector2(0.60104185, 0.60000044)
 texture = ExtResource("1_rr2rx")
 
-[node name="Player" parent="." instance=ExtResource("2_wpv1i")]
+[node name="Player" parent="." unique_id=1463755562 instance=ExtResource("2_wpv1i")]
 position = Vector2(74, 471)
 
-[node name="Wall" type="StaticBody2D" parent="."]
+[node name="Wall" type="StaticBody2D" parent="." unique_id=1265011343]
 visible = false
 position = Vector2(-33, 322)
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=1691276105]
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_wpv1i")
 
-[node name="Wall3" type="StaticBody2D" parent="."]
+[node name="Wall3" type="StaticBody2D" parent="." unique_id=711293230]
 visible = false
 position = Vector2(1186, 325)
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3" unique_id=2051298995]
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_wpv1i")
 
-[node name="Wall2" type="StaticBody2D" parent="."]
+[node name="Wall2" type="StaticBody2D" parent="." unique_id=1280826171]
 visible = false
 position = Vector2(359, 238)
 rotation = -1.5708
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2" unique_id=1472489747]
 position = Vector2(32.75, 216.5)
 shape = SubResource("RectangleShape2D_5w0dp")
 
-[node name="Wall4" type="StaticBody2D" parent="."]
+[node name="Wall4" type="StaticBody2D" parent="." unique_id=23782797]
 visible = false
 position = Vector2(368, 791)
 rotation = -1.5708
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4" unique_id=16889995]
 position = Vector2(191.25, 216.5)
 shape = SubResource("RectangleShape2D_806qg")
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=1092605283]
 offset_left = 42.0
 offset_top = 564.0
 offset_right = 219.0
@@ -71,7 +71,7 @@ offset_bottom = 622.0
 text = "Map"
 script = ExtResource("3_806qg")
 
-[node name="PlayerSpawn" type="Marker2D" parent="."]
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=822432842]
 position = Vector2(74, 471)
 
 [connection signal="hidden" from="." to="." method="_on_hidden"]

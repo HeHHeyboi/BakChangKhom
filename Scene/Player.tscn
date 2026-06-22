@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bv27tmq83wldi"]
+[gd_scene format=3 uid="uid://bv27tmq83wldi"]
 
 [ext_resource type="Script" uid="uid://bgcojx67cfifn" path="res://Scripts/player.gd" id="1_6l3be"]
 [ext_resource type="Texture2D" uid="uid://f8hat001vjxm" path="res://Assets/SpriteSheets/Walk_Khom.png" id="2_3eeal"]
@@ -141,15 +141,15 @@ _data = {
 &"Walk": SubResource("Animation_mud5u")
 }
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=178968993]
 collision_mask = 6
 script = ExtResource("1_6l3be")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1426908845]
 position = Vector2(0, 5.5)
 shape = SubResource("RectangleShape2D_6l3be")
 
-[node name="Idle" type="Sprite2D" parent="."]
+[node name="Idle" type="Sprite2D" parent="." unique_id=609307478]
 texture_filter = 1
 position = Vector2(4.76837e-07, 3.8147e-06)
 scale = Vector2(0.25, 0.29)
@@ -159,7 +159,5 @@ vframes = 4
 frame = 1
 region_rect = Rect2(0, 0, 500, 3496)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Idle"]
-libraries = {
-&"": SubResource("AnimationLibrary_fvocf")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Idle" unique_id=1203974141]
+libraries/ = SubResource("AnimationLibrary_fvocf")

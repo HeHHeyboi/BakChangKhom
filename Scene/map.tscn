@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://ddqejrf1gml67"]
+[gd_scene format=3 uid="uid://ddqejrf1gml67"]
 
 [ext_resource type="Script" uid="uid://desjp04mfica7" path="res://Scripts/Map/map.gd" id="1_ex5br"]
 [ext_resource type="Script" uid="uid://b34em8142t571" path="res://Scripts/Map/close.gd" id="2_5mejs"]
@@ -8,11 +8,11 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rgag"]
 bg_color = Color(1, 1, 1, 1)
 
-[node name="Map" type="CanvasLayer"]
+[node name="Map" type="CanvasLayer" unique_id=231059147]
 layer = 128
 script = ExtResource("1_ex5br")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=1250043087]
 top_level = true
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,7 +25,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_4rgag")
 
-[node name="หมู่บ้าน" type="Button" parent="Panel"]
+[node name="หมู่บ้าน" type="Button" parent="Panel" unique_id=1809791073]
 layout_mode = 0
 offset_left = 295.0
 offset_top = 56.0
@@ -35,7 +35,7 @@ theme_override_font_sizes/font_size = 32
 disabled = true
 text = "หมู่บ้าน"
 
-[node name="Close" type="Button" parent="Panel"]
+[node name="Close" type="Button" parent="Panel" unique_id=1384957006]
 layout_mode = 0
 offset_left = 738.0
 offset_top = 15.0
@@ -46,7 +46,7 @@ text = "Close
 "
 script = ExtResource("2_5mejs")
 
-[node name="market" type="Button" parent="Panel"]
+[node name="market" type="Button" parent="Panel" unique_id=1345222113]
 layout_mode = 0
 offset_left = 295.0
 offset_top = 211.0
@@ -56,7 +56,7 @@ theme_override_font_sizes/font_size = 32
 text = "ตลาด"
 script = ExtResource("3_5mejs")
 
-[node name="บ้าน" type="Button" parent="Panel"]
+[node name="บ้าน" type="Button" parent="Panel" unique_id=236963247]
 layout_mode = 0
 offset_left = 538.0
 offset_top = 354.0
@@ -66,7 +66,7 @@ theme_override_font_sizes/font_size = 32
 text = "บ้าน"
 script = ExtResource("4_5mejs")
 
-[node name="เมือง" type="Button" parent="Panel"]
+[node name="เมือง" type="Button" parent="Panel" unique_id=1642626268]
 layout_mode = 0
 offset_left = 81.0
 offset_top = 354.0

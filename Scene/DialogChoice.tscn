@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://0ammkthrqna6"]
+[gd_scene format=3 uid="uid://0ammkthrqna6"]
 
-[ext_resource type="Script" uid="uid://dqsmcb5pemarj" path="res://Scripts/dialog_choice.gd" id="1_e2l0x"]
+[ext_resource type="Script" uid="uid://dqsmcb5pemarj" path="res://Scripts/DialogSystem/dialog_choice.gd" id="1_e2l0x"]
 
-[node name="DialogChoice" type="Button"]
+[node name="DialogChoice" type="Button" unique_id=1580161417]
 offset_right = 308.0
 offset_bottom = 47.0
 script = ExtResource("1_e2l0x")

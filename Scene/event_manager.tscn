@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cjpenoqg41ftl"]
 
-[ext_resource type="Script" uid="uid://42fc4luvfmv" path="res://Scripts/EventManager.gd" id="1_1ssq2"]
+[ext_resource type="Script" uid="uid://42fc4luvfmv" path="res://Scripts/EventManager/EventManager.gd" id="1_1ssq2"]
 [ext_resource type="Script" uid="uid://cmlevo8ncs4s2" path="res://Scripts/Resources/Event.gd" id="2_3djp4"]
 [ext_resource type="Resource" uid="uid://bcrsnogyq77c7" path="res://Resources/Events/main_event.tres" id="3_brmao"]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://dlkgqk55eh46n"]
+[gd_scene format=3 uid="uid://dlkgqk55eh46n"]
 
 [ext_resource type="Script" uid="uid://chp8hsqmxbpb3" path="res://Scripts/simple_npc.gd" id="1_6na30"]
 [ext_resource type="Texture2D" uid="uid://c2vanpq7fk8qd" path="res://Assets/CharacterSprite/GrandmaNormal.png" id="2_641i6"]
@@ -10,20 +10,20 @@ size = Vector2(438, 450)
 text = "Press E to show Dialog"
 font_size = 24
 
-[node name="SimpleNpc" type="Node2D"]
+[node name="SimpleNpc" type="Node2D" unique_id=1255137391]
 script = ExtResource("1_6na30")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1382616295]
 position = Vector2(-7.10543e-15, 3.8147e-06)
 scale = Vector2(0.219, 0.219)
 texture = ExtResource("2_641i6")
 
-[node name="DialogArea" type="Area2D" parent="."]
+[node name="DialogArea" type="Area2D" parent="." unique_id=1374797741]
 
-[node name="Shape" type="CollisionShape2D" parent="DialogArea"]
+[node name="Shape" type="CollisionShape2D" parent="DialogArea" unique_id=1564217739]
 shape = SubResource("RectangleShape2D_sfnd0")
 
-[node name="TextHelp" type="MeshInstance2D" parent="."]
+[node name="TextHelp" type="MeshInstance2D" parent="." unique_id=235078334]
 position = Vector2(7.10543e-15, -116)
 scale = Vector2(73.8252, -149.332)
 mesh = SubResource("TextMesh_6na30")

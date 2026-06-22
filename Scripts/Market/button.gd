@@ -1,7 +1,7 @@
 extends Button
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if MapPanel.visible:
 		self.disabled = true
 	else:

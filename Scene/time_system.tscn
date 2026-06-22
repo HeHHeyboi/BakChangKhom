@@ -25,10 +25,10 @@ layout_mode = 2
 
 [node name="Time" type="RichTextLabel" parent="PanelContainer/HBoxContainer" unique_id=1812622510]
 clip_contents = false
-layout_direction = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
+layout_direction = 2
 theme_override_font_sizes/normal_font_size = 50
 bbcode_enabled = true
 scroll_active = false

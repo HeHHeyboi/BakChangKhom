@@ -21,4 +21,3 @@ func checkTrackEvent():
 		self.show()
 	else:
 		self.hide()
-
