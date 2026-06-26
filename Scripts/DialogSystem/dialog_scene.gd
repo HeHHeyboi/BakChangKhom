@@ -43,8 +43,8 @@ func _exit_tree() -> void:
 
 # NOTE: มีไว้ test
 func _ready():
-	get_tree().root.remove_child(self)
 	if Test:
+		get_tree().root.remove_child(self)
 		read_file(AssetDir + test_file + ".txt")
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
@@ -66,7 +66,6 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 	if !chars.is_empty():
 		for char_name in chars:
 			var c = Global.getCharacterSprite(char_name)
-			print(c.name)
 			ShowSprites.addCharacterSprite(c)
 
 	if !bg_name.is_empty():
@@ -137,38 +136,41 @@ func show_text(text: String):
 					curSprite.highlight()
 					break
 		DialogType.Choice:
-			var body = parse["choices"]
-			for choice in body:
-				var button = choiceButton.instantiate()
-				button.get_choice.connect(click_choice)
-				button.text = choice
-				ChoiceContainer.add_child(button)
-
+			create_choice_buttons(parse["choices"])
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
 
 
 func parse_text(text: String):
-	var header
+	var header: String = ""
 	var body
 	if text.find(":") > -1:
 		var p = text.split(":")
 		header = p.get(0)
+		body = p.get(1)
 
-		body = p.get(1).split(",")
-		for i in range(len(body)):
-			body[i] = body.get(i).lstrip(" ")
-	else:
-		body = text.split(",")
-		for i in range(len(body)):
-			body[i] = body.get(i).lstrip(" ")
+	if header != null:
+		header = header.to_lower()
 
 	match header:
 		CHOICE:
-			return {"type": DialogType.Choice, "choices": body}
-		DIALOG:
+			var choices = body.split(",")
+			for i in range(len(choices)):
+				choices[i] = choices.get(i).lstrip(" ")
+			return {"type": DialogType.Choice, "choices": choices}
+		_:
+			body = text.split(",")
+			for i in range(len(body)):
+				body[i] = body.get(i).lstrip(" ")
 			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
-	return {"type": DialogType.Dialog, "name": "", "dialog": ""}
+
+
+func create_choice_buttons(choices: Array) -> void:
+	for choice in choices:
+		var button = choiceButton.instantiate()
+		button.get_choice.connect(click_choice)
+		button.text = choice
+		ChoiceContainer.add_child(button)
 
 
 func next_text() -> void:
@@ -221,6 +223,7 @@ func _on_skip_pressed():
 		if parse["type"] == DialogType.Choice:
 			var dialog = parse_text(current_dialog[i - 1])
 			index_stack[-1] = i
+			create_choice_buttons(parse["choices"])
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
 			NameBox.text = dialog["name"]

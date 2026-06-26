@@ -10,8 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://bf5v5byfa0ih2" path="res://Assets/CharacterSprite/GradmaHighlight.png" id="7_4rgag"]
 [ext_resource type="Script" uid="uid://rvwxhf8keb70" path="res://Scripts/Home/door.gd" id="7_c1wnw"]
 [ext_resource type="Script" uid="uid://ber64ekrxxe8b" path="res://Scripts/Home/grandma.gd" id="10_k7bem"]
-[ext_resource type="Resource" uid="uid://bcrsnogyq77c7" path="res://Resources/Events/main_event.tres" id="12_k7bem"]
 [ext_resource type="PackedScene" uid="uid://wvisrff7ykkt" path="res://Scene/caution_marker.tscn" id="12_vgjmv"]
+[ext_resource type="Resource" uid="uid://cdhbewxxtn1wg" path="res://Resources/main.tres" id="13_tl381"]
 
 [node name="Home" type="Control" unique_id=767628668]
 layout_mode = 3
@@ -73,7 +73,7 @@ layout_mode = 0
 offset_right = 237.81201
 offset_bottom = 237.81226
 scale = Vector2(1.45, 1.45)
-trackEvent = ExtResource("12_k7bem")
+trackEvent = ExtResource("13_tl381")
 trackStep = 2
 
 [node name="Grandma" type="TextureButton" parent="." unique_id=1162435037]
@@ -94,7 +94,7 @@ script = ExtResource("10_k7bem")
 
 [node name="caution" parent="Grandma" unique_id=592627305 instance=ExtResource("12_vgjmv")]
 layout_mode = 0
-trackEvent = ExtResource("12_k7bem")
+trackEvent = ExtResource("13_tl381")
 
 [connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]
 [connection signal="pressed" from="Door" to="Door" method="_on_pressed"]
