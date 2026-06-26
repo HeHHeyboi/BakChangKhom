@@ -60,19 +60,14 @@ func _ready():
 	self.visible = false
 
 
-func addCharcter(chars: Array):
-	for char_name in chars:
-		var c = Global.getCharacterSprite(char_name)
-		print(c.name)
-		ShowSprites.addCharacterSprite(c)
-
-
-# NOTE: อันนี้เอาไว้ใช้จริง จะเรียกผ่าน Object อื่น
 func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 	Global.showDialog()
 	bg_node.scale = Vector2(1, 1)
 	if !chars.is_empty():
-		addCharcter(chars)
+		for char_name in chars:
+			var c = Global.getCharacterSprite(char_name)
+			print(c.name)
+			ShowSprites.addCharacterSprite(c)
 
 	if !bg_name.is_empty():
 		# var loadImg = Image.load_from_file(bg)
