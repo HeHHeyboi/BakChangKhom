@@ -16,6 +16,7 @@ enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
 const CHOICE = "choice"
+
 const AssetDir = "res://Assets/"
 const MaxBGSize = Vector2(1152.0, 648.0)
 var dialog_stack: Array[String] = []
@@ -42,10 +43,9 @@ func _exit_tree() -> void:
 
 # NOTE: มีไว้ test
 func _ready():
+	get_tree().root.remove_child(self)
 	if Test:
 		read_file(AssetDir + test_file + ".txt")
-		# print_rich(DialogDict)
-		# bg_node.texture = BG_img
 		dialog_stack.append(DIALOG)
 		index_stack.append(0)
 		current_dialog = DialogDict[dialog_stack[-1]]
@@ -58,7 +58,6 @@ func _ready():
 		return
 
 	self.visible = false
-	# self.call_deferred("move_to_front")
 
 
 func addCharcter(chars: Array):
@@ -143,6 +142,13 @@ func show_text(text: String):
 					curSprite.highlight()
 					break
 		DialogType.Choice:
+			var body = parse["choices"]
+			for choice in body:
+				var button = choiceButton.instantiate()
+				button.get_choice.connect(click_choice)
+				button.text = choice
+				ChoiceContainer.add_child(button)
+
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
 
@@ -163,16 +169,11 @@ func parse_text(text: String):
 			body[i] = body.get(i).lstrip(" ")
 
 	match header:
-		"Choice":
-			for choice in body:
-				var button = choiceButton.instantiate()
-				button.get_choice.connect(click_choice)
-				button.text = choice
-				ChoiceContainer.add_child(button)
-
-			return {"type": DialogType.Choice}
-		_:
+		CHOICE:
+			return {"type": DialogType.Choice, "choices": body}
+		DIALOG:
 			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
+	return {"type": DialogType.Dialog, "name": "", "dialog": ""}
 
 
 func next_text() -> void:
@@ -219,17 +220,17 @@ func click_choice(button: Button) -> void:
 
 
 func _on_skip_pressed():
-	var choice
+	var parse
 	for i in range(index_stack[-1], current_dialog.size()):
-		choice = parse_text(current_dialog[i])
-		if choice["type"] == DialogType.Choice:
+		parse = parse_text(current_dialog[i])
+		if parse["type"] == DialogType.Choice:
 			var dialog = parse_text(current_dialog[i - 1])
 			index_stack[-1] = i
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
 			NameBox.text = dialog["name"]
 			TextBox.clear()
-			TextBox.add_text(dialog["dialog"])
+			TextBox.text = dialog["dialog"]
 
 			for n in ShowSprites.get_children():
 				if n.name == dialog["name"]:
@@ -238,5 +239,5 @@ func _on_skip_pressed():
 					break
 			return
 
-	if choice["type"] == DialogType.Dialog:
+	if parse["type"] == DialogType.Dialog:
 		dialog_end()

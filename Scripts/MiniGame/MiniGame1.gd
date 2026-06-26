@@ -86,4 +86,4 @@ func _on_return_pressed() -> void:
 	EventManager.update_event()
 	EventManager.next_period.emit()
 	EventManager.hideTimeUI(false)
-	get_tree().root.remove_child(self)
+	queue_free()
