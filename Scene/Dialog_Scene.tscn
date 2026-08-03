@@ -24,7 +24,7 @@ bg_color = Color(1, 1, 1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_68vdo"]
 bg_color = Color(1, 1, 1, 1)
 
-[node name="DialogScene" type="CanvasLayer" unique_id=1007173657 node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton")]
+[node name="DialogScene" type="CanvasLayer" unique_id=1007173657 node_paths=PackedStringArray("TextBox", "NameBox", "ChoiceContainer", "DialogButton", "skip_btn")]
 process_mode = 3
 layer = 128
 script = ExtResource("1_wcj4s")
@@ -33,6 +33,7 @@ NameBox = NodePath("PanelContainer/VBoxContainer/NameBox")
 ChoiceContainer = NodePath("ChoiceContainer")
 DialogButton = NodePath("PanelContainer")
 test_file = "Chapter9School"
+skip_btn = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Skip")
 
 [node name="BG" type="Sprite2D" parent="." unique_id=1107860285]
 position = Vector2(576, 324)

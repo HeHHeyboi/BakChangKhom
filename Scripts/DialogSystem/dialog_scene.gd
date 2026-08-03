@@ -5,6 +5,7 @@ extends CanvasLayer
 @export var ChoiceContainer: VBoxContainer
 @export var DialogButton: Button
 @export var test_file: String
+@export var skip_btn: Button
 # @export var BG_img: Texture2D
 @export var Test: bool
 # @export var ShowSprites: Node2D
@@ -137,6 +138,7 @@ func show_text(text: String):
 					break
 		DialogType.Choice:
 			create_choice_buttons(parse["choices"])
+			skip_btn.disabled = true
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
 
@@ -173,19 +175,26 @@ func create_choice_buttons(choices: Array) -> void:
 		ChoiceContainer.add_child(button)
 
 
-func next_text() -> void:
+# Advances the cursor one line, popping any finished branches off the stack
+# so we return to the parent dialog. Returns false when the whole dialog ends.
+func advance_index() -> bool:
 	index_stack[-1] += 1
-	if curSprite != null:
-		curSprite.fade()
-
 	while index_stack.size() > 0 and index_stack[-1] >= current_dialog.size():
 		index_stack.pop_back()
 		dialog_stack.pop_back()
 		if dialog_stack.size() == 0:
-			dialog_end()
-			return
-
+			return false
 		current_dialog = DialogDict[dialog_stack[-1]]
+	return true
+
+
+func next_text() -> void:
+	if curSprite != null:
+		curSprite.fade()
+
+	if not advance_index():
+		dialog_end()
+		return
 
 	# prints(index_stack)
 	show_text(current_dialog[index_stack[-1]])
@@ -204,6 +213,7 @@ func dialog_end() -> void:
 
 func click_choice(button: Button) -> void:
 	var select_Choice = button.text
+	skip_btn.disabled = false
 
 	index_stack[-1] += 1
 	index_stack.append(0)
@@ -216,26 +226,19 @@ func click_choice(button: Button) -> void:
 		i.queue_free()
 
 
-func _on_skip_pressed():
-	var parse
-	for i in range(index_stack[-1], current_dialog.size()):
-		parse = parse_text(current_dialog[i])
-		if parse["type"] == DialogType.Choice:
-			var dialog = parse_text(current_dialog[i - 1])
-			index_stack[-1] = i
-			create_choice_buttons(parse["choices"])
-			ChoiceContainer.visible = true
-			DialogButton.disabled = true
-			NameBox.text = dialog["name"]
-			TextBox.clear()
-			TextBox.text = dialog["dialog"]
+func _on_skip_pressed() -> void:
+	# Fast-forward through dialog lines (across branches) until we reach a
+	# choice or the dialog ends. Each line is rendered through show_text, so
+	# the line right before a choice stays visible as its prompt.
+	while true:
+		if curSprite != null:
+			curSprite.fade()
 
-			for n in ShowSprites.get_children():
-				if n.name == dialog["name"]:
-					curSprite = n as CharacterSprite
-					curSprite.highlight()
-					break
-			return
+		if not advance_index():
+			dialog_end()
+			break
 
-	if parse["type"] == DialogType.Dialog:
-		dialog_end()
+		var line: String = current_dialog[index_stack[-1]]
+		show_text(line)
+		if parse_text(line)["type"] == DialogType.Choice:
+			break

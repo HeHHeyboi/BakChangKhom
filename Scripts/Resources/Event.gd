@@ -20,13 +20,14 @@ func _ready() -> void:
 	on_task_update.emit(currentTask, _tasks[currentTask])
 
 
-func next_step():
+func next_step() -> String:
 	if isDone:
 		return ""
 
 	currentTask += 1
 	if currentTask >= totalTask:
 		isDone = true
+		return ""
 	else:
 		return get_task()
 
