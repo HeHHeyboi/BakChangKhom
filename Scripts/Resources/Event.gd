@@ -1,16 +1,35 @@
 class_name Event extends Resource
 
-@export var name: String = "UnknowEvent"
-@export var totalTask: int = 1
+signal on_task_update(int, String)
 
-var currentStep = 1
+@export var name: String = "UnknowEvent"
+@export_multiline var Tasks: Array[String] = []:
+	set(value):
+		totalTask = value.size()
+		_tasks = value
+
 var isActive: bool = false
 var isDone: bool = false
 
+var totalTask = 0
+var currentTask = 0
+var _tasks: Array[String] = []
 
-func next_step() -> int:
-	currentStep += 1
-	if currentStep >= totalTask:
+
+func _ready() -> void:
+	on_task_update.emit(currentTask, _tasks[currentTask])
+
+
+func next_step():
+	if isDone:
+		return ""
+
+	currentTask += 1
+	if currentTask >= totalTask:
 		isDone = true
+	else:
+		return get_task()
 
-	return currentStep
+
+func get_task() -> String:
+	return _tasks[currentTask]

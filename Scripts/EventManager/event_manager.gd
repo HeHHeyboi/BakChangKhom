@@ -16,12 +16,14 @@ func _ready() -> void:
 	if eventList.size() <= 0:
 		return
 	currentEvent = eventList[0]
+	QuestBoard.update_task(currentEvent.get_task())
 
 
 func update_event():
 	if currentEvent == null:
 		return
-	currentEvent.next_step()
+	var text = currentEvent.next_step()
+	QuestBoard.update_task(text)
 	sendUpdatedEvent.emit()
 
 

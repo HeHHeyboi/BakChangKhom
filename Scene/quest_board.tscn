@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cado8kgpm8iqn"]
+
+[ext_resource type="Script" uid="uid://bl5j2h71tn33r" path="res://Scripts/quest_board.gd" id="1_hsgkk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nyd0s"]
+bg_color = Color(0.21255091, 0.16541138, 0.18050927, 1)
+
+[node name="QuestBoard" type="CanvasLayer" unique_id=858189005 node_paths=PackedStringArray("QuestList")]
+layer = 100
+script = ExtResource("1_hsgkk")
+QuestList = NodePath("PanelContainer/VBoxContainer/QuestList")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=275706880]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=27374643]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1360650457]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Event"
+horizontal_alignment = 1
+
+[node name="QuestList" type="VBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1286289454]
+layout_mode = 2

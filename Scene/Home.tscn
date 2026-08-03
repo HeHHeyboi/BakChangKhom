@@ -74,7 +74,7 @@ offset_right = 237.81201
 offset_bottom = 237.81226
 scale = Vector2(1.45, 1.45)
 trackEvent = ExtResource("13_tl381")
-trackStep = 2
+trackStep = 1
 
 [node name="Grandma" type="TextureButton" parent="." unique_id=1162435037]
 layout_mode = 1

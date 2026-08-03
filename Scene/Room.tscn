@@ -36,7 +36,7 @@ offset_top = 371.99997
 offset_right = 241.99998
 offset_bottom = 446.99997
 trackEvent = ExtResource("4_sym6q")
-trackStep = 2
+trackStep = 1
 
 [node name="Door" type="TextureButton" parent="." unique_id=2032888040]
 layout_mode = 0

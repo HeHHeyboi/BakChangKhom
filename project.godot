@@ -27,6 +27,7 @@ Market="*res://Scene/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 TimeSystem="*res://Scene/time_system.tscn"
 EventManager="*uid://cjpenoqg41ftl"
+QuestBoard="*uid://cado8kgpm8iqn"
 
 [display]
 

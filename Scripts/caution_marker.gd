@@ -1,7 +1,9 @@
-class_name CautionMarker extends TextureRect
+class_name CautionMarker extends Control
 
+## Event this marker watches.
 @export var trackEvent: Event
-@export var trackStep: int = 1
+## Task step of [member trackEvent] at which this marker is shown.
+@export var trackStep: int = 0
 
 
 func _enter_tree() -> void:
@@ -12,12 +14,10 @@ func _exit_tree() -> void:
 	EventManager.sendUpdatedEvent.disconnect(checkTrackEvent)
 
 
-func _ready():
+func _ready() -> void:
 	checkTrackEvent()
 
 
-func checkTrackEvent():
-	if trackEvent.currentStep == trackStep:
-		self.show()
-	else:
-		self.hide()
+func checkTrackEvent() -> void:
+	var active := EventManager.currentEvent
+	visible = active != null and active == trackEvent and active.currentTask == trackStep
