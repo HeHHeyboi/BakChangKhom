@@ -1,41 +1,63 @@
 extends Node
-signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
 signal next_period
 signal next_day
 signal next_mounth
 signal hide_time
 signal show_time
 
-signal sendUpdatedEvent
+signal sendUpdatedEvent(Event)
+signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
 
-@export var eventList: Array[Event]
+enum EventID { NONE, MAIN }
+
+@export var eventMap: Dictionary[EventID,Event]
 var currentEvent: Event
 
 
 func _ready() -> void:
-	if eventList.size() <= 0:
+	# Re-sync caution markers whenever one enters the tree (e.g. on scene change).
+	# get_tree().node_added.connect(_on_node_added)
+	var root_tree = get_tree().root.get_tree()
+	root_tree.node_added.connect(_on_node_added)
+	if eventMap.size() <= 0:
 		return
-	currentEvent = eventList[0]
-	QuestBoard.update_task(currentEvent.get_task(), currentEvent)
+	var event = eventMap[EventID.MAIN]
+	currentEvent = event
+	QuestBoard.update_task(event.get_task(), event)
+	sendUpdatedEvent.emit(event)
 
 
-func update_event():
-	if currentEvent == null:
+func _on_node_added(node: Node) -> void:
+	print(node)
+	if node is CautionMarker:
+		sendUpdatedEvent.emit(currentEvent)
+
+
+func init_manager() -> void:
+	var event = eventMap[EventID.MAIN]
+	currentEvent = event
+	QuestBoard.update_task(event.get_task(), event)
+	sendUpdatedEvent.emit(event)
+
+
+func update_event(id: EventID):
+	var event = eventMap[id]
+	if event == null:
 		return
-	var text = currentEvent.next_step()
-	QuestBoard.update_task(text, currentEvent)
+	currentEvent = event
+	var text = event.next_step()
+	QuestBoard.update_task(text, event)
 
-	sendUpdatedEvent.emit()
-
-
-func event_finished(event: Event):
-	if currentEvent == event:
-		currentEvent = null
+	sendUpdatedEvent.emit(event)
 
 
 func show_dialog(title: String, file_path: StringName, bg_name: String, chars: Array = []):
 	showDialogEvent.emit(file_path, bg_name, chars)
 	DialogScene.set_title(title)
+
+
+func hideQuest(isHide: bool) -> void:
+	QuestBoard.visit = isHide
 
 
 func hideTimeUI(isHide: bool) -> void:

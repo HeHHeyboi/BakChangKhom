@@ -20,6 +20,7 @@ func update_task(text: String, event: Event) -> void:
 	if _event_map.has(event):
 		var label = _event_map.get(event)
 		if text == "":
+			_event_map.erase(event)
 			label.queue_free()
 		else:
 			label.text = "- " + text

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://0abmohme5tku" path="res://Assets/Background/RoomBG.jpg" id="1_snhtf"]
 [ext_resource type="PackedScene" uid="uid://cnw1askytwsbe" path="res://Scene/caution_button.tscn" id="2_nfwx1"]
 [ext_resource type="Resource" uid="uid://cdhbewxxtn1wg" path="res://Resources/main.tres" id="4_sym6q"]
+[ext_resource type="Script" uid="uid://db0chdbe7jurd" path="res://Scripts/Resources/event.gd" id="4_yuu8g"]
 [ext_resource type="Texture2D" uid="uid://c5ou3sav10i66" path="res://Assets/Home/door.png" id="6_sym6q"]
 [ext_resource type="Texture2D" uid="uid://b52s4tlqgsvrn" path="res://Assets/Home/doorHighlight.png" id="7_yuu8g"]
 [ext_resource type="Script" uid="uid://cwpxqyxdgbtjd" path="res://Scripts/Room/door.gd" id="8_yuu8g"]
@@ -35,8 +36,9 @@ offset_left = 173.99998
 offset_top = 371.99997
 offset_right = 241.99998
 offset_bottom = 446.99997
-trackEvent = ExtResource("4_sym6q")
-trackStep = 1
+trackEvents = Dictionary[ExtResource("4_yuu8g"), int]({
+ExtResource("4_sym6q"): 1
+})
 
 [node name="Door" type="TextureButton" parent="." unique_id=2032888040]
 layout_mode = 0

@@ -6,4 +6,6 @@
 
 [node name="EventManager" type="Node" unique_id=1564540008]
 script = ExtResource("1_3fpgi")
-eventList = Array[ExtResource("2_1ssq2")]([ExtResource("3_3djp4")])
+eventMap = Dictionary[int, ExtResource("2_1ssq2")]({
+1: ExtResource("3_3djp4")
+})
