@@ -83,7 +83,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	EventManager.update_event()
+	EventManager.update_event(EventManager.EventID.MAIN)
 	EventManager.next_period.emit()
 	EventManager.hideTimeUI(false)
 	queue_free()
