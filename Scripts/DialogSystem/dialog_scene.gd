@@ -87,9 +87,12 @@ func read_file(file_path: StringName):
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	var type = DIALOG
 
+	var line_num = 0
+
 	while !file.eof_reached():
 		var line = file.get_line()
 		line = line.rstrip(" ").lstrip(" ")
+		line_num += 1
 
 		if line == "":
 			type = DIALOG
@@ -100,7 +103,10 @@ func read_file(file_path: StringName):
 
 		# var header = ""
 		if line.find(":") > -1:
-			var split = line.split(":")
+			var split = line.split(":", true, 1)
+			if split.get(0) == "":
+				printerr("%s missing header on line: %d" % [file_path, line_num])
+				continue
 			var header = split.get(0).to_lower()
 			if header != CHOICE:
 				type = header
@@ -111,9 +117,7 @@ func read_file(file_path: StringName):
 				if !DialogDict.has(type):
 					DialogDict[type] = []
 					continue
-
 				DialogDict[type].append(parse_text(line))
-
 	file.close()
 
 
@@ -146,17 +150,17 @@ func show_text(token) -> void:
 	DialogButton.disabled = false
 
 	match token:
-		var d when token is DialogToken:
-			NameBox.text = d.name
+		var dialog when token is DialogToken:
+			NameBox.text = dialog.name
 			TextBox.clear()
-			TextBox.add_text(d.dialog)
+			TextBox.add_text(dialog.dialog)
 			for n in ShowSprites.get_children():
-				if n.name == d.name:
+				if n.name == dialog.name:
 					curSprite = n as CharacterSprite
 					curSprite.highlight()
 					break
-		var c when token is ChoiceToken:
-			create_choice_buttons(c.choices)
+		var choice when token is ChoiceToken:
+			create_choice_buttons(choice.choices)
 			skip_btn.disabled = true
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
