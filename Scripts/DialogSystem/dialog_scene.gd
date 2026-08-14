@@ -13,7 +13,6 @@ extends CanvasLayer
 @onready var bg_node = $"BG" as Sprite2D
 @onready var ShowSprites = $"CharacterPos" as CharacterPos
 @onready var Title = $"Title" as RichTextLabel
-enum DialogType { Dialog, Choice, SelectChoice }
 
 const DIALOG = "dialog"
 const CHOICE = "choice"
@@ -107,40 +106,15 @@ func read_file(file_path: StringName):
 				type = header
 		match type:
 			CHOICE, DIALOG:
-				DialogDict[type].append(line)
+				DialogDict[type].append(parse_text(line))
 			_:
 				if !DialogDict.has(type):
 					DialogDict[type] = []
 					continue
 
-				DialogDict[type].append(line)
+				DialogDict[type].append(parse_text(line))
 
 	file.close()
-
-
-# TODO:
-# 	1. Parse header "Choice"
-# 	2. other thing too
-func show_text(text: String):
-	curSprite = null
-	var parse = parse_text(text)
-	DialogButton.disabled = false
-
-	match parse["type"]:
-		DialogType.Dialog:
-			NameBox.text = parse["name"]
-			TextBox.clear()
-			TextBox.add_text(parse["dialog"])
-			for n in ShowSprites.get_children():
-				if n.name == parse["name"]:
-					curSprite = n as CharacterSprite
-					curSprite.highlight()
-					break
-		DialogType.Choice:
-			create_choice_buttons(parse["choices"])
-			skip_btn.disabled = true
-			ChoiceContainer.visible = true
-			DialogButton.disabled = true
 
 
 func parse_text(text: String):
@@ -159,12 +133,33 @@ func parse_text(text: String):
 			var choices = body.split(",")
 			for i in range(len(choices)):
 				choices[i] = choices.get(i).lstrip(" ")
-			return {"type": DialogType.Choice, "choices": choices}
+			return ChoiceToken.new(choices)
 		_:
 			body = text.split(",")
 			for i in range(len(body)):
 				body[i] = body.get(i).lstrip(" ")
-			return {"type": DialogType.Dialog, "name": body[0], "dialog": body[1]}
+			return DialogToken.new(body[0], body[1])
+
+
+func show_text(token) -> void:
+	curSprite = null
+	DialogButton.disabled = false
+
+	match token:
+		var d when token is DialogToken:
+			NameBox.text = d.name
+			TextBox.clear()
+			TextBox.add_text(d.dialog)
+			for n in ShowSprites.get_children():
+				if n.name == d.name:
+					curSprite = n as CharacterSprite
+					curSprite.highlight()
+					break
+		var c when token is ChoiceToken:
+			create_choice_buttons(c.choices)
+			skip_btn.disabled = true
+			ChoiceContainer.visible = true
+			DialogButton.disabled = true
 
 
 func create_choice_buttons(choices: Array) -> void:
@@ -238,7 +233,7 @@ func _on_skip_pressed() -> void:
 			dialog_end()
 			break
 
-		var line: String = current_dialog[index_stack[-1]]
-		show_text(line)
-		if parse_text(line)["type"] == DialogType.Choice:
+		var token = current_dialog[index_stack[-1]]
+		show_text(token)
+		if token is ChoiceToken:
 			break
