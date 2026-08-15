@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://2fjl854kurod"]
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=1701626485]
+layer = 20
+
+[node name="Control" type="Control" parent="." unique_id=1237192822]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Next" type="Button" parent="Control" unique_id=1558089892]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -228.0
+offset_top = -80.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "Next"
+
+[node name="Previous" type="Button" parent="Control" unique_id=773762281]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_right = 228.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "Previous"
