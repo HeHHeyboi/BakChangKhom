@@ -1,7 +1,16 @@
 [gd_scene format=3 uid="uid://2fjl854kurod"]
 
+[ext_resource type="Script" uid="uid://bihmufs1n168t" path="res://Scripts/Tutorial/tutorial.gd" id="1_75s84"]
+[ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="2_3cocp"]
+[ext_resource type="Resource" uid="uid://dex66o3vsog27" path="res://Resources/tutorial1.tres" id="3_3cs6x"]
+
 [node name="CanvasLayer" type="CanvasLayer" unique_id=1701626485]
 layer = 20
+script = ExtResource("1_75s84")
+TutorialSlide = Dictionary[int, ExtResource("2_3cocp")]({
+0: ExtResource("3_3cs6x")
+})
+test = true
 
 [node name="Control" type="Control" parent="." unique_id=1237192822]
 layout_mode = 3
@@ -11,6 +20,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_lock_ = true
+
+[node name="Slide" type="TextureRect" parent="Control" unique_id=681950440]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
 
 [node name="Next" type="Button" parent="Control" unique_id=1558089892]
 layout_mode = 1
@@ -36,3 +54,6 @@ offset_right = 228.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 32
 text = "Previous"
+
+[connection signal="pressed" from="Control/Next" to="." method="_on_next_btn_pressed"]
+[connection signal="pressed" from="Control/Previous" to="." method="_on_prev_btn_pressed"]
