@@ -1,4 +1,4 @@
-extends CanvasLayer
+class_name TimeSystem extends CanvasLayer
 
 @onready var timeText = $PanelContainer/HBoxContainer/Time as RichTextLabel
 @onready var dateText = $PanelContainer/HBoxContainer/Date as RichTextLabel
@@ -13,15 +13,11 @@ enum TIME { MORNING, NOON, EVENING }
 func _enter_tree() -> void:
 	EventManager.next_period.connect(change_period)
 	EventManager.next_day.connect(change_day)
-	EventManager.hide_time.connect(self.hide)
-	EventManager.show_time.connect(self.show)
 
 
 func _exit_tree() -> void:
 	EventManager.next_period.disconnect(change_period)
 	EventManager.next_day.disconnect(change_day)
-	EventManager.hide_time.disconnect(self.hide)
-	EventManager.show_time.disconnect(self.show)
 
 
 func _ready() -> void:

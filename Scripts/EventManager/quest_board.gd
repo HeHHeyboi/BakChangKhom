@@ -1,4 +1,4 @@
-extends CanvasLayer
+class_name QuesetBoard extends CanvasLayer
 
 signal on_update_task(String)
 

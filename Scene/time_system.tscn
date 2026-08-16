@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dglblhypmpmth"]
 
-[ext_resource type="Script" uid="uid://kt7fp2rokrmr" path="res://Scripts/TimeSystem/time_system.gd" id="1_nyd0s"]
+[ext_resource type="Script" uid="uid://kt7fp2rokrmr" path="res://Scripts/EventManager/time_system.gd" id="1_nyd0s"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nyd0s"]
 bg_color = Color(0.22845358, 0.22845358, 0.22845358, 1)

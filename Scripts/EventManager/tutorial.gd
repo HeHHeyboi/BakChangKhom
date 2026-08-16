@@ -1,4 +1,4 @@
-extends CanvasLayer
+class_name Tutorial extends CanvasLayer
 
 enum TutorialState { BASIC_START, BASIC_HOME, RAM_CLEANING, MOTHERBOARD, GPU, FRONT_PANEL, BIOS }
 
@@ -16,11 +16,14 @@ var _finished = false
 
 
 func _ready() -> void:
+	self.visible = false
+	self.process_mode = Node.PROCESS_MODE_DISABLED
 	if test:
 		show_tutorial()
 
 
 func show_tutorial() -> void:
+	self.visible = true
 	self.process_mode = Node.PROCESS_MODE_INHERIT
 	cur_slide = _slides[TutorialState.BASIC_START]
 	slide_show.texture = cur_slide.get_cur_slide()

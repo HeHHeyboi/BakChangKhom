@@ -5,7 +5,7 @@ extends Control
 var showTutorial = false
 
 
-func _enter_tree() -> void:
+func _ready() -> void:
 	EventManager.hideTimeUI(true)
 	EventManager.hideQuest(true)
 

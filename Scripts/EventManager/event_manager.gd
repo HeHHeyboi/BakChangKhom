@@ -1,9 +1,6 @@
 extends Node
 signal next_period
 signal next_day
-signal next_mounth
-signal hide_time
-signal show_time
 
 signal sendUpdatedEvent(Event)
 signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
@@ -11,6 +8,9 @@ signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
 enum EventID { NONE, MAIN }
 
 @export var eventMap: Dictionary[EventID,Event]
+@onready var questboard = $"QuestBoard" as QuesetBoard
+@onready var time_system = $"TimeSystem" as TimeSystem
+@onready var tutorial = $"Tutorial" as Tutorial
 var currentEvent: Event
 
 
@@ -21,7 +21,7 @@ func _ready() -> void:
 		return
 	var event = eventMap[EventID.MAIN]
 	currentEvent = event
-	QuestBoard.update_task(event.get_task(), event)
+	questboard.update_task(event.get_task(), event)
 	sendUpdatedEvent.emit(event)
 
 
@@ -33,7 +33,7 @@ func _on_node_added(node: Node) -> void:
 func init_manager() -> void:
 	var event = eventMap[EventID.MAIN]
 	currentEvent = event
-	QuestBoard.update_task(event.get_task(), event)
+	questboard.update_task(event.get_task(), event)
 	sendUpdatedEvent.emit(event)
 
 
@@ -43,7 +43,7 @@ func update_event(id: EventID):
 		return
 	currentEvent = event
 	var text = event.next_step()
-	QuestBoard.update_task(text, event)
+	questboard.update_task(text, event)
 
 	sendUpdatedEvent.emit(event)
 
@@ -54,11 +54,12 @@ func show_dialog(title: String, file_path: StringName, bg_name: String, chars: A
 
 
 func hideQuest(isHide: bool) -> void:
-	QuestBoard.visible = !isHide
+	questboard.visible = !isHide
 
 
 func hideTimeUI(isHide: bool) -> void:
-	if isHide:
-		hide_time.emit()
-	else:
-		show_time.emit()
+	time_system.visible = !isHide
+
+
+func show_tutorial() -> void:
+	tutorial.show_tutorial()

@@ -26,8 +26,6 @@ EventManager="*uid://cjpenoqg41ftl"
 DialogScene="*res://Scene/Dialog_Scene.tscn"
 Market="*res://Scene/Location/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
-TimeSystem="*res://Scene/time_system.tscn"
-QuestBoard="*uid://cado8kgpm8iqn"
 
 [display]
 

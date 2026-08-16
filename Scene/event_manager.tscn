@@ -1,11 +1,21 @@
 [gd_scene format=3 uid="uid://cjpenoqg41ftl"]
 
 [ext_resource type="Script" uid="uid://2i2iq8ln8i11" path="res://Scripts/EventManager/event_manager.gd" id="1_3fpgi"]
-[ext_resource type="Script" uid="uid://db0chdbe7jurd" path="res://Scripts/Resources/event.gd" id="2_1ssq2"]
+[ext_resource type="Script" uid="uid://db0chdbe7jurd" path="res://Scripts/Resources/Event.gd" id="2_1ssq2"]
 [ext_resource type="Resource" uid="uid://cdhbewxxtn1wg" path="res://Resources/main.tres" id="3_3djp4"]
+[ext_resource type="PackedScene" uid="uid://dglblhypmpmth" path="res://Scene/time_system.tscn" id="4_brmao"]
+[ext_resource type="PackedScene" uid="uid://cado8kgpm8iqn" path="res://Scene/quest_board.tscn" id="5_ookmy"]
+[ext_resource type="PackedScene" uid="uid://2fjl854kurod" path="res://Scene/TutorialScene/Tutorial.tscn" id="6_ookmy"]
 
 [node name="EventManager" type="Node" unique_id=1564540008]
 script = ExtResource("1_3fpgi")
 eventMap = Dictionary[int, ExtResource("2_1ssq2")]({
 1: ExtResource("3_3djp4")
 })
+
+[node name="TimeSystem" parent="." unique_id=1106151211 instance=ExtResource("4_brmao")]
+
+[node name="QuestBoard" parent="." unique_id=858189005 instance=ExtResource("5_ookmy")]
+
+[node name="Tutorial" parent="." unique_id=1701626485 instance=ExtResource("6_ookmy")]
+visible = false
