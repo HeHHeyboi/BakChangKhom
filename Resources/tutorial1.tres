@@ -3,7 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://b55oyvcho4pj6" path="res://Assets/Background/Chapter2_bg.jpg" id="1_45gdi"]
 [ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="1_u8nrn"]
 [ext_resource type="Texture2D" uid="uid://b45od8371gqds" path="res://Assets/Background/placeholder.png" id="2_b8rou"]
+[ext_resource type="Texture2D" uid="uid://dqtco46bmjijd" path="res://Assets/Background/HomeBG.jpg" id="3_b8rou"]
 
 [resource]
 script = ExtResource("1_u8nrn")
-ImageSlide = Array[Texture2D]([ExtResource("1_45gdi"), ExtResource("2_b8rou")])
+ImageSlide = Array[Texture2D]([ExtResource("1_45gdi"), ExtResource("2_b8rou"), ExtResource("3_b8rou")])

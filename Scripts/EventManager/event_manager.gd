@@ -15,8 +15,6 @@ var currentEvent: Event
 
 
 func _ready() -> void:
-	# Re-sync caution markers whenever one enters the tree (e.g. on scene change).
-	# get_tree().node_added.connect(_on_node_added)
 	var root_tree = get_tree().root.get_tree()
 	root_tree.node_added.connect(_on_node_added)
 	if eventMap.size() <= 0:
@@ -28,7 +26,6 @@ func _ready() -> void:
 
 
 func _on_node_added(node: Node) -> void:
-	print(node)
 	if node is CautionMarker:
 		sendUpdatedEvent.emit(currentEvent)
 
@@ -57,7 +54,7 @@ func show_dialog(title: String, file_path: StringName, bg_name: String, chars: A
 
 
 func hideQuest(isHide: bool) -> void:
-	QuestBoard.visit = isHide
+	QuestBoard.visible = !isHide
 
 
 func hideTimeUI(isHide: bool) -> void:

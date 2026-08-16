@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://dex66o3vsog27" path="res://Resources/tutorial1.tres" id="3_3cs6x"]
 
 [node name="CanvasLayer" type="CanvasLayer" unique_id=1701626485]
-layer = 20
+layer = 120
 script = ExtResource("1_75s84")
 TutorialSlide = Dictionary[int, ExtResource("2_3cocp")]({
 0: ExtResource("3_3cs6x")

@@ -7,15 +7,17 @@ var showTutorial = false
 
 func _enter_tree() -> void:
 	EventManager.hideTimeUI(true)
+	EventManager.hideQuest(true)
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT and showTutorial:
-			get_tree().change_scene_to_file("res://Scene/Home.tscn")
+			get_tree().change_scene_to_file("res://Scene/Location/Home.tscn")
 			EventManager.show_dialog("ออฟฟิส", "res://Assets/Prolouge.txt", "placeholder.png")
 			Global.on_start = false
 			EventManager.hideTimeUI(false)
+			EventManager.hideQuest(false)
 			self.hide()
 
 
