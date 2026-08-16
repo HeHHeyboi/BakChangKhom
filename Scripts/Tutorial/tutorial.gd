@@ -12,6 +12,7 @@ enum TutorialState { BASIC_START, BASIC_HOME, RAM_CLEANING, MOTHERBOARD, GPU, FR
 
 var _slides = {}
 var cur_slide: TutorialSlides = null
+var _finished = false
 
 
 func _ready() -> void:
@@ -20,6 +21,7 @@ func _ready() -> void:
 
 
 func show_tutorial() -> void:
+	self.process_mode = Node.PROCESS_MODE_INHERIT
 	cur_slide = _slides[TutorialState.BASIC_START]
 	slide_show.texture = cur_slide.get_cur_slide()
 
@@ -34,16 +36,21 @@ func _process(delta: float) -> void:
 		prev_btn.disabled = false
 
 	if cur_slide.is_finish():
-		next_btn.disabled = true
+		next_btn.text = "Close"
+		_finished = true
 	else:
-		next_btn.disabled = false
+		next_btn.text = "Next"
+		_finished = false
 
 
 func _on_next_btn_pressed():
+	if _finished:
+		self.visible = false
+		self.process_mode = Node.PROCESS_MODE_DISABLED
+		return
 	var slide = cur_slide.get_next_slide()
 	if slide == null:
-		next_btn.disabled = true
-		prev_btn.disabled = false
+		return
 
 	slide_show.texture = slide
 	pass
@@ -52,7 +59,5 @@ func _on_next_btn_pressed():
 func _on_prev_btn_pressed():
 	var slide = cur_slide.get_prev_slide()
 	if slide == null:
-		next_btn.disabled = false
-		prev_btn.disabled = true
+		return
 	slide_show.texture = slide
-	pass
