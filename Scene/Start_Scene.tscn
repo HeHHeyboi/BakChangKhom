@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://ddqsjm26hsw5t" path="res://Assets/Background/settingBG.jpg" id="7_x8fdo"]
 [ext_resource type="Script" uid="uid://dy8qq50jrvugu" path="res://Scripts/StartMenu/return.gd" id="8_x8fdo"]
 
-[node name="StartScene" type="Control" unique_id=198003018 node_paths=PackedStringArray("SettingScene", "Tutorial")]
+[node name="StartScene" type="Control" unique_id=198003018 node_paths=PackedStringArray("SettingScene", "tutorial")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fnmpy")
 SettingScene = NodePath("Setting")
-Tutorial = NodePath("Tutorial")
+tutorial = NodePath("Tutorial")
 
 [node name="Background" type="TextureRect" parent="." unique_id=122107632]
 layout_mode = 1
