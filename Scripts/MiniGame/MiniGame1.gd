@@ -17,10 +17,15 @@ var goalPos
 var curPos
 var clikTime = 0
 var t = 1.0
+
+const RamDirtyImage = "res://Assets/MiniGame/ramDirty.png"
+const RamSlightDirtyImage = "res://Assets/MiniGame/ramSligtDirty.png"
+const RamCleanImage = "res://Assets/MiniGame/ram.png"
+
 var RamIMG = [
-	load("res://Assets/MiniGame/ramDirty.png"),
-	load("res://Assets/MiniGame/ramSligtDirty.png"),
-	load("res://Assets/MiniGame/ram.png")
+	load(RamDirtyImage),
+	load(RamSlightDirtyImage),
+	load(RamCleanImage)
 ]
 
 enum RamStatus { DIRTY = 0, BETTER = 10, CLEAN = 15 }

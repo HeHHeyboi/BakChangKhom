@@ -53,6 +53,16 @@ func show_dialog(title: String, file_path: StringName, bg_name: String, chars: A
 	DialogScene.set_title(title)
 
 
+func hideUI() -> void:
+	questboard.visible = false
+	time_system.visible = false
+
+
+func showUI() -> void:
+	questboard.visible = true
+	time_system.visible = true
+
+
 func hideQuest(isHide: bool) -> void:
 	questboard.visible = !isHide
 

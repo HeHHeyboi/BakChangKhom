@@ -4,7 +4,7 @@ const speed = 300
 
 @onready var sprite = $"Idle"
 @onready var anim = $"Idle/AnimationPlayer"
-@onready var idle = preload("res://Assets/SpriteSheets/Idle.png")
+@onready var idle = load(Constant.PLAYER_IDLE_SPRITESHEET)
 var Dir = Vector2(0, 0)
 
 # TODO: เมื่อเข้า Dialog อาจจะต้อง Disable Player Input ทั้งหมด

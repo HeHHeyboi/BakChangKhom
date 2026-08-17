@@ -17,7 +17,7 @@ func _input(event: InputEvent) -> void:
 		if event.is_pressed() && playerEnter:
 			if event.keycode == KEY_E:
 				DialogScene.visible = !DialogScene.visible
-				DialogScene.show_dialog("res://Assets/Chapter1ReturnHome.txt", player, ["ขม,ยาย"])
+				DialogScene.show_dialog(Constant.CHAPTER1_RETURN_HOME_TEXT, player, ["ขม,ยาย"])
 
 
 func _on_dialog_area_body_entered(body: Node2D) -> void:

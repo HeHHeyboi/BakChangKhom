@@ -2,4 +2,4 @@ extends TextureButton
 
 
 func _on_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scene/Location/Home.tscn")
+	get_tree().change_scene_to_file(Constant.HOME_SCENE)

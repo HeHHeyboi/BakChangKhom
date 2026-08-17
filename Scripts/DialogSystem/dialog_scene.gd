@@ -18,12 +18,15 @@ const DIALOG = "dialog"
 const CHOICE = "choice"
 
 const AssetDir = "res://Assets/"
+const BackgroundDir = "res://Assets/Background/"
+const DialogChoiceScene = "res://Scene/DialogChoice.tscn"
+
 const MaxBGSize = Vector2(1152.0, 648.0)
 var dialog_stack: Array[String] = []
 var index_stack: Array[int] = []
 var current_dialog: Array
 var DialogDict := {DIALOG: []}
-var choiceButton = preload("res://Scene/DialogChoice.tscn")
+var choiceButton = preload(DialogChoiceScene)
 var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
 
@@ -70,7 +73,7 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 
 	if !bg_name.is_empty():
 		# var loadImg = Image.load_from_file(bg)
-		bg_node.texture = load("res://Assets/Background/" + bg_name) as Texture2D
+		bg_node.texture = load(BackgroundDir + bg_name) as Texture2D
 		var bgSize = bg_node.texture.get_size()
 		if bgSize > MaxBGSize:
 			bg_node.scale = MaxBGSize / bgSize
