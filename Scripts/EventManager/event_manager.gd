@@ -13,6 +13,8 @@ enum EventID { NONE, MAIN }
 @onready var tutorial = $"Tutorial" as Tutorial
 var currentEvent: Event
 
+signal on_tutorial_finish
+
 
 func _ready() -> void:
 	var root_tree = get_tree().root.get_tree()
@@ -23,11 +25,17 @@ func _ready() -> void:
 	currentEvent = event
 	questboard.update_task(event.get_task(), event)
 	sendUpdatedEvent.emit(event)
+	tutorial.on_tutorial_end.connect(_on_tutorial_end)
 
 
 func _on_node_added(node: Node) -> void:
 	if node is CautionMarker:
 		sendUpdatedEvent.emit(currentEvent)
+
+
+func _on_tutorial_end():
+	print("Tutorial Finish")
+	on_tutorial_finish.emit()
 
 
 func init_manager() -> void:
@@ -71,5 +79,8 @@ func hideTimeUI(isHide: bool) -> void:
 	time_system.visible = !isHide
 
 
-func show_tutorial() -> void:
-	tutorial.show_tutorial()
+const TutorialState = Tutorial.TutorialState
+
+
+func show_tutorial(index: TutorialState) -> void:
+	tutorial.show_tutorial(index)

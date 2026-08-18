@@ -14,18 +14,21 @@ var _slides = {}
 var cur_slide: TutorialSlides = null
 var _finished = false
 
+signal on_tutorial_end
+
 
 func _ready() -> void:
 	self.visible = false
 	self.process_mode = Node.PROCESS_MODE_DISABLED
 	if test:
-		show_tutorial()
+		show_tutorial(TutorialState.BASIC_START)
 
 
-func show_tutorial() -> void:
+func show_tutorial(tutor_index: TutorialState) -> void:
 	self.visible = true
+	self._finished = false
 	self.process_mode = Node.PROCESS_MODE_INHERIT
-	cur_slide = _slides[TutorialState.BASIC_START]
+	cur_slide = _slides[tutor_index]
 	slide_show.texture = cur_slide.get_cur_slide()
 
 
@@ -48,6 +51,7 @@ func _process(delta: float) -> void:
 
 func _on_next_btn_pressed():
 	if _finished:
+		on_tutorial_end.emit()
 		self.visible = false
 		self.process_mode = Node.PROCESS_MODE_DISABLED
 		return
