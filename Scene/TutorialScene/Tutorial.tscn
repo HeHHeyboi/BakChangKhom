@@ -3,12 +3,14 @@
 [ext_resource type="Script" uid="uid://bihmufs1n168t" path="res://Scripts/EventManager/tutorial.gd" id="1_75s84"]
 [ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="2_3cocp"]
 [ext_resource type="Resource" uid="uid://dex66o3vsog27" path="res://Resources/tutorial1.tres" id="3_3cs6x"]
+[ext_resource type="Resource" uid="uid://cffbfrrxldydc" path="res://Resources/ram_cleaning.tres" id="4_3cs6x"]
 
 [node name="Tutorial" type="CanvasLayer" unique_id=1701626485]
 layer = 120
 script = ExtResource("1_75s84")
 TutorialSlide = Dictionary[int, ExtResource("2_3cocp")]({
-0: ExtResource("3_3cs6x")
+0: ExtResource("3_3cs6x"),
+2: ExtResource("4_3cs6x")
 })
 
 [node name="Control" type="Control" parent="." unique_id=1237192822]

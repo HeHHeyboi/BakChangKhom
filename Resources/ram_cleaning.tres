@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TutorialSlides" format=3 uid="uid://cffbfrrxldydc"]
+
+[ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="1_gjru7"]
+[ext_resource type="Texture2D" uid="uid://cksvkup55mhlm" path="res://Assets/Tutorial/RamCleaning/Tutorial ขัดแรม.png" id="1_lr1uy"]
+
+[resource]
+script = ExtResource("1_gjru7")
+ImageSlide = Array[Texture2D]([ExtResource("1_lr1uy")])
+metadata/_custom_type_script = "uid://wqsge0jtfd64"

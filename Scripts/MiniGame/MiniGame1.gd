@@ -22,11 +22,7 @@ const RamDirtyImage = "res://Assets/MiniGame/ramDirty.png"
 const RamSlightDirtyImage = "res://Assets/MiniGame/ramSligtDirty.png"
 const RamCleanImage = "res://Assets/MiniGame/ram.png"
 
-var RamIMG = [
-	load(RamDirtyImage),
-	load(RamSlightDirtyImage),
-	load(RamCleanImage)
-]
+var RamIMG = [load(RamDirtyImage), load(RamSlightDirtyImage), load(RamCleanImage)]
 
 enum RamStatus { DIRTY = 0, BETTER = 10, CLEAN = 15 }
 
@@ -36,6 +32,7 @@ func _ready() -> void:
 	curPos = pos1.position
 	eraser.position = curPos
 	EventManager.hideTimeUI(true)
+	EventManager.show_tutorial(EventManager.TutorialState.RAM_CLEANING)
 	pass
 
 
