@@ -34,3 +34,10 @@ func next_step() -> String:
 
 func get_task() -> String:
 	return _tasks[currentTask]
+
+
+# Jumps directly to a task index (used by the debug menu to skip ahead).
+func set_step(index: int) -> String:
+	currentTask = clampi(index, 0, maxi(totalTask - 1, 0))
+	isDone = false
+	return get_task()

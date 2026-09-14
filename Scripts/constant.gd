@@ -2,10 +2,13 @@ class_name Constant
 
 const HOME_SCENE = "res://Scene/Location/Home.tscn"
 const ROOM_SCENE = "res://Scene/Location/Room.tscn"
-const PROLOUGE_TEXT = "res://Assets/Prolouge.txt"
+const DIALOG_DIR = "res://Assets/Dialog/"
+const PROLOUGE_TEXT = DIALOG_DIR+"Prolouge.txt"
 const PLACEHOLDER_IMAGE = "placeholder.png"
 
-const CHAPTER1_RETURN_HOME_TEXT = "res://Assets/Chapter1ReturnHome.txt"
+const CHAPTER1_RETURN_HOME_TEXT = DIALOG_DIR+"Chapter1ReturnHome.txt"
 const CHAPTER2_BG_IMAGE = "Chapter2_bg.jpg"
 
 const PLAYER_IDLE_SPRITESHEET = "res://Assets/SpriteSheets/Idle.png"
+
+const MAIN_DIALOG_1 = DIALOG_DIR+"MainQuest/GoToRoom.txt"

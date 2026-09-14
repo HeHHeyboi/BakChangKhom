@@ -31,8 +31,6 @@ func _ready() -> void:
 	goalPos = pos1.position
 	curPos = pos1.position
 	eraser.position = curPos
-	EventManager.hideTimeUI(true)
-	EventManager.show_tutorial(EventManager.TutorialState.RAM_CLEANING)
 	pass
 
 

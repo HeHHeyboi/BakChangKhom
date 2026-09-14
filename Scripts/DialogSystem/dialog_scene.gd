@@ -30,6 +30,8 @@ var choiceButton = preload(DialogChoiceScene)
 var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
 
+signal on_dialog_finish
+
 
 func set_title(title: String):
 	Title.clear()
@@ -71,7 +73,11 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 			var c = Global.getCharacterSprite(char_name)
 			ShowSprites.addCharacterSprite(c)
 
-	if !bg_name.is_empty():
+	if bg_name.is_empty():
+		var transparent_img = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		transparent_img.fill(Color(0, 0, 0, 0))
+		bg_node.texture = ImageTexture.create_from_image(transparent_img)
+	else:
 		# var loadImg = Image.load_from_file(bg)
 		bg_node.texture = load(BackgroundDir + bg_name) as Texture2D
 		var bgSize = bg_node.texture.get_size()
@@ -204,6 +210,7 @@ func next_text() -> void:
 
 # NOTE: maybe this is a signal
 func dialog_end() -> void:
+	on_dialog_finish.emit()
 	Global.hideDialog()
 	self.visible = false
 	DialogDict.clear()

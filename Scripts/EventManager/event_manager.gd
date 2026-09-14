@@ -56,6 +56,18 @@ func update_event(id: EventID):
 	sendUpdatedEvent.emit(event)
 
 
+# Jumps an event straight to a task index (used by the debug menu).
+func jump_event(id: EventID, task_index: int) -> void:
+	var event = eventMap[id]
+	if event == null:
+		return
+	currentEvent = event
+	var text = event.set_step(task_index)
+	questboard.update_task(text, event)
+
+	sendUpdatedEvent.emit(event)
+
+
 func show_dialog(title: String, file_path: StringName, bg_name: String, chars: Array = []):
 	showDialogEvent.emit(file_path, bg_name, chars)
 	DialogScene.set_title(title)

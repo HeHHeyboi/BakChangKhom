@@ -26,6 +26,7 @@ EventManager="*uid://cjpenoqg41ftl"
 DialogScene="*res://Scene/Dialog_Scene.tscn"
 Market="*res://Scene/Location/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
+DebugMenu="*res://Scripts/Debug/debug_menu.gd"
 
 [display]
 
