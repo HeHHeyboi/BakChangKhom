@@ -214,6 +214,48 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 มีแค่ `.stylebox` (StyleBox ของ Godot ไม่ใช่รูป): `base`, `baseHover`, `baseHoverPress`, `StartMenu/button_*`, `StartMenu/option_*`
 **ยังไม่มี UI ที่เป็นภาพวาดเลยแม้แต่ชิ้นเดียว** → ดูหัวข้อ 5.6
 
+### 3.8 ✨ ชุด asset รอบใหม่ (Gen batch — 84 ไฟล์, ย้ายเข้า `Assets/` แล้ว 16 ก.ย. 2569)
+
+ไฟล์ทั้งหมดถูกย้ายจาก `Assets/Gen/Assets/**` เข้าโครงจริงแล้ว ขนาดและชื่อไฟล์ **ตรงตามสเปกในเอกสารนี้**
+
+| หมวด | ได้ครบ | หมายเหตุ |
+|---|---|---|
+| Background (หัวข้อ 5.5) | **9 / 9** ✅ | ทุกไฟล์ 1152×648 · 100–166 KB · ครบตามรายการที่เสนอไว้ |
+| ตัวละคร (หัวข้อ 5.3 + 5.4) | **20 ไฟล์** ✅ | 400×500 ทุกไฟล์ · ปิ๊บ 5 อารมณ์ · ขม 4 อารมณ์ · มิ้น 2 · ยาย/ลุงอำนวย/ผอ./ผู้ใหญ่บ้าน/ครู/เด็กหญิง/เด็ก/เพื่อนร่วมงาน/หัวหน้า |
+| MiniGame Tier 1 | 4 ไฟล์ | `mg1_ram_dirty/better/clean` **600×214 เท่ากันทุกใบ** (แก้ปัญหาเดิม) + `mg1_eraser` 256×256 |
+| MiniGame Tier 2 | 10 / 12 | ขาด `mg2_mainboard_ghost`, `mg2_cpu_wrong` |
+| MiniGame Tier 3 | **10 / 10** ✅ | ครบ |
+| MiniGame Tier 4 | 9 ไฟล์ | ใช้ `mg4_slots_overview.png` (520×240) แทนสลอตแยก 4 ไฟล์ — ถ้าจะทำ drag-drop ทีละสลอตต้องแยกไฟล์หรือใช้ region |
+| MiniGame Tier 5 | 6 / 7 | ขาด `mg5_bottleneck_chart` |
+| UI | 9 ไฟล์ | ปุ่ม 4 state (320×96), dialog box (1152×200), name plate, quest panel, time panel, marker_caution 1 state |
+| Ending | 1 / 4 | มีแค่ `credits_bg.jpg` ขาดภาพ ending 3 ใบ |
+| Sprite sheet เดิน | ✅ | `char_khom_walk_sheet.png` 1600×500 (4 เฟรม 400×500) + เฟรมแยกใน `SpriteSheets/Frames/` + `Resources/khom_walk.tres` (SpriteFrames พร้อมใช้) — **แทน `Walk_Khom.png` 3500×3500 ของเดิมได้เลย** |
+
+#### ยังขาดอยู่ (หลัง Gen batch)
+
+| ลำดับ | สิ่งที่ขาด | อ้างอิง |
+|---|---|---|
+| 🔴 1 | **Tutorial slides ทั้ง 7 state** — ยังไม่มีไฟล์ใหม่เลย | หัวข้อ 5.1 |
+| 🔴 2 | **Asset มินิเกม 1 นอกเหนือจากขั้นขัด** — Phase 0 วินิจฉัย (6), ภาพประกอบตอนสอน (3), ขั้นตัดไฟ/ถอด/ใส่กลับ/ตรวจผล/สรุป (~12) | `MINIGAME1_DESIGN.md` หัวข้อ 11 |
+| 🔴 3 | **อุปกรณ์ทำความสะอาด 10 ชิ้น + ถาด + การ์ดคุณสมบัติ** (ระบบเลือกอุปกรณ์) | `MINIGAME1_DESIGN.md` หัวข้อ 14.8 |
+| 🟡 4 | **Audio ทั้งหมด** — ยังไม่มีไฟล์เสียงแม้แต่ไฟล์เดียว | หัวข้อ 5.8 |
+| 🟡 5 | UI ที่เหลือ: ไอคอนช่วงเวลา 3, เงิน/XP/ยศ 7, ปุ่ม close/next/prev/map 4, marker_caution อีก 2 state | หัวข้อ 5.6 |
+| 🟢 6 | ภาพ Ending 3 ใบ · `mg2_mainboard_ghost` · `mg2_cpu_wrong` · `mg5_bottleneck_chart` | หัวข้อ 5.2, 5.7 |
+
+#### งานที่ต้องทำกับชุด Gen ก่อนใช้จริง
+
+1. **เปิด Godot ให้ import** — ไฟล์ทั้ง 84 ยังไม่มี `.import` (ต้อง commit `.import` ตามด้วย)
+2. **ผูกเข้า `_CharacterMap`** (`Scene/Global.tscn`) — เพิ่ม `"ปิ๊บ"`, `"มิ้น"`, `"ลุงอำนวย"`, `"ผอ."`, `"ผู้ใหญ่บ้าน"`, `"ครู"`, `"เด็กหญิง"`, `"เด็ก"`, `"เพื่อนร่วมงาน"`, `"หัวหน้า"`
+3. **เลือกไฟล์ที่ซ้ำซ้อนให้เหลืออันเดียว** แล้วลบของเก่า:
+   * `char_khom_normal.png` / `char_khom_idle.png` ↔ `Idle.png` เดิม
+   * `char_grandma_normal.png` ↔ `GrandmaNormal.png` เดิม
+   * `char_pib_normal.png` ↔ `char_pib_neutral.png` (ซ้ำกันเอง — เลือก 1)
+   * `mg1_ram_*.png` ↔ `ram*.png` เดิมใน `Assets/MiniGame/`
+   * `char_khom_walk_sheet.png` ↔ `Walk_Khom.png` (มี 2 ที่: `SpriteSheets/` และ `TileMap/`)
+4. **บีบไฟล์ที่ใหญ่เกินเพดาน** (ใช้ `pngquant` หรือ `oxipng`) — ชุด Gen กิน LFS ไป **14 MB**
+   * `mg2_mainboard.png` 1.47 MB · `mg2_case_open.png` 1.41 MB · `mg3_cable_messy.png` 1.15 MB · `mg3_cable_tidy.png` 887 KB · `char_khom_walk_sheet.png` 622 KB
+5. **ผูก `Resources/khom_walk.tres` เข้า `Player.tscn`** — เปลี่ยนจาก AnimationPlayer + region เป็น `AnimatedSprite2D` + SpriteFrames (หรือคงของเดิมแล้วปรับ region ให้ตรงชีตใหม่)
+
 ---
 
 ## 4. สรุปงานแก้ asset เดิม (ทำก่อนสร้างของใหม่)
@@ -564,4 +606,5 @@ const BG_SHOP_EMPTY = "bg_shop_empty.jpg"
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 16 ก.ย. 2569 (2) | เพิ่มหัวข้อ 3.8 — สรุปชุด asset รอบใหม่ 84 ไฟล์ที่ย้ายจาก `Assets/Gen/` เข้าโครงจริง พร้อมรายการที่ยังขาดและงานที่ต้องทำก่อนใช้ |
 | 16 ก.ย. 2569 | สร้างเอกสาร — ตรวจ asset จริงทั้งหมดที่ commit `8c4db20`, เทียบกับ `TutorialState` 7 ค่า, `_CharacterMap` 2 คน, และรายชื่อตัวละครในไฟล์บททั้งหมด |
