@@ -1,0 +1,27 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/SpriteSheets/char_khom_walk_sheet.png" id="1_sheet"]
+
+[sub_resource type="AtlasTexture" id="Atlas_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 0, 400, 500)
+
+[sub_resource type="AtlasTexture" id="Atlas_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(400, 0, 400, 500)
+
+[sub_resource type="AtlasTexture" id="Atlas_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(800, 0, 400, 500)
+
+[sub_resource type="AtlasTexture" id="Atlas_3"]
+atlas = ExtResource("1_sheet")
+region = Rect2(1200, 0, 400, 500)
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("Atlas_0")}, {"duration": 1.0, "texture": SubResource("Atlas_1")}, {"duration": 1.0, "texture": SubResource("Atlas_2")}, {"duration": 1.0, "texture": SubResource("Atlas_3")}],
+"loop": true,
+"name": &"walk_right",
+"speed": 6.0
+}]
