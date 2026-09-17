@@ -1,19 +1,8 @@
 class_name QuesetBoard extends CanvasLayer
 
-signal on_update_task(String)
-
 @export var QuestList: Node
 
-var _event_map: Dictionary[Event,Label] = {}
-
-
-# Called when the node enters the scene tree for the first time.
-func _enter_tree() -> void:
-	on_update_task.connect(self._on_update_task)
-
-
-func _exit_tree() -> void:
-	on_update_task.disconnect(self._on_update_task)
+var _event_map: Dictionary[Event, Label] = { }
 
 
 func update_task(text: String, event: Event) -> void:
@@ -30,7 +19,3 @@ func update_task(text: String, event: Event) -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD
 		QuestList.add_child(label)
 		_event_map.set(event, label)
-
-
-func _on_update_task(text: String) -> void:
-	print(text)

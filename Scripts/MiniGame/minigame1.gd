@@ -24,7 +24,11 @@ const RamCleanImage = "res://Assets/MiniGame/ram.png"
 
 var RamIMG = [load(RamDirtyImage), load(RamSlightDirtyImage), load(RamCleanImage)]
 
-enum RamStatus { DIRTY = 0, BETTER = 10, CLEAN = 15 }
+enum RamStatus {
+	DIRTY = 0,
+	BETTER = 10,
+	CLEAN = 15,
+}
 
 
 func _ready() -> void:
@@ -83,7 +87,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	EventManager.update_event(EventManager.EventID.MAIN)
 	EventManager.next_period.emit()
 	EventManager.hideTimeUI(false)
+	EventManager.hideQuest(false)
 	queue_free()

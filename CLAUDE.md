@@ -13,6 +13,7 @@ BakChangKhom — a Godot 4.7 2D game (GL Compatibility renderer). GDScript codeb
 - `Assets/` — textures, sprites, and dialog `.txt` files
 - `Resources/` — `.tres` resources (events, tutorial slides)
 - `Test/` — manual test scenes/scripts, not part of any automated suite
+- `Docs/` — design docs kept in sync with the code: `ASSET_GUIDE.md` (asset specs/pipeline, Thai) and `MINIGAME1_DESIGN.md` (minigame design + known blockers, Thai)
 
 ## Key Scripts
 
@@ -38,6 +39,7 @@ This project has no CLI build/test tooling (no npm/CMake/CI config) — all buil
 - `DialogScene` (`Scene/Dialog_Scene.tscn` / `Scripts/DialogSystem/dialog_scene.gd`) — dialog engine and text display
 - `Market` (`Scene/Location/Market.tscn`) — market UI
 - `MapPanel` (`Scene/map.tscn`) — map navigation
+- `DebugMenu` (`Scripts/Debug/debug_menu.gd`) — F1-toggled dev overlay for jumping the MAIN quest to a specific task index/scene; extend via its `jump_points` array
 
 Cross-system communication runs through signals on these autoloads rather than direct references — e.g. `EventManager.showDialogEvent` is connected to by `DialogScene`, and `EventManager.sendUpdatedEvent` notifies quest UI.
 
@@ -68,8 +70,10 @@ Cross-system communication runs through signals on these autoloads rather than d
 
 ## Assets & Git LFS
 
-- `*.png` and `*.jpg` are tracked via Git LFS (`.gitattributes`).
+- `*.png` and `*.jpg` are tracked via Git LFS (`.gitattributes`); always commit the Godot-generated `.import` file alongside a new asset.
 - `.godot/`, `/Build/*`, `/BakChangKhom`, and `**/*.zip` are gitignored — don't commit editor cache or build output.
+- Base viewport is a fixed **1152×648** (Godot 4 default, not overridden in `project.godot`; stretch mode `canvas_items`). Full-screen backgrounds/tutorial slides should be authored at that resolution — `dialog_scene.gd` auto-scales larger dialog backgrounds down to fit (`MaxBGSize`), and other UI can stretch/blur if fed mismatched aspect ratios. See `Docs/ASSET_GUIDE.md` for full asset specs (naming, formats, size budgets) and its inventory of assets that still need fixing/replacing.
+- Character keys in `Global._CharacterMap` (`Scene/Global.tscn`) must match a dialog file's `CharacterName` exactly — a mismatch crashes at runtime.
 
 ## Coding Conventions
 

@@ -2,16 +2,19 @@ extends Node
 signal next_period
 signal next_day
 
-signal sendUpdatedEvent(Event)
+signal sendUpdatedEvent(EventID, Event)
 signal showDialogEvent(arg1: StringName, arg2: String, arg3: Array)
 
-enum EventID { NONE, MAIN }
+enum EventID {
+	NONE,
+	MAIN,
+}
 
-@export var eventMap: Dictionary[EventID,Event]
+@export var eventMap: Dictionary[EventID, Event]
 @onready var questboard = $"QuestBoard" as QuesetBoard
 @onready var time_system = $"TimeSystem" as TimeSystem
 @onready var tutorial = $"Tutorial" as Tutorial
-var currentEvent: Event
+var currentEvent: EventID
 
 signal on_tutorial_finish
 
@@ -21,16 +24,16 @@ func _ready() -> void:
 	root_tree.node_added.connect(_on_node_added)
 	if eventMap.size() <= 0:
 		return
-	var event = eventMap[EventID.MAIN]
-	currentEvent = event
+	currentEvent = EventID.MAIN
+	var event = eventMap[currentEvent]
 	questboard.update_task(event.get_task(), event)
-	sendUpdatedEvent.emit(event)
+	sendUpdatedEvent.emit(currentEvent, event)
 	tutorial.on_tutorial_end.connect(_on_tutorial_end)
 
 
 func _on_node_added(node: Node) -> void:
 	if node is CautionMarker:
-		sendUpdatedEvent.emit(currentEvent)
+		sendUpdatedEvent.emit(currentEvent, self.eventMap[currentEvent])
 
 
 func _on_tutorial_end():
@@ -39,21 +42,24 @@ func _on_tutorial_end():
 
 
 func init_manager() -> void:
-	var event = eventMap[EventID.MAIN]
-	currentEvent = event
+	currentEvent = EventID.MAIN
+	var event = eventMap[currentEvent]
 	questboard.update_task(event.get_task(), event)
-	sendUpdatedEvent.emit(event)
+	sendUpdatedEvent.emit(EventID.MAIN, event)
 
 
 func update_event(id: EventID):
 	var event = eventMap[id]
 	if event == null:
 		return
-	currentEvent = event
+	currentEvent = id
 	var text = event.next_step()
 	questboard.update_task(text, event)
 
-	sendUpdatedEvent.emit(event)
+	if event.isDone:
+		sendUpdatedEvent.emit(id, null)
+	else:
+		sendUpdatedEvent.emit(id, event)
 
 
 # Jumps an event straight to a task index (used by the debug menu).
@@ -61,11 +67,13 @@ func jump_event(id: EventID, task_index: int) -> void:
 	var event = eventMap[id]
 	if event == null:
 		return
-	currentEvent = event
+	currentEvent = id
 	var text = event.set_step(task_index)
 	questboard.update_task(text, event)
+	questboard.show()
+	time_system.show()
 
-	sendUpdatedEvent.emit(event)
+	sendUpdatedEvent.emit(id, event)
 
 
 func show_dialog(title: String, file_path: StringName, bg_name: String, chars: Array = []):

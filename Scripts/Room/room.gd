@@ -15,8 +15,15 @@ func _on_dialog_finish():
 	pass
 
 
-func _on_event_pressed() -> void:
-	EventManager.hideTimeUI(true)
-	EventManager.hideQuest(true)
-	DialogScene.show_dialog(Constant.MAIN_DIALOG_1, "")
-	DialogScene.set_title("ห้องของขม")
+const EventID = EventManager.EventID
+
+
+func _on_event_pressed(id: EventID, event: Event) -> void:
+	if id == EventID.MAIN:
+		if event.currentTask == 1:
+			EventManager.hideTimeUI(true)
+			EventManager.hideQuest(true)
+			EventManager.update_event(id)
+			DialogScene.show_dialog(Constant.MAIN_DIALOG_1, "")
+			DialogScene.set_title("ห้องของขม")
+	pass

@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_vbkmp")
 name = "main"
-Tasks = Array[String](["Talk to Grandma", "Go to your Room and Clean the ram"])
+Tasks = Array[String](["Talk to Grandma", "Go to your Room and Inspect the Computer"])
 metadata/_custom_type_script = "uid://db0chdbe7jurd"
