@@ -88,6 +88,5 @@ func _on_button_pressed() -> void:
 
 func _on_return_pressed() -> void:
 	EventManager.next_period.emit()
-	EventManager.hideTimeUI(false)
-	EventManager.hideQuest(false)
+	EventManager.showUI()
 	queue_free()

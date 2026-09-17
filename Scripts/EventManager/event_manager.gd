@@ -91,14 +91,6 @@ func showUI() -> void:
 	time_system.visible = true
 
 
-func hideQuest(isHide: bool) -> void:
-	questboard.visible = !isHide
-
-
-func hideTimeUI(isHide: bool) -> void:
-	time_system.visible = !isHide
-
-
 const TutorialState = Tutorial.TutorialState
 
 
