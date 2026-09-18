@@ -1,14 +1,9 @@
 extends Node2D
 @export var _CharacterMap: Dictionary
-@export var MiniGames: Dictionary
 
 var dialogShown = false
 var in_minigame = false
 var on_start = true
-
-
-func ReturnMiniGame(minigame_name: String) -> Variant:
-	return MiniGames[minigame_name].instantiate()
 
 
 func getCharacterTexture(t_name: String):

@@ -17,7 +17,7 @@ func _exit_tree() -> void:
 
 
 func checkTrackEvent(id: EventManager.EventID, event: Event) -> void:
-	if event == null:
+	if event == null || event.isDone:
 		self.visible = false
 		return
 	var is_track = trackEvents.has(id)

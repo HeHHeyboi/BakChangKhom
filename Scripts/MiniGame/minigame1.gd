@@ -89,4 +89,5 @@ func _on_button_pressed() -> void:
 func _on_return_pressed() -> void:
 	EventManager.next_period.emit()
 	EventManager.showUI()
+	EventManager.minigame_end()
 	queue_free()
