@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://cglek35w4b64v"]
 
-[ext_resource type="Script" uid="uid://p8ifipaeg0ox" path="res://Scripts/Room/room.gd" id="1_os8kx"]
 [ext_resource type="Texture2D" uid="uid://0abmohme5tku" path="res://Assets/Background/RoomBG.jpg" id="2_2cyw2"]
 [ext_resource type="PackedScene" uid="uid://cnw1askytwsbe" path="res://Scene/caution_button.tscn" id="3_uj64w"]
 [ext_resource type="Texture2D" uid="uid://c5ou3sav10i66" path="res://Assets/Home/door.png" id="6_4u688"]
@@ -14,7 +13,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_os8kx")
 
 [node name="BG" type="TextureRect" parent="." unique_id=2067211465]
 layout_mode = 1

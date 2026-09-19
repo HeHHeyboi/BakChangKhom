@@ -129,10 +129,8 @@ func _on_dialog_finish() -> void:
 
 func minigame_end() -> void:
 	if currentEvent == EventID.MAIN:
-		var event = eventMap[currentEvent]
-		if event.currentTask == 2:
-			update_event(currentEvent)
-		elif event.currentTask == 3:
+		var task = eventMap[currentEvent].currentTask
+		if [2, 3].has(task):
 			update_event(currentEvent)
 
 
