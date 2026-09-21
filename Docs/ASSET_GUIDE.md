@@ -2,12 +2,16 @@
 
 > อ้างอิงโค้ดจริงที่ commit `8c4db20` (`feat: add debug quest-jump menu and finish room-to-minigame dialog wiring`)
 > อัปเดตล่าสุด: 16 ก.ย. 2569 · Engine: **Godot 4.7 (GL Compatibility)**
-> เอกสารคู่กัน: `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7, ClickUp [[Project] Bak Chang Khom](https://app.clickup.com/t/86ey2e8mm)
+> เอกสารคู่กัน: `Docs/REPAIR_FLOW.md` (โครง scene + ลูปงานซ่อม), `Docs/MINIGAME1_DESIGN.md`, `CLAUDE.md`, GDD v1.7, ClickUp [[Project] Bak Chang Khom](https://app.clickup.com/t/86ey2e8mm)
 
 เอกสารนี้ใช้ตอน **สร้าง asset ใหม่** (ส่วนใหญ่ generate ด้วย AI) ให้ได้ไฟล์ที่ drop เข้า Godot แล้วใช้ได้เลย
 ไม่ต้องแก้ scene ตามทีหลัง — ทุกหัวข้อระบุ **ขนาด / ฟอร์แมต / path / ชื่อไฟล์ / prompt / วิธีผูกเข้าโค้ด**
 
 ---
+
+> **21 ก.ย. 2569 — เปลี่ยนศัพท์ Tier → Part** โฟลเดอร์และชื่อไฟล์ถูก rename แล้ว:
+> `Tier1Ram/mg1_*` → `PartRam/ram_*` · `Tier2Mainboard/mg2_*` → `PartMainboard/mb_*` · `Tier3Gpu/mg3_*` → `PartGpu/gpu_*` · `Tier4FrontPanel/mg4_*` → `PartFrontPanel/fp_*` · `Tier5Bios/mg5_*` → `PartBios/bios_*`
+> โครงเนื้อหาใหม่ (Core Part 5 + Normal Part 8 + ลูปงานซ่อม 5 scene) อยู่ใน `Docs/REPAIR_FLOW.md`
 
 ## 0. TL;DR — กฎ 8 ข้อที่ห้ามพลาด
 
@@ -58,7 +62,7 @@
 ตัวอย่าง:
   bg_shop_morning.jpg
   char_min_normal.png        char_min_happy.png
-  mg2_cpu.png                mg2_cpu_placed.png
+  mb_cpu.png                mb_cpu_placed.png
   ui_btn_next_normal.png     ui_btn_next_hover.png
   tut_ram_01.png             tut_ram_02.png
 ```
@@ -75,11 +79,11 @@ Assets/
 ├── CharacterSprite/     # char_*.png ตัวละครใน dialog (พื้นโปร่ง)
 ├── Home/                # props ฉากบ้าน (door, pc)
 ├── MiniGame/
-│   ├── Tier1Ram/        # แยก tier ตั้งแต่ตอนนี้
-│   ├── Tier2Mainboard/
-│   ├── Tier3Gpu/
-│   ├── Tier4FrontPanel/
-│   └── Tier5Bios/
+│   ├── PartRam/        # แยกตาม Part ตั้งแต่ตอนนี้
+│   ├── PartMainboard/
+│   ├── PartGpu/
+│   ├── PartFrontPanel/
+│   └── PartBios/
 ├── Tutorial/
 │   ├── BasicStart/  BasicHome/  RamCleaning/
 │   ├── Motherboard/ Gpu/  FrontPanel/  Bios/
@@ -176,7 +180,7 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 | `door.png` / `doorHighlight.png` | 594×880 / 606×844 | ⚠️ ขนาด 2 state ไม่เท่ากัน → ภาพกระตุกตอน hover **ควรทำใหม่ให้เท่ากัน** |
 | `pc_up.png` / `pc_down.png` | 814×514 | ✅ เท่ากัน |
 
-### 3.4 MiniGame Tier 1 (ขัดแรม) — `Assets/MiniGame/`
+### 3.4 MiniGame Part RAM (ขัดแรม) — `Assets/MiniGame/`
 
 | ไฟล์ | ขนาด | ผูกกับ |
 |---|---|---|
@@ -188,7 +192,7 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 | `cautionPress.png` | **350×350** | 🔴 ไม่เท่ากับอีก 2 state → ปุ่มกระตุกตอนกด |
 | `PCCaseBG.jpg` | 1152×648 | พื้นหลังมินิเกม |
 
-> ⚠️ ทั้ง 3 สถานะของแรมขนาดไม่เท่ากัน (597 / 593 / 589 px) ทำให้ภาพขยับตอนสลับ texture — **asset ชุดใหม่ทุก tier ต้องขนาดเท่ากันทุก state**
+> ⚠️ ทั้ง 3 สถานะของแรมขนาดไม่เท่ากัน (597 / 593 / 589 px) ทำให้ภาพขยับตอนสลับ texture — **asset ชุดใหม่ทุก Part ต้องขนาดเท่ากันทุก state**
 
 ### 3.5 Sprite sheet / TileMap
 
@@ -222,11 +226,11 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 |---|---|---|
 | Background (หัวข้อ 5.5) | **9 / 9** ✅ | ทุกไฟล์ 1152×648 · 100–166 KB · ครบตามรายการที่เสนอไว้ |
 | ตัวละคร (หัวข้อ 5.3 + 5.4) | **20 ไฟล์** ✅ | 400×500 ทุกไฟล์ · ปิ๊บ 5 อารมณ์ · ขม 4 อารมณ์ · มิ้น 2 · ยาย/ลุงอำนวย/ผอ./ผู้ใหญ่บ้าน/ครู/เด็กหญิง/เด็ก/เพื่อนร่วมงาน/หัวหน้า |
-| MiniGame Tier 1 | 4 ไฟล์ | `mg1_ram_dirty/better/clean` **600×214 เท่ากันทุกใบ** (แก้ปัญหาเดิม) + `mg1_eraser` 256×256 |
-| MiniGame Tier 2 | 10 / 12 | ขาด `mg2_mainboard_ghost`, `mg2_cpu_wrong` |
-| MiniGame Tier 3 | **10 / 10** ✅ | ครบ |
-| MiniGame Tier 4 | 9 ไฟล์ | ใช้ `mg4_slots_overview.png` (520×240) แทนสลอตแยก 4 ไฟล์ — ถ้าจะทำ drag-drop ทีละสลอตต้องแยกไฟล์หรือใช้ region |
-| MiniGame Tier 5 | 6 / 7 | ขาด `mg5_bottleneck_chart` |
+| Part RAM | 4 ไฟล์ | ``ram_dirty/better/clean`` **600×214 เท่ากันทุกใบ** (แก้ปัญหาเดิม) + `ram_eraser` 256×256 |
+| Part Mainboard | 10 / 12 | ขาด `mb_mainboard_ghost`, `mb_cpu_wrong` |
+| Part GPU | **10 / 10** ✅ | ครบ |
+| Part Front Panel | 9 ไฟล์ | ใช้ `fp_slots_overview.png` (520×240) แทนสลอตแยก 4 ไฟล์ — ถ้าจะทำ drag-drop ทีละสลอตต้องแยกไฟล์หรือใช้ region |
+| Part BIOS | 6 / 7 | ขาด `bios_bottleneck_chart` |
 | UI | 9 ไฟล์ | ปุ่ม 4 state (320×96), dialog box (1152×200), name plate, quest panel, time panel, marker_caution 1 state |
 | Ending | 1 / 4 | มีแค่ `credits_bg.jpg` ขาดภาพ ending 3 ใบ |
 | Sprite sheet เดิน | ✅ | `char_khom_walk_sheet.png` 1600×500 (4 เฟรม 400×500) + เฟรมแยกใน `SpriteSheets/Frames/` + `Resources/khom_walk.tres` (SpriteFrames พร้อมใช้) — **แทน `Walk_Khom.png` 3500×3500 ของเดิมได้เลย** |
@@ -240,7 +244,7 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 | 🔴 3 | **อุปกรณ์ทำความสะอาด 10 ชิ้น + ถาด + การ์ดคุณสมบัติ** (ระบบเลือกอุปกรณ์) | `MINIGAME1_DESIGN.md` หัวข้อ 14.8 |
 | 🟡 4 | **Audio ทั้งหมด** — ยังไม่มีไฟล์เสียงแม้แต่ไฟล์เดียว | หัวข้อ 5.8 |
 | 🟡 5 | UI ที่เหลือ: ไอคอนช่วงเวลา 3, เงิน/XP/ยศ 7, ปุ่ม close/next/prev/map 4, marker_caution อีก 2 state | หัวข้อ 5.6 |
-| 🟢 6 | ภาพ Ending 3 ใบ · `mg2_mainboard_ghost` · `mg2_cpu_wrong` · `mg5_bottleneck_chart` | หัวข้อ 5.2, 5.7 |
+| 🟢 6 | ภาพ Ending 3 ใบ · `mb_mainboard_ghost` · `mb_cpu_wrong` · `bios_bottleneck_chart` | หัวข้อ 5.2, 5.7 |
 
 #### งานที่ต้องทำกับชุด Gen ก่อนใช้จริง
 
@@ -250,10 +254,10 @@ blurry, jpeg artifacts, extra limbs, deformed hands
    * `char_khom_normal.png` / `char_khom_idle.png` ↔ `Idle.png` เดิม
    * `char_grandma_normal.png` ↔ `GrandmaNormal.png` เดิม
    * `char_pib_normal.png` ↔ `char_pib_neutral.png` (ซ้ำกันเอง — เลือก 1)
-   * `mg1_ram_*.png` ↔ `ram*.png` เดิมใน `Assets/MiniGame/`
+   * `ram_*.png` ↔ `ram*.png` เดิมใน `Assets/MiniGame/`
    * `char_khom_walk_sheet.png` ↔ `Walk_Khom.png` (มี 2 ที่: `SpriteSheets/` และ `TileMap/`)
 4. **บีบไฟล์ที่ใหญ่เกินเพดาน** (ใช้ `pngquant` หรือ `oxipng`) — ชุด Gen กิน LFS ไป **14 MB**
-   * `mg2_mainboard.png` 1.47 MB · `mg2_case_open.png` 1.41 MB · `mg3_cable_messy.png` 1.15 MB · `mg3_cable_tidy.png` 887 KB · `char_khom_walk_sheet.png` 622 KB
+   * `mb_mainboard.png` 1.47 MB · `mb_case_open.png` 1.41 MB · `gpu_cable_messy.png` 1.15 MB · `gpu_cable_tidy.png` 887 KB · `char_khom_walk_sheet.png` 622 KB
 5. **ผูก `Resources/khom_walk.tres` เข้า `Player.tscn`** — เปลี่ยนจาก AnimationPlayer + region เป็น `AnimatedSprite2D` + SpriteFrames (หรือคงของเดิมแล้วปรับ region ให้ตรงชีตใหม่)
 
 ---
@@ -283,7 +287,7 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 แต่ `Scene/TutorialScene/Tutorial.tscn` ผูกจริงแค่ key `0` (BASIC_START) และ `2` (RAM_CLEANING)
 
 > ⚠️ **เรียก `show_tutorial()` ด้วย state ที่ไม่มีใน dict = crash ทันที** (`_slides[tutor_index]`)
-> ฉะนั้นห้าม implement Tier 2–5 ก่อนมีสไลด์ หรือต้องใส่ guard ในโค้ดก่อน
+> ฉะนั้นห้าม implement Core Part อีก 4 ตัว ก่อนมีสไลด์ หรือต้องใส่ guard ในโค้ดก่อน
 
 | State | index | โฟลเดอร์ | จำนวนสไลด์ที่แนะนำ | เนื้อหา | สถานะ |
 |---|---|---|---|---|---|
@@ -311,9 +315,9 @@ at the top for Thai text,
 
 ---
 
-### 5.2 🔴 MiniGame Tier 2–5
+### 5.2 🔴 Part Mainboard–5
 
-ผูกกับ ClickUp: [MiniGame Tier 2](https://app.clickup.com/t/86eyh2w16) · [Tier 3](https://app.clickup.com/t/86eyh2w5k) · [Tier 4](https://app.clickup.com/t/86eyh2wba) · [Tier 5](https://app.clickup.com/t/86eyh2wfd)
+ผูกกับ ClickUp: [Part Mainboard](https://app.clickup.com/t/86eyh2w16) · [Part GPU](https://app.clickup.com/t/86eyh2w5k) · [Part Front Panel](https://app.clickup.com/t/86eyh2wba) · [Part BIOS](https://app.clickup.com/t/86eyh2wfd)
 
 **กติกาสำหรับ asset minigame ทุกชิ้น:**
 * ทุก state ของชิ้นเดียวกัน **ขนาด canvas เท่ากันเป๊ะ** (เรียนจากปัญหาแรม/caution)
@@ -321,24 +325,24 @@ at the top for Thai text,
 * พื้นโปร่ง ไม่มีเงาทอดลงพื้นในตัวไฟล์ (ทำเงาด้วย node ในเกม)
 * วาดชิ้นส่วนใหญ่กว่าที่ใช้จริง ~1.5× แล้วย่อในเกม เผื่อ zoom
 
-#### Tier 2 — Motherboard + CPU (`Assets/MiniGame/Tier2Mainboard/`)
+#### Part Mainboard — Motherboard + CPU (`Assets/MiniGame/PartMainboard/`)
 
 | ไฟล์ | ขนาด | คำอธิบาย |
 |---|---|---|
-| `mg2_case_open.png` | 900 × 900 | เคสเปิดฝา มุม top-down เห็นรูสกรู standoff |
-| `mg2_standoff.png` | 60 × 60 | น็อตรองเมนบอร์ด |
-| `mg2_mainboard.png` | 800 × 760 | เมนบอร์ด ATX เปล่า เห็น socket + สลอตชัด |
-| `mg2_mainboard_ghost.png` | 800 × 760 | เงาโปร่ง 30% ใช้เป็นจุดวาง (drop target) |
-| `mg2_cpu.png` | 180 × 180 | CPU เห็นสามเหลี่ยมทองมุมซ้ายล่าง |
-| `mg2_cpu_wrong.png` | 180 × 180 | CPU หันผิดทิศ (มีเครื่องหมาย ✕ แดง) |
-| `mg2_socket_open.png` / `mg2_socket_closed.png` | 220 × 220 | คานล็อกเปิด/ปิด |
-| `mg2_thermal_tube.png` | 200 × 90 | หลอดซิลิโคน |
-| `mg2_thermal_dot.png` | 80 × 80 | หยดซิลิโคนบน CPU |
-| `mg2_cooler.png` | 300 × 300 | ฮีตซิงก์ + พัดลม |
-| `mg2_screwdriver.png` | 260 × 260 | ไขควง (เคอร์เซอร์) |
+| `mb_case_open.png` | 900 × 900 | เคสเปิดฝา มุม top-down เห็นรูสกรู standoff |
+| `mb_standoff.png` | 60 × 60 | น็อตรองเมนบอร์ด |
+| `mb_mainboard.png` | 800 × 760 | เมนบอร์ด ATX เปล่า เห็น socket + สลอตชัด |
+| `mb_mainboard_ghost.png` | 800 × 760 | เงาโปร่ง 30% ใช้เป็นจุดวาง (drop target) |
+| `mb_cpu.png` | 180 × 180 | CPU เห็นสามเหลี่ยมทองมุมซ้ายล่าง |
+| `mb_cpu_wrong.png` | 180 × 180 | CPU หันผิดทิศ (มีเครื่องหมาย ✕ แดง) |
+| `mb_socket_open.png` / `mb_socket_closed.png` | 220 × 220 | คานล็อกเปิด/ปิด |
+| `mb_thermal_tube.png` | 200 × 90 | หลอดซิลิโคน |
+| `mb_thermal_dot.png` | 80 × 80 | หยดซิลิโคนบน CPU |
+| `mb_cooler.png` | 300 × 300 | ฮีตซิงก์ + พัดลม |
+| `mb_screwdriver.png` | 260 × 260 | ไขควง (เคอร์เซอร์) |
 
 ```
-Prompt (mg2_mainboard.png):
+Prompt (mb_mainboard.png):
 top-down flat view of a cartoon ATX computer motherboard, clearly
 readable CPU socket in the upper middle, two pairs of RAM slots on the
 right, one long PCIe slot at the bottom, screw holes at the corners,
@@ -346,42 +350,42 @@ dark green PCB with warm gold traces, no text labels, transparent
 background, <Base Style Prompt>
 ```
 
-#### Tier 3 — GPU + Cable Management (`Assets/MiniGame/Tier3Gpu/`)
+#### Part GPU — GPU + Cable Management (`Assets/MiniGame/PartGpu/`)
 
 | ไฟล์ | ขนาด | คำอธิบาย |
 |---|---|---|
-| `mg3_gpu.png` | 620 × 220 | การ์ดจอ 2 พัดลม เห็นแถบทองขา PCIe |
-| `mg3_pcie_slot.png` / `mg3_pcie_slot_locked.png` | 520 × 90 | สลอต + สลักล็อก |
-| `mg3_psu.png` | 420 × 300 | Power supply |
-| `mg3_cable_pcie.png` | 400 × 160 | สาย PCIe 8-pin |
-| `mg3_cable_24pin.png` | 420 × 170 | สาย ATX 24-pin |
-| `mg3_cable_tie.png` | 120 × 60 | สายรัด |
-| `mg3_airflow_arrow.png` | 200 × 100 | ลูกศรทิศลม (ฟ้า `#4A90D9`) |
-| `mg3_cable_messy.png` / `mg3_cable_tidy.png` | 900 × 700 | ภาพเปรียบเทียบก่อน/หลังจัดสาย |
+| `gpu_card.png` | 620 × 220 | การ์ดจอ 2 พัดลม เห็นแถบทองขา PCIe |
+| `gpu_pcie_slot.png` / `gpu_pcie_slot_locked.png` | 520 × 90 | สลอต + สลักล็อก |
+| `gpu_psu.png` | 420 × 300 | Power supply |
+| `gpu_cable_pcie.png` | 400 × 160 | สาย PCIe 8-pin |
+| `gpu_cable_24pin.png` | 420 × 170 | สาย ATX 24-pin |
+| `gpu_cable_tie.png` | 120 × 60 | สายรัด |
+| `gpu_airflow_arrow.png` | 200 × 100 | ลูกศรทิศลม (ฟ้า `#4A90D9`) |
+| `gpu_cable_messy.png` / `gpu_cable_tidy.png` | 900 × 700 | ภาพเปรียบเทียบก่อน/หลังจัดสาย |
 
-#### Tier 4 — Front Panel + Dual Channel (`Assets/MiniGame/Tier4FrontPanel/`)
-
-| ไฟล์ | ขนาด | คำอธิบาย |
-|---|---|---|
-| `mg4_pin_header.png` | 340 × 200 | บล็อก pin header ซูมใหญ่ เห็นแต่ละพินชัด |
-| `mg4_connector_power_sw.png` | 120 × 80 | หัวต่อ POWER SW |
-| `mg4_connector_reset_sw.png` | 120 × 80 | RESET SW |
-| `mg4_connector_power_led.png` | 120 × 80 | POWER LED (มีขั้ว +/-) |
-| `mg4_connector_hdd_led.png` | 120 × 80 | HDD LED |
-| `mg4_ram_stick.png` | 500 × 120 | แรม 1 แถว (ใช้ซ้ำได้ 4 ตัว) |
-| `mg4_slot_a1.png` … `mg4_slot_b2.png` | 520 × 60 | สลอตแรม 4 ช่อง แยกสีคู่ A/B ชัดเจน |
-| `mg4_led_on.png` / `mg4_led_off.png` | 64 × 64 | ไฟหน้าเคสติด/ดับ (feedback) |
-
-#### Tier 5 — BIOS + OS + Upgrade (`Assets/MiniGame/Tier5Bios/`)
+#### Part Front Panel — Front Panel + Dual Channel (`Assets/MiniGame/PartFrontPanel/`)
 
 | ไฟล์ | ขนาด | คำอธิบาย |
 |---|---|---|
-| `mg5_bios_screen.png` | 1152 × 648 | หน้าจอ BIOS สไตล์การ์ตูน (เว้นที่ใส่ข้อความไทย) |
-| `mg5_boot_order_item.png` | 420 × 70 | แถบรายการ boot ลากสลับได้ |
-| `mg5_xmp_toggle_off/on.png` | 160 × 80 | สวิตช์ XMP |
-| `mg5_usb_installer.png` | 200 × 90 | USB ลง OS |
-| `mg5_progress_bar.png` | 700 × 60 | แถบติดตั้ง |
-| `mg5_bottleneck_chart.png` | 600 × 400 | กราฟเปรียบเทียบ CPU/GPU แบบการ์ตูน |
+| `fp_pin_header.png` | 340 × 200 | บล็อก pin header ซูมใหญ่ เห็นแต่ละพินชัด |
+| `fp_connector_power_sw.png` | 120 × 80 | หัวต่อ POWER SW |
+| `fp_connector_reset_sw.png` | 120 × 80 | RESET SW |
+| `fp_connector_power_led.png` | 120 × 80 | POWER LED (มีขั้ว +/-) |
+| `fp_connector_hdd_led.png` | 120 × 80 | HDD LED |
+| `fp_ram_stick.png` | 500 × 120 | แรม 1 แถว (ใช้ซ้ำได้ 4 ตัว) |
+| `fp_slot_a1.png` … `fp_slot_b2.png` | 520 × 60 | สลอตแรม 4 ช่อง แยกสีคู่ A/B ชัดเจน |
+| `fp_led_on.png` / `fp_led_off.png` | 64 × 64 | ไฟหน้าเคสติด/ดับ (feedback) |
+
+#### Part BIOS — BIOS + OS + Upgrade (`Assets/MiniGame/PartBios/`)
+
+| ไฟล์ | ขนาด | คำอธิบาย |
+|---|---|---|
+| `bios_screen.png` | 1152 × 648 | หน้าจอ BIOS สไตล์การ์ตูน (เว้นที่ใส่ข้อความไทย) |
+| `bios_boot_order_item.png` | 420 × 70 | แถบรายการ boot ลากสลับได้ |
+| `bios_xmp_toggle_off/on.png` | 160 × 80 | สวิตช์ XMP |
+| `bios_usb_installer.png` | 200 × 90 | USB ลง OS |
+| `bios_progress_bar.png` | 700 × 60 | แถบติดตั้ง |
+| `bios_bottleneck_chart.png` | 600 × 400 | กราฟเปรียบเทียบ CPU/GPU แบบการ์ตูน |
 
 ---
 
@@ -514,12 +518,12 @@ wide 16:9 composition with empty space in the lower third,
 | `bgm_emotional.ogg` | BGM loop | 60 s | เปียโนช้า สำหรับฉากซึ้ง |
 | `sfx_dialog_blip.wav` | SFX | 0.1 s | เสียงตัวอักษรวิ่ง |
 | `sfx_click.wav` / `sfx_hover.wav` | SFX | 0.1 s | ปุ่ม |
-| `sfx_rub.wav` | SFX | 0.3 s | ถูยางลบ (Tier 1) |
+| `sfx_rub.wav` | SFX | 0.3 s | ถูยางลบ (Part RAM) |
 | `sfx_click_in.wav` | SFX | 0.2 s | เสียบชิ้นส่วนเข้าที่ |
 | `sfx_error.wav` | SFX | 0.3 s | ทำผิด |
 | `sfx_success.wav` | SFX | 1.0 s | ผ่านมินิเกม |
 | `sfx_rank_up.wav` | SFX | 1.5 s | เลื่อนยศ |
-| `sfx_pc_boot.wav` | SFX | 2.0 s | เครื่องบูตติด (Tier 5) |
+| `sfx_pc_boot.wav` | SFX | 2.0 s | เครื่องบูตติด (Part BIOS) |
 
 **สเปก:** BGM = `.ogg` loop seamless, −16 LUFS · SFX = `.wav` 16-bit 44.1 kHz mono, −12 dBFS peak
 **ต้องมีในโค้ดก่อน:** autoload `AudioManager` + bus `Master / BGM / SFX` (ยังไม่มี)
@@ -567,7 +571,7 @@ const BG_SHOP_EMPTY = "bg_shop_empty.jpg"
 2. เปิด `Scene/Global.tscn` → `MiniGames` dict → เพิ่ม `"MiniGame<N>": <PackedScene>`
 3. เรียก `Global.ReturnMiniGame("MiniGame<N>")`
 
-> 🐞 **บั๊กที่ต้องแก้ก่อนทำ Tier 2:** `Scripts/Room/room.gd` บรรทัด 3 instantiate มินิเกมครั้งเดียวเก็บเป็นตัวแปรสมาชิก แต่ `minigame1.gd::_on_return_pressed()` เรียก `queue_free()` → เข้ามินิเกมรอบที่ 2 จะ `add_child` โนดที่ถูกปล่อยไปแล้ว
+> 🐞 **บั๊กที่ต้องแก้ก่อนทำ Part Mainboard:** `Scripts/Room/room.gd` บรรทัด 3 instantiate มินิเกมครั้งเดียวเก็บเป็นตัวแปรสมาชิก แต่ `minigame1.gd::_on_return_pressed()` เรียก `queue_free()` → เข้ามินิเกมรอบที่ 2 จะ `add_child` โนดที่ถูกปล่อยไปแล้ว
 
 ---
 
@@ -594,10 +598,10 @@ const BG_SHOP_EMPTY = "bg_shop_empty.jpg"
 | **2** | sprite `มิ้น` + มาสคอตปิ๊บ 4 อารมณ์ | 5 |
 | **3** | Tutorial slides `BASIC_START` (3) + `BASIC_HOME` (3) + `RAM_CLEANING` (4) ให้ครบชุดถูกขนาด | 10 |
 | **4** | UI Kit หัวข้อ 5.6 | ~20 |
-| **5** | MiniGame Tier 2 + tutorial slides Tier 2 | ~16 |
+| **5** | Part Mainboard + tutorial slides | ~16 |
 | **6** | Audio ชุดแรก (BGM 3 + SFX 6) | 9 |
 | **7** | BG Chapter 3–12 | 9 |
-| **8** | MiniGame Tier 3–5 + tutorial slides | ~40 |
+| **8** | Part GPU–5 + tutorial slides | ~40 |
 | **9** | Ending + Credits | 4 |
 
 ---

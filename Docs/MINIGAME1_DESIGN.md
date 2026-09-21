@@ -1,10 +1,13 @@
-# MINIGAME1_DESIGN.md — มินิเกมที่ 1: ทำความสะอาดแรม (Tier 1)
+# MINIGAME1_DESIGN.md — มินิเกม **Part RAM**: ทำความสะอาดแรม
 
 > อ้างอิงโค้ดจริงที่ commit `86b719f` · 16 ก.ย. 2569 · Godot 4.7
-> เอกสารคู่กัน: `Docs/ASSET_GUIDE.md` (สเปก asset), `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7 หัวข้อ 4.7–4.11
+> เอกสารคู่กัน: `Docs/REPAIR_FLOW.md` (ลูปงานซ่อม 5 scene ที่ครอบมินิเกมนี้อยู่), `Docs/ASSET_GUIDE.md` (สเปก asset), `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7 หัวข้อ 4.7–4.11
 > ClickUp: [MiniGame Tutorial Mode](https://app.clickup.com/t/86eygp946) · [[Project] Bak Chang Khom](https://app.clickup.com/t/86ey2e8mm)
 
 ---
+
+> **21 ก.ย. 2569 — เปลี่ยนศัพท์ Tier → Part** มินิเกมนี้คือ **Core Part `ram`** ในลูปงานซ่อมของ `Docs/REPAIR_FLOW.md`
+> Phase 0 (วินิจฉัย) ยังอยู่ — แต่ตอนนี้เป็นการ *ยืนยันหน้าเครื่อง* หลังจากที่ผู้เล่นซักถามลูกค้าที่หน้าร้านมาแล้วใน Scene S1
 
 ## 1. เป้าหมายของเอกสารนี้
 
@@ -128,7 +131,7 @@ room.gd: กดปุ่ม caution
 
 ## 5. Phase 1 — BRIEFING: ปิ๊บสอนความรู้
 
-ปิ๊บลอยเข้ามาข้างจอ พร้อมภาพประกอบเล็ก ๆ (`mg1_diagram_*.png`) ผู้เล่นกด "ถัดไป" ทีละประโยค
+ปิ๊บลอยเข้ามาข้างจอ พร้อมภาพประกอบเล็ก ๆ (`ram_diagram_*.png`) ผู้เล่นกด "ถัดไป" ทีละประโยค
 
 ```
 ปิ๊บ,ก่อนลงมือ ขมรู้มั้ยว่าแรมคืออะไร
@@ -158,7 +161,7 @@ room.gd: กดปุ่ม caution
 
 ### Phase 3 · REMOVE (ถอดแรม)
 
-1. คลิก **สลักล็อกซ้าย** → สลักกางออก (`mg1_clip_left_open.png`)
+1. คลิก **สลักล็อกซ้าย** → สลักกางออก (`ram_clip_left_open.png`)
 2. คลิก **สลักล็อกขวา** → สลักกางออก
 3. **ลากแรมขึ้นตรง ๆ** (drag ขึ้นแนวตั้ง ระยะ ≥ 80 px)
 
@@ -278,7 +281,7 @@ Minigame1.tscn  (Node2D, script: minigame1.gd)
 └── PibHint           (CanvasLayer, layer = 110) → pib_hint.gd   ← ใช้ซ้ำได้ทุกมินิเกม
 ```
 
-### 8.3 `PibHint` — คอมโพเนนต์ปิ๊บ (สร้างใหม่ ใช้ซ้ำได้ทุก Tier)
+### 8.3 `PibHint` — คอมโพเนนต์ปิ๊บ (สร้างใหม่ ใช้ซ้ำได้ทุก Part)
 
 **ทำไมไม่ใช้ `DialogScene`:** `DialogScene` ตั้ง `Global.showDialog()` และกินทั้งจอ + บล็อกอินพุต ซึ่งขัดกับปิ๊บที่ต้องพูด *ระหว่าง* ผู้เล่นกำลังเล่น
 
@@ -352,7 +355,7 @@ func _on_minigame_finished(score: Dictionary) -> void:
 | D4 | ลบ `print_rich(_slides)` | `tutorial_slides.gd:13` | debug ค้าง |
 | D5 | Save As `Minigame1.scn` → `Minigame1.tscn` แล้วอัปเดต `MiniGames` dict | `Scene/MiniGame/`, `Scene/Global.tscn` | แก้ B3 ให้ review โค้ดได้ |
 | D6 | เพิ่ม `AudioManager` autoload + bus BGM/SFX | ใหม่ | Phase 0 ต้องมีเสียงบี๊บ · Phase 5 ต้องมีเสียงคลิก |
-| D7 | เพิ่ม `signal tier_unlocked(tier_id)` | `event_manager.gd` | เตรียมต่อ Tier 2 |
+| D7 | เพิ่ม `signal part_unlocked(part_id)` | `event_manager.gd` | เตรียมต่อ Part อื่น |
 
 ---
 
@@ -364,40 +367,40 @@ func _on_minigame_finished(score: Dictionary) -> void:
 
 `char_pib_normal.png` · `char_pib_happy.png` · `char_pib_worry.png` · `char_pib_point.png` — 400 × 500 PNG พื้นโปร่ง
 
-### 11.2 Phase 0 — วินิจฉัย · `Assets/MiniGame/Tier1Ram/`
+### 11.2 Phase 0 — วินิจฉัย · `Assets/MiniGame/PartRam/`
 
 | ไฟล์ | ขนาด | ใช้ทำอะไร |
 |---|---|---|
-| `mg1_pc_front.png` | 700 × 800 | คอมลูกค้าตั้งอยู่ มองด้านหน้า |
-| `mg1_screen_glitch.png` | 520 × 340 | จอค้างเป็นบล็อกสี (จุดสังเกต 1) |
-| `mg1_screen_normal.png` | 520 × 340 | จอปกติ (ใช้ตอน Phase 6) |
-| `mg1_speaker_icon.png` | 120 × 120 | ลำโพงเคส + คลื่นเสียง (จุดสังเกต 2) |
-| `mg1_case_dusty.png` | 640 × 640 | ในเคสมีฝุ่นจับ (จุดสังเกต 3) |
-| `mg1_clue_card.png` | 300 × 90 | การ์ดเบาะแสในสมุดจด |
+| `ram_pc_front.png` | 700 × 800 | คอมลูกค้าตั้งอยู่ มองด้านหน้า |
+| `ram_screen_glitch.png` | 520 × 340 | จอค้างเป็นบล็อกสี (จุดสังเกต 1) |
+| `ram_screen_normal.png` | 520 × 340 | จอปกติ (ใช้ตอน Phase 6) |
+| `ram_speaker_icon.png` | 120 × 120 | ลำโพงเคส + คลื่นเสียง (จุดสังเกต 2) |
+| `ram_case_dusty.png` | 640 × 640 | ในเคสมีฝุ่นจับ (จุดสังเกต 3) |
+| `ram_clue_card.png` | 300 × 90 | การ์ดเบาะแสในสมุดจด |
 
 ### 11.3 Phase 1 — ภาพประกอบตอนปิ๊บสอน
 
 | ไฟล์ | ขนาด | เนื้อหา |
 |---|---|---|
-| `mg1_diagram_ram_role.png` | 500 × 300 | เปรียบแรมเป็นโต๊ะทำงาน |
-| `mg1_diagram_gold_contact.png` | 500 × 300 | ซูมขาทอง + เส้นสัญญาณวิ่ง |
-| `mg1_diagram_dust_block.png` | 500 × 300 | ฝุ่นขวางทางสัญญาณ |
+| `ram_diagram_ram_role.png` | 500 × 300 | เปรียบแรมเป็นโต๊ะทำงาน |
+| `ram_diagram_gold_contact.png` | 500 × 300 | ซูมขาทอง + เส้นสัญญาณวิ่ง |
+| `ram_diagram_dust_block.png` | 500 × 300 | ฝุ่นขวางทางสัญญาณ |
 
 ### 11.4 Phase 2–6 — ชิ้นส่วน
 
 | ไฟล์ | ขนาด | หมายเหตุ |
 |---|---|---|
-| `mg1_btn_shutdown.png` | 160 × 160 | ปุ่มปิดเครื่องบนจอ |
-| `mg1_plug_in.png` / `mg1_plug_out.png` | 260 × 180 | ปลั๊กเสียบ/ถอด **ขนาดเท่ากัน** |
-| `mg1_hand_touch_case.png` | 300 × 300 | มือแตะโครงเคส |
-| `mg1_slot_empty.png` | 560 × 90 | สลอตแรมว่าง |
-| `mg1_clip_closed.png` / `mg1_clip_open.png` | 70 × 120 | สลักล็อก (ใช้ซ้าย–ขวา flip ได้) |
-| `mg1_ram_dirty.png` / `mg1_ram_half.png` / `mg1_ram_clean.png` | **600 × 215 เท่ากันทุกใบ** | แทนของเดิมที่ 597/593/589 ไม่เท่ากัน |
-| `mg1_ram_ghost.png` | 600 × 215 | เงาโปร่งบอกจุดวางตอนใส่กลับ |
-| `mg1_eraser.png` | 360 × 370 | ใช้ของเดิมได้ (rename) |
-| `mg1_dust_particle.png` | 32 × 32 | particle ฝุ่นฟุ้งตอนขัด |
-| `mg1_spark.png` | 200 × 200 | ประกายไฟตอนข้ามขั้นตัดไฟ |
-| `mg1_star_full.png` / `mg1_star_empty.png` | 96 × 96 | ดาวในหน้าสรุป |
+| `ram_btn_shutdown.png` | 160 × 160 | ปุ่มปิดเครื่องบนจอ |
+| `ram_plug_in.png` / `ram_plug_out.png` | 260 × 180 | ปลั๊กเสียบ/ถอด **ขนาดเท่ากัน** |
+| `ram_hand_touch_case.png` | 300 × 300 | มือแตะโครงเคส |
+| `ram_slot_empty.png` | 560 × 90 | สลอตแรมว่าง |
+| `ram_clip_closed.png` / `ram_clip_open.png` | 70 × 120 | สลักล็อก (ใช้ซ้าย–ขวา flip ได้) |
+| `ram_dirty.png` / `ram_half.png` / `ram_clean.png` | **600 × 215 เท่ากันทุกใบ** | แทนของเดิมที่ 597/593/589 ไม่เท่ากัน |
+| `ram_ghost.png` | 600 × 215 | เงาโปร่งบอกจุดวางตอนใส่กลับ |
+| `ram_eraser.png` | 360 × 370 | ใช้ของเดิมได้ (rename) |
+| `ram_dust_particle.png` | 32 × 32 | particle ฝุ่นฟุ้งตอนขัด |
+| `ram_spark.png` | 200 × 200 | ประกายไฟตอนข้ามขั้นตัดไฟ |
+| `ram_star_full.png` / `ram_star_empty.png` | 96 × 96 | ดาวในหน้าสรุป |
 
 ### 11.5 เสียง (ต้องมี `AudioManager` ก่อน)
 
@@ -595,28 +598,28 @@ func _on_tool_used(tool: CleanTool, step: CleanStep) -> void:
 ```
 
 > ทุกอุปกรณ์เป็นไฟล์ `.tres` แยกที่ `Resources/MiniGame/Tools/` — เพิ่ม/แก้อุปกรณ์และบทพูดได้โดยไม่ต้องแตะสคริปต์
-> โครงนี้ใช้ซ้ำได้กับ Tier 2–5 (เช่น เลือกซิลิโคนถูกชนิด, เลือกไขควงถูกหัว) — ออกแบบให้ `CleanStep` เป็น `int` จึงขยายเป็น step ของ tier อื่นได้
+> โครงนี้ใช้ซ้ำได้กับ Core Part อีก 4 ตัว (เช่น เลือกซิลิโคนถูกชนิด, เลือกไขควงถูกหัว) — ออกแบบให้ `CleanStep` เป็น `int` จึงขยายเป็น step ของ Part อื่นได้
 
 ### 14.8 Asset ที่ระบบนี้ต้องใช้เพิ่ม
 
 | ไฟล์ | ขนาด | หมายเหตุ |
 |---|---|---|
-| `mg1_tool_eraser_white.png` | 200 × 200 | มีแล้วบางส่วน: `mg1_eraser.png` (256×256) ใช้แทนได้ |
-| `mg1_tool_brush.png` | 200 × 200 | แปรงขนนุ่ม |
-| `mg1_tool_blower.png` | 200 × 200 | ลูกยางเป่าลม |
-| `mg1_tool_cloth.png` | 200 × 200 | ผ้าไมโครไฟเบอร์ |
-| `mg1_tool_ipa_swab.png` | 200 × 200 | คอตตอนบัด + ขวด IPA |
-| `mg1_tool_eraser_red.png` | 200 × 200 | ยางลบสีแดง |
-| `mg1_tool_sandpaper.png` | 200 × 200 | กระดาษทราย |
-| `mg1_tool_wet_cloth.png` | 200 × 200 | ผ้าชุบน้ำ (มีหยดน้ำ) |
-| `mg1_tool_hairdryer.png` | 200 × 200 | ไดร์เป่าผม |
-| `mg1_tool_vacuum.png` | 200 × 200 | เครื่องดูดฝุ่นบ้าน |
-| `mg1_tray.png` | 900 × 220 | ถาด/โต๊ะวางเครื่องมือ |
+| `ram_tool_eraser_white.png` | 200 × 200 | มีแล้วบางส่วน: `ram_eraser.png` (256×256) ใช้แทนได้ |
+| `ram_tool_brush.png` | 200 × 200 | แปรงขนนุ่ม |
+| `ram_tool_blower.png` | 200 × 200 | ลูกยางเป่าลม |
+| `ram_tool_cloth.png` | 200 × 200 | ผ้าไมโครไฟเบอร์ |
+| `ram_tool_ipa_swab.png` | 200 × 200 | คอตตอนบัด + ขวด IPA |
+| `ram_tool_eraser_red.png` | 200 × 200 | ยางลบสีแดง |
+| `ram_tool_sandpaper.png` | 200 × 200 | กระดาษทราย |
+| `ram_tool_wet_cloth.png` | 200 × 200 | ผ้าชุบน้ำ (มีหยดน้ำ) |
+| `ram_tool_hairdryer.png` | 200 × 200 | ไดร์เป่าผม |
+| `ram_tool_vacuum.png` | 200 × 200 | เครื่องดูดฝุ่นบ้าน |
+| `ram_tray.png` | 900 × 220 | ถาด/โต๊ะวางเครื่องมือ |
 | `ui_tool_card.png` | 320 × 200 | กรอบการ์ดคุณสมบัติ |
 | `ui_meter_pip_on.png` / `_off.png` | 24 × 24 | จุดวัดความแข็ง ▮▯ |
-| `mg1_icon_moisture.png` · `mg1_icon_esd.png` · `mg1_icon_residue.png` · `mg1_icon_narrow.png` | 48 × 48 | ไอคอนบนการ์ด |
+| `ram_icon_moisture.png` · `ram_icon_esd.png` · `ram_icon_residue.png` · `ram_icon_narrow.png` | 48 × 48 | ไอคอนบนการ์ด |
 
-**Prompt (ตัวอย่าง `mg1_tool_blower.png`):**
+**Prompt (ตัวอย่าง `ram_tool_blower.png`):**
 ```
 a cartoon rubber air blower bulb for cleaning electronics, side view,
 warm orange rubber body, small nozzle pointing left, centered,
