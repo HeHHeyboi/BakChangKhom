@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cl3geaph6h53t" path="res://Assets/MiniGame/box.png" id="3_ad3c0"]
 [ext_resource type="Texture2D" uid="uid://cddhpu756wbba" path="res://Assets/MiniGame/box_on_hover.png" id="4_l2pj6"]
 [ext_resource type="Script" uid="uid://bebw7l4xouf2" path="res://Scripts/MiniGame/search_box.gd" id="5_ic58l"]
-[ext_resource type="Texture2D" uid="uid://b7hvifd3sv78t" path="res://Assets/MiniGame/Tier1Ram/mg1_eraser.png" id="6_kt573"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_eraser.png" id="6_kt573"]
 
 [node name="FindItemMinigame" type="Node" unique_id=1698144630]
 script = ExtResource("1_feygu")

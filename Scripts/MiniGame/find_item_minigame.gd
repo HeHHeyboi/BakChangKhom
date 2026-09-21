@@ -4,7 +4,7 @@ extends Node
 var box_click_count = 2
 @onready var text = $RichTextLabel as RichTextLabel
 @onready var eraser = $Eraser as TextureRect
-var dialog_arr = ["หาไม่เจอ", "อยู่ใหนนะ?", "หรือว่าอยู่ในกล่องนั้น"]
+var dialog_arr = ["ยางลบอยู่ไหนนะ ลองหาในกล่องดูก่อน", "ไม่มีในกล่องนี้แฮะ", "หรือว่าอยู่ในกล่องนั้น"]
 
 
 # Called when the node enters the scene tree for the first time.
@@ -14,6 +14,7 @@ func _ready() -> void:
 	timer.wait_time = 1
 	timer.one_shot = true
 	timer.connect("timeout", self._timeout)
+	text.text = dialog_arr[0]
 
 
 func _timeout():
@@ -24,7 +25,7 @@ func _timeout():
 
 func _on_box_pressed() -> void:
 	if box_click_count > 0:
-		text.text = dialog_arr[-box_click_count]
+		text.text = dialog_arr[dialog_arr.size() - box_click_count]
 		box_click_count -= 1
 	else:
 		text.text = "เจอแล้ว!"

@@ -25,10 +25,20 @@ func _ready() -> void:
 
 
 func show_tutorial(tutor_index: TutorialState) -> void:
+	# ตอนนี้มีสไลด์จริงแค่บาง state (BASIC_START, RAM_CLEANING)
+	# state ที่ยังไม่มีสไลด์ต้องข้ามไปเงียบ ๆ ไม่ใช่ crash
+	if not _slides.has(tutor_index) or _slides[tutor_index] == null:
+		push_warning("ยังไม่มีสไลด์ของ TutorialState %d — ข้าม tutorial นี้ไปก่อน" % tutor_index)
+		self.visible = false
+		self.process_mode = Node.PROCESS_MODE_DISABLED
+		on_tutorial_end.emit()
+		return
+
 	self.visible = true
 	self._finished = false
 	self.process_mode = Node.PROCESS_MODE_INHERIT
 	cur_slide = _slides[tutor_index]
+	cur_slide.reset()
 	slide_show.texture = cur_slide.get_cur_slide()
 
 

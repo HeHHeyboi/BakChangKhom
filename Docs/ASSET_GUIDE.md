@@ -260,6 +260,21 @@ blurry, jpeg artifacts, extra limbs, deformed hands
    * `mb_mainboard.png` 1.47 MB · `mb_case_open.png` 1.41 MB · `gpu_cable_messy.png` 1.15 MB · `gpu_cable_tidy.png` 887 KB · `char_khom_walk_sheet.png` 622 KB
 5. **ผูก `Resources/khom_walk.tres` เข้า `Player.tscn`** — เปลี่ยนจาก AnimationPlayer + region เป็น `AnimatedSprite2D` + SpriteFrames (หรือคงของเดิมแล้วปรับ region ให้ตรงชีตใหม่)
 
+### 3.9 ✨ asset ที่เข้ามาหลังจากนั้น (commit `1c9040a`, 21 ก.ย. 2569)
+
+| ไฟล์ | ขนาด | ใช้ที่ไหน |
+|---|---|---|
+| `Assets/MiniGame/box.png` | 256×256 | กล่องค้นหาใน find-item minigame (หายางลบ) |
+| `Assets/MiniGame/box_on_hover.png` | 256×256 | state hover — ขนาดเท่ากัน ✅ |
+
+**🔴 ปัญหาที่ต้องแก้ก่อนใช้ asset ชุด Part (รายละเอียดใน `Docs/SYNC_REVIEW.md` หัวข้อ 2):**
+
+1. **`.import` ไม่ตรงกับชื่อรูป 39 คู่** — commit `1c9040a` มีรูปชื่อใหม่ (`ram_eraser.png`) กับ `.import` ชื่อเก่า (`mg1_eraser.png.import`) อยู่ด้วยกัน → ต้องลบ `.import` กำพร้าแล้วให้ Godot import ใหม่ ไม่งั้น uid ตายตอน clone ใหม่
+2. **`Scene/MiniGame/find_item_minigame.tscn` ยังชี้ `Assets/MiniGame/Tier1Ram/mg1_eraser.png`** ซึ่งไม่มีแล้ว
+3. `box*.png` ควรย้ายเข้า `Assets/MiniGame/PartRam/` และตั้งชื่อ `ram_box_normal.png` / `ram_box_hover.png` — ทำพร้อมรอบ reimport ทีเดียว
+4. asset ชุดเก่าที่ควรลบหลังเปลี่ยนโค้ดไปใช้ชุดใหม่: `ram.png` · `ramDirty.png` · `ramSligtDirty.png` · `eraser.png` ที่ราก `Assets/MiniGame/`
+5. find-item minigame ใช้ `RoomBG.jpg` (1920×1080) เป็นพื้นหลัง — ควรย่อเป็น 1152×648
+
 ---
 
 ## 4. สรุปงานแก้ asset เดิม (ทำก่อนสร้างของใหม่)
@@ -568,8 +583,9 @@ const BG_SHOP_EMPTY = "bg_shop_empty.jpg"
 
 ### 6.5 MiniGame ใหม่
 1. สร้าง scene ที่ `Scene/MiniGame/Minigame<N>.tscn`
-2. เปิด `Scene/Global.tscn` → `MiniGames` dict → เพิ่ม `"MiniGame<N>": <PackedScene>`
-3. เรียก `Global.ReturnMiniGame("MiniGame<N>")`
+2. เพิ่มค่าคงที่พาธใน `Scripts/constant.gd` (เช่น `const MINIGAME2_SCENE = "res://Scene/MiniGame/PartMainboard.tscn"`)
+3. โหลดจาก `EventManager.trigger_step()` ด้วย `load(Constant.MINIGAME2_SCENE).instantiate()`
+   *(ตั้งแต่ commit `46a5a7b` `Global.MiniGames` / `ReturnMiniGame()` ถูกลบแล้ว)*
 
 > 🐞 **บั๊กที่ต้องแก้ก่อนทำ Part Mainboard:** `Scripts/Room/room.gd` บรรทัด 3 instantiate มินิเกมครั้งเดียวเก็บเป็นตัวแปรสมาชิก แต่ `minigame1.gd::_on_return_pressed()` เรียก `queue_free()` → เข้ามินิเกมรอบที่ 2 จะ `add_child` โนดที่ถูกปล่อยไปแล้ว
 
@@ -610,5 +626,6 @@ const BG_SHOP_EMPTY = "bg_shop_empty.jpg"
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 21 ก.ย. 2569 | เพิ่มหัวข้อ 3.9 — asset ที่เข้ามาใหม่ (box) + ปัญหา `.import` ไม่ตรงชื่อ 39 คู่ หลัง rename Tier→Part |
 | 16 ก.ย. 2569 (2) | เพิ่มหัวข้อ 3.8 — สรุปชุด asset รอบใหม่ 84 ไฟล์ที่ย้ายจาก `Assets/Gen/` เข้าโครงจริง พร้อมรายการที่ยังขาดและงานที่ต้องทำก่อนใช้ |
 | 16 ก.ย. 2569 | สร้างเอกสาร — ตรวจ asset จริงทั้งหมดที่ commit `8c4db20`, เทียบกับ `TutorialState` 7 ค่า, `_CharacterMap` 2 คน, และรายชื่อตัวละครในไฟล์บททั้งหมด |

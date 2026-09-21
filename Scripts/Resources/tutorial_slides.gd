@@ -9,8 +9,15 @@ var _slides = []
 var curIndex = 0
 
 
+## รีเซ็ตกลับไปสไลด์แรก — ต้องเรียกทุกครั้งที่เปิด tutorial ใหม่
+## เพราะ TutorialSlides เป็น Resource ที่แชร์กันทั้งเกม curIndex จึงค้างข้ามรอบ
+func reset() -> void:
+	curIndex = 0
+
+
 func get_cur_slide() -> Texture2D:
-	print_rich(_slides)
+	if _slides.is_empty():
+		return null
 	return _slides[curIndex]
 
 

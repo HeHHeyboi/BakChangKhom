@@ -30,7 +30,7 @@ offset_left = 173.99998
 offset_top = 371.99997
 offset_right = 241.99998
 offset_bottom = 446.99997
-trackEvents = Dictionary[Variant, PackedByteArray]({
+trackEvents = Dictionary[int, PackedByteArray]({
 1: PackedByteArray(1, 3)
 })
 

@@ -41,7 +41,7 @@
 
 | # | ไฟล์ | ปัญหา |
 |---|---|---|
-| B1 | `Scripts/Room/room.gd:3` | `var minigame = Global.ReturnMiniGame("MiniGame1")` instantiate ครั้งเดียวเป็นตัวแปรสมาชิก แต่มินิเกม `queue_free()` ตัวเอง → **เข้ารอบ 2 พัง** ต้องย้ายไป instantiate ใน `_on_dialog_finish()` |
+| ~~B1~~ ✅ **แก้แล้ว** (commit `e5d5203` ลบ `room.gd` ทิ้ง ย้ายไป instantiate สดใน `EventManager.trigger_step()`) | ~~`Scripts/Room/room.gd:3`~~ | `var minigame = Global.ReturnMiniGame("MiniGame1")` instantiate ครั้งเดียวเป็นตัวแปรสมาชิก แต่มินิเกม `queue_free()` ตัวเอง → **เข้ารอบ 2 พัง** ต้องย้ายไป instantiate ใน `_on_dialog_finish()` |
 | B2 | `Scripts/Resources/tutorial_slides.gd` | `curIndex` ไม่รีเซ็ตใน `show_tutorial()` → เปิดซ้ำเริ่มที่สไลด์สุดท้าย · ต้องเพิ่ม `func reset(): curIndex = 0` แล้วเรียกจาก `Tutorial.show_tutorial()` |
 | B3 | `Scene/MiniGame/Minigame1.scn` | เป็นไฟล์ **binary `.scn`** → diff ไม่ได้ merge ไม่ได้ **ต้อง Save As เป็น `.tscn`** ก่อนเริ่มงานนี้ |
 | B4 | `minigame1.gd` | `match clikTime` เทียบค่าเป๊ะ ควรเป็น `if clikTime >= ...` |
@@ -310,19 +310,17 @@ func point_at(target: Node2D, line: String) -> void
 ### 8.4 การผูกกับระบบเดิม
 
 ```gdscript
-# room.gd — แก้ B1 ไปด้วยในตัว
-func _on_dialog_finish() -> void:
-    EventManager.show_tutorial(EventManager.TutorialState.RAM_CLEANING)
-    var minigame = Global.ReturnMiniGame("MiniGame1")   # instantiate ใหม่ทุกครั้ง
-    minigame.minigame_finished.connect(_on_minigame_finished)
-    get_tree().root.add_child(minigame)
-    Global.in_minigame = true
+# โค้ดจริงตอนนี้อยู่ที่ EventManager.trigger_step() (commit e5d5203) — room.gd ถูกลบแล้ว
+# Global.MiniGames / ReturnMiniGame() ก็ถูกลบ ใช้ค่าคงที่ใน constant.gd แทน
+	3:
+		hideUI()
+		show_tutorial(TutorialState.RAM_CLEANING)
+		var minigame = load(Constant.MINIGAME1_SCENE).instantiate()
+		get_tree().root.add_child(minigame)
+		Global.in_minigame = true
 
-func _on_minigame_finished(score: Dictionary) -> void:
-    Global.in_minigame = false
-    EventManager.update_event(EventManager.EventID.MAIN)
-    EventManager.next_period.emit()
-    EventManager.hideTimeUI(false)
+# มินิเกมจบแล้วเรียกกลับมาที่ EventManager.minigame_end()
+# ⚠️ minigame1.gd ยังลืม Global.in_minigame = false — ดู Docs/SYNC_REVIEW.md หัวข้อ 2.3
 ```
 
 > ย้ายโค้ดจบเกมออกจากมินิเกมมาไว้ที่ `room.gd` — มินิเกมแค่ `emit` สัญญาณ ทำให้เอาไปใช้ที่อื่น (เช่นร้าน) ได้โดยไม่ต้องแก้

@@ -476,7 +476,21 @@ Resources/
 └── Cases/      case_c01.tres … case_c06.tres
 ```
 
-### 8.4 การต่อกับระบบเดิม
+### 8.4 ฐานโค้ดที่มีอยู่แล้วและควรต่อยอด (อัปเดต 21 ก.ย. 2569 · commit `1c9040a`)
+
+โค้ดเดินหน้าไปแล้วในทิศทางเดียวกับดีไซน์นี้ — **อย่าเขียน `RepairManager` ใหม่ทั้งหมด ให้ต่อจากของเดิม**
+
+| ของที่มีแล้ว | ใช้ต่อยังไง |
+|---|---|
+| `EventManager.trigger_step(id, event)` — ตารางปฏิกิริยาต่อ quest step รวมศูนย์ | คือต้นแบบของ `RepairManager` · เปลี่ยนจาก `match` hardcode เป็น `QuestStep` resource (ดู `SYNC_REVIEW.md` 4.1) |
+| `EventManager.minigame_end()` | จุดที่ Part ซ่อมเสร็จแล้วรายงานกลับ — เพิ่ม argument `success` / `score` |
+| `CautionMarker.caution_press(id, event)` | คือ hotspot ของ Part ใน Scene S2 อยู่แล้ว ใช้รูปแบบเดียวกันได้เลย |
+| `sendUpdatedEvent(EventID, Event)` | signature ปัจจุบัน (เปลี่ยนจาก `(Event)` ใน commit `6d37f54`) |
+| `find_item_minigame` | เป็นตัวอย่าง Normal Part ที่ทำงานอยู่จริงแล้ว |
+
+> `Global.MiniGames` และ `Global.ReturnMiniGame()` **ถูกลบแล้ว** — โหลดซีนมินิเกมผ่านค่าคงที่ใน `Scripts/constant.gd` แทน
+
+### 8.5 การต่อกับระบบเดิม
 
 * **เข้าลูป:** `Scripts/Map/market.gd` หรือ hotspot ในฉากร้าน → `RepairManager.start_case(case)` → เปลี่ยน scene เป็น `ShopCounter.tscn`
 * **ออกจากลูป:** `job_finished` → `EventManager.update_event(MAIN)` + `EventManager.next_period.emit()` (เหมือนที่ `minigame1.gd` ทำอยู่ตอนนี้)
@@ -485,7 +499,7 @@ Resources/
 * **Tutorial:** `EventManager.show_tutorial(part.tutorial_state)` ตอนเข้า Core Part ครั้งแรก
 * **QuestBoard:** ใบงานปัจจุบันแสดงเป็น task ผ่าน `EventManager.update_event()` ตามเดิม
 
-### 8.5 สิ่งที่ต้องเพิ่มใน Global
+### 8.6 สิ่งที่ต้องเพิ่มใน Global
 
 ```gdscript
 # Scripts/global.gd
@@ -582,4 +596,5 @@ var completed_jobs: Array = []       # ประวัติงานซ่อ�
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 21 ก.ย. 2569 (2) | เพิ่มหัวข้อ 8.4 — ฐานโค้ดที่มีอยู่แล้ว (`trigger_step` / `minigame_end` / `caution_press`) ที่ `RepairManager` ควรต่อยอด |
 | 21 ก.ย. 2569 | สร้างเอกสาร — เปลี่ยนหน่วยเนื้อหาจาก Tier เป็น Part (Core 5 + Normal 8), ออกแบบลูปงานซ่อม 5 scene เริ่มจากลูกค้าเข้าร้านและระบบซักถามหาคำสำคัญ, ถาดเครื่องมือรวม 21 ชิ้น, Part dependency graph, สเปก Resource/Manager/Scene และลำดับ implement 9 ขั้น |

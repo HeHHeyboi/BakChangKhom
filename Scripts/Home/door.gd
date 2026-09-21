@@ -4,4 +4,8 @@ extends TextureButton
 
 
 func _on_pressed() -> void:
+	# ห้ามเปลี่ยนฉากระหว่างบทสนทนาหรือมินิเกม ไม่งั้นฉากใต้ UI จะถูกปล่อยทิ้ง
+	# แล้วเหลือแต่ฉากใหม่กับมินิเกมที่ค้างอยู่บน root
+	if Global.isDialogShown() or Global.isInMinigame():
+		return
 	get_tree().change_scene_to_file(Constant.ROOM_SCENE)

@@ -18,9 +18,9 @@ var curPos
 var clikTime = 0
 var t = 1.0
 
-const RamDirtyImage = "res://Assets/MiniGame/ramDirty.png"
-const RamSlightDirtyImage = "res://Assets/MiniGame/ramSligtDirty.png"
-const RamCleanImage = "res://Assets/MiniGame/ram.png"
+const RamDirtyImage = "res://Assets/MiniGame/PartRam/ram_dirty.png"
+const RamSlightDirtyImage = "res://Assets/MiniGame/PartRam/ram_better.png"
+const RamCleanImage = "res://Assets/MiniGame/PartRam/ram_clean.png"
 
 var RamIMG = [load(RamDirtyImage), load(RamSlightDirtyImage), load(RamCleanImage)]
 
@@ -58,13 +58,13 @@ func _physics_process(delta: float) -> void:
 			moving = false
 		eraser.position = curPos.lerp(goalPos, t)
 
-	match clikTime:
-		RamStatus.DIRTY:
-			ram.texture = RamIMG[0]
-		RamStatus.BETTER:
-			ram.texture = RamIMG[1]
-		RamStatus.CLEAN:
-			ram.texture = RamIMG[2]
+	# ใช้ >= แทนการเทียบค่าเป๊ะ เผื่ออนาคตเพิ่ม clikTime ทีละมากกว่า 1
+	if clikTime >= RamStatus.CLEAN:
+		ram.texture = RamIMG[2]
+	elif clikTime >= RamStatus.BETTER:
+		ram.texture = RamIMG[1]
+	else:
+		ram.texture = RamIMG[0]
 
 
 func _on_button_pressed() -> void:
@@ -79,7 +79,7 @@ func _on_button_pressed() -> void:
 	moving = true
 
 	clikTime += 1
-	if clikTime == RamStatus.CLEAN:
+	if clikTime >= RamStatus.CLEAN and not isFinish:
 		isFinish = true
 		button.hide()
 		for n in miniGameBG.get_children():
@@ -87,6 +87,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
+	Global.in_minigame = false
 	EventManager.next_period.emit()
 	EventManager.showUI()
 	EventManager.minigame_end()
