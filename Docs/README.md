@@ -10,8 +10,10 @@
 | `ASSET_GUIDE.md` | คู่มือสร้าง asset — ขนาด/ฟอร์แมต/ชื่อไฟล์/prompt/pipeline + inventory ปัจจุบัน |
 | `ASSET_TODO.md` | เช็กลิสต์ asset ที่ต้องทำ เรียงตามลำดับ |
 | `DIAGRAMS.md` + `Diagrams/` | ไดอะแกรม 9 ภาพสำหรับเล่มรายงาน (PNG 300 dpi + SVG) พร้อมคำบรรยายใต้ภาพ |
+| `UI_MOCKUP.md` + `Mockups/` | mockup 4 หน้าจอประกอบจาก asset จริง — ตารางตำแหน่ง x/y/w/h ทุกช่อง + สรุป asset ที่ยังขาด 23 ไฟล์ |
 | `STORYBOARD.md` | Low-fi wireframe 40 เฟรมของ Core Part ทั้ง 5 + เลย์เอาต์กลาง + prompt pack สำหรับสั่ง AI ทำ storyboard |
 | `BUG_LIST.md` | บั๊กทั้งหมดที่ตรวจพบ พร้อมสถานะ |
+| `Storyboard/CROP_REPORT.md` | ผลตรวจ asset ที่ crop มาจาก sheet (ผ่าน/ลบเศษ/ต้องทำใหม่) |
 | `SYNC_REVIEW.md` | ผลเทียบโค้ดจริงกับดีไซน์ + วิธีแก้ทีละข้อ |
 
 ## มินิเกม Core Part 5 ตัว
@@ -67,5 +69,3 @@
 
 - [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
 - [ ] เขียนคอมโพเนนต์ `PibHint` ที่อ่านไฟล์แล้วแยกตาม `# @SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้
-
-| `Storyboard/CROP_REPORT.md` | ผลตรวจ asset ที่ crop จาก sheet |
