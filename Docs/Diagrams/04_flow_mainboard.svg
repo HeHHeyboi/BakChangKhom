@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="639.72pt" height="436.176pt" viewBox="0 0 639.72 436.176" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:c2pa="http://c2pa.org/manifest">
+ <metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTphNGIwOGQ2OS1jODcyLTQ1ZjYtYWY5OS0xZjFkMjkxZWJiY2IAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaMUVO5A9thYbUrKufhEr5mMAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpmMDA3ODM2Mi1lNTlkLTQxMmUtYWU3Mi00MjY1MzE4MTVlYmNscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNo/jjMHEHqzghsUWx/wLVq9QAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggc99IVhZ/ZDB0L/rmxnydkvBoDxNGf65cpsjEVhrKVh+kZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaCC70tB9YBtEaYTX2T/yiJEAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIEqrCNceIATqcbSWZVeeYEAiFoQ8mvuOFlAa3OFZDtBVZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GQF/Zmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmE0YjA4ZDY5LWM4NzItNDVmNi1hZjk5LTFmMWQyOTFlYmJjYi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmMzNTM2YzE1LWI1NTEtNDRiOS1iYTlhLTA0YTQxMDY2NjU3YXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBz30hWFn9kMHQv+ubGfJ2S8GgPE0Z/rlymyMRWGspWH6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgg+FvWHyiIm6m5UqUfknHX/0vPb04m+pTQTSx+VUV+t3SiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggFk4FZGvI7Eigm3Mritvl/1t2/q5/8+9+kPjn3tZtrBt0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQALrnokfVy4qcDaCkW/Lrn7jo4Irpy1KIprWKkLtQHFVgRfKhXo9m/F7tdG6L5TRuqDF4vCXIUrZ7urLHm4D6vs=</c2pa:manifest>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-22T09:33:08.019281</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.9, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 436.176 
+L 639.72 436.176 
+L 639.72 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 38.7396 136.5912 
+L 155.9754 136.5912 
+Q 163.341 136.5912 163.341 129.27312 
+L 163.341 113.41728 
+Q 163.341 106.0992 155.9754 106.0992 
+L 38.7396 106.0992 
+Q 31.374 106.0992 31.374 113.41728 
+L 31.374 129.27312 
+Q 31.374 136.5912 38.7396 136.5912 
+z
+" clip-path="url(#p036f751513)" style="fill: #dce9f7; stroke: #4a90d9; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 38.7396 188.4276 
+L 155.9754 188.4276 
+Q 163.341 188.4276 163.341 181.10952 
+L 163.341 143.90928 
+Q 163.341 136.5912 155.9754 136.5912 
+L 38.7396 136.5912 
+Q 31.374 136.5912 31.374 143.90928 
+L 31.374 181.10952 
+Q 31.374 188.4276 38.7396 188.4276 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 166.182672 162.81432 
+Q 172.855982 162.81432 177.740438 162.81432 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 172.540438 160.21432 
+L 177.740438 162.81432 
+L 172.540438 165.41432 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 189.7344 136.5912 
+L 306.9702 136.5912 
+Q 314.3358 136.5912 314.3358 129.27312 
+L 314.3358 113.41728 
+Q 314.3358 106.0992 306.9702 106.0992 
+L 189.7344 106.0992 
+Q 182.3688 106.0992 182.3688 113.41728 
+L 182.3688 129.27312 
+Q 182.3688 136.5912 189.7344 136.5912 
+z
+" clip-path="url(#p036f751513)" style="fill: #f3efe7; stroke: #8a7a63; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 189.7344 188.4276 
+L 306.9702 188.4276 
+Q 314.3358 188.4276 314.3358 181.10952 
+L 314.3358 143.90928 
+Q 314.3358 136.5912 306.9702 136.5912 
+L 189.7344 136.5912 
+Q 182.3688 136.5912 182.3688 143.90928 
+L 182.3688 181.10952 
+Q 182.3688 188.4276 189.7344 188.4276 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 317.177472 162.81432 
+Q 323.850782 162.81432 328.735238 162.81432 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 323.535238 160.21432 
+L 328.735238 162.81432 
+L 323.535238 165.41432 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 340.7292 136.5912 
+L 457.965 136.5912 
+Q 465.3306 136.5912 465.3306 129.27312 
+L 465.3306 113.41728 
+Q 465.3306 106.0992 457.965 106.0992 
+L 340.7292 106.0992 
+Q 333.3636 106.0992 333.3636 113.41728 
+L 333.3636 129.27312 
+Q 333.3636 136.5912 340.7292 136.5912 
+z
+" clip-path="url(#p036f751513)" style="fill: #fbefd3; stroke: #e8a854; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 340.7292 188.4276 
+L 457.965 188.4276 
+Q 465.3306 188.4276 465.3306 181.10952 
+L 465.3306 143.90928 
+Q 465.3306 136.5912 457.965 136.5912 
+L 340.7292 136.5912 
+Q 333.3636 136.5912 333.3636 143.90928 
+L 333.3636 181.10952 
+Q 333.3636 188.4276 340.7292 188.4276 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 468.172272 162.81432 
+Q 474.845582 162.81432 479.730038 162.81432 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 474.530038 160.21432 
+L 479.730038 162.81432 
+L 474.530038 165.41432 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 491.724 136.5912 
+L 608.9598 136.5912 
+Q 616.3254 136.5912 616.3254 129.27312 
+L 616.3254 113.41728 
+Q 616.3254 106.0992 608.9598 106.0992 
+L 491.724 106.0992 
+Q 484.3584 106.0992 484.3584 113.41728 
+L 484.3584 129.27312 
+Q 484.3584 136.5912 491.724 136.5912 
+z
+" clip-path="url(#p036f751513)" style="fill: #f3efe7; stroke: #8a7a63; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 491.724 188.4276 
+L 608.9598 188.4276 
+Q 616.3254 188.4276 616.3254 181.10952 
+L 616.3254 143.90928 
+Q 616.3254 136.5912 608.9598 136.5912 
+L 491.724 136.5912 
+Q 484.3584 136.5912 484.3584 143.90928 
+L 484.3584 181.10952 
+Q 484.3584 188.4276 491.724 188.4276 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 550.3419 189.429235 
+Q 550.3419 202.151141 550.3419 213.084192 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 552.9419 207.884192 
+L 550.3419 213.084192 
+L 547.7419 207.884192 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 491.724 246.3624 
+L 608.9598 246.3624 
+Q 616.3254 246.3624 616.3254 239.04432 
+L 616.3254 223.18848 
+Q 616.3254 215.8704 608.9598 215.8704 
+L 491.724 215.8704 
+Q 484.3584 215.8704 484.3584 223.18848 
+L 484.3584 239.04432 
+Q 484.3584 246.3624 491.724 246.3624 
+z
+" clip-path="url(#p036f751513)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 491.724 298.1988 
+L 608.9598 298.1988 
+Q 616.3254 298.1988 616.3254 290.88072 
+L 616.3254 253.68048 
+Q 616.3254 246.3624 608.9598 246.3624 
+L 491.724 246.3624 
+Q 484.3584 246.3624 484.3584 253.68048 
+L 484.3584 290.88072 
+Q 484.3584 298.1988 491.724 298.1988 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 481.516728 272.58552 
+Q 474.843418 272.58552 469.958962 272.58552 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 475.158962 275.18552 
+L 469.958962 272.58552 
+L 475.158962 269.98552 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 340.7292 246.3624 
+L 457.965 246.3624 
+Q 465.3306 246.3624 465.3306 239.04432 
+L 465.3306 223.18848 
+Q 465.3306 215.8704 457.965 215.8704 
+L 340.7292 215.8704 
+Q 333.3636 215.8704 333.3636 223.18848 
+L 333.3636 239.04432 
+Q 333.3636 246.3624 340.7292 246.3624 
+z
+" clip-path="url(#p036f751513)" style="fill: #f8deda; stroke: #c0453b; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 340.7292 298.1988 
+L 457.965 298.1988 
+Q 465.3306 298.1988 465.3306 290.88072 
+L 465.3306 253.68048 
+Q 465.3306 246.3624 457.965 246.3624 
+L 340.7292 246.3624 
+Q 333.3636 246.3624 333.3636 253.68048 
+L 333.3636 290.88072 
+Q 333.3636 298.1988 340.7292 298.1988 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 330.521928 272.58552 
+Q 323.848618 272.58552 318.964162 272.58552 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 324.164162 275.18552 
+L 318.964162 272.58552 
+L 324.164162 269.98552 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 189.7344 246.3624 
+L 306.9702 246.3624 
+Q 314.3358 246.3624 314.3358 239.04432 
+L 314.3358 223.18848 
+Q 314.3358 215.8704 306.9702 215.8704 
+L 189.7344 215.8704 
+Q 182.3688 215.8704 182.3688 223.18848 
+L 182.3688 239.04432 
+Q 182.3688 246.3624 189.7344 246.3624 
+z
+" clip-path="url(#p036f751513)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 189.7344 298.1988 
+L 306.9702 298.1988 
+Q 314.3358 298.1988 314.3358 290.88072 
+L 314.3358 253.68048 
+Q 314.3358 246.3624 306.9702 246.3624 
+L 189.7344 246.3624 
+Q 182.3688 246.3624 182.3688 253.68048 
+L 182.3688 290.88072 
+Q 182.3688 298.1988 189.7344 298.1988 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 179.527128 272.58552 
+Q 172.853818 272.58552 167.969362 272.58552 
+" clip-path="url(#p036f751513)" style="fill: none; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 173.169362 275.18552 
+L 167.969362 272.58552 
+L 173.169362 269.98552 
+z
+" clip-path="url(#p036f751513)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 38.7396 246.3624 
+L 155.9754 246.3624 
+Q 163.341 246.3624 163.341 239.04432 
+L 163.341 223.18848 
+Q 163.341 215.8704 155.9754 215.8704 
+L 38.7396 215.8704 
+Q 31.374 215.8704 31.374 223.18848 
+L 31.374 239.04432 
+Q 31.374 246.3624 38.7396 246.3624 
+z
+" clip-path="url(#p036f751513)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_24">
+    <path d="M 38.7396 298.1988 
+L 155.9754 298.1988 
+Q 163.341 298.1988 163.341 290.88072 
+L 163.341 253.68048 
+Q 163.341 246.3624 155.9754 246.3624 
+L 38.7396 246.3624 
+Q 31.374 246.3624 31.374 253.68048 
+L 31.374 290.88072 
+Q 31.374 298.1988 38.7396 298.1988 
+z
+" clip-path="url(#p036f751513)" style="fill: #ffffff; stroke: #2c1810; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_25">
+    <path d="M 38.7396 389.6748 
+L 585.6354 389.6748 
+Q 593.001 389.6748 593.001 382.35672 
+L 593.001 326.86128 
+Q 593.001 319.5432 585.6354 319.5432 
+L 38.7396 319.5432 
+Q 31.374 319.5432 31.374 326.86128 
+L 31.374 382.35672 
+Q 31.374 389.6748 38.7396 389.6748 
+z
+" clip-path="url(#p036f751513)" style="fill: #f8deda; stroke: #c0453b; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 21px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="319.86" y="42.463031" transform="rotate(-0 319.86 42.463031)">ภาพที่ 4  ขั้นตอนมินิเกม Core Part: เมนบอร์ด + CPU</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #6b5b4b" x="319.86" y="62.362018" transform="rotate(-0 319.86 62.362018)">เน้นเรื่องทิศทางการวาง CPU ซิลิโคนนำความร้อน และลำดับการขันน็อต</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="97.3575" y="123.626489" transform="rotate(-0 97.3575 123.626489)">0  ตรวจสภาพ</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(59.577188 159.396712)">ดูครีบฮีตซิงก์ ซิลิโคนเก่า</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(73.2975 173.302087)">และรอยใต้แผ่น</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="248.3523" y="124.766606" transform="rotate(-0 248.3523 124.766606)">1  ปิ๊บสอน</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(209.1123 159.083587)">ความร้อนเดินทางอย่างไร</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(217.17105 172.053337)">ซิลิโคนมีไว้ไล่อากาศ</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="399.3471" y="123.632817" transform="rotate(-0 399.3471 123.632817)">2  ตัดไฟ</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(369.438975 159.065775)">ปิดเครื่อง ถอดปลั๊ก</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(345.87585 172.035525)">วางบอร์ดบนแผ่นรองกันไฟฟ้าสถิต</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="550.3419" y="124.625278" transform="rotate(-0 550.3419 124.625278)">3  ถอดฮีตซิงก์</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(516.485963 157.769681)">ปลดคานล็อกแบบไขว้</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(520.4694 172.587244)">หมุนเบา ๆ ก่อนยก</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="550.3419" y="234.254095" transform="rotate(-0 550.3419 234.254095)">4  เช็ดซิลิโคนเก่า</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(502.279088 267.735131)">2 ขั้น ผิว CPU และฐานฮีตซิงก์</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(525.041588 283.917319)">เลือกน้ำยาให้ถูก</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="399.3471" y="233.397689" transform="rotate(-0 399.3471 233.397689)">5  วาง CPU</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(362.07585 268.854787)">หันสามเหลี่ยมให้ตรงกัน</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(367.752413 281.824537)">ปล่อยลงเอง ห้ามกด</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="248.3523" y="233.397689" transform="rotate(-0 248.3523 233.397689)">6  ทาซิลิโคน</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(214.321988 267.823537)">เลือกชนิดและปริมาณ</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(205.190738 280.793287)">เท่าเม็ดถั่วเขียว ไม่ต้องเกลี่ย</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="97.3575" y="233.397689" transform="rotate(-0 97.3575 233.397689)">7  ประกอบและตรวจผล</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(64.3275 266.775131)">ขันน็อตแบบทแยงมุม</text>
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(50.294063 283.101694)">ดูอุณหภูมิต้องไม่เกิน 65 องศา</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(260.566406 351.619107)">จุดที่ผิดพลาดได้และผลที่ตามมา</text>
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(135.404297 365.960221)">กดแรงตอนหัน CPU ผิด ขาซ็อกเก็ตพับถาวร     ใช้น้ำเช็ดซิลิโคน ความชื้นค้าง     ขันน็อตไล่รอบ ฮีตซิงก์เอียง</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p036f751513">
+   <rect x="12.96" y="12.96" width="613.8" height="410.256"/>
+  </clipPath>
+ </defs>
+</svg>

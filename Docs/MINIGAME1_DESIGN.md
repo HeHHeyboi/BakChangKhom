@@ -1,6 +1,7 @@
 # MINIGAME1_DESIGN.md — มินิเกม **Part RAM**: ทำความสะอาดแรม
 
 > อ้างอิงโค้ดจริงที่ commit `86b719f` · 16 ก.ย. 2569 · Godot 4.7
+> ชุดเดียวกับ: `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md` · `PART_BIOS_DESIGN.md` (สารบัญ: `Docs/README.md`)
 > เอกสารคู่กัน: `Docs/REPAIR_FLOW.md` (ลูปงานซ่อม 5 scene ที่ครอบมินิเกมนี้อยู่), `Docs/ASSET_GUIDE.md` (สเปก asset), `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7 หัวข้อ 4.7–4.11
 > ClickUp: [MiniGame Tutorial Mode](https://app.clickup.com/t/86eygp946) · [[Project] Bak Chang Khom](https://app.clickup.com/t/86ey2e8mm)
 

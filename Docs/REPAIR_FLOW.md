@@ -290,6 +290,17 @@
 
 ### 5.1 Core Part → มินิเกมเต็มรูปแบบ
 
+**เอกสารออกแบบรายตัว (เขียนครบทั้ง 5 แล้ว)**
+
+| Part | เอกสาร |
+|---|---|
+| `ram` | `MINIGAME1_DESIGN.md` |
+| `mainboard` | `PART_MAINBOARD_DESIGN.md` |
+| `gpu` | `PART_GPU_DESIGN.md` |
+| `front_panel` | `PART_FRONTPANEL_DESIGN.md` |
+| `bios` | `PART_BIOS_DESIGN.md` |
+
+
 เข้า `PartMinigame` ที่ลงทะเบียนไว้กับ Part นั้น โครงมาตรฐาน (ปรับจาก `MINIGAME1_DESIGN.md`):
 
 ```
