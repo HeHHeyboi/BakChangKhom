@@ -13,5 +13,5 @@ const PLAYER_IDLE_SPRITESHEET = "res://Assets/SpriteSheets/Idle.png"
 
 const MAIN_DIALOG_1 = DIALOG_DIR + "MainQuest/GoToRoom.txt"
 
-const MINIGAME1_SCENE = "res://Scene/MiniGame/Minigame1.scn"
+const MINIGAME1_SCENE = "res://Scene/MiniGame/part_ram.tscn"
 const FIND_ERASER_MINIGAME_SCENE = "res://Scene/MiniGame/find_item_minigame.tscn"

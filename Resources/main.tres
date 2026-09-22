@@ -1,9 +1,14 @@
 [gd_resource type="Resource" script_class="Event" format=3 uid="uid://cdhbewxxtn1wg"]
 
+[ext_resource type="Script" uid="uid://b8ve2y18gu4uw" path="res://Scripts/Resources/quest_step.gd" id="1_naor1"]
 [ext_resource type="Script" uid="uid://db0chdbe7jurd" path="res://Scripts/Resources/event.gd" id="1_vbkmp"]
+
+[sub_resource type="Resource" id="Resource_42x1i"]
+script = ExtResource("1_naor1")
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [resource]
 script = ExtResource("1_vbkmp")
 name = "main"
-Tasks = Array[String](["คุยกับยาย", "กลับไปที่ห้องแล้วลองเปิดคอมเครื่องเก่า", "หายางลบในกล่องเก็บของ", "ขัดทำความสะอาดแรม"])
+Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_42x1i")])
 metadata/_custom_type_script = "uid://db0chdbe7jurd"

@@ -1,8 +1,16 @@
 class_name Tutorial extends CanvasLayer
 
-enum TutorialState { BASIC_START, BASIC_HOME, RAM_CLEANING, MOTHERBOARD, GPU, FRONT_PANEL, BIOS }
+enum TutorialState {
+	BASIC_START,
+	BASIC_HOME,
+	RAM_CLEANING,
+	MOTHERBOARD,
+	GPU,
+	FRONT_PANEL,
+	BIOS,
+}
 
-@export var TutorialSlide: Dictionary[TutorialState,TutorialSlides]:
+@export var TutorialSlide: Dictionary[TutorialState, TutorialSlides]:
 	set(value):
 		_slides = value
 @export var test = false
@@ -10,7 +18,7 @@ enum TutorialState { BASIC_START, BASIC_HOME, RAM_CLEANING, MOTHERBOARD, GPU, FR
 @onready var next_btn = $"Control/Next" as Button
 @onready var prev_btn = $"Control/Previous" as Button
 
-var _slides = {}
+var _slides = { }
 var cur_slide: TutorialSlides = null
 var _finished = false
 

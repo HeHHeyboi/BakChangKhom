@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://bbcfansu05shj"]
+
+[ext_resource type="Script" uid="uid://t7qjeqpkv0kg" path="res://Scripts/MiniGame/minigame1.gd" id="1_dhngu"]
+[ext_resource type="Texture2D" uid="uid://qe3oe14u0tfo" path="res://Assets/Background/PCCaseBG.jpg" id="2_a0o4c"]
+[ext_resource type="StyleBox" uid="uid://i5pn0aqx5owb" path="res://Assets/ButtonStyle/base.stylebox" id="3_8lhnf"]
+[ext_resource type="StyleBox" uid="uid://6hbish40q6s3" path="res://Assets/ButtonStyle/baseHoverPress.stylebox" id="4_un0ic"]
+[ext_resource type="StyleBox" uid="uid://x606sxkwb0kg" path="res://Assets/ButtonStyle/baseHover.stylebox" id="5_ctj7s"]
+[ext_resource type="Texture2D" uid="uid://31buooj7rm87" path="res://Assets/MiniGame/ramDirty.png" id="6_xwu5d"]
+[ext_resource type="Texture2D" uid="uid://coqvtlitytxxr" path="res://Assets/MiniGame/eraser.png" id="7_jpna7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o0y1f"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="ComputerTest" type="Node2D" unique_id=1125874144]
+script = ExtResource("1_dhngu")
+
+[node name="PcCaseBg" type="Sprite2D" parent="." unique_id=1126629142]
+position = Vector2(578, 324)
+texture = ExtResource("2_a0o4c")
+
+[node name="MiniGameBackgroud" type="Panel" parent="." unique_id=307419067]
+visible = false
+offset_right = 1153.0
+offset_bottom = 645.0
+
+[node name="Return" type="Button" parent="MiniGameBackgroud" unique_id=203719061]
+visible = false
+layout_mode = 0
+offset_left = 340.0
+offset_top = 435.0
+offset_right = 790.0
+offset_bottom = 515.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("3_8lhnf")
+theme_override_styles/pressed = ExtResource("4_un0ic")
+theme_override_styles/hover = ExtResource("5_ctj7s")
+text = "Click Here to Return to Room"
+
+[node name="Label" type="Label" parent="MiniGameBackgroud" unique_id=1831987404]
+visible = false
+layout_mode = 0
+offset_left = 446.0
+offset_top = 144.0
+offset_right = 645.0
+offset_bottom = 232.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_o0y1f")
+text = "Pass"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Ram" type="Sprite2D" parent="." unique_id=1142329838]
+visible = false
+position = Vector2(323, 344)
+rotation = -0.523598
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("6_xwu5d")
+
+[node name="Eraser" type="Sprite2D" parent="." unique_id=833996452]
+visible = false
+position = Vector2(446, 279)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("7_jpna7")
+
+[node name="pos1" type="Marker2D" parent="." unique_id=1627938123]
+position = Vector2(237.00002, 386.00003)
+
+[node name="pos2" type="Marker2D" parent="." unique_id=1649464060]
+position = Vector2(446, 279)
+
+[node name="StartText" type="Label" parent="." unique_id=184243201]
+offset_left = -50.0
+offset_top = 144.0
+offset_right = 527.0
+offset_bottom = 232.0
+theme_override_font_sizes/font_size = 64
+text = "Click to Start"
+horizontal_alignment = 1
+
+[node name="MiniGame" type="Control" parent="." unique_id=1808907818]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1153.0
+offset_bottom = 645.0
+
+[node name="Button" type="Button" parent="MiniGame" unique_id=1815070488]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33044234
+anchor_top = 0.8155039
+anchor_right = 0.641804
+anchor_bottom = 0.95658916
+offset_right = 8.0
+offset_bottom = 8.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("3_8lhnf")
+theme_override_styles/pressed = ExtResource("4_un0ic")
+theme_override_styles/hover = ExtResource("5_ctj7s")
+theme_override_styles/hover_pressed = ExtResource("4_un0ic")
+text = "Click Here to Clean"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="MiniGameBackgroud/Return" to="." method="_on_return_pressed"]
+[connection signal="pressed" from="MiniGame/Button" to="." method="_on_button_pressed"]

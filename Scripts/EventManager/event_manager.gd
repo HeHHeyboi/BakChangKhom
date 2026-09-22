@@ -28,7 +28,7 @@ func _ready() -> void:
 		return
 	currentEvent = EventID.MAIN
 	var event = eventMap[currentEvent]
-	questboard.update_task(event.get_task(), event)
+	questboard.update_task(event.get_task().quest_text_th, event)
 	sendUpdatedEvent.emit(currentEvent, event)
 	tutorial.on_tutorial_end.connect(_on_tutorial_end)
 
@@ -47,7 +47,7 @@ func _on_tutorial_end():
 func init_manager() -> void:
 	currentEvent = EventID.MAIN
 	var event = eventMap[currentEvent]
-	questboard.update_task(event.get_task(), event)
+	questboard.update_task(event.get_task().quest_text_th, event)
 	sendUpdatedEvent.emit(EventID.MAIN, event)
 
 
@@ -88,60 +88,38 @@ func show_dialog(title: String, file_path: StringName, bg_name: String, chars: A
 # pressed. Called directly by CautionMarker.caution_press connections, and by
 # any node that gates a press on its own marker's visibility (e.g. grandma.gd).
 func trigger_step(id: EventID, event: Event) -> void:
-	if id != EventID.MAIN:
-		return
-
-	match event.currentTask:
-		0:
-			pendingTask = 0
-			update_event(id)
-			show_dialog(
-				"บ้านของยาย",
-				Constant.CHAPTER1_RETURN_HOME_TEXT,
-				Constant.CHAPTER2_BG_IMAGE,
-				["ขม", "ยาย"],
-			)
-		1:
-			pendingTask = 1
-			hideUI()
-			update_event(id)
-			DialogScene.show_dialog(Constant.MAIN_DIALOG_1, "")
-			DialogScene.set_title("ห้องของขม")
-		3:
-			hideUI()
-			show_tutorial(TutorialState.RAM_CLEANING)
-			var minigame = load(Constant.MINIGAME1_SCENE).instantiate()
+	var data = event.get_task()
+	hud_state(data.showHUD)
+	match data.action:
+		QuestStep.Action.DIALOG:
+			DialogScene.show_dialog(data.dialog_file, data.bg_name, data.chars)
+			DialogScene.set_title(data.title)
+		QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
+			var minigame = load(data.scene_path)
 			get_tree().root.add_child(minigame)
 			Global.in_minigame = true
+			pass
 
 
 func _on_dialog_finish() -> void:
-	if currentEvent == EventID.MAIN:
-		match pendingTask:
-			1:
-				showUI()
-				var find_minigame = load(Constant.FIND_ERASER_MINIGAME_SCENE).instantiate()
-				get_tree().root.add_child(find_minigame)
-				Global.in_minigame = true
-
-	pendingTask = -1
+	pass
 
 
 func minigame_end() -> void:
-	if currentEvent == EventID.MAIN:
-		var task = eventMap[currentEvent].currentTask
-		if [2, 3].has(task):
-			update_event(currentEvent)
+	pass
 
 
-func hideUI() -> void:
-	questboard.visible = false
-	time_system.visible = false
+func hud_state(state: bool):
+	questboard.visible = state
+	time_system.visible = state
 
 
-func showUI() -> void:
-	questboard.visible = true
-	time_system.visible = true
+func hideUI():
+	hud_state(false)
+
+
+func showUI():
+	hud_state(true)
 
 
 const TutorialState = Tutorial.TutorialState

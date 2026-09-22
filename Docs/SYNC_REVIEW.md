@@ -8,13 +8,13 @@
 
 ## 0. สรุป 30 วินาที
 
-| ระดับ | เรื่อง | จำนวน |
-|---|---|---|
-| 🔴 ต้องแก้ก่อนทำงานต่อ | `.import` ไม่ตรงชื่อไฟล์ · ซีนชี้พาธเก่า · `in_minigame` ค้าง | 3 |
-| 🟡 บั๊กเดิมที่ยังไม่แก้ | tutorial `curIndex` · `.scn` binary · `match clikTime` | 3 |
-| 🟢 ข้อเสนอปรับโครง | `trigger_step` เป็น data-driven · `minigame_end` เปราะ · find-item ยังไม่ใช่การค้นหาจริง · quest เป็นภาษาอังกฤษ | 4 |
-| 📄 เอกสารที่ล้าสมัยตามโค้ดใหม่ | แก้ให้แล้วในรอบนี้ | 3 ไฟล์ |
-| ✍️ Text | แก้ของเดิม 3 · ไฟล์บทใหม่ที่ต้องเพิ่ม 8 | 11 |
+| ระดับ                          | เรื่อง                                                                                                          | จำนวน  |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- | ------ |
+| 🔴 ต้องแก้ก่อนทำงานต่อ         | `.import` ไม่ตรงชื่อไฟล์ · ซีนชี้พาธเก่า · `in_minigame` ค้าง                                                   | 3      |
+| 🟡 บั๊กเดิมที่ยังไม่แก้        | tutorial `curIndex` · `.scn` binary · `match clikTime`                                                          | 3      |
+| 🟢 ข้อเสนอปรับโครง             | `trigger_step` เป็น data-driven · `minigame_end` เปราะ · find-item ยังไม่ใช่การค้นหาจริง · quest เป็นภาษาอังกฤษ | 4      |
+| 📄 เอกสารที่ล้าสมัยตามโค้ดใหม่ | แก้ให้แล้วในรอบนี้                                                                                              | 3 ไฟล์ |
+| ✍️ Text                        | แก้ของเดิม 3 · ไฟล์บทใหม่ที่ต้องเพิ่ม 8                                                                         | 11     |
 
 **ข่าวดี:** บั๊ก **B1** (room.gd instantiate ซ้ำ) **หายไปแล้ว** เพราะ `Scripts/Room/room.gd` ถูกลบ และย้ายไป instantiate สด ๆ ใน `EventManager.trigger_step()` ทุกครั้ง — ตรงกับที่ดีไซน์แนะนำพอดี
 
@@ -24,18 +24,18 @@
 
 **แก้ให้แล้วในรีโป — 9 รายการ**
 
-| # | รายการ | ไฟล์ที่แตะ |
-|---|---|---|
-| 2.1 | ลบ `.import` กำพร้า 39 ไฟล์ (`mg1_*` – `mg5_*`) | `Assets/MiniGame/Part*/` |
-| 2.2 | ซีน find-item ชี้ `PartRam/ram_eraser.png` แล้ว (ตัด `uid` เก่าออกให้ Godot เขียนใหม่) | `Scene/MiniGame/find_item_minigame.tscn` |
-| 2.3 | เพิ่ม `Global.in_minigame = false` ตอนออกจากมินิเกมขัดแรม | `Scripts/MiniGame/minigame1.gd` |
-| B2a | เพิ่ม `TutorialSlides.reset()` + กัน `_slides` ว่าง + ลบ `print_rich` | `Scripts/Resources/tutorial_slides.gd` |
-| B2b | `show_tutorial()` guard state ที่ยังไม่มีสไลด์ (เดิม crash) + เรียก `reset()` | `Scripts/EventManager/tutorial.gd` |
-| B4a | `match clikTime` → `if/elif >=` | `Scripts/MiniGame/minigame1.gd` |
-| B4b | เปลี่ยนไปใช้ texture ชุด `PartRam/ram_dirty|better|clean.png` (600×214 เท่ากันทุกใบ) | `Scripts/MiniGame/minigame1.gd` |
-| 7.1(1) | แก้ชื่อตัวละคร `ชม,` → `ขม,` | `Assets/Dialog/MainQuest/GoToRoom.txt` |
+| #      | รายการ                                                                                 | ไฟล์ที่แตะ                               |
+| ------ | -------------------------------------------------------------------------------------- | ---------------------------------------- |
+| 2.1    | ลบ `.import` กำพร้า 39 ไฟล์ (`mg1_*` – `mg5_*`)                                        | `Assets/MiniGame/Part*/`                 |
+| 2.2    | ซีน find-item ชี้ `PartRam/ram_eraser.png` แล้ว (ตัด `uid` เก่าออกให้ Godot เขียนใหม่) | `Scene/MiniGame/find_item_minigame.tscn` |
+| 2.3    | เพิ่ม `Global.in_minigame = false` ตอนออกจากมินิเกมขัดแรม                              | `Scripts/MiniGame/minigame1.gd`          |
+| B2a    | เพิ่ม `TutorialSlides.reset()` + กัน `_slides` ว่าง + ลบ `print_rich`                  | `Scripts/Resources/tutorial_slides.gd`   |
+| B2b    | `show_tutorial()` guard state ที่ยังไม่มีสไลด์ (เดิม crash) + เรียก `reset()`          | `Scripts/EventManager/tutorial.gd`       |
+| B4a    | `match clikTime` → `if/elif >=`                                                        | `Scripts/MiniGame/minigame1.gd`          |
+| B4b    | เปลี่ยนไปใช้ texture ชุด `PartRam/ram_dirty                                            | better                                   |
+| 7.1(1) | แก้ชื่อตัวละคร `ชม,` → `ขม,`                                                           | `Assets/Dialog/MainQuest/GoToRoom.txt`   |
 | 7.1(2) | แก้ข้อความ find-item (สะกดถูก + ใช้ครบทุกบรรทัด + ขึ้นข้อความเปิดเรื่องตั้งแต่เข้าฉาก) | `Scripts/MiniGame/find_item_minigame.gd` |
-| 7.1(3) | quest บน QuestBoard เป็นภาษาไทย | `Resources/main.tres` |
+| 7.1(3) | quest บน QuestBoard เป็นภาษาไทย                                                        | `Resources/main.tres`                    |
 
 **⚠️ เหลือ 2 ขั้นที่ต้องทำใน Godot เอง (สั่งจากนอกโปรแกรมไม่ได้)**
 
@@ -52,14 +52,14 @@
 
 ## 1. สิ่งที่เปลี่ยนใน repo ตั้งแต่ commit `4a89e7e`
 
-| commit | เนื้อหา |
-|---|---|
+| commit    | เนื้อหา                                                                                      |
+| --------- | -------------------------------------------------------------------------------------------- |
 | `6d37f54` | key event tracking by EventID — `sendUpdatedEvent` เปลี่ยน signature เป็น `(EventID, Event)` |
-| `1e81773` | change function |
-| `b49267d` | **เพิ่มมินิเกมใหม่: find-item** (หายางลบในกล่อง) + `search_box.gd` |
-| `e5d5203` | **รวม trigger ของทุก quest step ไว้ที่ `EventManager.trigger_step()`** + จบ flow หายางลบ |
-| `46a5a7b` | remove unused code — `Global.MiniGames` / `ReturnMiniGame()` ถูกลบ |
-| `1c9040a` | Update game — commit asset ชุด Part เข้ามา |
+| `1e81773` | change function                                                                              |
+| `b49267d` | **เพิ่มมินิเกมใหม่: find-item** (หายางลบในกล่อง) + `search_box.gd`                           |
+| `e5d5203` | **รวม trigger ของทุก quest step ไว้ที่ `EventManager.trigger_step()`** + จบ flow หายางลบ     |
+| `46a5a7b` | remove unused code — `Global.MiniGames` / `ReturnMiniGame()` ถูกลบ                           |
+| `1c9040a` | Update game — commit asset ชุด Part เข้ามา                                                   |
 
 **โครงใหม่ที่เกิดขึ้น (ดีมาก เก็บไว้):**
 
@@ -132,18 +132,18 @@ git add Assets/MiniGame/Part*/*.import
 ```gdscript
 # ตอนนี้
 func _on_return_pressed() -> void:
-	EventManager.next_period.emit()
-	EventManager.showUI()
-	EventManager.minigame_end()
-	queue_free()
+    EventManager.next_period.emit()
+    EventManager.showUI()
+    EventManager.minigame_end()
+    queue_free()
 
 # ควรเป็น
 func _on_return_pressed() -> void:
-	Global.in_minigame = false          # ← เพิ่มบรรทัดนี้
-	EventManager.next_period.emit()
-	EventManager.showUI()
-	EventManager.minigame_end()
-	queue_free()
+    Global.in_minigame = false          # ← เพิ่มบรรทัดนี้
+    EventManager.next_period.emit()
+    EventManager.showUI()
+    EventManager.minigame_end()
+    queue_free()
 ```
 
 เทียบกับ `find_item_minigame.gd::_timeout()` ที่ทำถูกแล้ว (`Global.in_minigame = false` ก่อน `queue_free()`)
@@ -161,26 +161,26 @@ func _on_return_pressed() -> void:
 ```gdscript
 # tutorial_slides.gd — เพิ่ม
 func reset() -> void:
-	curIndex = 0
+    curIndex = 0
 
 func get_cur_slide() -> Texture2D:
-	return _slides[curIndex]        # ← ลบ print_rich(_slides) ออก
+    return _slides[curIndex]        # ← ลบ print_rich(_slides) ออก
 ```
 
 ```gdscript
 # tutorial.gd — เรียก reset ตอนเปิด
 func show_tutorial(tutor_index: TutorialState) -> void:
-	self.visible = true
-	self._finished = false
-	self.process_mode = Node.PROCESS_MODE_INHERIT
-	if not _slides.has(tutor_index):        # ← กัน crash ถ้า state ยังไม่มีสไลด์
-		push_warning("ยังไม่มีสไลด์ของ state %d" % tutor_index)
-		self.visible = false
-		on_tutorial_end.emit()
-		return
-	cur_slide = _slides[tutor_index]
-	cur_slide.reset()                       # ← เพิ่ม
-	slide_show.texture = cur_slide.get_cur_slide()
+    self.visible = true
+    self._finished = false
+    self.process_mode = Node.PROCESS_MODE_INHERIT
+    if not _slides.has(tutor_index):        # ← กัน crash ถ้า state ยังไม่มีสไลด์
+        push_warning("ยังไม่มีสไลด์ของ state %d" % tutor_index)
+        self.visible = false
+        on_tutorial_end.emit()
+        return
+    cur_slide = _slides[tutor_index]
+    cur_slide.reset()                       # ← เพิ่ม
+    slide_show.texture = cur_slide.get_cur_slide()
 ```
 
 > guard `_slides.has()` สำคัญมาก เพราะตอนนี้มีสไลด์แค่ state 0 กับ 2 จาก 7 — เรียก state อื่น = crash
@@ -200,11 +200,11 @@ const MINIGAME1_SCENE = "res://Scene/MiniGame/PartRam.tscn"
 ```gdscript
 # ควรเป็น
 if clikTime >= RamStatus.CLEAN:
-	ram.texture = RamIMG[2]
+    ram.texture = RamIMG[2]
 elif clikTime >= RamStatus.BETTER:
-	ram.texture = RamIMG[1]
+    ram.texture = RamIMG[1]
 else:
-	ram.texture = RamIMG[0]
+    ram.texture = RamIMG[0]
 ```
 
 และตรง `_on_button_pressed()` ก็ควรเป็น `if clikTime >= RamStatus.CLEAN and not isFinish:`
@@ -221,9 +221,9 @@ else:
 
 ```gdscript
 match event.currentTask:
-	0: ...คุยกับยาย
-	1: ...เข้าห้อง
-	3: ...ขัดแรม
+    0: ...คุยกับยาย
+    1: ...เข้าห้อง
+    3: ...ขัดแรม
 ```
 
 โครงนี้ใช้ได้ดีกับ quest เส้นเดียว แต่พอทำลูปงานซ่อมที่มีลูกค้าหลายเคส (`Docs/REPAIR_FLOW.md`) จะกลายเป็น `match` ยาวเป็นร้อยบรรทัด **ข้อเสนอ:** ย้ายปฏิกิริยาของแต่ละ step ไปเป็น Resource
@@ -250,19 +250,19 @@ enum Action { DIALOG, MINIGAME, TUTORIAL, SCENE_CHANGE }
 
 ```gdscript
 func minigame_end() -> void:
-	if currentEvent == EventID.MAIN:
-		var task = eventMap[currentEvent].currentTask
-		if [2, 3].has(task):     # ← hardcode
-			update_event(currentEvent)
+    if currentEvent == EventID.MAIN:
+        var task = eventMap[currentEvent].currentTask
+        if [2, 3].has(task):     # ← hardcode
+            update_event(currentEvent)
 ```
 
 ถ้าแทรก task ใหม่ตรงกลางเมื่อไร ตัวเลขนี้พังทันที **ข้อเสนอ:** ให้มินิเกมส่งผลลัพธ์กลับมาแทน
 
 ```gdscript
 func minigame_end(success: bool = true, score: Dictionary = {}) -> void:
-	Global.in_minigame = false
-	if success:
-		update_event(currentEvent)
+    Global.in_minigame = false
+    if success:
+        update_event(currentEvent)
 ```
 
 ### 4.3 find-item minigame ยังไม่ใช่ "การค้นหา" จริง
@@ -285,14 +285,14 @@ var target_box: int = randi() % 3
 
 ## 5. 📄 เอกสารดีไซน์ที่ล้าสมัย — แก้ให้แล้วในรอบนี้
 
-| ไฟล์ | สิ่งที่ล้าสมัย | แก้เป็น |
-|---|---|---|
-| `MINIGAME1_DESIGN.md` | บั๊ก B1 (room.gd) | ทำเครื่องหมายว่า **แก้แล้ว** — room.gd ถูกลบ |
-| `MINIGAME1_DESIGN.md` | ตัวอย่างโค้ด `Global.ReturnMiniGame("MiniGame1")` | เปลี่ยนเป็น `load(Constant.MINIGAME1_SCENE).instantiate()` |
-| `MINIGAME1_DESIGN.md` · `REPAIR_FLOW.md` | `Global.MiniGames` dict | ถูกลบจากโค้ดแล้ว — ใช้ค่าคงที่ใน `constant.gd` แทน |
-| `REPAIR_FLOW.md` | `sendUpdatedEvent(Event)` | signature ใหม่คือ `sendUpdatedEvent(EventID, Event)` |
-| `REPAIR_FLOW.md` | ไม่รู้จัก `trigger_step` / `minigame_end` | เพิ่มหมายเหตุว่า `RepairManager` ควรต่อยอดจากโครงนี้ ไม่ใช่เขียนใหม่ทั้งหมด |
-| `ASSET_GUIDE.md` | ไม่มี asset ของ find-item minigame | เพิ่มหัวข้อ 3.9 |
+| ไฟล์                                     | สิ่งที่ล้าสมัย                                    | แก้เป็น                                                                     |
+| ---------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------- |
+| `MINIGAME1_DESIGN.md`                    | บั๊ก B1 (room.gd)                                 | ทำเครื่องหมายว่า **แก้แล้ว** — room.gd ถูกลบ                                |
+| `MINIGAME1_DESIGN.md`                    | ตัวอย่างโค้ด `Global.ReturnMiniGame("MiniGame1")` | เปลี่ยนเป็น `load(Constant.MINIGAME1_SCENE).instantiate()`                  |
+| `MINIGAME1_DESIGN.md` · `REPAIR_FLOW.md` | `Global.MiniGames` dict                           | ถูกลบจากโค้ดแล้ว — ใช้ค่าคงที่ใน `constant.gd` แทน                          |
+| `REPAIR_FLOW.md`                         | `sendUpdatedEvent(Event)`                         | signature ใหม่คือ `sendUpdatedEvent(EventID, Event)`                        |
+| `REPAIR_FLOW.md`                         | ไม่รู้จัก `trigger_step` / `minigame_end`         | เพิ่มหมายเหตุว่า `RepairManager` ควรต่อยอดจากโครงนี้ ไม่ใช่เขียนใหม่ทั้งหมด |
+| `ASSET_GUIDE.md`                         | ไม่มี asset ของ find-item minigame                | เพิ่มหัวข้อ 3.9                                                             |
 
 ---
 
@@ -300,10 +300,10 @@ var target_box: int = randi() % 3
 
 **ของใหม่ที่เข้ามาใน repo แต่ยังไม่อยู่ในคู่มือ:**
 
-| ไฟล์ | ขนาด | ใช้ที่ไหน |
-|---|---|---|
-| `Assets/MiniGame/box.png` | 256×256 | กล่องค้นหาใน find-item minigame |
-| `Assets/MiniGame/box_on_hover.png` | 256×256 | state hover (ขนาดเท่ากัน ✅) |
+| ไฟล์                               | ขนาด    | ใช้ที่ไหน                       |
+| ---------------------------------- | ------- | ------------------------------- |
+| `Assets/MiniGame/box.png`          | 256×256 | กล่องค้นหาใน find-item minigame |
+| `Assets/MiniGame/box_on_hover.png` | 256×256 | state hover (ขนาดเท่ากัน ✅)     |
 
 **ข้อสังเกต / สิ่งที่ควรทำกับ asset:**
 
@@ -341,22 +341,22 @@ var dialog_arr = ["หาไม่เจอ", "อยู่ใหนนะ?", "�
 
 ```gdscript
 Tasks = Array[String]([
-	"คุยกับยาย",
-	"กลับไปที่ห้องแล้วลองเปิดคอมเครื่องเก่า",
-	"หายางลบในกล่องเก็บของ",
-	"ขัดทำความสะอาดแรม",
+    "คุยกับยาย",
+    "กลับไปที่ห้องแล้วลองเปิดคอมเครื่องเก่า",
+    "หายางลบในกล่องเก็บของ",
+    "ขัดทำความสะอาดแรม",
 ])
 ```
 
 ### 7.2 ไฟล์บทใหม่ที่ต้องเพิ่ม (ตามดีไซน์ Part / ลูปงานซ่อม)
 
-| ไฟล์ | เนื้อหา | อ้างอิงบทที่เขียนไว้แล้ว |
-|---|---|---|
-| `Assets/Dialog/MiniGame/Ram_Pib.txt` | บทปิ๊บทุก phase ของมินิเกมขัดแรม | `MINIGAME1_DESIGN.md` หัวข้อ 4.3, 5, 6, 7, 14.6 |
-| `Assets/Dialog/MiniGame/FindEraser.txt` | บทตอนหายางลบ (ย้ายออกจาก `dialog_arr`) | ใหม่ |
-| `Assets/Dialog/Case/Case_C01.txt` | เคสลูกค้า C01 แรมสกปรก | `REPAIR_FLOW.md` หัวข้อ 3.5 |
-| `Assets/Dialog/Case/Case_C02.txt` … `Case_C06.txt` | อีก 5 เคส | `REPAIR_FLOW.md` หัวข้อ 3.5 |
-| `Assets/Dialog/Common/Pib_Safety.txt` | บทเตือนความปลอดภัยที่ใช้ซ้ำทุก Part (ตัดไฟ/ESD/เครื่องมือผิด) | `REPAIR_FLOW.md` หัวข้อ 4.3 |
+| ไฟล์                                               | เนื้อหา                                                       | อ้างอิงบทที่เขียนไว้แล้ว                        |
+| -------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| `Assets/Dialog/MiniGame/Ram_Pib.txt`               | บทปิ๊บทุก phase ของมินิเกมขัดแรม                              | `MINIGAME1_DESIGN.md` หัวข้อ 4.3, 5, 6, 7, 14.6 |
+| `Assets/Dialog/MiniGame/FindEraser.txt`            | บทตอนหายางลบ (ย้ายออกจาก `dialog_arr`)                        | ใหม่                                            |
+| `Assets/Dialog/Case/Case_C01.txt`                  | เคสลูกค้า C01 แรมสกปรก                                        | `REPAIR_FLOW.md` หัวข้อ 3.5                     |
+| `Assets/Dialog/Case/Case_C02.txt` … `Case_C06.txt` | อีก 5 เคส                                                     | `REPAIR_FLOW.md` หัวข้อ 3.5                     |
+| `Assets/Dialog/Common/Pib_Safety.txt`              | บทเตือนความปลอดภัยที่ใช้ซ้ำทุก Part (ตัดไฟ/ESD/เครื่องมือผิด) | `REPAIR_FLOW.md` หัวข้อ 4.3                     |
 
 > **สำคัญ:** export preset กรองด้วย `include_filter="*.txt"` — ไฟล์บทต้องเป็น `.txt` และอยู่ใต้ `Assets/` เท่านั้น ไม่งั้นหายตอน export
 
@@ -376,14 +376,14 @@ Tasks = Array[String]([
 
 จาก `dialog_scene.gd::parse_text()` และ `read_file()`
 
-| กฎ | เหตุผล |
-|---|---|
-| ทุกบรรทัดต้องมี `,` คั่นชื่อกับข้อความ | ไม่มี `,` → `body[1]` error ทำเกม crash |
-| **ห้ามใช้ `:` ในบรรทัดบทปกติ** | parser มองว่าเป็น header ของ choice block |
-| ชื่อก่อน `,` ต้องตรงกับ key ใน `_CharacterMap` เป๊ะ | ไม่ตรง → crash ตอนสร้าง sprite |
-| บรรทัดว่าง = จบ block | ใช้คั่นระหว่าง choice branch |
-| choice เขียนว่า `Choice: ตัวเลือก1,ตัวเลือก2` แล้วตามด้วย block `ตัวเลือก1:` | ดูตัวอย่างใน `Chapter5Quiet.txt` |
-| ชื่อแบบ `ขม (ยิ้ม)` จะถูกมองเป็นคนละตัวละคร | ต้องแก้ parser ก่อนถึงจะใช้ได้ |
+| กฎ                                                                           | เหตุผล                                    |
+| ---------------------------------------------------------------------------- | ----------------------------------------- |
+| ทุกบรรทัดต้องมี `,` คั่นชื่อกับข้อความ                                       | ไม่มี `,` → `body[1]` error ทำเกม crash   |
+| **ห้ามใช้ `:` ในบรรทัดบทปกติ**                                               | parser มองว่าเป็น header ของ choice block |
+| ชื่อก่อน `,` ต้องตรงกับ key ใน `_CharacterMap` เป๊ะ                          | ไม่ตรง → crash ตอนสร้าง sprite            |
+| บรรทัดว่าง = จบ block                                                        | ใช้คั่นระหว่าง choice branch              |
+| choice เขียนว่า `Choice: ตัวเลือก1,ตัวเลือก2` แล้วตามด้วย block `ตัวเลือก1:` | ดูตัวอย่างใน `Chapter5Quiet.txt`          |
+| ชื่อแบบ `ขม (ยิ้ม)` จะถูกมองเป็นคนละตัวละคร                                  | ต้องแก้ parser ก่อนถึงจะใช้ได้            |
 
 ---
 
@@ -403,6 +403,7 @@ Tasks = Array[String]([
 ## 10. 🐛 บั๊กฉาก Room — "กดเข้าห้องแล้วเหลือแต่ห้องเปล่า" (แก้แล้ว)
 
 ### อาการ
+
 เดินเข้าห้องของขมแล้วไม่มีปุ่ม `!` (caution) ขึ้นมาเลย เหลือแต่พื้นหลังห้องกับประตู ทำอะไรต่อไม่ได้
 
 ### สาเหตุ — key type ของ `trackEvents` ใน `Room.tscn` ไม่ตรงกับที่สคริปต์ประกาศ
@@ -433,11 +434,11 @@ Godot 4 เข้มเรื่อง typed dictionary — พอ key type ไ�
 
 ### แก้เพิ่มอีก 3 จุดที่เกี่ยวข้อง
 
-| ไฟล์ | แก้อะไร | เหตุผล |
-|---|---|---|
-| `Scripts/caution_marker.gd` | guard `eventMap.has(cur_id)` ใน `_on_pressed()` | `cur_id` เริ่มที่ `NONE` ถ้า marker ถูกกดก่อนผูก event จะ crash ที่ `eventMap[NONE]` |
-| `Scripts/Home/door.gd` | ไม่เปลี่ยนฉากถ้า `isDialogShown()` หรือ `isInMinigame()` | กดประตูระหว่างบทสนทนา/มินิเกม → ฉากเดิมถูกปล่อยทิ้ง เหลือมินิเกมลอยอยู่บน root |
-| `Scripts/Room/door.gd` | เงื่อนไขเดียวกัน | เหมือนกัน |
+| ไฟล์                        | แก้อะไร                                                  | เหตุผล                                                                               |
+| --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `Scripts/caution_marker.gd` | guard `eventMap.has(cur_id)` ใน `_on_pressed()`          | `cur_id` เริ่มที่ `NONE` ถ้า marker ถูกกดก่อนผูก event จะ crash ที่ `eventMap[NONE]` |
+| `Scripts/Home/door.gd`      | ไม่เปลี่ยนฉากถ้า `isDialogShown()` หรือ `isInMinigame()` | กดประตูระหว่างบทสนทนา/มินิเกม → ฉากเดิมถูกปล่อยทิ้ง เหลือมินิเกมลอยอยู่บน root       |
+| `Scripts/Room/door.gd`      | เงื่อนไขเดียวกัน                                         | เหมือนกัน                                                                            |
 
 ### ยังเหลือเป็นข้อสังเกต (ยังไม่แก้)
 
@@ -449,8 +450,8 @@ Godot 4 เข้มเรื่อง typed dictionary — พอ key type ไ�
 
 ## 9. ประวัติเอกสาร
 
-| วันที่ | การเปลี่ยนแปลง |
-|---|---|
-| 21 ก.ย. 2569 (3) | หาและแก้บั๊กฉาก Room — `trackEvents` เซฟเป็น `Dictionary[Variant,…]` ทำให้ปุ่ม `!` ไม่ขึ้น + guard อีก 3 จุด (หัวข้อ 10) |
-| 21 ก.ย. 2569 (2) | ลงมือแก้ 🔴 + 🟡 + ข้อความ รวม 9 รายการ เหลือ 2 ขั้นที่ต้องทำใน Godot (import รอบใหม่ + แปลง `.scn` → `.tscn`) |
-| 21 ก.ย. 2569 | สร้างเอกสาร — เทียบ commit `1c9040a` กับดีไซน์ พบปัญหา `.import` ไม่ตรงชื่อ 39 คู่, ซีน find-item ชี้พาธเก่า, `in_minigame` ค้าง, บั๊กเดิม B2–B4 ยังอยู่ (B1 หายแล้ว) และสรุปงาน text ที่ต้องแก้/เพิ่ม |
+| วันที่           | การเปลี่ยนแปลง                                                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 21 ก.ย. 2569 (3) | หาและแก้บั๊กฉาก Room — `trackEvents` เซฟเป็น `Dictionary[Variant,…]` ทำให้ปุ่ม `!` ไม่ขึ้น + guard อีก 3 จุด (หัวข้อ 10)                                                                               |
+| 21 ก.ย. 2569 (2) | ลงมือแก้ 🔴 + 🟡 + ข้อความ รวม 9 รายการ เหลือ 2 ขั้นที่ต้องทำใน Godot (import รอบใหม่ + แปลง `.scn` → `.tscn`)                                                                                         |
+| 21 ก.ย. 2569     | สร้างเอกสาร — เทียบ commit `1c9040a` กับดีไซน์ พบปัญหา `.import` ไม่ตรงชื่อ 39 คู่, ซีน find-item ชี้พาธเก่า, `in_minigame` ค้าง, บั๊กเดิม B2–B4 ยังอยู่ (B1 หายแล้ว) และสรุปงาน text ที่ต้องแก้/เพิ่ม |
