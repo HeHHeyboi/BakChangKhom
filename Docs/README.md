@@ -9,6 +9,8 @@
 | `REPAIR_FLOW.md` | **เริ่มอ่านที่นี่** — ลูปงานซ่อม 5 scene (ShopCounter → Workbench → PartView → Reassemble → Handover), Part 13 ชิ้น, เครื่องมือ 21 ชิ้น, สเปก Resource/Manager/Scene |
 | `ASSET_GUIDE.md` | คู่มือสร้าง asset — ขนาด/ฟอร์แมต/ชื่อไฟล์/prompt/pipeline + inventory ปัจจุบัน |
 | `ASSET_TODO.md` | เช็กลิสต์ asset ที่ต้องทำ เรียงตามลำดับ |
+| `DIAGRAMS.md` + `Diagrams/` | ไดอะแกรม 9 ภาพสำหรับเล่มรายงาน (PNG 300 dpi + SVG) พร้อมคำบรรยายใต้ภาพ |
+| `STORYBOARD.md` | Low-fi wireframe 40 เฟรมของ Core Part ทั้ง 5 + เลย์เอาต์กลาง + prompt pack สำหรับสั่ง AI ทำ storyboard |
 | `BUG_LIST.md` | บั๊กทั้งหมดที่ตรวจพบ พร้อมสถานะ |
 | `SYNC_REVIEW.md` | ผลเทียบโค้ดจริงกับดีไซน์ + วิธีแก้ทีละข้อ |
 

@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="639.72pt" height="451.920105pt" viewBox="0 0 639.72 451.920105" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:c2pa="http://c2pa.org/manifest">
+ <metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo1YTBkMGYxNi0wZTFjLTQyMjUtYTczMC0wZDI3ZjU0MWRmY2QAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaIjN3E2W8sJipdG6oPrtEAEAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDoyNjU4MmQ0Ni1mYmU1LTQ2MTktYWY1OC1lMWJlZDc4MGM5YzVscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoxH6n4MWHV2o1+VqaoGHeCQAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggRYibrOftPgZ/jXMzhX2qgw3TMV2kiL6SfIw92UuXVM+kZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaKp6JftnXa4kfv3T1tLJmWwAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIGdaH406l24lbtDVkMxNp/EGU2S81Bbi+CzZ3ypRT4tVZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GQGFZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjVhMGQwZjE2LTBlMWMtNDIyNS1hNzMwLTBkMjdmNTQxZGZjZC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmY4MmFkOTQzLTdlYTgtNDllYy05MjlkLTdjYzM4MTg3ZDE0Y3JjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBFiJus5+0+Bn+NczOFfaqDDdMxXaSIvpJ8jD3ZS5dUz6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggmfw2Sta9CTB6ekIpeyH+iOoi25Qoc5o+B625nNL+TWKiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggIhzWchwNyg8esHa3Kzg3BANkk9YH3I1IrpgHDm7N17R0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQCPSW9PmDdpxcwq6pWigDV/Pb21b/7aofmLuS9leZ8VqovQWhgNiMBVbqQIZFlyHJ4srkxdr9bTDqS2fbyU2Y0Y=</c2pa:manifest>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-22T09:33:06.642707</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.9, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 451.920105 
+L 639.72 451.920105 
+L 639.72 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 244.3626 117.1872 
+L 376.9434 117.1872 
+Q 384.309 117.1872 384.309 109.86912 
+L 384.309 78.76728 
+Q 384.309 71.4492 376.9434 71.4492 
+L 244.3626 71.4492 
+Q 236.997 71.4492 236.997 78.76728 
+L 236.997 109.86912 
+Q 236.997 117.1872 244.3626 117.1872 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 75.5676 196.4664 
+L 128.3544 196.4664 
+Q 135.72 196.4664 135.72 189.14832 
+L 135.72 158.04648 
+Q 135.72 150.7284 128.3544 150.7284 
+L 75.5676 150.7284 
+Q 68.202 150.7284 68.202 158.04648 
+L 68.202 189.14832 
+Q 68.202 196.4664 75.5676 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 309.662656 117.346369 
+Q 206.30465 133.958178 103.940126 150.410313 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 109.486818 152.152209 
+L 103.940126 150.410313 
+L 108.661658 147.018097 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 151.065 196.4664 
+L 213.0588 196.4664 
+Q 220.4244 196.4664 220.4244 189.14832 
+L 220.4244 158.04648 
+Q 220.4244 150.7284 213.0588 150.7284 
+L 151.065 150.7284 
+Q 143.6994 150.7284 143.6994 158.04648 
+L 143.6994 189.14832 
+Q 143.6994 196.4664 151.065 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 309.683701 117.440028 
+Q 246.357691 133.957737 184.005336 150.221482 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 189.693205 151.424871 
+L 184.005336 150.221482 
+L 188.380769 146.39322 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 235.7694 196.4664 
+L 300.8322 196.4664 
+Q 308.1978 196.4664 308.1978 189.14832 
+L 308.1978 158.04648 
+Q 308.1978 150.7284 300.8322 150.7284 
+L 235.7694 150.7284 
+Q 228.4038 150.7284 228.4038 158.04648 
+L 228.4038 189.14832 
+Q 228.4038 196.4664 235.7694 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 309.869753 117.807499 
+Q 289.477269 133.957508 269.873603 149.482804 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 275.564256 148.292646 
+L 269.873603 149.482804 
+L 272.335868 144.216188 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 323.5428 196.4664 
+L 407.0196 196.4664 
+Q 414.3852 196.4664 414.3852 189.14832 
+L 414.3852 158.04648 
+Q 414.3852 150.7284 407.0196 150.7284 
+L 323.5428 150.7284 
+Q 316.1772 150.7284 316.1772 158.04648 
+L 316.1772 189.14832 
+Q 316.1772 196.4664 323.5428 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 311.503231 117.709234 
+Q 337.967152 133.957832 363.573574 149.679934 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 360.502608 144.74342 
+L 363.573574 149.679934 
+L 357.781784 149.174799 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 429.7302 196.4664 
+L 513.207 196.4664 
+Q 520.5726 196.4664 520.5726 189.14832 
+L 520.5726 158.04648 
+Q 520.5726 150.7284 513.207 150.7284 
+L 429.7302 150.7284 
+Q 422.3646 150.7284 422.3646 158.04648 
+L 422.3646 189.14832 
+Q 422.3646 196.4664 429.7302 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 311.632087 117.391407 
+Q 391.060122 133.957659 469.503124 150.318462 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 464.943522 146.711519 
+L 469.503124 150.318462 
+L 463.881809 151.801978 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 535.9176 196.4664 
+L 594.8424 196.4664 
+Q 602.208 196.4664 602.208 189.14832 
+L 602.208 158.04648 
+Q 602.208 150.7284 594.8424 150.7284 
+L 535.9176 150.7284 
+Q 528.552 150.7284 528.552 158.04648 
+L 528.552 189.14832 
+Q 528.552 196.4664 535.9176 196.4664 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 311.644141 117.317709 
+Q 438.014557 133.957544 563.387353 150.466018 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 558.57128 147.209418 
+L 563.387353 150.466018 
+L 557.89243 152.364917 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 232.7004 272.6964 
+L 303.9012 272.6964 
+Q 311.2668 272.6964 311.2668 265.37832 
+L 311.2668 234.27648 
+Q 311.2668 226.9584 303.9012 226.9584 
+L 232.7004 226.9584 
+Q 225.3348 226.9584 225.3348 234.27648 
+L 225.3348 265.37832 
+Q 225.3348 272.6964 232.7004 272.6964 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 268.3008 197.467663 
+Q 268.3008 211.714439 268.3008 224.284165 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 270.9008 219.084165 
+L 268.3008 224.284165 
+L 265.7008 219.084165 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 232.7004 342.828 
+L 303.9012 342.828 
+Q 311.2668 342.828 311.2668 335.50992 
+L 311.2668 304.40808 
+Q 311.2668 297.09 303.9012 297.09 
+L 232.7004 297.09 
+Q 225.3348 297.09 225.3348 304.40808 
+L 225.3348 335.50992 
+Q 225.3348 342.828 232.7004 342.828 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 268.3008 273.693941 
+Q 268.3008 284.890749 268.3008 294.410506 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 270.9008 289.210506 
+L 268.3008 294.410506 
+L 265.7008 289.210506 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 222.8796 412.9596 
+L 312.4944 412.9596 
+Q 319.86 412.9596 319.86 405.64152 
+L 319.86 374.53968 
+Q 319.86 367.2216 312.4944 367.2216 
+L 222.8796 367.2216 
+Q 215.514 367.2216 215.514 374.53968 
+L 215.514 405.64152 
+Q 215.514 412.9596 222.8796 412.9596 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 268.3008 343.825541 
+Q 268.3008 355.022349 268.3008 364.542106 
+" clip-path="url(#p57be515503)" style="fill: none; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 270.9008 359.342106 
+L 268.3008 364.542106 
+L 265.7008 359.342106 
+z
+" clip-path="url(#p57be515503)" style="fill: #2c1810; stroke: #2c1810; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 388.6056 348.9264 
+L 545.7384 348.9264 
+Q 553.104 348.9264 553.104 341.60832 
+L 553.104 301.35888 
+Q 553.104 294.0408 545.7384 294.0408 
+L 388.6056 294.0408 
+Q 381.24 294.0408 381.24 301.35888 
+L 381.24 341.60832 
+Q 381.24 348.9264 388.6056 348.9264 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 357.9156 412.9596 
+L 447.5304 412.9596 
+Q 454.896 412.9596 454.896 405.64152 
+L 454.896 388.566 
+Q 454.896 381.24792 447.5304 381.24792 
+L 357.9156 381.24792 
+Q 350.55 381.24792 350.55 388.566 
+L 350.55 405.64152 
+Q 350.55 412.9596 357.9156 412.9596 
+z
+" clip-path="url(#p57be515503)" style="fill: #fbe3c4; stroke: #c98a2e; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 471.4686 412.9596 
+L 561.0834 412.9596 
+Q 568.449 412.9596 568.449 405.64152 
+L 568.449 388.566 
+Q 568.449 381.24792 561.0834 381.24792 
+L 471.4686 381.24792 
+Q 464.103 381.24792 464.103 388.566 
+L 464.103 405.64152 
+Q 464.103 412.9596 471.4686 412.9596 
+z
+" clip-path="url(#p57be515503)" style="fill: #e4efe0; stroke: #6baf52; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 21px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="319.86" y="42.420375" transform="rotate(-0 319.86 42.420375)">ภาพที่ 2  ชิ้นส่วนในเกมและลำดับการถอด</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 13.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #6b5b4b" x="319.86" y="64.494596" transform="rotate(-0 319.86 64.494596)">Core Part 5 ชิ้นมีมินิเกมสอนเต็มรูปแบบ   Normal Part 8 ชิ้นเป็นงานตรวจและทำความสะอาดแบบสั้น</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="310.653" y="97.887106" transform="rotate(-0 310.653 97.887106)">ฝาข้างเคส</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="101.961" y="175.715564" transform="rotate(-0 101.961 175.715564)">สายไฟ</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="182.0619" y="175.709705" transform="rotate(-0 182.0619 175.709705)">พัดลมเคส</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="268.3008" y="176.610095" transform="rotate(-0 268.3008 176.610095)">การ์ดจอ</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="365.2812" y="177.290759" transform="rotate(-0 365.2812 177.290759)">อุปกรณ์เก็บข้อมูล</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="471.4686" y="177.371814" transform="rotate(-0 471.4686 177.371814)">แผงปุ่มหน้าเคส</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="565.38" y="176.515369" transform="rotate(-0 565.38 176.515369)">ถ่าน CMOS</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="268.3008" y="252.193181" transform="rotate(-0 268.3008 252.193181)">แรม</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="268.3008" y="322.971695" transform="rotate(-0 268.3008 322.971695)">ฮีตซิงก์ CPU</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="267.687" y="393.223803" transform="rotate(-0 267.687 393.223803)">เมนบอร์ด + CPU</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(418.656375 318.568903)">BIOS / ติดตั้งระบบปฏิบัติการ</text>
+    <text style="font-size: 12.5px; font-family: 'TH Sarabun New'; fill: #2c1810" transform="translate(391.847781 332.759625)">ทำหลังประกอบเครื่องเสร็จ ไม่ต้องถอดชิ้นส่วน</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #8a7a63" x="34.443" y="96.650932" transform="rotate(-0 34.443 96.650932)">ระดับ 1</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #8a7a63" x="34.443" y="175.930132" transform="rotate(-0 34.443 175.930132)">ระดับ 2</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #8a7a63" x="34.443" y="252.160132" transform="rotate(-0 34.443 252.160132)">ระดับ 3</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #8a7a63" x="34.443" y="322.291732" transform="rotate(-0 34.443 322.291732)">ระดับ 4</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #8a7a63" x="34.443" y="392.423332" transform="rotate(-0 34.443 392.423332)">ระดับ 5</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="402.723" y="399.131572" transform="rotate(-0 402.723 399.131572)">Core Part</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #2c1810" x="516.276" y="399.131572" transform="rotate(-0 516.276 399.131572)">Normal Part</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 12px; font-family: 'TH Sarabun New'; text-anchor: middle; fill: #6b5b4b" x="402.723" y="436.020105" transform="rotate(-0 402.723 436.020105)">ลูกศรอ่านว่า ต้องถอดชิ้นบนออกก่อนจึงถอดชิ้นล่างได้</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p57be515503">
+   <rect x="12.96" y="12.96" width="613.8" height="421.344"/>
+  </clipPath>
+ </defs>
+</svg>
