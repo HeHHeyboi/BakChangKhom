@@ -17,6 +17,63 @@
 
 ---
 
+## 🆕 ตรวจเพิ่ม 22 ก.ย. 2569 — หลัง refactor `QuestStep` (commit `a48aa67`)
+
+ทีมทำ QuestStep resource ตามข้อเสนอ 4.1 แล้ว 👍 แต่ระหว่างทาง refactor ยังค้างอยู่ 4 จุดที่ทำให้เกมเดินไม่ได้
+
+### BUG-28 🔴 `load()` ไม่ได้ `.instantiate()` — มินิเกมเปิดไม่ขึ้น
+
+`Scripts/EventManager/event_manager.gd` บรรทัด 98–99
+
+```gdscript
+# ตอนนี้ — load() คืน PackedScene ไม่ใช่ Node
+var minigame = load(data.scene_path)
+get_tree().root.add_child(minigame)      # error: Invalid type in add_child
+
+# ควรเป็น
+var minigame = load(data.scene_path).instantiate()
+get_tree().root.add_child(minigame)
+```
+
+### BUG-29 🔴 ส่ง `QuestStep` เข้าไปในช่องที่รับ `String`
+
+`event.next_step()` และ `event.set_step()` เปลี่ยนไปคืน **QuestStep** แล้ว แต่ผู้เรียกยังส่งต่อเข้า `update_task(text: String, ...)` ตรง ๆ
+
+| ไฟล์ | บรรทัด | แก้เป็น |
+|---|---|---|
+| `event_manager.gd` `update_event()` | 59–60 | `var step = event.next_step()` แล้วส่ง `step.quest_text_th if step else ""` |
+| `event_manager.gd` `jump_event()` | 74–75 | เหมือนกัน |
+
+> `_ready()` กับ `init_manager()` แก้ถูกแล้ว (ใช้ `.quest_text_th`) เหลือสองจุดนี้
+
+### BUG-30 🔴 `main.tres` เหลือ QuestStep เดียวและว่างเปล่า
+
+```
+Tasks = Array[QuestStep]([SubResource("Resource_42x1i")])   # มี 1 ตัว ไม่มีค่าใด ๆ
+```
+
+ของเดิมมี 4 ขั้น (คุยกับยาย → เข้าห้อง → หายางลบ → ขัดแรม) ตอนนี้หายหมด
+ต้องสร้าง QuestStep 4 ไฟล์แล้วเติมค่า `action`, `dialog_file`, `scene_path`, `quest_text_th` ให้ครบ แนะนำแยกเป็นไฟล์ `.tres` ละขั้นใน `Resources/MainQuest/` จะ diff ง่ายกว่าฝังใน `main.tres`
+
+### BUG-31 🔴 `minigame_end()` และ `_on_dialog_finish()` เป็น `pass`
+
+ลูปขาดตรงกลาง — มินิเกมจบแล้วเควสต์ไม่เดินต่อ และบทสนทนาจบแล้วไม่มีอะไรตามมา
+ต้องใส่ logic กลับ โดยคราวนี้อ่านจาก `QuestStep.updateEvent` แทนการเช็กเลข task แบบเดิม (ตรงกับข้อเสนอ 4.2)
+
+### ✅ ที่แก้ไปแล้วในรอบนี้ (จากฝั่งทีม)
+
+| บั๊ก | สถานะใหม่ |
+|---|---|
+| BUG-19 `.scn` binary | ✅ มี `Scene/MiniGame/part_ram.tscn` แล้ว และ `Constant.MINIGAME1_SCENE` ชี้ถูก |
+| BUG-20 `minigame_end` อิงเลข task | ✅ โครงเปลี่ยนเป็น data-driven แล้ว (แต่ยังไม่ได้ใส่ logic — ดู BUG-31) |
+| ข้อเสนอ 4.1 QuestStep resource | ✅ ทำแล้ว |
+
+### ⬜ ที่ยังค้างเหมือนเดิม
+
+BUG-14 (`simple_npc.gd` signature ผิด) · BUG-18 (`parse_text` `body[1]`) · BUG-26 (`Event` ไม่มี `reset()`) · BUG-15 (ไม่มี Player / MainGame.tscn ไม่ถูกโหลด) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-25
+
+---
+
 ## 🔴 Critical
 
 ### BUG-01 ✅ ปุ่ม `!` ในห้องของขมไม่ขึ้นเลย — เข้าห้องแล้วเหลือแต่ห้องเปล่า
@@ -192,4 +249,5 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 22 ก.ย. 2569 | ตรวจเพิ่มหลัง refactor QuestStep — พบบั๊กใหม่ 4 ข้อ (BUG-28 ถึง BUG-31) ที่ทำให้เกมเดินไม่ได้ · ปิด BUG-19 และ BUG-20 |
 | 21 ก.ย. 2569 | สร้างเอกสาร — รวมบั๊ก 27 รายการจากการไล่โค้ดทั้งโปรเจกต์ที่ commit `1c9040a` · แก้แล้ว 13 · รอทำใน Godot 2 · ยังไม่แก้ 12 |

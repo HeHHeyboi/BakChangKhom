@@ -67,3 +67,5 @@
 
 - [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
 - [ ] เขียนคอมโพเนนต์ `PibHint` ที่อ่านไฟล์แล้วแยกตาม `# @SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้
+
+| `Storyboard/CROP_REPORT.md` | ผลตรวจ asset ที่ crop จาก sheet |
