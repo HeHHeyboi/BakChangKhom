@@ -263,6 +263,23 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 
 ---
 
+# ชุด J · asset จากดีไซน์ Core Part อีก 4 ตัว (35 ไฟล์)
+
+รายละเอียดขนาด/เนื้อหาอยู่ในเอกสารของแต่ละ Part — ที่นี่เป็นสรุปจำนวนเพื่อวางแผน
+
+| Part | เอกสาร | มีแล้ว | ยังขาด | ไฟล์ที่ขาดเด่น ๆ |
+|---|---|---|---|---|
+| Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` §10 | 10 | **9** | `mb_paste_dot_small/ok/large` (3 ขนาดหยดซิลิโคน) · `mb_heatsink_dusty` · `mb_pins_bent` · `mb_temp_gauge` |
+| GPU | `PART_GPU_DESIGN.md` §9 | 10 | **10** | `gpu_cable_cpu8` (ตัวลวงสำคัญ ต้องขนาดเท่า `gpu_cable_pcie`) · `gpu_connector_zoom` · `gpu_card_dusty` · `gpu_burn` |
+| Front Panel | `PART_FRONTPANEL_DESIGN.md` §8 | 9 | **8** | `fp_pin_header_zoom` + `fp_pin_label_overlay` · สลอตแยก 4 ไฟล์ · `fp_flashlight_beam` |
+| BIOS | `PART_BIOS_DESIGN.md` §11 | 6 | **8** | `bios_bottleneck_chart` · ไอคอนไดรฟ์ 3 แบบ · ปุ่ม Save/Discard/Default · `bios_windows_desktop` |
+
+**กฎที่ใช้ซ้ำทุก Part:** ภาพคู่เปรียบเทียบ (สะอาด/สกปรก · ล็อก/ปลดล็อก · เปิด/ปิด) **ต้องขนาด canvas เท่ากันเป๊ะ** ไม่งั้นภาพกระโดดตอนสลับ
+
+**ไฟล์บทที่ต้องเพิ่มคู่กัน** — `Assets/Dialog/MiniGame/` : `Mainboard_Pib.txt` · `Gpu_Pib.txt` · `FrontPanel_Pib.txt` · `Bios_Pib.txt` *(เนื้อหาเขียนไว้ครบแล้วในเอกสารแต่ละ Part ก๊อปวางได้เลย)*
+
+---
+
 # งานจัดระเบียบ asset (ไม่ต้อง gen ใหม่)
 
 - [ ] **เปิด Godot 1 รอบ** ให้ import รูป 39 ไฟล์ในโฟลเดอร์ `Part*` แล้ว `git add Assets/MiniGame/Part*/*.import` *(สำคัญที่สุด — ดู `BUG_LIST.md` BUG-09)*
@@ -288,7 +305,8 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 | G · เติมช่องว่าง Part อื่น | 3 | 🟢 |
 | H · Ending | 3 | 🟢 |
 | I · Audio | 19 | 🟢 (ต้องมี AudioManager ก่อน) |
-| **รวม** | **118 ไฟล์** | |
+| J · Core Part อีก 4 ตัว | 35 | 🟡 |
+| **รวม** | **153 ไฟล์** | |
 
 ## ประวัติเอกสาร
 
