@@ -10,67 +10,57 @@
 
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
-| 🔴 Critical | 5 | 1 | 2 | 8 |
-| 🟡 High | 6 | 1 | 4 | 11 |
-| 🟢 Low | 2 | 0 | 6 | 8 |
-| **รวม** | **13** | **2** | **12** | **27** |
+| 🔴 Critical | 9 | 1 | 2 | 12 |
+| 🟡 High | 7 | 1 | 3 | 11 |
+| 🟢 Low | 3 | 0 | 5 | 8 |
+| **รวม** | **19** | **2** | **10** | **31** |
 
 ---
 
 ## 🆕 ตรวจเพิ่ม 22 ก.ย. 2569 — หลัง refactor `QuestStep` (commit `a48aa67`)
 
-ทีมทำ QuestStep resource ตามข้อเสนอ 4.1 แล้ว 👍 แต่ระหว่างทาง refactor ยังค้างอยู่ 4 จุดที่ทำให้เกมเดินไม่ได้
+ทีมทำ QuestStep resource ตามข้อเสนอ 4.1 แล้ว 👍 แต่ระหว่างทาง refactor ยังค้างอยู่ 4 จุดที่ทำให้เกมเดินไม่ได้ — **ทั้ง 4 จุดแก้แล้วใน commit `7c291e5` (23 ก.ย. 2569)** ดูรายละเอียดที่แก้จริงในแต่ละข้อด้านล่าง
 
-### BUG-28 🔴 `load()` ไม่ได้ `.instantiate()` — มินิเกมเปิดไม่ขึ้น
+### BUG-28 ✅ `load()` ไม่ได้ `.instantiate()` — มินิเกมเปิดไม่ขึ้น
 
-`Scripts/EventManager/event_manager.gd` บรรทัด 98–99
+`Scripts/EventManager/event_manager.gd::_process_data()` ตอนนี้:
 
 ```gdscript
-# ตอนนี้ — load() คืน PackedScene ไม่ใช่ Node
-var minigame = load(data.scene_path)
-get_tree().root.add_child(minigame)      # error: Invalid type in add_child
-
-# ควรเป็น
-var minigame = load(data.scene_path).instantiate()
-get_tree().root.add_child(minigame)
+QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
+    var scene = load(data.scene_path) as PackedScene
+    get_tree().root.add_child(scene.instantiate())
+    Global.in_minigame = true
 ```
 
-### BUG-29 🔴 ส่ง `QuestStep` เข้าไปในช่องที่รับ `String`
+### BUG-29 ✅ ส่ง `QuestStep` เข้าไปในช่องที่รับ `String`
 
-`event.next_step()` และ `event.set_step()` เปลี่ยนไปคืน **QuestStep** แล้ว แต่ผู้เรียกยังส่งต่อเข้า `update_task(text: String, ...)` ตรง ๆ
+`update_event()` และ `jump_event()` ทั้งคู่ส่ง `quest_step.quest_text_th` เข้า `questboard.update_task()` แล้ว แทนที่จะส่ง `QuestStep` ทั้งตัว
 
-| ไฟล์ | บรรทัด | แก้เป็น |
-|---|---|---|
-| `event_manager.gd` `update_event()` | 59–60 | `var step = event.next_step()` แล้วส่ง `step.quest_text_th if step else ""` |
-| `event_manager.gd` `jump_event()` | 74–75 | เหมือนกัน |
+### BUG-30 ✅ `main.tres` เหลือ QuestStep เดียวและว่างเปล่า
 
-> `_ready()` กับ `init_manager()` แก้ถูกแล้ว (ใช้ `.quest_text_th`) เหลือสองจุดนี้
+`Resources/main.tres` มี 5 `QuestStep` ครบแล้ว: คุยกับยาย (DIALOG) → เข้าห้อง (DIALOG) → หายางลบ (MINIGAME, find-item) → ขัดแรม (TUTORIAL) → SCENE_CHANGE ปิดท้าย แต่ละอันมี `action`/`dialog_file`/`scene_path`/`quest_text_th` ครบ ยังฝังรวมในไฟล์เดียว (ไม่ได้แยกเป็น `Resources/MainQuest/*.tres` ตามที่เสนอไว้ — ไม่ใช่บั๊ก แค่ diff จะอ่านยากขึ้นถ้าแก้บ่อย)
 
-### BUG-30 🔴 `main.tres` เหลือ QuestStep เดียวและว่างเปล่า
+### BUG-31 ✅ `minigame_end()` และ `_on_dialog_finish()` เป็น `pass`
 
-```
-Tasks = Array[QuestStep]([SubResource("Resource_42x1i")])   # มี 1 ตัว ไม่มีค่าใด ๆ
-```
+แก้ด้วยสถาปัตยกรรมใหม่ทั้งชุด แทนการเช็กเลข task หรือ flag `updateEvent` เดี่ยว ๆ:
 
-ของเดิมมี 4 ขั้น (คุยกับยาย → เข้าห้อง → หายางลบ → ขัดแรม) ตอนนี้หายหมด
-ต้องสร้าง QuestStep 4 ไฟล์แล้วเติมค่า `action`, `dialog_file`, `scene_path`, `quest_text_th` ให้ครบ แนะนำแยกเป็นไฟล์ `.tres` ละขั้นใน `Resources/MainQuest/` จะ diff ง่ายกว่าฝังใน `main.tres`
-
-### BUG-31 🔴 `minigame_end()` และ `_on_dialog_finish()` เป็น `pass`
-
-ลูปขาดตรงกลาง — มินิเกมจบแล้วเควสต์ไม่เดินต่อ และบทสนทนาจบแล้วไม่มีอะไรตามมา
-ต้องใส่ logic กลับ โดยคราวนี้อ่านจาก `QuestStep.updateEvent` แทนการเช็กเลข task แบบเดิม (ตรงกับข้อเสนอ 4.2)
+- `QuestStep` มี `isDone` + `set_done()`/`reset()` เอง แทนที่จะพึ่ง index
+- `QuestStep.EmitType` (`TRIGGER` / `DIALOG_END` / `MINIGAME_END` / `TUTORIAL_END`) บอกว่า step นี้ต้องรอ action ของตัวเองจบก่อนถึงจะ trigger step ถัดไปได้ (กันปัญหาเดิมที่ quest วิ่งไปข้างหน้าตั้งแต่ action เพิ่งเริ่ม ไม่ใช่ตอนจบจริง)
+- `EventManager` ต่อสัญญาณ `on_dialog_end` / `on_minigame_end` / `on_tutorial_finish` เข้ากับ `data.set_done` แบบ `CONNECT_ONE_SHOT` ใน `_process_data()`
+- `_on_dialog_finish()` / `minigame_end()` / `_on_tutorial_end()` เช็ก `data.isDone` ก่อนเรียก `update_event()` แล้วค่อย `_process_data()` ต่อให้ step ใหม่ถ้า `emitType` ของมันไม่ใช่ `TRIGGER`
 
 ### ✅ ที่แก้ไปแล้วในรอบนี้ (จากฝั่งทีม)
 
 | บั๊ก | สถานะใหม่ |
 |---|---|
 | BUG-19 `.scn` binary | ✅ มี `Scene/MiniGame/part_ram.tscn` แล้ว และ `Constant.MINIGAME1_SCENE` ชี้ถูก |
-| BUG-20 `minigame_end` อิงเลข task | ✅ โครงเปลี่ยนเป็น data-driven แล้ว (แต่ยังไม่ได้ใส่ logic — ดู BUG-31) |
+| BUG-20 `minigame_end` อิงเลข task | ✅ เปลี่ยนเป็น data-driven เต็มรูปแบบแล้ว (ดู BUG-31) — ไม่มี hardcode เลข task เหลืออยู่ |
+| BUG-26 `Event` ไม่มี `reset()` | ✅ เพิ่ม `Event.reset()` (รีเซ็ต `currentTask`/`isDone`/`isDone` ของทุก task) แล้วเรียกจาก `EventManager._ready()` ทุกครั้งที่โปรเซสเริ่มใหม่ |
 | ข้อเสนอ 4.1 QuestStep resource | ✅ ทำแล้ว |
 
 ### ⬜ ที่ยังค้างเหมือนเดิม
 
-BUG-14 (`simple_npc.gd` signature ผิด) · BUG-18 (`parse_text` `body[1]`) · BUG-26 (`Event` ไม่มี `reset()`) · BUG-15 (ไม่มี Player / MainGame.tscn ไม่ถูกโหลด) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-25
+BUG-14 (`simple_npc.gd` signature ผิด) · BUG-18 (`parse_text` `body[1]`) · BUG-15 (ไม่มี Player / MainGame.tscn ไม่ถูกโหลด) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-25
 
 ---
 
@@ -196,14 +186,15 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 | สาเหตุ | `body = text.split(",")` แล้วใช้ `body[1]` ทันที — บรรทัดที่ไม่มี `,` จะ index out of range |
 | แก้ | `if body.size() < 2: push_error("บรรทัดบทผิดรูปแบบ: %s" % text); return null` |
 
-### BUG-26 ⬜ `Event` เก็บ state ไว้ใน Resource ที่แชร์กัน
+### BUG-26 ✅ `Event` เก็บ state ไว้ใน Resource ที่แชร์กัน
 
 | | |
 |---|---|
 | ไฟล์ | `Scripts/Resources/event.gd` |
 | สาเหตุ | `currentTask` / `isDone` เป็นตัวแปรใน Resource `main.tres` ซึ่ง Godot cache ไว้ตัวเดียวทั้งเกม (ปัญหาชนิดเดียวกับ BUG-06) |
-| ผล | เริ่มเกมใหม่ / `change_scene` แล้วความคืบหน้า quest ไม่รีเซ็ต จนกว่าจะปิดโปรแกรม · ตอนทำ Save/Load จะเจอปัญหานี้เต็ม ๆ |
-| แก้ | เพิ่ม `func reset(): currentTask = 0; isDone = false` แล้วเรียกจาก `EventManager.init_manager()` หรือใช้ `event.duplicate()` ตอนเริ่มเกม |
+| ผล (ก่อนแก้) | เริ่มเกมใหม่ / `change_scene` แล้วความคืบหน้า quest ไม่รีเซ็ต จนกว่าจะปิดโปรแกรม |
+| แก้ (commit `7c291e5`) | เพิ่ม `Event.reset()` (รีเซ็ต `currentTask`, `isDone`, และวนรีเซ็ต `isDone` ของทุก `QuestStep` ใน `_tasks`) แล้วเรียกจาก `EventManager._ready()` ทุกครั้งที่โปรเซสเริ่มใหม่ · `set_step()` (debug jump) ก็ปรับ `isDone` ของแต่ละ task ให้ตรงกับ index ที่กระโดดไปด้วย |
+| ยังไม่ครอบคลุม | ยังไม่รองรับ Save/Load กลางเกม (reset เกิดที่ `_ready()` ของ autoload เท่านั้น ไม่ใช่ทุกครั้งที่ `change_scene`) — ยกไว้เป็นงานของระบบ Save/Load ในอนาคต |
 
 ---
 
@@ -217,9 +208,10 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 `Resources/main.tres` — เปลี่ยนเป็นไทยทั้ง 4 ข้อแล้ว
 
-### BUG-20 ⬜ `minigame_end()` อิงเลข task แบบ hardcode
+### BUG-20 ✅ `minigame_end()` อิงเลข task แบบ hardcode
 
-`event_manager.gd` — `if [2, 3].has(task)` แทรก task ใหม่ตรงกลางเมื่อไรพังทันที → เปลี่ยนเป็น `minigame_end(success: bool = true, score: Dictionary = {})`
+เดิม `event_manager.gd` เช็ก `if [2, 3].has(task)` — แทรก task ใหม่ตรงกลางเมื่อไรพังทันที
+แก้ใน commit `7c291e5`: `minigame_end()` เช็ก `data.isDone && data.action == QuestStep.Action.MINIGAME || ...` (data-driven จาก task ปัจจุบันเอง ไม่ใช่เลข index ที่ hardcode) ก่อนเรียก `update_event()`
 
 ### BUG-21 ⬜ เดินทแยงมุมไม่ได้
 
@@ -249,5 +241,6 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 23 ก.ย. 2569 | commit `7c291e5` — ปิด BUG-28 ถึง BUG-31 (load/instantiate, QuestStep→String, main.tres 5 task, minigame_end/dialog_finish logic) ด้วยระบบ `isDone`/`EmitType` ต่อสัญญาณ `on_dialog_end`/`on_minigame_end`/`on_tutorial_finish` แบบ one-shot · ปิด BUG-20 (data-driven เต็มรูปแบบ) และ BUG-26 (`Event.reset()` + เรียกจาก `_ready()`) ไปด้วย |
 | 22 ก.ย. 2569 | ตรวจเพิ่มหลัง refactor QuestStep — พบบั๊กใหม่ 4 ข้อ (BUG-28 ถึง BUG-31) ที่ทำให้เกมเดินไม่ได้ · ปิด BUG-19 และ BUG-20 |
 | 21 ก.ย. 2569 | สร้างเอกสาร — รวมบั๊ก 27 รายการจากการไล่โค้ดทั้งโปรเจกต์ที่ commit `1c9040a` · แก้แล้ว 13 · รอทำใน Godot 2 · ยังไม่แก้ 12 |

@@ -46,7 +46,9 @@
 2. **B3** — Save As `Scene/MiniGame/Minigame1.scn` → `Scene/MiniGame/PartRam.tscn` แล้วแก้
    `Constant.MINIGAME1_SCENE = "res://Scene/MiniGame/PartRam.tscn"` *(ยังไม่ได้แก้ให้ เพราะต้องมีไฟล์ `.tscn` จริงก่อน ไม่งั้นเกมพัง)*
 
-**ยังไม่ทำ (เป็นข้อเสนอ ไม่ใช่บั๊ก):** ข้อ 4.1 `QuestStep` resource · 4.2 `minigame_end(success, score)` · 4.3 สุ่มกล่องเป้าหมายใน find-item · ย้าย `box*.png` เข้า `PartRam/`
+**✅ ทำแล้วเพิ่มใน commit `7c291e5` (23 ก.ย. 2569):** ข้อ 4.1 `QuestStep` resource (มี `isDone`/`set_done()`/`reset()`) · ข้อ 4.2 `minigame_end()` เปลี่ยนเป็น data-driven เต็มรูปแบบ (อ่านจาก `data.isDone`/`data.action` ของ task ปัจจุบัน แทน hardcode เลข task — ไม่ได้ใช้ signature `(success, score)` ตามที่เสนอไว้เดิม แต่แก้ปัญหาความเปราะเดียวกัน) · `main.tres` ครบ 5 task แล้ว (ดู `Docs/BUG_LIST.md` BUG-28 ถึง BUG-31)
+
+**ยังไม่ทำ (เป็นข้อเสนอ ไม่ใช่บั๊ก):** ข้อ 4.3 สุ่มกล่องเป้าหมายใน find-item · ย้าย `box*.png` เข้า `PartRam/` — **อัปเดต:** `Assets/MiniGame/PartRam/ram_box_normal.png` / `ram_box_hover.png` มีไฟล์และ `.import` แล้ว (commit `7c291e5`) แต่ `Scene/MiniGame/find_item_minigame.tscn` ยังอ้าง `Assets/MiniGame/box.png` / `box_on_hover.png` ตัวเก่าอยู่ — ต้องเปิดซีนแล้วสลับ texture ไปใช้ไฟล์ใหม่ให้จบงานนี้
 
 ---
 
@@ -452,6 +454,7 @@ Godot 4 เข้มเรื่อง typed dictionary — พอ key type ไ�
 
 | วันที่           | การเปลี่ยนแปลง                                                                                                                                                                                         |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 23 ก.ย. 2569     | commit `7c291e5` ปิดงานค้างข้อ 4.1/4.2 (หัวข้อ 0.1) — `QuestStep.isDone` + `EmitType` ทำให้ quest รอ action ของตัวเองจบจริงก่อนเดินต่อ, `Event.reset()` ถูกเรียกใน `EventManager._ready()`, `main.tres` ครบ 5 task, และแก้ `DialogScene.show_dialog()` ที่เคย prefix `BackgroundDir` ซ้ำกับ `bg_name` ที่เป็น uid/absolute path อยู่แล้ว — ดูรายละเอียดที่ `Docs/BUG_LIST.md` (BUG-28 ถึง BUG-31, BUG-20, BUG-26) |
 | 21 ก.ย. 2569 (3) | หาและแก้บั๊กฉาก Room — `trackEvents` เซฟเป็น `Dictionary[Variant,…]` ทำให้ปุ่ม `!` ไม่ขึ้น + guard อีก 3 จุด (หัวข้อ 10)                                                                               |
 | 21 ก.ย. 2569 (2) | ลงมือแก้ 🔴 + 🟡 + ข้อความ รวม 9 รายการ เหลือ 2 ขั้นที่ต้องทำใน Godot (import รอบใหม่ + แปลง `.scn` → `.tscn`)                                                                                         |
 | 21 ก.ย. 2569     | สร้างเอกสาร — เทียบ commit `1c9040a` กับดีไซน์ พบปัญหา `.import` ไม่ตรงชื่อ 39 คู่, ซีน find-item ชี้พาธเก่า, `in_minigame` ค้าง, บั๊กเดิม B2–B4 ยังอยู่ (B1 หายแล้ว) และสรุปงาน text ที่ต้องแก้/เพิ่ม |

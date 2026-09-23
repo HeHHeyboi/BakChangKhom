@@ -311,20 +311,26 @@ func point_at(target: Node2D, line: String) -> void
 ### 8.4 การผูกกับระบบเดิม
 
 ```gdscript
-# โค้ดจริงตอนนี้อยู่ที่ EventManager.trigger_step() (commit e5d5203) — room.gd ถูกลบแล้ว
-# Global.MiniGames / ReturnMiniGame() ก็ถูกลบ ใช้ค่าคงที่ใน constant.gd แทน
-	3:
-		hideUI()
-		show_tutorial(TutorialState.RAM_CLEANING)
-		var minigame = load(Constant.MINIGAME1_SCENE).instantiate()
-		get_tree().root.add_child(minigame)
+# โค้ดจริงตอนนี้ (commit 7c291e5) — trigger_step() ไม่ match เลข task แล้ว
+# แต่ละ MAIN task เป็น QuestStep resource ใน main.tres ที่มี action=TUTORIAL, tutorial=RAM_CLEANING
+# ตามด้วยอีก QuestStep action=MINIGAME/SCENE_CHANGE ชี้ scene_path = Constant.MINIGAME1_SCENE
+# EventManager._process_data() อ่าน resource แล้วสั่งตาม action:
+	QuestStep.Action.TUTORIAL:
+		tutorial.show_tutorial(data.tutorial)
+		if !on_tutorial_finish.is_connected(data.set_done):
+			on_tutorial_finish.connect(data.set_done, CONNECT_ONE_SHOT)
+	QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
+		var scene = load(data.scene_path) as PackedScene
+		get_tree().root.add_child(scene.instantiate())
 		Global.in_minigame = true
+		if !on_minigame_end.is_connected(data.set_done):
+			on_minigame_end.connect(data.set_done, CONNECT_ONE_SHOT)
 
-# มินิเกมจบแล้วเรียกกลับมาที่ EventManager.minigame_end()
-# ⚠️ minigame1.gd ยังลืม Global.in_minigame = false — ดู Docs/SYNC_REVIEW.md หัวข้อ 2.3
+# มินิเกมจบแล้วเรียก EventManager.minigame_end() → set_done() ของ QuestStep นั้น → update_event() ไปยัง task ถัดไป
+# Global.in_minigame = false ถูกแก้แล้วใน minigame1.gd (ดู Docs/SYNC_REVIEW.md หัวข้อ 2.3 — ปิดแล้ว)
 ```
 
-> ย้ายโค้ดจบเกมออกจากมินิเกมมาไว้ที่ `room.gd` — มินิเกมแค่ `emit` สัญญาณ ทำให้เอาไปใช้ที่อื่น (เช่นร้าน) ได้โดยไม่ต้องแก้
+> `trigger_step()`/`_process_data()` เป็น data-driven เต็มรูปแบบตามข้อเสนอ 4.1/4.2 แล้ว ไม่มี `match currentTask`/เลข task hardcode เหลืออยู่ — แต่ละ step บอกเองผ่าน `action`/`emitType`/`isDone` ว่าเมื่อไหร่ถึงจะ trigger step ถัดไปได้
 
 ---
 
@@ -631,5 +637,6 @@ transparent background, <Base Style Prompt>
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 23 ก.ย. 2569 | commit `7c291e5` — อัปเดตหัวข้อ 8.4 ให้ตรงกับ `trigger_step()`/`_process_data()` แบบ data-driven ใหม่ (ไม่ match เลข task แล้ว ใช้ `QuestStep.action`/`emitType`/`isDone` แทน) และปิดหมายเหตุเก่าเรื่อง `Global.in_minigame` ค้าง (แก้แล้ว) |
 | 16 ก.ย. 2569 (2) | เพิ่มหัวข้อ 14 — ระบบเลือกอุปกรณ์ทำความสะอาด (3 ขั้นย่อย, อุปกรณ์ 10 ชิ้นพร้อมการ์ดคุณสมบัติ, ผลของการเลือกถูก/พอใช้/ห้ามใช้, สเปก `CleanTool` แบบ data-driven) และปรับตารางคะแนนให้มีหมวด "การเลือกอุปกรณ์" |
 | 16 ก.ย. 2569 | สร้างเอกสาร — ออกแบบมินิเกม 1 ใหม่เป็น 8 phase, เพิ่ม sub-minigame วินิจฉัยแบบสังเกตอาการ→เดาสาเหตุ, ถอด/ประกอบระดับกลาง (ปลดสลัก 2 ข้าง → ดึง → ขัด → เสียบกลับ), สเปก `PibHint` และรายการ asset/บั๊กที่ต้องแก้ก่อน |
