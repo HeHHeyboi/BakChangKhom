@@ -3,12 +3,48 @@
 [ext_resource type="Script" uid="uid://b8ve2y18gu4uw" path="res://Scripts/Resources/quest_step.gd" id="1_naor1"]
 [ext_resource type="Script" uid="uid://db0chdbe7jurd" path="res://Scripts/Resources/event.gd" id="1_vbkmp"]
 
+[sub_resource type="Resource" id="Resource_naor1"]
+script = ExtResource("1_naor1")
+title = "ที่นาของยาย"
+dialog_file = "res://Assets/Dialog/Chapter1ReturnHome.txt"
+bg_name = "uid://dvdbswncu5tnq"
+chars = Array[String](["ขม", "ยาย"])
+quest_text_th = "Talk to gradma"
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
+
 [sub_resource type="Resource" id="Resource_42x1i"]
 script = ExtResource("1_naor1")
+title = "ห้องของขม"
+dialog_file = "res://Assets/Dialog/MainQuest/GoToRoom.txt"
+bg_name = "uid://0abmohme5tku"
+quest_text_th = "go in to your room and inspect computer"
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
+
+[sub_resource type="Resource" id="Resource_ur0up"]
+script = ExtResource("1_naor1")
+action = 1
+emitType = 1
+scene_path = "uid://d3tpe65flyrex"
+showHUD = true
+quest_text_th = "find eraser"
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
+
+[sub_resource type="Resource" id="Resource_xrra5"]
+script = ExtResource("1_naor1")
+action = 2
+tutorial = 2
+quest_text_th = "clean a ram"
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
+
+[sub_resource type="Resource" id="Resource_rvjks"]
+script = ExtResource("1_naor1")
+action = 1
+emitType = 3
+scene_path = "uid://bbcfansu05shj"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [resource]
 script = ExtResource("1_vbkmp")
 name = "main"
-Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_42x1i")])
+Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_naor1"), SubResource("Resource_42x1i"), SubResource("Resource_ur0up"), SubResource("Resource_xrra5"), SubResource("Resource_rvjks")])
 metadata/_custom_type_script = "uid://db0chdbe7jurd"

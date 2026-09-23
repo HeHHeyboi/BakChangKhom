@@ -6,9 +6,16 @@ enum Action {
 	TUTORIAL,
 	SCENE_CHANGE,
 }
+
+enum EmitType {
+	TRIGGER,
+	DIALOG_END,
+	MINIGAME_END,
+	TUTORIAL_END,
+}
 @export var action: Action
 ## When trigger, does this step update event
-@export var updateEvent = true
+@export var emitType: EmitType = EmitType.TRIGGER
 
 ## Title of the Dialog. Only Action is DIALOG
 @export var title: String
@@ -23,6 +30,17 @@ enum Action {
 @export_file("*.tscn") var scene_path: String
 ## Show HUD. Only Action is Minigame
 @export var showHUD = false
+@export var tutorial: Tutorial.TutorialState
 # @export var tutorial_state: int = -1
 ## Text that need to show in QuestBoard.
 @export_multiline var quest_text_th: String
+
+var isDone = false
+
+
+func set_done():
+	isDone = true
+
+
+func reset():
+	isDone = false

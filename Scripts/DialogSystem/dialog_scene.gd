@@ -25,7 +25,7 @@ const MaxBGSize = Vector2(1152.0, 648.0)
 var dialog_stack: Array[String] = []
 var index_stack: Array[int] = []
 var current_dialog: Array
-var DialogDict := {DIALOG: []}
+var DialogDict := { DIALOG: [] }
 var choiceButton = preload(DialogChoiceScene)
 var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
@@ -79,7 +79,7 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 		bg_node.texture = ImageTexture.create_from_image(transparent_img)
 	else:
 		# var loadImg = Image.load_from_file(bg)
-		bg_node.texture = load(BackgroundDir + bg_name) as Texture2D
+		bg_node.texture = load(bg_name) as Texture2D
 		var bgSize = bg_node.texture.get_size()
 		if bgSize > MaxBGSize:
 			bg_node.scale = MaxBGSize / bgSize

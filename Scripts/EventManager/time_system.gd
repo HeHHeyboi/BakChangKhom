@@ -7,17 +7,23 @@ class_name TimeSystem extends CanvasLayer
 var current_day = 1
 var current_month = 1
 
-enum TIME { MORNING, NOON, EVENING }
+enum TIME {
+	MORNING,
+	NOON,
+	EVENING,
+}
 
 
 func _enter_tree() -> void:
 	EventManager.next_period.connect(change_period)
 	EventManager.next_day.connect(change_day)
+	pass
 
 
 func _exit_tree() -> void:
 	EventManager.next_period.disconnect(change_period)
 	EventManager.next_day.disconnect(change_day)
+	pass
 
 
 func _ready() -> void:

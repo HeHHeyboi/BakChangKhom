@@ -20,6 +20,13 @@ func _ready() -> void:
 	on_task_update.emit(currentTask, _tasks[currentTask])
 
 
+func reset() -> void:
+	currentTask = 0
+	isDone = false
+	for task in _tasks:
+		task.reset()
+
+
 func next_step() -> QuestStep:
 	if isDone:
 		return null
@@ -33,6 +40,8 @@ func next_step() -> QuestStep:
 
 
 func get_task() -> QuestStep:
+	if isDone:
+		return null
 	return _tasks[currentTask]
 
 
@@ -40,4 +49,8 @@ func get_task() -> QuestStep:
 func set_step(index: int) -> QuestStep:
 	currentTask = clampi(index, 0, maxi(totalTask - 1, 0))
 	isDone = false
+	for i in range(0, currentTask):
+		_tasks[i].set_done()
+	for i in range(currentTask, totalTask):
+		_tasks[i].reset()
 	return get_task()
