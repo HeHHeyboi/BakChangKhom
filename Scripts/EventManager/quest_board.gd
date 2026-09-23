@@ -1,4 +1,4 @@
-class_name QuesetBoard extends CanvasLayer
+class_name QuestBoard extends CanvasLayer
 
 @export var QuestList: Node
 

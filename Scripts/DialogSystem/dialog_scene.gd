@@ -149,6 +149,9 @@ func parse_text(text: String):
 			return ChoiceToken.new(choices)
 		_:
 			body = text.split(",")
+			if body.size() < 2:
+				push_error("บรรทัดบทผิดรูปแบบ: %s" % text)
+				return null
 			for i in range(len(body)):
 				body[i] = body.get(i).lstrip(" ")
 			return DialogToken.new(body[0], body[1])

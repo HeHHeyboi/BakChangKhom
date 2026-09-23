@@ -1,6 +1,6 @@
 # BUG_LIST.md — รายการบั๊กทั้งหมดที่ตรวจพบ
 
-> ตรวจจากโค้ดจริงที่ commit `1c9040a` · อัปเดต 23 ก.ย. 2569 (audit หลัง commit `cd053b4`) · Godot 4.7
+> ตรวจจากโค้ดจริงที่ commit `1c9040a` · อัปเดต 23 ก.ย. 2569 (audit หลัง commit `cd053b4`, ปิด BUG-18/BUG-24 จาก working-tree changes ที่ยังไม่ commit) · Godot 4.7
 > เอกสารคู่กัน: `Docs/SYNC_REVIEW.md` (รายละเอียดวิธีแก้) · `Docs/ASSET_TODO.md` (asset ที่ต้องทำ)
 > สถานะ: ✅ แก้แล้วในรีโป · 🔧 รอทำใน Godot · ⬜ ยังไม่แก้
 
@@ -11,9 +11,9 @@
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
 | 🔴 Critical | 10 | 0 | 2 | 12 |
-| 🟡 High | 8 | 0 | 3 | 11 |
-| 🟢 Low | 3 | 0 | 5 | 8 |
-| **รวม** | **21** | **0** | **10** | **31** |
+| 🟡 High | 9 | 0 | 2 | 11 |
+| 🟢 Low | 4 | 0 | 4 | 8 |
+| **รวม** | **23** | **0** | **8** | **31** |
 
 ---
 
@@ -60,7 +60,7 @@ QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
 
 ### ⬜ ที่ยังค้างเหมือนเดิม
 
-BUG-14 (`simple_npc.gd` signature ผิด) · BUG-18 (`parse_text` `body[1]`) · BUG-15 (ไม่มี Player / MainGame.tscn ไม่ถูกโหลด) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-25
+BUG-14 (`simple_npc.gd` signature ผิด) · BUG-15 (ไม่มี Player / MainGame.tscn ไม่ถูกโหลด) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-23 · BUG-25
 
 ### 🔎 พบระหว่างตรวจซ้ำ 23 ก.ย. 2569 — ยังไม่ฟันธงว่าเป็นบั๊ก
 
@@ -183,13 +183,13 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 ไม่ได้อยู่ใต้ฉากปัจจุบัน → ไม่บล็อกอินพุตของฉากข้างล่าง (กดปุ่มในห้องทะลุผ่านมินิเกมได้) และไม่ถูกลบตอนเปลี่ยนฉาก
 **แก้:** ใส่ `Control` เต็มจอที่ `mouse_filter = STOP` เป็นฉากหลังของมินิเกม หรือ add เข้า `get_tree().current_scene` แทน root
 
-### BUG-18 ⬜ `parse_text()` พังถ้าบรรทัดบทไม่มี `,`
+### BUG-18 ✅ `parse_text()` พังถ้าบรรทัดบทไม่มี `,`
 
 | | |
 |---|---|
-| ไฟล์ | `Scripts/DialogSystem/dialog_scene.gd::parse_text()` บรรทัด 151–154 (ตรวจซ้ำ 23 ก.ย. 2569 — เลขบรรทัดขยับจากของเดิม) |
+| ไฟล์ | `Scripts/DialogSystem/dialog_scene.gd::parse_text()` |
 | สาเหตุ | `body = text.split(",")` แล้วใช้ `body[1]` ทันที — บรรทัดที่ไม่มี `,` จะ index out of range |
-| แก้ | `if body.size() < 2: push_error("บรรทัดบทผิดรูปแบบ: %s" % text); return null` |
+| แก้ | เพิ่ม guard ก่อนอ่าน `body[1]`: `if body.size() < 2: push_error("บรรทัดบทผิดรูปแบบ: %s" % text); return null` — บรรทัดผิดรูปแบบตอนนี้แค่ log error แล้วข้าม ไม่ทำเกม crash แล้ว |
 
 ### BUG-26 ✅ `Event` เก็บ state ไว้ใน Resource ที่แชร์กัน
 
@@ -232,9 +232,9 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 `global.gd` + `start_scene.gd` — dead field ลบทิ้งหรือเอาไปใช้จริง
 
-### BUG-24 ⬜ `class_name QuesetBoard` สะกดผิด
+### BUG-24 ✅ `class_name QuesetBoard` สะกดผิด
 
-`Scripts/EventManager/quest_board.gd` → `QuestBoard` (แก้พร้อมกับที่อ้างใน `event_manager.gd`)
+`Scripts/EventManager/quest_board.gd` → `class_name QuestBoard` แล้ว พร้อมแก้จุดที่อ้างใน `event_manager.gd::questboard` (`as QuesetBoard` → `as QuestBoard`)
 
 ### BUG-25 ⬜ ชื่อไฟล์สะกดผิดค้างจากของเดิม
 
@@ -246,6 +246,7 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 23 ก.ย. 2569 (ตรวจซ้ำ 2) | ปิด BUG-18 (`parse_text()` guard `body.size() < 2` ก่อน `push_error`+`return null`) และ BUG-24 (`QuesetBoard` → `QuestBoard` ทั้ง `quest_board.gd` และ `event_manager.gd`) จาก working-tree changes ที่ยังไม่ commit — ดู `git diff` ตอนตรวจ |
 | 23 ก.ย. 2569 (ตรวจซ้ำ) | Audit เต็มไฟล์เทียบกับโค้ดจริงที่ HEAD `cd053b4` (ไม่มี commit โค้ดใหม่ตั้งแต่ `7c291e5`) — ปิด BUG-09 (`.import` ครบ 69 คู่ ไม่มีไฟล์กำพร้าแล้ว) และ BUG-19 (`Constant.MINIGAME1_SCENE` ชี้ `part_ram.tscn` แล้วจริง) เป็น ✅ ทั้งคู่ · อัปเดตเลขบรรทัด/จุดอ้างอิงโค้ดของ BUG-16 (ย้ายจาก `trigger_step()` case 3 ไปที่ `_on_tutorial_end()` + `minigame1.gd::_input()`) และ BUG-18 (เลขบรรทัดขยับ) ให้ตรงโค้ดปัจจุบัน · พบจุดน่าสงสัยใหม่ใน `main.tres` (emitType ของ task หายางลบ) แต่ยังไม่ฟันธงเป็นบั๊ก |
 | 23 ก.ย. 2569 | commit `7c291e5` — ปิด BUG-28 ถึง BUG-31 (load/instantiate, QuestStep→String, main.tres 5 task, minigame_end/dialog_finish logic) ด้วยระบบ `isDone`/`EmitType` ต่อสัญญาณ `on_dialog_end`/`on_minigame_end`/`on_tutorial_finish` แบบ one-shot · ปิด BUG-20 (data-driven เต็มรูปแบบ) และ BUG-26 (`Event.reset()` + เรียกจาก `_ready()`) ไปด้วย |
 | 22 ก.ย. 2569 | ตรวจเพิ่มหลัง refactor QuestStep — พบบั๊กใหม่ 4 ข้อ (BUG-28 ถึง BUG-31) ที่ทำให้เกมเดินไม่ได้ · ปิด BUG-19 และ BUG-20 |

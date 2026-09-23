@@ -11,7 +11,7 @@ enum EventID {
 }
 
 @export var eventMap: Dictionary[EventID, Event]
-@onready var questboard = $"QuestBoard" as QuesetBoard
+@onready var questboard = $"QuestBoard" as QuestBoard
 @onready var time_system = $"TimeSystem" as TimeSystem
 @onready var tutorial = $"Tutorial" as Tutorial
 var currentEvent: EventID

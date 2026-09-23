@@ -380,7 +380,7 @@ Tasks = Array[String]([
 
 | กฎ                                                                           | เหตุผล                                    |
 | ---------------------------------------------------------------------------- | ----------------------------------------- |
-| ทุกบรรทัดต้องมี `,` คั่นชื่อกับข้อความ                                       | ไม่มี `,` → `body[1]` error ทำเกม crash   |
+| ทุกบรรทัดต้องมี `,` คั่นชื่อกับข้อความ                                       | ไม่มี `,` → `parse_text()` guard แล้ว (`push_error` + คืน `null`), ไม่ crash แต่บรรทัดนั้นหาย |
 | **ห้ามใช้ `:` ในบรรทัดบทปกติ**                                               | parser มองว่าเป็น header ของ choice block |
 | ชื่อก่อน `,` ต้องตรงกับ key ใน `_CharacterMap` เป๊ะ                          | ไม่ตรง → crash ตอนสร้าง sprite            |
 | บรรทัดว่าง = จบ block                                                        | ใช้คั่นระหว่าง choice branch              |
@@ -454,6 +454,7 @@ Godot 4 เข้มเรื่อง typed dictionary — พอ key type ไ�
 
 | วันที่           | การเปลี่ยนแปลง                                                                                                                                                                                         |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 23 ก.ย. 2569 (2) | working-tree (ยังไม่ commit): ปิด BUG-18 — `parse_text()` guard บรรทัดไม่มี `,` แล้ว (ดูหัวข้อ 7.4) · ปิด BUG-24 — `QuesetBoard` → `QuestBoard` ทั้ง `quest_board.gd`/`event_manager.gd` · พบแล้วแก้กลับ: `Scene/Location/Room.tscn` เคยมี diff เผลอเปลี่ยน `trackEvents` จาก `Dictionary[int, …]` เป็น `Dictionary[Variant, …]` (น่าจะ Godot Editor เซฟทับตอนเปิดซีน) ซึ่งจะรีโอเพน BUG-01 — revert กลับเป็น `Dictionary[int, …]` แล้ว ไฟล์ตรงกับ HEAD เป๊ะ ไม่มี diff ค้าง |
 | 23 ก.ย. 2569     | commit `7c291e5` ปิดงานค้างข้อ 4.1/4.2 (หัวข้อ 0.1) — `QuestStep.isDone` + `EmitType` ทำให้ quest รอ action ของตัวเองจบจริงก่อนเดินต่อ, `Event.reset()` ถูกเรียกใน `EventManager._ready()`, `main.tres` ครบ 5 task, และแก้ `DialogScene.show_dialog()` ที่เคย prefix `BackgroundDir` ซ้ำกับ `bg_name` ที่เป็น uid/absolute path อยู่แล้ว — ดูรายละเอียดที่ `Docs/BUG_LIST.md` (BUG-28 ถึง BUG-31, BUG-20, BUG-26) |
 | 21 ก.ย. 2569 (3) | หาและแก้บั๊กฉาก Room — `trackEvents` เซฟเป็น `Dictionary[Variant,…]` ทำให้ปุ่ม `!` ไม่ขึ้น + guard อีก 3 จุด (หัวข้อ 10)                                                                               |
 | 21 ก.ย. 2569 (2) | ลงมือแก้ 🔴 + 🟡 + ข้อความ รวม 9 รายการ เหลือ 2 ขั้นที่ต้องทำใน Godot (import รอบใหม่ + แปลง `.scn` → `.tscn`)                                                                                         |
