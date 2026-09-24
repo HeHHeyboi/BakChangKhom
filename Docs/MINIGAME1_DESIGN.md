@@ -306,7 +306,7 @@ func point_at(target: Node2D, line: String) -> void
 ```
 
 บทพูดเก็บเป็นไฟล์ `.txt` รูปแบบเดียวกับระบบ dialog เดิม (`ชื่อ,ข้อความ`) ที่
-`Assets/Dialog/MiniGame/Ram_Pib.txt` — ใช้ `#` คั่นเป็นบล็อกต่อ phase เพื่อให้ทีมเนื้อหาแก้ได้โดยไม่แตะโค้ด
+`Assets/Dialog/MiniGame/Ram_Pib.txt` — ใช้บรรทัด `@SECTION_NAME` (ต้องขึ้นต้นด้วย `@` ล้วน ๆ ห้ามมี `#` นำหน้า) คั่นเป็นบล็อกต่อ phase เพื่อให้ทีมเนื้อหาแก้ได้โดยไม่แตะโค้ด — อ่านโดย `Scripts/MiniGame/phase_dialog_parser.gd` (`PhaseDialogParser.parse()`)
 
 ### 8.4 การผูกกับระบบเดิม
 

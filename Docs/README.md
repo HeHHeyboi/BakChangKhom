@@ -53,7 +53,7 @@
 
 ```
 # คอมเมนต์ธรรมดา parser ข้ามให้
-# @SECTION_NAME        ← หัวข้อ section สำหรับ PibHint ใช้ค้นหา
+@SECTION_NAME          ← หัวข้อ section สำหรับ PibHint ใช้ค้นหา (ต้องขึ้นต้นด้วย @ ตัวแรกของบรรทัด ห้ามมี # นำหน้า)
 ปิ๊บ,ข้อความที่จะพูด
 ปิ๊บ,บรรทัดถัดไปในหัวข้อเดียวกัน
 ```
@@ -64,8 +64,9 @@
 2. **ห้ามมีเครื่องหมาย colon** ในบรรทัดบท — parser จะคิดว่าเป็น header ของ choice block
 3. ชื่อหน้าคอมมาต้องตรงกับ key ใน `Global._CharacterMap` เป๊ะ
 4. ไฟล์ต้องเป็น `.txt` และอยู่ใต้ `Assets/` (export preset กรองด้วย `include_filter="*.txt"`)
+5. หัวข้อ phase ต้องเป็น `@SECTION_NAME` ล้วน ๆ — `Scripts/MiniGame/phase_dialog_parser.gd` เช็ก `#` ก่อน `@` เสมอ ถ้าเขียน `# @SECTION_NAME` จะโดนอ่านเป็นคอมเมนต์เฉย ๆ แล้ว section นั้นหายไปทั้งก้อนแบบเงียบ ๆ
 
 ### ⚠️ ต้องทำก่อนใช้ไฟล์เหล่านี้
 
 - [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
-- [ ] เขียนคอมโพเนนต์ `PibHint` ที่อ่านไฟล์แล้วแยกตาม `# @SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้
+- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริงแค่ `Ram_Pib.txt` ผ่าน `part_ram.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)
