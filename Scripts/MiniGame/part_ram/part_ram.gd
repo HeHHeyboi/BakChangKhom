@@ -1,5 +1,6 @@
 # Scripts/MiniGame/minigame1.gd (เขียนใหม่)
 class_name MiniGameRam extends Node2D
+@export var Pib: PibHint
 
 enum Phase {
 	DIAGNOSIS, # 0 สังเกตอาการ + เลือกสาเหตุ
@@ -17,3 +18,16 @@ signal minigame_finished(score: Dictionary)
 
 var current_phase: Phase = Phase.DIAGNOSIS
 var _mistakes := { "diagnosis": 0, "safety": 0, "handling": 0 }
+var dialog_dict: Dictionary
+
+var RAM_PIB_PATH = "res://Assets/Dialog/MiniGame/Ram_Pib.txt"
+
+
+func _ready() -> void:
+	EventManager.hideUI()
+	dialog_dict = PhaseDialogParser.parse(RAM_PIB_PATH)
+	if Pib == null:
+		push_error("Pib is null please assign")
+		return
+
+	Pib.say(dialog_dict["REMOVE"])
