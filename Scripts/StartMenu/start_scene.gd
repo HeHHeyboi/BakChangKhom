@@ -12,7 +12,7 @@ func _ready() -> void:
 
 func tutorial_end():
 	get_tree().change_scene_to_file(Constant.HOME_SCENE)
-	EventManager.show_dialog("ออฟฟิส", Constant.PROLOUGE_TEXT, Constant.PLACEHOLDER_IMAGE)
+	EventManager.show_dialog("ออฟฟิส", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
 	Global.on_start = false
 	showTutorial = false
 	EventManager.showUI()

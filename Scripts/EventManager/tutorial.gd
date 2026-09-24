@@ -18,6 +18,8 @@ enum TutorialState {
 @onready var next_btn = $"Control/Next" as Button
 @onready var prev_btn = $"Control/Previous" as Button
 
+var tutorial_seen: Dictionary[TutorialState, bool] = { }
+
 var _slides = { }
 var cur_slide: TutorialSlides = null
 var _finished = false

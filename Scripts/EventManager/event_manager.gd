@@ -175,7 +175,7 @@ func _process_data(id: EventID, data: QuestStep):
 				on_dialog_end.connect(data.set_done, CONNECT_ONE_SHOT)
 		QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
 			var scene = load(data.scene_path) as PackedScene
-			get_tree().root.add_child(scene.instantiate())
+			get_tree().current_scene.add_child(scene.instantiate())
 			Global.in_minigame = true
 			if !on_minigame_end.is_connected(data.set_done):
 				on_minigame_end.connect(data.set_done, CONNECT_ONE_SHOT)
