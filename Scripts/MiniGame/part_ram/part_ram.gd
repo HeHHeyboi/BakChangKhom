@@ -45,7 +45,7 @@ func _ready() -> void:
 		_phase_nodes[phase].phase_completed.connect(_advance_phase)
 		_phase_nodes[phase].pib_toggle.connect(self.pib_toggle)
 
-	pib.say(dialog_dict["REMOVE"])
+	#pib.say(dialog_dict["REMOVE"])
 	_set_phase(Phase.DIAGNOSIS)
 
 

@@ -9,6 +9,10 @@
 [ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/pib_hint.gd" id="5_jxkp8"]
 [ext_resource type="PackedScene" uid="uid://0ammkthrqna6" path="res://Scene/DialogChoice.tscn" id="7_a0o4c"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a0o4c"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8lhnf"]
+
 [node name="part_ram" type="Node2D" unique_id=1125874144 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_x7ph2")
 pib = NodePath("PibHint")
@@ -20,6 +24,7 @@ texture = ExtResource("1_nlaq1")
 metadata/_edit_lock_ = true
 
 [node name="PhaseDiagnosis" type="Control" parent="." unique_id=1733273461]
+visible = false
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -180,6 +185,64 @@ layer = 120
 visible = false
 script = ExtResource("5_jxkp8")
 
+[node name="DialogPanel" type="Button" parent="PibHint" unique_id=961198624]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 480.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="HBoxContainer" parent="PibHint/DialogPanel" unique_id=2023095318]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VSeparator" type="VSeparator" parent="PibHint/DialogPanel/Container" unique_id=1412869140]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.25
+mouse_filter = 1
+theme_override_styles/separator = SubResource("StyleBoxEmpty_a0o4c")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PibHint/DialogPanel/Container" unique_id=191156297]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 10.0
+theme_override_constants/separation = 6
+
+[node name="Name" type="RichTextLabel" parent="PibHint/DialogPanel/Container/VBoxContainer" unique_id=837285019]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/bold_italics_font_size = 24
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/mono_font_size = 24
+text = "sdfsdfasdf"
+vertical_alignment = 1
+
+[node name="Dialog" type="RichTextLabel" parent="PibHint/DialogPanel/Container/VBoxContainer" unique_id=1072533843]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+mouse_filter = 1
+text = "sdfsdfasdf"
+
+[node name="VSeparator2" type="VSeparator" parent="PibHint/DialogPanel/Container" unique_id=379491990]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.25
+theme_override_styles/separator = SubResource("StyleBoxTexture_8lhnf")
+
 [connection signal="pressed" from="PhaseDiagnosis/ClueScreen" to="PhaseDiagnosis" method="_on_clue_screen_pressed"]
 [connection signal="pressed" from="PhaseDiagnosis/ClueSpeaker" to="PhaseDiagnosis" method="_on_clue_speaker_pressed"]
 [connection signal="pressed" from="PhaseDiagnosis/ClueCase" to="PhaseDiagnosis" method="_on_clue_case_pressed"]
@@ -187,3 +250,5 @@ script = ExtResource("5_jxkp8")
 [connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice2" to="PhaseDiagnosis" method="_on_choice_select"]
 [connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice3" to="PhaseDiagnosis" method="_on_choice_select"]
 [connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice4" to="PhaseDiagnosis" method="_on_choice_select"]
+[connection signal="all_lines_finished" from="PibHint" to="PhaseDiagnosis" method="_on_pib_hint_all_lines_finished"]
+[connection signal="pressed" from="PibHint/DialogPanel" to="PibHint" method="_on_dialog_panel_pressed"]
