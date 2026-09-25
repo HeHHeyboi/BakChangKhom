@@ -37,3 +37,25 @@ func toast(line: String, mood: Mood = Mood.WORRY, seconds: float = 3.0) -> void:
 ## ชี้ไปที่ node เป้าหมาย (วาดลูกศรจากปิ๊บไปยัง target)
 func point_at(target: Node2D, line: String) -> void:
 	pass
+
+
+class Data extends RefCounted:
+	enum Act {
+		SAY,
+		TOAST,
+		POINT_AT,
+	}
+
+	var type: Act
+	var header: String
+	var mood: PibHint.Mood
+	var seconds: float
+	var target: Node2D
+
+
+	static func say(p_header: String, p_mood: Mood = Mood.NORMAL) -> Data:
+		var p = Data.new()
+		p.type = Act.SAY
+		p.header = p_header
+		p.mood = p_mood
+		return p

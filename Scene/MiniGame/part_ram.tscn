@@ -7,10 +7,11 @@
 [ext_resource type="Script" uid="uid://dwe4g0duiavhg" path="res://Scripts/MiniGame/part_ram/phase_diagnosis.gd" id="3_dhngu"]
 [ext_resource type="Texture2D" uid="uid://rk8ifr1hwea4" path="res://Assets/MiniGame/PartRam/speaker.png" id="4_dk27f"]
 [ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/pib_hint.gd" id="5_jxkp8"]
+[ext_resource type="PackedScene" uid="uid://0ammkthrqna6" path="res://Scene/DialogChoice.tscn" id="7_a0o4c"]
 
-[node name="part_ram" type="Node2D" unique_id=1125874144 node_paths=PackedStringArray("Pib")]
+[node name="part_ram" type="Node2D" unique_id=1125874144 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_x7ph2")
-Pib = NodePath("PibHint")
+pib = NodePath("PibHint")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=481430171]
 position = Vector2(576, 322)
@@ -87,9 +88,43 @@ alignment = 1
 
 [node name="CauseChoices" type="VBoxContainer" parent="PhaseDiagnosis" unique_id=453688084]
 visible = false
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -142.0
+offset_top = -142.0
+offset_right = 142.0
+offset_bottom = 142.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="DialogChoice" parent="PhaseDiagnosis/CauseChoices" unique_id=1580161417 instance=ExtResource("7_a0o4c")]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "จอภาพเสีย"
+metadata/choice_meta = "screen"
+
+[node name="DialogChoice2" parent="PhaseDiagnosis/CauseChoices" unique_id=2125194098 instance=ExtResource("7_a0o4c")]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "แรมหลวม/ขาสกปรก"
+metadata/choice_meta = "correct"
+
+[node name="DialogChoice3" parent="PhaseDiagnosis/CauseChoices" unique_id=1947975198 instance=ExtResource("7_a0o4c")]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "ไฟไม่พอ (PSU)"
+metadata/choice_meta = "psu"
+
+[node name="DialogChoice4" parent="PhaseDiagnosis/CauseChoices" unique_id=1567930670 instance=ExtResource("7_a0o4c")]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "ไวรัส"
+metadata/choice_meta = "virus"
 
 [node name="PhaseBriefing" type="Control" parent="." unique_id=1636974471]
 visible = false
@@ -148,3 +183,7 @@ script = ExtResource("5_jxkp8")
 [connection signal="pressed" from="PhaseDiagnosis/ClueScreen" to="PhaseDiagnosis" method="_on_clue_screen_pressed"]
 [connection signal="pressed" from="PhaseDiagnosis/ClueSpeaker" to="PhaseDiagnosis" method="_on_clue_speaker_pressed"]
 [connection signal="pressed" from="PhaseDiagnosis/ClueCase" to="PhaseDiagnosis" method="_on_clue_case_pressed"]
+[connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice" to="PhaseDiagnosis" method="_on_choice_select"]
+[connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice2" to="PhaseDiagnosis" method="_on_choice_select"]
+[connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice3" to="PhaseDiagnosis" method="_on_choice_select"]
+[connection signal="get_choice" from="PhaseDiagnosis/CauseChoices/DialogChoice4" to="PhaseDiagnosis" method="_on_choice_select"]

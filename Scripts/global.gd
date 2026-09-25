@@ -4,6 +4,7 @@ extends Node2D
 var dialogShown = false
 var in_minigame = false
 var on_start = true
+var cur_pib: PibHint = null
 
 
 func getCharacterTexture(t_name: String):

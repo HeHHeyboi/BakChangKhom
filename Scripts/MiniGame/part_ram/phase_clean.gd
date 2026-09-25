@@ -1,4 +1,7 @@
 # Scripts/MiniGame/phase_clean.gd
+extends Control
+signal phase_completed
+
 enum CleanStep {
 	DUST_BOARD,
 	SCRUB_CONTACTS,
