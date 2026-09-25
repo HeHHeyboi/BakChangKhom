@@ -1,6 +1,7 @@
 # MINIGAME1_DESIGN.md — มินิเกม **Part RAM**: ทำความสะอาดแรม
 
-> อ้างอิงโค้ดจริงที่ commit `86b719f` · 16 ก.ย. 2569 · Godot 4.7
+> อ้างอิงโค้ดจริงที่ commit `52715cd` · 25 ก.ย. 2569 (เดิมเขียนไว้ที่ commit `86b719f` · 16 ก.ย. 2569) · Godot 4.7
+> หัวข้อ 8 (สเปกโค้ด) อัปเดตให้ตรงกับ implementation จริงแล้ว — ดูหัวข้อ 15 สำหรับรายละเอียดที่เปลี่ยน
 > ชุดเดียวกับ: `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md` · `PART_BIOS_DESIGN.md` (สารบัญ: `Docs/README.md`)
 > เอกสารคู่กัน: `Docs/REPAIR_FLOW.md` (ลูปงานซ่อม 5 scene ที่ครอบมินิเกมนี้อยู่), `Docs/ASSET_GUIDE.md` (สเปก asset), `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7 หัวข้อ 4.7–4.11
 > ClickUp: [MiniGame Tutorial Mode](https://app.clickup.com/t/86eygp946) · [[Project] Bak Chang Khom](https://app.clickup.com/t/86ey2e8mm)
@@ -39,14 +40,14 @@
 | จบเกม      | `_on_return_pressed()` → `update_event(MAIN)` + `next_period` + `hideTimeUI(false)` + `queue_free()`             |
 | Tutorial   | `room.gd::_on_dialog_finish()` เรียก `show_tutorial(RAM_CLEANING)` แล้วค่อย add มินิเกม                          |
 
-**ปัญหาที่ต้องแก้ก่อนต่อยอด (blocker):**
+**ปัญหาที่ต้องแก้ก่อนต่อยอด (blocker) — ตารางนี้คือสถานะ ณ วันที่เขียนเอกสาร (16 ก.ย.) เก็บไว้เป็นประวัติ ดูหัวข้อ 8/12 สำหรับสถานะโค้ดปัจจุบัน:**
 
 | #                                                                                                               | ไฟล์                                   | ปัญหา                                                                                                                                                                                           |
 | --------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~B1~~ ✅ **แก้แล้ว** (commit `e5d5203` ลบ `room.gd` ทิ้ง ย้ายไป instantiate สดใน `EventManager.trigger_step()`) | ~~`Scripts/Room/room.gd:3`~~           | `var minigame = Global.ReturnMiniGame("MiniGame1")` instantiate ครั้งเดียวเป็นตัวแปรสมาชิก แต่มินิเกม `queue_free()` ตัวเอง → **เข้ารอบ 2 พัง** ต้องย้ายไป instantiate ใน `_on_dialog_finish()` |
-| B2                                                                                                              | `Scripts/Resources/tutorial_slides.gd` | `curIndex` ไม่รีเซ็ตใน `show_tutorial()` → เปิดซ้ำเริ่มที่สไลด์สุดท้าย · ต้องเพิ่ม `func reset(): curIndex = 0` แล้วเรียกจาก `Tutorial.show_tutorial()`                                         |
-| B3                                                                                                              | `Scene/MiniGame/Minigame1.scn`         | เป็นไฟล์ **binary `.scn`** → diff ไม่ได้ merge ไม่ได้ **ต้อง Save As เป็น `.tscn`** ก่อนเริ่มงานนี้                                                                                             |
-| B4                                                                                                              | `minigame1.gd`                         | `match clikTime` เทียบค่าเป๊ะ ควรเป็น `if clikTime >= ...`                                                                                                                                      |
+| ~~B2~~ ✅ **แก้แล้ว** (ดู `Docs/BUG_LIST.md` BUG-06/BUG-07)                                                       | ~~`Scripts/Resources/tutorial_slides.gd`~~ | `curIndex` ไม่รีเซ็ตใน `show_tutorial()` → เปิดซ้ำเริ่มที่สไลด์สุดท้าย · เพิ่ม `func reset(): curIndex = 0` แล้วเรียกจาก `Tutorial.show_tutorial()` แล้ว                                        |
+| ~~B3~~ ✅ **แก้แล้ว** — Save As เป็น `Scene/MiniGame/part_ram.tscn`, `Constant.MINIGAME1_SCENE` ชี้ถูกแล้ว (ดู `Docs/BUG_LIST.md` BUG-19)                                                        | ~~`Scene/MiniGame/Minigame1.scn`~~     | เป็นไฟล์ **binary `.scn`** → diff ไม่ได้ merge ไม่ได้                                                                                                                                           |
+| ~~B4~~ ⚠️ **ไม่เกี่ยวแล้ว** — `minigame1.gd` ทั้งไฟล์ถูกลบใน commit `29b706d` กลไก "ถู 15 ครั้งเทียบค่าเป๊ะ" ถูกแทนที่ด้วยระบบเลือกอุปกรณ์ (หัวข้อ 14) ซึ่งยังเป็นโครงเปล่าใน `phase_clean.gd` (ดูหัวข้อ 8, 12) | ~~`minigame1.gd`~~                     | ~~`match clikTime` เทียบค่าเป๊ะ ควรเป็น `if clikTime >= ...`~~                                                                                                                                  |
 
 ---
 
@@ -237,11 +238,14 @@ Phase นี้ถูกออกแบบใหม่เป็น **3 ขั้
 
 ## 8. สเปกโค้ด
 
+> **อัปเดต 25 ก.ย. 2569:** หัวข้อนี้เดิมเป็นข้อเสนอ (เขียนไว้ 16 ก.ย.) ตอนนี้เขียนโค้ดจริงตามแนวนี้ไปบางส่วนแล้ว แต่มีรายละเอียดที่ต่างจากข้อเสนอเดิม (ชื่อคลาส/ไฟล์/รูปแบบการเชื่อมปิ๊บ) เนื้อหาด้านล่างอัปเดตให้ตรงกับโค้ดจริงที่ commit `52715cd`
+
 ### 8.1 State machine
 
 ```gdscript
-# Scripts/MiniGame/minigame1.gd (เขียนใหม่)
-class_name MiniGameRam extends Node2D
+# Scripts/MiniGame/part_ram/part_ram.gd
+class_name PartRam extends Node2D
+@export var pib: PibHint
 
 enum Phase {
     DIAGNOSIS,   # 0 สังเกตอาการ + เลือกสาเหตุ
@@ -259,57 +263,98 @@ signal minigame_finished(score: Dictionary)
 
 var current_phase: Phase = Phase.DIAGNOSIS
 var _mistakes := {"diagnosis": 0, "safety": 0, "handling": 0}
+var dialog_dict: Dictionary   # Dictionary[String, Array[DialogToken]] — จาก PhaseDialogParser
+
+@onready var _phase_nodes: Dictionary = {
+    Phase.DIAGNOSIS: $PhaseDiagnosis,
+    #Phase.BRIEFING: $PhaseBriefing,      ← ยังไม่ผูก รอ node ในซีน
+    #Phase.POWER_OFF: $PhasePoweroff,
+    #Phase.REMOVE: $PhaseRemove,
+    #Phase.CLEAN: $PhaseClean,
+    #Phase.INSTALL: $PhaseInstall,
+    #Phase.VERIFY: $PhaseVerify,
+    #Phase.SUMMARY: $PhaseSummary,
+}
 ```
 
-แต่ละ phase = **1 node ลูก** ที่เปิด/ปิด `visible` + `process_mode` — ไม่ยัดทุกอย่างไว้ในสคริปต์เดียว
+ต่างจากข้อเสนอเดิม 3 จุด: (1) class ชื่อ `PartRam` ไม่ใช่ `MiniGameRam`, ไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/` ไม่ใช่ `Scripts/MiniGame/minigame1.gd` เดี่ยว ๆ — สคริปต์เดิมทั้งไฟล์ถูกลบไปแล้วตั้งแต่ commit `29b706d` (2) แต่ละ phase เป็น node ลูกจริงตาม `_phase_nodes` dict แต่ **ตอนนี้ผูกใช้งานจริงแค่ `PhaseDiagnosis`** — อีก 7 phase มีสคริปต์ stub รออยู่แล้ว (`phase_briefing.gd` … `phase_summary.gd`, ทุกไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/`) แต่ยังไม่ได้เพิ่ม node ในซีนจริง จึงคอมเมนต์ไว้ใน dict (3) `_advance_phase()` ไล่ตาม `current_phase + 1` ตรง ๆ, `_set_phase()` มีการ์ด `if current_phase >= _phase_nodes.size(): return` กันพังตอนไล่เกินจำนวน phase ที่ผูกไว้จริง
 
-### 8.2 โครง Scene ที่เสนอ
+### 8.2 โครง Scene ปัจจุบัน
 
 ```
-Minigame1.tscn  (Node2D, script: minigame1.gd)
-├── Background        (Sprite2D — PCCaseBG.jpg)
-├── PhaseDiagnosis    (Control)  → phase_diagnosis.gd
-│   ├── ClueScreen / ClueSpeaker / ClueCase   (TextureButton ×3)
-│   ├── ClueNotebook  (VBoxContainer — 3 ช่อง)
-│   └── CauseChoices  (VBoxContainer — 4 ปุ่ม)
-├── PhaseBriefing     (Control)  → phase_briefing.gd
-├── PhasePowerOff     (Control)  → phase_power_off.gd
-├── PhaseRemove       (Control)  → phase_remove.gd
-│   ├── ClipLeft / ClipRight (TextureButton)
-│   └── RamDraggable  (Sprite2D + Area2D)
-├── PhaseClean        (Control)  → phase_clean.gd   ← ย้ายโค้ดเดิมมาไว้ที่นี่
-│   ├── Ram / Eraser / pos1 / pos2 / CleanBar
-├── PhaseInstall      (Control)  → phase_install.gd
-├── PhaseVerify       (Control)  → phase_verify.gd
-├── PhaseSummary      (Control)  → phase_summary.gd
-└── PibHint           (CanvasLayer, layer = 110) → pib_hint.gd   ← ใช้ซ้ำได้ทุกมินิเกม
+Scene/MiniGame/part_ram.tscn  (Node2D "part_ram", script: part_ram.gd)
+├── Background        (Sprite2D)
+├── PhaseDiagnosis    (Control, visible=false)  → phase_diagnosis.gd   ← ตัวเดียวที่ implement จริง
+│   ├── ClueScreen / ClueSpeaker / ClueCase   (TextureButton ×3, pressed → _on_clue_*_pressed)
+│   ├── ClueNotebook  (VBoxContainer)
+│   └── CauseChoices  (VBoxContainer — 4× DialogChoice, get_choice → _on_choice_select)
+└── PibHint           (CanvasLayer, layer=120, visible=false) → pib_hint.gd
+    └── DialogPanel   (Button, full-rect anchored, pressed → _on_dialog_panel_pressed)
+        └── Container (HBoxContainer)
+            ├── VSeparator
+            ├── VBoxContainer
+            │   ├── Name    (RichTextLabel)
+            │   └── Dialog  (RichTextLabel)
+            └── VSeparator2
 ```
 
-### 8.3 `PibHint` — คอมโพเนนต์ปิ๊บ (สร้างใหม่ ใช้ซ้ำได้ทุก Part)
+`PhaseBriefing`/`PhasePoweroff`/`PhaseRemove`/`PhaseClean`/`PhaseInstall`/`PhaseVerify`/`PhaseSummary` ยังไม่มี node ในซีนนี้ (สคริปต์ stub มีแล้ว ดูหัวข้อ 12) — โครง `Minigame1.tscn` ที่เสนอไว้เดิมถูกแทนที่ด้วย `part_ram.tscn` (ไฟล์ `.scn` เดิมยังอยู่ในดิสก์เป็นไฟล์กำพร้า ไม่ได้ใช้แล้ว)
+
+### 8.3 `PibHint` — คอมโพเนนต์ปิ๊บ (ใช้ซ้ำได้ทุก Part)
 
 **ทำไมไม่ใช้ `DialogScene`:** `DialogScene` ตั้ง `Global.showDialog()` และกินทั้งจอ + บล็อกอินพุต ซึ่งขัดกับปิ๊บที่ต้องพูด *ระหว่าง* ผู้เล่นกำลังเล่น
 
 ```gdscript
 # Scripts/MiniGame/pib_hint.gd
 class_name PibHint extends CanvasLayer
+@onready var name_label = $DialogPanel/Container/VBoxContainer/Name
+@onready var dialog_label = $DialogPanel/Container/VBoxContainer/Dialog
 
 enum Mood { NORMAL, HAPPY, WORRY, POINT }
 
-signal line_finished
-signal all_lines_finished
+signal line_finished        # emit ทุกครั้งที่คลิกไปบรรทัดถัดไป
+signal all_lines_finished   # emit เมื่อพูดครบ คิวว่าง แล้วซ่อนตัวเอง
 
-## พูดต่อเนื่องหลายบรรทัด — ผู้เล่นคลิกเพื่อไปบรรทัดถัดไป
-func say(lines: Array[String], mood: Mood = Mood.NORMAL) -> void
+var cur_dialog: Array[DialogToken] = []
 
-## พูดบรรทัดเดียวแล้วหายไปเองใน N วินาที (ใช้ตอนเตือนระหว่างเล่น)
+## พูดต่อเนื่องหลายบรรทัด — ผู้เล่นคลิก DialogPanel เพื่อไปบรรทัดถัดไป
+## รับ Array ของ String หรือ DialogToken ปนกันได้ (String ถูกแปลงเป็น DialogToken ชื่อ "ปิ๊บ")
+func say(lines: Array, mood: Mood = Mood.NORMAL) -> void
+
+## พูดบรรทัดเดียวแล้วหายไปเองใน N วินาที (ใช้ตอนเตือนระหว่างเล่น) — ยังเป็น stub (pass)
 func toast(line: String, mood: Mood = Mood.WORRY, seconds: float = 3.0) -> void
 
-## ชี้ไปที่ node เป้าหมาย (วาดลูกศรจากปิ๊บไปยัง target)
+## ชี้ไปที่ node เป้าหมาย (วาดลูกศรจากปิ๊บไปยัง target) — ยังเป็น stub (pass)
 func point_at(target: Node2D, line: String) -> void
+
+## คำสั่งย่อยส่งผ่าน signal จาก phase ไปหา PibHint — ดูหัวข้อ 8.4
+class Data extends RefCounted:
+    enum Act { SAY, TOAST, POINT_AT }   # ตอนนี้ implement จริงแค่ SAY
+    static func say(p_header: String, p_mood: Mood = Mood.NORMAL) -> Data
 ```
 
+ต่างจากข้อเสนอเดิม: `say()` ไม่ได้แค่ `print()` เนื้อหาแล้ว — แสดง `DialogPanel` จริง เก็บคิวบรรทัดใน `cur_dialog`, โชว์บรรทัดแรกทันที แล้วรอผู้เล่นคลิก `DialogPanel` (`_on_dialog_panel_pressed()`) เพื่อ pop บรรทัดถัดไปทีละบรรทัด — คลิกครั้งสุดท้ายที่คิวว่างจะซ่อนพาเนลแล้ว emit `all_lines_finished`
+
 บทพูดเก็บเป็นไฟล์ `.txt` รูปแบบเดียวกับระบบ dialog เดิม (`ชื่อ,ข้อความ`) ที่
-`Assets/Dialog/MiniGame/Ram_Pib.txt` — ใช้บรรทัด `@SECTION_NAME` (ต้องขึ้นต้นด้วย `@` ล้วน ๆ ห้ามมี `#` นำหน้า) คั่นเป็นบล็อกต่อ phase เพื่อให้ทีมเนื้อหาแก้ได้โดยไม่แตะโค้ด — อ่านโดย `Scripts/MiniGame/phase_dialog_parser.gd` (`PhaseDialogParser.parse()`)
+`Assets/Dialog/MiniGame/Ram_Pib.txt` — ใช้บรรทัด `@SECTION_NAME` (ต้องขึ้นต้นด้วย `@` ล้วน ๆ ห้ามมี `#` นำหน้า) คั่นเป็นบล็อกต่อ phase เพื่อให้ทีมเนื้อหาแก้ได้โดยไม่แตะโค้ด — อ่านโดย `Scripts/MiniGame/phase_dialog_parser.gd` (`PhaseDialogParser.parse()`) คืนค่าเป็น `Dictionary[String, Array[DialogToken]]` เก็บไว้ใน `PartRam.dialog_dict`
+
+**ชื่อ header เป็นค่าคงที่รวมศูนย์:** `Scripts/MiniGame/minigame_header.gd` (`class_name MinigameHeader`, ไม่มี `extends`) เก็บ `const` string ของหัวข้อ `@SECTION` **ของทุก Core Part** ไว้ที่เดียว (เช่น `DIAGNOSIS_CORRECT`, `DIAGNOSIS_WRONG_SCREEN`, `CLEAN_S2_ERASER`, `SEAT_CPU_FORCED`, `XMP_FAILED` ฯลฯ) — กันพิมพ์ผิด header ตอนอ้างจาก `dialog_dict[MinigameHeader.XXX]` เทียบกับพิมพ์ string ตรง ๆ
+
+**Phase ไม่เรียก `pib.say()` เอง** — แต่ละ phase Control ประกาศ `signal pib_toggle(data: PibHint.Data)` แล้ว `PartRam._ready()` connect ทุก phase เข้ากับ handler กลางตัวเดียว:
+
+```gdscript
+# part_ram.gd
+func pib_toggle(data: PibHint.Data):
+    match data.type:
+        data.Act.SAY:
+            var lines = dialog_dict[data.header]
+            if lines != null:
+                pib.say(lines, data.mood)
+            else:
+                push_error("There is no header %s" % data.header)
+```
+
+phase เรียกใช้แค่ `pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_CORRECT))` — ไม่ต้องรู้จัก `pib`/`dialog_dict` โดยตรง ตัวอย่างจริงใน `phase_diagnosis.gd::_on_choice_select()`
 
 ### 8.4 การผูกกับระบบเดิม
 
@@ -330,10 +375,11 @@ func point_at(target: Node2D, line: String) -> void
             on_minigame_end.connect(data.set_done, CONNECT_ONE_SHOT)
 
 # มินิเกมจบแล้วเรียก EventManager.minigame_end() → set_done() ของ QuestStep นั้น → update_event() ไปยัง task ถัดไป
-# Global.in_minigame = false ถูกแก้แล้วใน minigame1.gd (ดู Docs/SYNC_REVIEW.md หัวข้อ 2.3 — ปิดแล้ว)
 ```
 
 > `trigger_step()`/`_process_data()` เป็น data-driven เต็มรูปแบบตามข้อเสนอ 4.1/4.2 แล้ว ไม่มี `match currentTask`/เลข task hardcode เหลืออยู่ — แต่ละ step บอกเองผ่าน `action`/`emitType`/`isDone` ว่าเมื่อไหร่ถึงจะ trigger step ถัดไปได้
+>
+> ⚠️ **สังเกต 25 ก.ย. 2569 — ยังไม่ยืนยันเป็นบั๊ก:** `_process_data()` set `Global.in_minigame = true` ตอนเปิดมินิเกม (บรรทัด `event_manager.gd:179`) แต่ `EventManager.minigame_end()` (บรรทัด `event_manager.gd:143`) ไม่มีจุดไหนสั่ง `= false` กลับ — ตอนแก้ `minigame1.gd` (BUG-04 เดิม) จะ set false เองใน `_on_return_pressed()` แต่ไฟล์นั้นถูกลบไปทั้งไฟล์ใน commit `29b706d` ตอน refactor เป็น `QuestStep`/`part_ram.gd` และ `part_ram.gd` ก็ไม่ได้ set กลับเช่นกัน (มีแค่ `find_item_minigame.gd` ที่ยัง set เอง) น่าจะต้องเพิ่ม `Global.in_minigame = false` ใน `EventManager.minigame_end()` ให้ตรงกับที่ SYNC_REVIEW เคยเสนอไว้ (รวมจุด set/clear ไว้ที่ `EventManager` ที่เดียว) — ยังไม่ได้ตรวจว่ากระทบอะไรจริงในเกม จึงไม่ฟันธงเป็นบั๊กในเอกสารนี้
 
 ---
 
@@ -432,6 +478,14 @@ func point_at(target: Node2D, line: String) -> void
 | 5    | Phase 2/3/5 (ถอด–ใส่)                                                                     | เล่นครบลูป                                |
 | 6    | Phase 6/7 + ระบบคะแนน                                                                     | จบเกมมีคะแนน                              |
 | 7    | แทน placeholder ด้วย asset จริง + เสียง                                                   | พร้อมโชว์                                 |
+
+**ความคืบหน้าจริง (25 ก.ย. 2569, commit `52715cd`):**
+
+- **ขั้น 1** ✅ ทำแล้ว (B1–B4 หมดสถานะ, D3–D5 ทำแล้ว — ดูหัวข้อ 2)
+- **ขั้น 2** ✅ `PibHint` ใช้งานได้จริงแล้ว — มี `DialogPanel` UI ให้คลิกไปทีละบรรทัด ไม่ใช่แค่ `print()` เหมือนตอนเสนอแรก (หัวข้อ 8.3)
+- **ขั้น 3** 🟡 ทำบางส่วน — มี state machine 8 phase + stub script ครบทั้ง 8 ไฟล์ใต้ `Scripts/MiniGame/part_ram/` (รวม `phase_clean.gd` ที่มีโครง `CleanStep`/`_build_tray()`/`_on_tool_used()` ตามหัวข้อ 14.7 แล้วแต่ตัวฟังก์ชันยังเป็น `pass`) **แต่มีแค่ `PhaseDiagnosis` เท่านั้นที่ถูกเพิ่มเป็น node จริงในซีน** — อีก 7 phase ยังกด "ถัดไป" ไล่ไม่ได้เพราะไม่มี node ให้ `_phase_nodes` ชี้ถึง
+- **ขั้น 4** 🟡 Phase 0 วินิจฉัยเล่นจบได้แล้ว — คลิกเบาะแสครบ 3 จุด → เลือกสาเหตุ → ตอบถูกให้ปิ๊บพูดจบก่อนค่อยข้าม phase (`_on_pib_hint_all_lines_finished`) ตรงตามกติกาหัวข้อ 4 **แต่** ข้อความเบาะแสยังเป็น placeholder ภาษาอังกฤษ ("Screen"/"Speaker"/"Case") ไม่ใช่บทปิ๊บภาษาไทยตามหัวข้อ 4.3 และยังไม่มีการนับจำนวนตอบผิด/ใบ้หลัง 3 ครั้งผิดตามหัวข้อ 4.2
+- **ขั้น 5–7** ⬜ ยังไม่เริ่ม
 
 ---
 
@@ -643,6 +697,7 @@ transparent background, <Base Style Prompt>
 
 | วันที่           | การเปลี่ยนแปลง                                                                                                                                                                                                                              |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 25 ก.ย. 2569     | commit `52715cd` — เขียนหัวข้อ 8 (สเปกโค้ด) ใหม่ให้ตรงกับโค้ดจริง: class `PartRam` (ไม่ใช่ `MiniGameRam`), ไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/` (`minigame1.gd` เดิมถูกลบทิ้งใน commit `29b706d`), `PibHint.say()` แสดง `DialogPanel` UI ให้คลิกไปทีละบรรทัดจริงแล้ว (ไม่ใช่แค่ `print()`), เพิ่มรูปแบบ `PibHint.Data`/`pib_toggle` signal ที่ phase ใช้เรียกปิ๊บผ่าน `part_ram.gd` กลาง และค่าคงที่ header รวมศูนย์ที่ `MinigameHeader` · ปิดสถานะ B2/B3 เป็น ✅, ทำเครื่องหมาย B4 ว่า "ไม่เกี่ยวแล้ว" (กลไกเดิมถูกแทนด้วยระบบเลือกอุปกรณ์หัวข้อ 14) · เพิ่มหัวข้อความคืบหน้าจริงในหัวข้อ 12 (มีแค่ Phase 0 วินิจฉัยที่ผูก node จริงในซีน) · ตั้งข้อสังเกต (ยังไม่ฟันธง) ว่า `Global.in_minigame` อาจไม่ถูก clear หลัง `EventManager.minigame_end()` อีกแล้วหลัง refactor |
 | 23 ก.ย. 2569     | commit `7c291e5` — อัปเดตหัวข้อ 8.4 ให้ตรงกับ `trigger_step()`/`_process_data()` แบบ data-driven ใหม่ (ไม่ match เลข task แล้ว ใช้ `QuestStep.action`/`emitType`/`isDone` แทน) และปิดหมายเหตุเก่าเรื่อง `Global.in_minigame` ค้าง (แก้แล้ว) |
 | 16 ก.ย. 2569 (2) | เพิ่มหัวข้อ 14 — ระบบเลือกอุปกรณ์ทำความสะอาด (3 ขั้นย่อย, อุปกรณ์ 10 ชิ้นพร้อมการ์ดคุณสมบัติ, ผลของการเลือกถูก/พอใช้/ห้ามใช้, สเปก `CleanTool` แบบ data-driven) และปรับตารางคะแนนให้มีหมวด "การเลือกอุปกรณ์"                                |
 | 16 ก.ย. 2569     | สร้างเอกสาร — ออกแบบมินิเกม 1 ใหม่เป็น 8 phase, เพิ่ม sub-minigame วินิจฉัยแบบสังเกตอาการ→เดาสาเหตุ, ถอด/ประกอบระดับกลาง (ปลดสลัก 2 ข้าง → ดึง → ขัด → เสียบกลับ), สเปก `PibHint` และรายการ asset/บั๊กที่ต้องแก้ก่อน                        |
