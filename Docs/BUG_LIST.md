@@ -1,6 +1,6 @@
 # BUG_LIST.md — รายการบั๊กทั้งหมดที่ตรวจพบ
 
-> ตรวจจากโค้ดจริงที่ commit `1c9040a` · อัปเดต 23 ก.ย. 2569 (audit หลัง commit `cd053b4`, ปิด BUG-18/BUG-24 จาก working-tree changes ที่ยังไม่ commit) · Godot 4.7
+> ตรวจจากโค้ดจริงที่ commit `4b84c10` · อัปเดต 27 ก.ย. 2569 (audit หลังทีมลง state machine 8 phase ของ Part RAM) · Godot 4.7
 > เอกสารคู่กัน: `Docs/SYNC_REVIEW.md` (รายละเอียดวิธีแก้) · `Docs/ASSET_TODO.md` (asset ที่ต้องทำ)
 > สถานะ: ✅ แก้แล้วในรีโป · 🔧 รอทำใน Godot · ⬜ ยังไม่แก้
 
@@ -10,10 +10,57 @@
 
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
-| 🔴 Critical | 10 | 0 | 2 | 12 |
-| 🟡 High | 9 | 0 | 2 | 11 |
-| 🟢 Low | 4 | 0 | 4 | 8 |
-| **รวม** | **23** | **0** | **8** | **31** |
+| 🔴 Critical | 10 | 0 | 3 | 13 |
+| 🟡 High | 9 | 0 | 3 | 12 |
+| 🟢 Low | 4 | 0 | 6 | 10 |
+| **รวม** | **23** | **0** | **12** | **35** |
+
+---
+
+## 🆕 ตรวจเพิ่ม 27 ก.ย. 2569 — หลังทีมลง state machine 8 phase ของ Part RAM (commit `4b84c10`)
+
+รอบนี้ทีมเขียนของใหม่มาเยอะมาก — `PibHint` · `PhaseDialogParser` · `part_ram.gd` state machine ครบ 8 phase · `phase_diagnosis.gd` ที่เล่นได้จริง · `CleanTool` resource · แปลงไฟล์บทปิ๊บทั้ง 5 ไฟล์เป็นฟอร์แมต `@SECTION` โครงถูกทางหมด ที่เจอด้านล่างเป็นงานที่ยังต่อไม่ครบ ไม่ใช่ออกแบบผิด
+
+### BUG-32 🔴 จบ Phase 0 แล้วจอว่าง — ลงทะเบียน phase node ไว้แค่ตัวเดียว
+
+| | |
+|---|---|
+| ไฟล์ | `Scripts/MiniGame/part_ram/part_ram.gd` บล็อก `_phase_nodes` |
+| อาการ | Phase 0 DIAGNOSIS เล่นได้ปกติ ตอบสาเหตุถูกแล้วหน้าจอว่างเปล่า เล่นต่อไม่ได้ ไม่มี error แดง |
+| สาเหตุ | `_phase_nodes` มีแค่ `Phase.DIAGNOSIS: $PhaseDiagnosis` อีก 7 บรรทัดยังคอมเมนต์อยู่ · `_advance_phase()` เรียก `_set_phase(BRIEFING)` ซึ่งซ่อน diagnosis ทิ้งก่อน แล้วเจอเงื่อนไข `current_phase >= _phase_nodes.size()` (1 >= 1) เป็นจริง จึง `return` ออกไปโดยไม่แสดงอะไรต่อ |
+| หมายเหตุ | โหนดทั้ง 8 มีครบแล้วใน `Scene/MiniGame/part_ram.tscn` (`PhaseBriefing` ถึง `PhaseSummary`) แค่ยังไม่ได้ลงทะเบียน และสคริปต์ยังเป็นสตับ 2 บรรทัด ยกเว้น `phase_clean.gd` ที่เขียนไป 39 บรรทัดแล้ว |
+| แก้ | uncomment ทั้ง 7 บรรทัดเมื่อแต่ละ phase พร้อม · และเลิกใช้ `_phase_nodes.size()` เป็นตัวเทียบกับค่า enum เพราะถ้าลงทะเบียนไม่ต่อเนื่องจะพังเงียบแบบเดียวกัน เปลี่ยนเป็น `if not _phase_nodes.has(current_phase): return` จะตรงความตั้งใจกว่า |
+
+### BUG-33 🟡 `pib_toggle()` อ่าน Dictionary ด้วยคีย์ที่อาจไม่มี
+
+| | |
+|---|---|
+| ไฟล์ | `Scripts/MiniGame/part_ram/part_ram.gd` ฟังก์ชัน `pib_toggle()` |
+| อาการ | ถ้าหัวข้อใน `MinigameHeader` ไม่ตรงกับ `@SECTION` ในไฟล์บท จะขึ้น error แดงตอนรัน |
+| สาเหตุ | `var lines = dialog_dict[data.header]` เข้าถึงคีย์ตรง ๆ Godot จะ push error ทันทีที่คีย์ไม่มี ก่อนจะไปถึงบรรทัด `if lines != null` ที่ตั้งใจดักไว้ |
+| แก้ | `if not dialog_dict.has(data.header): push_error(...); return` ก่อน หรือใช้ `dialog_dict.get(data.header)` |
+
+### BUG-34 🟢 ข้อความเควสต์ใน `main.tres` กลับไปเป็นภาษาอังกฤษ (ย้อนกลับของ BUG-13)
+
+`quest_text_th` ทั้ง 4 ขั้นเป็น `"Talk to gradma"` · `"go in to your room and inspect computer"` · `"find eraser"` · `"clean a ram"` — ตัวแรกสะกดผิดด้วย (`gradma`) เคยแก้เป็นไทยไปแล้วรอบหนึ่ง แล้วถูกเขียนทับตอน rebuild resource · ชื่อฟิลด์ลงท้าย `_th` แต่เนื้อหาเป็นอังกฤษ
+
+### BUG-35 🟢 `output.txt` ไฟล์ debug หลุดเข้ารีโป
+
+ไฟล์ 30 ไบต์ที่ root มีแค่คำว่า `Hello` 3 บรรทัด น่าจะมาจากการทดสอบ `gen_constant.py` · ลบทิ้งหรือใส่ `.gitignore`
+
+### ✅ ที่แก้ไปแล้วในรอบนี้ (จากฝั่งทีม)
+
+| เรื่อง | สถานะใหม่ |
+|---|---|
+| BUG-28 ถึง BUG-31 | ✅ ยืนยันซ้ำแล้วว่าแก้ครบทั้ง 4 จุด เควสต์หลักเดินได้ |
+| `PibHint` (ข้อเสนอใน `MINIGAME1_DESIGN.md` 8.3) | ✅ เขียนแล้ว 85 บรรทัด เป็น CanvasLayer แยกจาก `DialogScene` มี enum `Mood` 4 อารมณ์ |
+| บทปิ๊บใช้ไม่ได้เพราะ `_CharacterMap` | ✅ **หมดปัญหาสำหรับมินิเกม** — `PibHint` มีแผงบทของตัวเอง ไม่ผ่าน `_CharacterMap` แล้ว (แต่บท NPC อีก 10 ตัวยังติดปัญหาเดิมอยู่) |
+| parser หัวข้อ `@SECTION` | ✅ `Scripts/MiniGame/phase_dialog_parser.gd` 83 บรรทัด + แปลงไฟล์บททั้ง 5 ไฟล์แล้ว |
+| `CleanTool` resource (ข้อเสนอ 14.7) | ✅ สร้างแล้ว |
+
+### ⬜ ที่ยังค้างเหมือนเดิม
+
+BUG-14 · BUG-15 (ไม่มี Player) · BUG-16 · BUG-17 · BUG-21 ถึง BUG-23 · BUG-25 · `_CharacterMap` ยังมี 2 คน · ยังไม่มี Save System · ยังไม่มี Audio
 
 ---
 
@@ -251,3 +298,4 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 | 23 ก.ย. 2569 | commit `7c291e5` — ปิด BUG-28 ถึง BUG-31 (load/instantiate, QuestStep→String, main.tres 5 task, minigame_end/dialog_finish logic) ด้วยระบบ `isDone`/`EmitType` ต่อสัญญาณ `on_dialog_end`/`on_minigame_end`/`on_tutorial_finish` แบบ one-shot · ปิด BUG-20 (data-driven เต็มรูปแบบ) และ BUG-26 (`Event.reset()` + เรียกจาก `_ready()`) ไปด้วย |
 | 22 ก.ย. 2569 | ตรวจเพิ่มหลัง refactor QuestStep — พบบั๊กใหม่ 4 ข้อ (BUG-28 ถึง BUG-31) ที่ทำให้เกมเดินไม่ได้ · ปิด BUG-19 และ BUG-20 |
 | 21 ก.ย. 2569 | สร้างเอกสาร — รวมบั๊ก 27 รายการจากการไล่โค้ดทั้งโปรเจกต์ที่ commit `1c9040a` · แก้แล้ว 13 · รอทำใน Godot 2 · ยังไม่แก้ 12 |
+| 27 ก.ย. 2569 | เพิ่ม BUG-32 ถึง BUG-35 หลังทีมลง state machine 8 phase · ยืนยัน BUG-28 ถึง 31 แก้ครบ · รวมเป็น 35 รายการ |

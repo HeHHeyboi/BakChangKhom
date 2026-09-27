@@ -3,6 +3,9 @@
 > อัปเดต 21 ก.ย. 2569 · สเปกเต็มอยู่ใน `Docs/ASSET_GUIDE.md` · เอกสารนี้คือ **รายการสั่งงาน** เอาไว้ไล่ทำทีละชุด
 > ✅ = มีในรีโปแล้ว · ⬜ = ต้องทำใหม่
 
+> ⚠️ **ตรวจล่าสุด 24 ก.ย. 2569 — ดู `ASSET_STATUS.md` สำหรับสถานะจริง**
+> ชุด B และชุด E ทำครบแล้ว (29 ไฟล์) · เหลือขาด 118 ไฟล์ · มีอีก 7 ไฟล์ที่ขนาดถูกแต่เนื้อหาในภาพผิด
+
 ## กฎ 5 ข้อ (ย้ำก่อนเริ่ม)
 
 1. **จอเกม 1152 × 648** — ภาพเต็มจอต้องเป๊ะขนาดนี้
@@ -63,27 +66,27 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 | ⬜   | ไฟล์                      | subject prompt                                                   |
 | --- | ------------------------- | ---------------------------------------------------------------- |
 | ✅   | `ram_eraser.png`          | *(มีแล้ว — ยางลบสีขาว)*                                          |
-| ⬜   | `ram_tool_brush.png`      | soft anti-static cleaning brush with wooden handle, side view    |
-| ⬜   | `ram_tool_blower.png`     | rubber air blower bulb for electronics, nozzle pointing left     |
-| ⬜   | `ram_tool_cloth.png`      | folded blue microfiber cloth                                     |
-| ⬜   | `ram_tool_ipa_swab.png`   | small bottle labeled with a droplet icon + cotton swab beside it |
-| ⬜   | `ram_tool_eraser_red.png` | hard red-and-blue ink eraser                                     |
-| ⬜   | `ram_tool_sandpaper.png`  | folded sheet of sandpaper, rough texture                         |
-| ⬜   | `ram_tool_wet_cloth.png`  | dripping wet cloth with water droplets falling                   |
-| ⬜   | `ram_tool_hairdryer.png`  | cartoon hair dryer with heat waves                               |
-| ⬜   | `ram_tool_vacuum.png`     | small household vacuum nozzle with static sparks                 |
+| ✅   | `ram_tool_brush.png`      | soft anti-static cleaning brush with wooden handle, side view    |
+| ✅   | `ram_tool_blower.png`     | rubber air blower bulb for electronics, nozzle pointing left     |
+| ✅   | `ram_tool_cloth.png`      | folded blue microfiber cloth                                     |
+| ✅   | `ram_tool_ipa_swab.png`   | small bottle labeled with a droplet icon + cotton swab beside it |
+| ✅   | `ram_tool_eraser_red.png` | hard red-and-blue ink eraser                                     |
+| ✅   | `ram_tool_sandpaper.png`  | folded sheet of sandpaper, rough texture                         |
+| ✅   | `ram_tool_wet_cloth.png`  | dripping wet cloth with water droplets falling                   |
+| ✅   | `ram_tool_hairdryer.png`  | cartoon hair dryer with heat waves                               |
+| ✅   | `ram_tool_vacuum.png`     | small household vacuum nozzle with static sparks                 |
 
 **ของประกอบระบบเลือกอุปกรณ์**
 
 | ⬜   | ไฟล์                                           | ขนาด      | เนื้อหา                                                        |
 | --- | ---------------------------------------------- | --------- | -------------------------------------------------------------- |
-| ⬜   | `ram_tray.png`                                 | 900 × 220 | ถาด/โต๊ะไม้วางเครื่องมือ มองจากด้านหน้า                        |
-| ⬜   | `ui_tool_card.png`                             | 320 × 200 | กรอบการ์ดกระดาษสำหรับโชว์คุณสมบัติ (ว่างเปล่า ไม่มีตัวหนังสือ) |
-| ⬜   | `ui_meter_pip_on.png` / `ui_meter_pip_off.png` | 24 × 24   | จุดวัดระดับความแข็ง ▮ / ▯                                      |
-| ⬜   | `ram_icon_moisture.png`                        | 48 × 48   | ไอคอนหยดน้ำ                                                    |
-| ⬜   | `ram_icon_esd.png`                             | 48 × 48   | ไอคอนสายฟ้าไฟฟ้าสถิต                                           |
-| ⬜   | `ram_icon_residue.png`                         | 48 × 48   | ไอคอนเศษผงร่วง                                                 |
-| ⬜   | `ram_icon_narrow.png`                          | 48 × 48   | ไอคอนช่องแคบ/ซอก                                               |
+| ✅   | `ram_tray.png`                                 | 900 × 220 | ถาด/โต๊ะไม้วางเครื่องมือ มองจากด้านหน้า                        |
+| ✅   | `ui_tool_card.png`                             | 320 × 200 | กรอบการ์ดกระดาษสำหรับโชว์คุณสมบัติ (ว่างเปล่า ไม่มีตัวหนังสือ) |
+| ✅   | `ui_meter_pip_on.png` / `ui_meter_pip_off.png` | 24 × 24   | จุดวัดระดับความแข็ง ▮ / ▯                                      |
+| ✅   | `ram_icon_moisture.png`                        | 48 × 48   | ไอคอนหยดน้ำ                                                    |
+| ✅   | `ram_icon_esd.png`                             | 48 × 48   | ไอคอนสายฟ้าไฟฟ้าสถิต                                           |
+| ✅   | `ram_icon_residue.png`                         | 48 × 48   | ไอคอนเศษผงร่วง                                                 |
+| ✅   | `ram_icon_narrow.png`                          | 48 × 48   | ไอคอนช่องแคบ/ซอก                                               |
 
 ---
 
@@ -187,17 +190,17 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 | ⬜   | ไฟล์                        | subject prompt                                                                               |
 | --- | --------------------------- | -------------------------------------------------------------------------------------------- |
 | ✅   | ไขควงแฉก                    | *(ใช้ `PartMainboard/mb_screwdriver.png` ได้)*                                               |
-| ⬜   | `tool_screwdriver_flat.png` | flathead screwdriver, side view                                                              |
-| ⬜   | `tool_hex_driver.png`       | hex nut driver with 5mm socket                                                               |
-| ⬜   | `tool_pliers.png`           | needle-nose pliers                                                                           |
-| ⬜   | `tool_esd_strap.png`        | anti-static wrist strap with coiled cord                                                     |
-| ⬜   | `tool_esd_mat.png`          | grey anti-static mat, top view                                                               |
-| ⬜   | `tool_flashlight.png`       | small desk flashlight with light beam                                                        |
-| ⬜   | `tool_multimeter.png`       | cartoon multimeter with two probes                                                           |
-| ⬜   | `tool_psu_tester.png`       | small PSU tester box with connectors                                                         |
-| ⬜   | `tool_usb_installer.png`    | USB flash drive with a small OS disc icon                                                    |
-| ⬜   | `tool_thermal_paste.png`    | thermal paste tube *(มี `mb_thermal_tube.png` 200×90 แล้ว ทำใหม่ให้เป็น 200×200 ให้เข้าชุด)* |
-| ⬜   | `tool_cable_tie.png`        | bundle of zip ties *(มี `gpu_cable_tie.png` 120×60 แล้ว ทำใหม่ให้เข้าชุด)*                   |
+| ✅   | `tool_screwdriver_flat.png` | flathead screwdriver, side view                                                              |
+| ✅   | `tool_hex_driver.png`       | hex nut driver with 5mm socket                                                               |
+| ✅   | `tool_pliers.png`           | needle-nose pliers                                                                           |
+| ✅   | `tool_esd_strap.png`        | anti-static wrist strap with coiled cord                                                     |
+| ✅   | `tool_esd_mat.png`          | grey anti-static mat, top view                                                               |
+| ✅   | `tool_flashlight.png`       | small desk flashlight with light beam                                                        |
+| ✅   | `tool_multimeter.png`       | cartoon multimeter with two probes                                                           |
+| ✅   | `tool_psu_tester.png`       | small PSU tester box with connectors                                                         |
+| ✅   | `tool_usb_installer.png`    | USB flash drive with a small OS disc icon                                                    |
+| ✅   | `tool_thermal_paste.png`    | thermal paste tube *(มี `mb_thermal_tube.png` 200×90 แล้ว ทำใหม่ให้เป็น 200×200 ให้เข้าชุด)* |
+| ✅   | `tool_cable_tie.png`        | bundle of zip ties *(มี `gpu_cable_tie.png` 120×60 แล้ว ทำใหม่ให้เข้าชุด)*                   |
 
 ---
 
@@ -301,19 +304,20 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 | ชุด                               | จำนวน        | สถานะ                         |
 | --------------------------------- | ------------ | ----------------------------- |
 | A · Tutorial slides               | 7            | 🔴 ทำก่อน                     |
-| B · เครื่องมือทำความสะอาด + การ์ด | 17           | 🔴                            |
+| B · เครื่องมือทำความสะอาด + การ์ด | 17           | ✅ ครบแล้ว (6 ไฟล์เนื้อหาผิด) |
 | C · มินิเกม Part RAM 8 phase      | 21           | 🟡                            |
 | D · Scene ลูปงานซ่อม              | 23           | 🟡                            |
-| E · เครื่องมือที่เหลือ            | 11           | 🟡                            |
+| E · เครื่องมือที่เหลือ            | 11           | ✅ ครบแล้ว (1 ไฟล์เนื้อหาผิด) |
 | F · UI ที่เหลือ                   | 14           | 🟢                            |
 | G · เติมช่องว่าง Part อื่น        | 3            | 🟢                            |
 | H · Ending                        | 3            | 🟢                            |
 | I · Audio                         | 19           | 🟢 (ต้องมี AudioManager ก่อน) |
 | J · Core Part อีก 4 ตัว           | 35           | 🟡                            |
-| **รวม**                           | **153 ไฟล์** |                               |
+| **รวม**                           | **153 ไฟล์** | เหลือขาดจริง **118 ไฟล์**     |
 
 ## ประวัติเอกสาร
 
 | วันที่       | การเปลี่ยนแปลง                                                                                                                 |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | 21 ก.ย. 2569 | สร้างเอกสาร — เช็กลิสต์ asset 118 ไฟล์ที่ยังขาด แยกเป็น 9 ชุดตามลำดับที่ควรทำ พร้อม subject prompt และงานจัดระเบียบ asset เดิม |
+| 24 ก.ย. 2569 | ติ๊ก ✅ ชุด B และชุด E ที่ทำเสร็จแล้ว 29 ไฟล์ · แยกผลตรวจไฟล์จริงไปไว้ที่ `ASSET_STATUS.md` |

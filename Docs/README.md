@@ -8,6 +8,7 @@
 |---|---|
 | `REPAIR_FLOW.md` | **เริ่มอ่านที่นี่** — ลูปงานซ่อม 5 scene (ShopCounter → Workbench → PartView → Reassemble → Handover), Part 13 ชิ้น, เครื่องมือ 21 ชิ้น, สเปก Resource/Manager/Scene |
 | `ASSET_GUIDE.md` | คู่มือสร้าง asset — ขนาด/ฟอร์แมต/ชื่อไฟล์/prompt/pipeline + inventory ปัจจุบัน |
+| `ASSET_STATUS.md` | **ผลตรวจไฟล์จริงในโฟลเดอร์** เทียบกับเช็กลิสต์ — เพิ่มไปแล้วกี่ไฟล์ เหลืออะไร ไฟล์ไหนมีแล้วแต่ใช้ไม่ได้ |
 | `ASSET_TODO.md` | เช็กลิสต์ asset ที่ต้องทำ เรียงตามลำดับ |
 | `DIAGRAMS.md` + `Diagrams/` | ไดอะแกรม 9 ภาพสำหรับเล่มรายงาน (PNG 300 dpi + SVG) พร้อมคำบรรยายใต้ภาพ |
 | `UI_MOCKUP.md` + `Mockups/` | mockup 4 หน้าจอประกอบจาก asset จริง — ตารางตำแหน่ง x/y/w/h ทุกช่อง + สรุป asset ที่ยังขาด 23 ไฟล์ |
