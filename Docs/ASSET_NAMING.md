@@ -110,7 +110,7 @@
 | `mb_paste_dot_large.png` | 200×200 | 🔴 ยังไม่มี | Part Mainboard |
 | `mb_heatsink_dusty.png` | = mb_cooler.png | 🔴 ยังไม่มี | Part Mainboard |
 | `mb_pins_bent.png` | = mb_socket_open.png | 🔴 ยังไม่มี | Part Mainboard |
-| `mb_temp_gauge.png` | 300×300 | 🔴 ยังไม่มี | Part Mainboard |
+| `mb_temp_gauge.png` | 400×400 | 🔴 ยังไม่มี | Part Mainboard |
 
 ## `Assets/MiniGame/PartGpu/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
@@ -123,20 +123,20 @@
 ## `Assets/MiniGame/PartFrontPanel/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
 |---|---|---|---|
-| `fp_pin_header_zoom.png` | 600×400 | 🔴 ยังไม่มี | Part Front Panel |
-| `fp_pin_label_overlay.png` | 600×400 | 🔴 ยังไม่มี | Part Front Panel |
-| `fp_flashlight_beam.png` | 400×400 | 🔴 ยังไม่มี | Part Front Panel |
+| `fp_pin_header_zoom.png` | 700×420 | 🔴 ยังไม่มี | Part Front Panel |
+| `fp_pin_label_overlay.png` | 700×420 | 🔴 ยังไม่มี | Part Front Panel |
+| `fp_flashlight_beam.png` | 500×500 | 🔴 ยังไม่มี | Part Front Panel |
 
 ## `Assets/MiniGame/PartBios/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
 |---|---|---|---|
 | `bios_bottleneck_chart.png` | 600×400 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_hdd.png` | 120×120 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_ssd.png` | 120×120 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_usb.png` | 120×120 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_save.png` | 200×64 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_discard.png` | 200×64 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_default.png` | 200×64 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_drive_hdd.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_drive_ssd.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_drive_usb.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_btn_save.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_btn_discard.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_btn_default.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
 | `bios_windows_desktop.png` | 1152×648 | 🔴 ยังไม่มี | Part BIOS |
 
 ## `Assets/UI/`
@@ -198,6 +198,17 @@
 | `end_back_city.jpg` | 1152×648 | 🔴 ยังไม่มี | ฉากจบ 3 แบบ |
 | `end_expand_shop.jpg` | 1152×648 | 🔴 ยังไม่มี | ฉากจบ 3 แบบ |
 
+## ไฟล์ที่มีในโฟลเดอร์แต่ยังไม่อยู่ในตารางนี้
+
+ตรวจ 28 ก.ย. 2569 — 11 ไฟล์ต่อไปนี้มีอยู่จริงแต่ยังไม่ถูกพูดถึงในเอกสารไหนเลย ต้องตัดสินใจว่าเก็บหรือลบ
+
+| ไฟล์ | สถานะที่ควรเป็น |
+|---|---|
+| `CharacterSprite/char_khom_happy.png` · `char_khom_worry.png` · `char_min_happy.png` | เก็บ — เป็นอารมณ์เพิ่มของตัวละครที่มีอยู่แล้ว ใส่ใน `_CharacterMap` ตอนผูกตัวละคร |
+| `MiniGame/PartBios/bios_xmp_toggle_on.png` · `bios_xmp_toggle_off.png` | เก็บ — ใช้ใน Part BIOS Phase 4 (ชื่อถูกกฎแล้ว) |
+| `SpriteSheets/Frames/char_khom_walk_01..04.png` | เก็บ — เฟรมที่ตัดจาก `char_khom_walk_sheet.png` แล้ว |
+| `Tutorial/BasicStart/Tutorial สอนเล่น.png` · `Tutorial/RamCleaning/Tutorial ขัดแรม.png` | **ลบ** — ชื่อภาษาไทย ผิดกฎ · แทนด้วยชุด `tut_start_01..03` / `tut_ram_01..04` ตามตารางด้านบน |
+
 ## สรุป
 
 | | จำนวน |
@@ -215,3 +226,4 @@
 |---|---|
 | 28 ก.ย. 2569 | สร้างเอกสาร — รวมชื่อไฟล์จากทุก MD ให้เป็นรายการเดียว ตรวจกับไฟล์จริง และแยกขนาด canvas ออกจากขนาดตอนวางในฉาก |
 | 28 ก.ย. 2569 | เปลี่ยน asset ตัวใหม่ 23 ไฟล์ที่ crop ใหม่จาก sheet ต้นฉบับ (PartCommon 11 · PartRam 12) ทุกไฟล์ที่เคยเป็น 🟠 กลายเป็น ✅ แล้ว |
+| 28 ก.ย. 2569 (ครั้งที่ 2) | ปรับขนาด 10 ไฟล์ของ Part BIOS / Front Panel / Mainboard ให้ตรงกับเอกสารดีไซน์ของแต่ละ Part (เดิมผมกรอกเดาไว้) · เพิ่มรายการไฟล์ที่มีอยู่แต่ยังไม่อยู่ในเอกสาร 11 ไฟล์ |

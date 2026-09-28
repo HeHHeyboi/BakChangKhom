@@ -1,117 +1,64 @@
 # ASSET_STATUS.md — ผลตรวจ asset จริงในโฟลเดอร์
+> ตรวจ 29 ก.ย. 2569 · commit `47fbfd7` · สแกนไฟล์จริงเทียบ `ASSET_NAMING.md`
+> เอกสารคู่กัน: `ASSET_NAMING.md` (ชื่อ+ขนาดฉบับอ้างอิง) · `ASSET_RENAME.md` (ไฟล์ที่ชื่อยังไม่ตรงกฎ) · `ASSET_TODO.md` (เช็กลิสต์งาน)
 
-> ตรวจ 24 ก.ย. 2569 · สแกนไฟล์จริงใน `Assets/` แล้วเทียบกับเช็กลิสต์ใน `ASSET_TODO.md` (ซึ่งอัปเดตล่าสุด 21 ก.ย.)
-> เอกสารนี้ตอบคำถามเดียว — **ตั้งแต่ตั้งเช็กลิสต์มา เพิ่มอะไรไปแล้ว และเหลืออะไร**
-
-## สรุป 30 วินาที
+## สรุป
 
 | | จำนวน |
 |---|---|
-| ✅ เพิ่มเข้ามาใหม่ตั้งแต่ 21 ก.ย. | **29 ไฟล์** (ชุด B + ชุด E ครบทั้งชุด) |
-| 🔴 ยังขาดตามเช็กลิสต์ | **118 ไฟล์** |
-| 🟠 มีไฟล์แล้วแต่ยังใช้ไม่ได้ | **7 ไฟล์** (เนื้อหาผิด/crop เพี้ยน) |
-| 🟠 มีไฟล์แต่ต้องแก้ก่อนใช้ | พื้นหลังผิดขนาด 6 · ไฟล์ใหญ่เกิน 4 · ตัวละครยังไม่ผูก |
+| ✅ มีไฟล์จริงและขนาดตรงสเปกทุกไฟล์ | **43** |
+| 🔴 ยังไม่มี | **99** |
+| 🟠 มีไฟล์แต่ภาพในไฟล์ผิด | **0** (เดิม 7 · แก้ครบแล้วใน commit `fc660aa`) |
+| 🟡 ชื่อไม่ตรงกฎ ต้องเปลี่ยน | **38** — ดู `ASSET_RENAME.md` |
 
----
+## ✅ ที่ทำเสร็จแล้ว
 
-## ✅ เพิ่มเข้ามาแล้ว — 29 ไฟล์ (เช็กลิสต์ยังขึ้น ⬜ อยู่ ต้องติ๊กให้)
+* **ชุดเครื่องมือครบทั้งสองชุด** — `PartCommon/tool_*` 11 ไฟล์ · `PartRam/ram_tool_*` 10 ไฟล์ ขนาด 200×200 ตรงสเปกทุกไฟล์
+* **ถาดและการ์ดคุณสมบัติ** — `ram_tray` 580×320 · `ui_tool_card` 290×380 · `ui_meter_pip_on/off` 24×24 · `ram_icon_*` 4 ไฟล์ 48×48
+* **แรม 3 สถานะ** 600×214 เท่ากันทุกใบ · **กล่องค้นหา** 2 state 256×256
+* **UI พื้นฐาน 9 ไฟล์** — ปุ่ม 4 state · dialog box · name plate · quest panel · time panel · marker
+* **crop รอบใหม่แก้ปัญหากริดเลื่อน** — ของเดิมใน `PartCommon` ผิดเกือบทั้งชุด (คีมเป็นเศษ 2 ชิ้นปนกัน · มัลติมิเตอร์โดนตัด · USB เป็นแผ่นรอง ESD) ตอนนี้ถูกทุกชิ้น
 
-### ชุด B · เครื่องมือทำความสะอาด + การ์ด — **ครบ 18/18**
+## 🔴 ยังขาด 99 ไฟล์
 
-`Assets/MiniGame/PartRam/`
+| กลุ่ม | ขาด | ไฟล์ |
+|---|---|---|
+| UI ที่ต้องทำ | 18 | `ui_icon_morning.png` · `ui_icon_noon.png` · `ui_icon_evening.png` · `ui_icon_coin.png` · `ui_icon_xp.png` · `ui_rank_1.png` · … อีก 12 |
+| UI ลูปงานซ่อม S1-S5 | 15 | `ui_clue_notebook.png` · `ui_clue_slot_empty.png` · `ui_clue_slot_filled.png` · `ui_patience_pip_on.png` · `ui_patience_pip_off.png` · `ui_topic_btn_normal.png` · … อีก 9 |
+| S2 Workbench + Normal Part | 12 | `wb_case_closed.png` · `wb_case_open.png` · `wb_parts_tray.png` · `wb_screw_cup.png` · `part_side_panel.png` · `part_psu.png` · … อีก 6 |
+| Part Mainboard | 8 | `mb_mainboard_ghost.png` · `mb_cpu_wrong.png` · `mb_paste_dot_small.png` · `mb_paste_dot_ok.png` · `mb_paste_dot_large.png` · `mb_heatsink_dusty.png` · … อีก 2 |
+| Part BIOS | 8 | `bios_bottleneck_chart.png` · `bios_drive_hdd.png` · `bios_drive_ssd.png` · `bios_drive_usb.png` · `bios_btn_save.png` · `bios_btn_discard.png` · … อีก 2 |
+| Phase 2-3 ตัดไฟและถอด | 7 | `ram_btn_shutdown.png` · `ram_plug_in.png` · `ram_plug_out.png` · `ram_hand_touch_case.png` · `ram_slot_empty.png` · `ram_clip_closed.png` · … อีก 1 |
+| Phase 0 วินิจฉัย | 6 | `ram_pc_front.png` · `ram_screen_glitch.png` · `ram_screen_normal.png` · `ram_speaker_icon.png` · `ram_case_dusty.png` · `ram_clue_card.png` |
+| สไลด์สอนขัดแรม | 4 | `tut_ram_01.png` · `tut_ram_02.png` · `tut_ram_03.png` · `tut_ram_04.png` |
+| Part GPU | 4 | `gpu_cable_cpu8.png` · `gpu_connector_zoom.png` · `gpu_card_dusty.png` · `gpu_burn.png` |
+| สไลด์สอนเล่นพื้นฐาน | 3 | `tut_start_01.png` · `tut_start_02.png` · `tut_start_03.png` |
+| Phase 1 ภาพประกอบตอนปิ๊บสอน | 3 | `ram_diagram_ram_role.png` · `ram_diagram_gold_contact.png` · `ram_diagram_dust_block.png` |
+| Phase 5-6 ใส่กลับและเอฟเฟกต์ | 3 | `ram_ghost.png` · `ram_dust_particle.png` · `ram_spark.png` |
+| Part Front Panel | 3 | `fp_pin_header_zoom.png` · `fp_pin_label_overlay.png` · `fp_flashlight_beam.png` |
+| ฉากจบ 3 แบบ | 3 | `end_stay_village.jpg` · `end_back_city.jpg` · `end_expand_shop.jpg` |
+| พื้นหลัง scene ใหม่ | 2 | `bg_shop_counter.jpg` · `bg_workbench.jpg` |
 
-เครื่องมือ 10 ชิ้น ขนาด 200×200 ครบทุกไฟล์ — `ram_eraser` · `ram_tool_brush` · `ram_tool_blower` · `ram_tool_cloth` · `ram_tool_ipa_swab` · `ram_tool_eraser_red` · `ram_tool_sandpaper` · `ram_tool_wet_cloth` · `ram_tool_hairdryer` · `ram_tool_vacuum`
+⚡ **ทำ 5 ไฟล์นี้ก่อน** เพื่อให้เล่นจบลูปได้ 1 รอบ — `ui_star_full` · `ui_star_empty` · `ui_icon_coin` · `ui_icon_xp` · `ui_btn_close`
 
-ของประกอบ 8 ไฟล์ ขนาดตรงสเปกทุกตัว — `ram_tray` (900×220) · `ui_tool_card` (320×200) · `ui_meter_pip_on/off` (24×24) · `ram_icon_moisture` · `ram_icon_esd` · `ram_icon_residue` · `ram_icon_narrow` (48×48)
+## 🟠 งานที่ไม่ต้องวาดใหม่ แต่ต้องทำ
 
-> ⚠️ ขนาดถูกหมด แต่ **เนื้อหาในภาพ 6 จาก 8 ไฟล์ยังใช้ไม่ได้** — ดูหัวข้อ 🟠 ด้านล่าง
-
-### ชุด E · เครื่องมือ ToolBelt — **ครบ 11/11**
-
-`Assets/MiniGame/PartCommon/` · ขนาด 200×200 ตรงสเปกทุกไฟล์
-
-`tool_screwdriver_flat` · `tool_hex_driver` · `tool_pliers` · `tool_esd_strap` · `tool_esd_mat` · `tool_flashlight` · `tool_multimeter` · `tool_psu_tester` · `tool_usb_installer` · `tool_thermal_paste` · `tool_cable_tie`
-
----
-
-## 🔴 ยังขาด 118 ไฟล์ — แยกตามชุด
-
-| ชุด | ขาด | สถานะ | หมายเหตุ |
-|---|---|---|---|
-| A · Tutorial slides | **7 / 7** | 🔴 ยังไม่เริ่ม | ของเดิม 2 ไฟล์ยังเป็นชื่อไทย `Tutorial สอนเล่น.png` · `Tutorial ขัดแรม.png` ต้องทำใหม่ทับ |
-| C · Part RAM 8 phase | **21 / 21** | 🔴 ยังไม่เริ่ม | บล็อกมินิเกม RAM เต็มรูปแบบ — Phase 0 วินิจฉัย 6 ไฟล์ · ภาพสอน 3 · ตัดไฟ/ถอด 7 · ใส่กลับ/สรุป 5 |
-| D · Scene ลูปงานซ่อม | **29 / 29** | 🔴 ยังไม่เริ่ม | รวม `bg_shop_counter.jpg` · `bg_workbench.jpg` · Normal Part 8 ชิ้น · UI เคาน์เตอร์/โต๊ะซ่อม |
-| F · UI ที่เหลือ | **16 / 16** | 🔴 ยังไม่เริ่ม | ไอคอนเวลา 3 · coin · xp · rank 5 · ปุ่ม close/next/prev/map · marker 2 state |
-| G · เติมช่องว่าง Part อื่น | **3 / 3** | 🟡 | `mb_mainboard_ghost` · `mb_cpu_wrong` · `bios_bottleneck_chart` |
-| H · Ending | **3 / 3** | 🟢 ยังไม่ถึงคิว | 1152×648 JPG |
-| I · Audio | **19 / 19** | 🟢 รอโค้ด | ต้องมี autoload `AudioManager` + bus ก่อน ไม่งั้นใส่ไฟล์ไปก็ใช้ไม่ได้ |
-| J · Core Part อีก 4 ตัว | **20 / 20** | 🟡 | Mainboard 6 · GPU 4 · Front Panel 3 · BIOS 7 |
-
-### ลำดับที่แนะนำ (เรียงตามว่าอะไรบล็อกอะไร)
-
-1. **ชุด F เฉพาะ 5 ไฟล์หน้าสรุป** — `ui_star_full` · `ui_star_empty` · `ui_icon_coin` · `ui_icon_xp` · `ui_btn_close` → ปลดล็อกให้เล่นจบลูปได้ 1 รอบ
-2. **ซ่อม 7 ไฟล์ 🟠 ด้านล่าง** — ไม่ต้อง gen ใหม่ทั้งชุด แค่ crop ใหม่จาก sheet ต้นฉบับ
-3. **ชุด A (7 ไฟล์)** — tutorial ขาด 5 จาก 7 state อยู่แล้วในโค้ด
-4. **ชุด C** — ทำให้มินิเกม RAM ครบ 8 phase เป็นต้นแบบก่อนขยาย Part อื่น
-5. ชุด D → J
-
----
-
-## 🟠 มีไฟล์แล้วแต่ใช้ไม่ได้ — 7 ไฟล์
-
-ตรวจด้วยการวิเคราะห์ชั้น alpha + ดูภาพจริง ทุกไฟล์ **ขนาด canvas ถูกต้อง** ปัญหาอยู่ที่เนื้อหาในภาพ
-
-| ไฟล์ | ควรเป็น | ที่ได้จริง | ต้องทำ |
-|---|---|---|---|
-| `PartRam/ram_tray.png` | ถาดไม้วางเครื่องมือเต็มใบ | ถาดถูกตัดครึ่ง เห็นแค่ขอบบน วัตถุทะลุขอบขวา-ล่าง | crop ใหม่จาก sheet |
-| `PartRam/ui_tool_card.png` | กรอบการ์ดกระดาษเปล่า | **เป็นภาพถาดไม้ ซ้ำกับ `ram_tray`** | gen ใหม่ |
-| `PartRam/ram_icon_narrow.png` | ไอคอนช่องแคบ/ซอก | เศษผง + แท่งอะไรบางอย่างปนกัน (crop คร่อม 2 ช่องใน sheet) | crop ใหม่ |
-| `PartRam/ram_icon_residue.png` | ไอคอนเศษผงร่วง | สายฟ้า ESD + เศษผงปนกัน (crop คร่อมช่อง) | crop ใหม่ |
-| `PartRam/ui_meter_pip_on.png` | จุดวัดระดับ ▮ ทึบ | สี่เหลี่ยมกรอบจาง แยกจาก off ไม่ออก | gen ใหม่ทั้งคู่ |
-| `PartRam/ui_meter_pip_off.png` | จุดวัดระดับ ▯ โปร่ง | เหมือนกับ on | gen ใหม่ทั้งคู่ |
-| `PartCommon/tool_esd_strap.png` | สายรัดข้อมือกันไฟฟ้าสถิต | **เป็นรูปคีมปากแหลม ซ้ำกับ `tool_pliers`** | gen ใหม่ |
-
-> ต้นเหตุร่วม: ตอน crop จาก sprite sheet กริดเลื่อนไปประมาณครึ่งช่อง ทำให้บางไฟล์ได้ภาพของช่องข้าง ๆ มาแทน
-> **ถ้าเอาไฟล์ sheet ต้นฉบับใส่เข้า repo จะ crop ใหม่ให้อัตโนมัติได้ทั้งชุด**
-
-### ไฟล์ที่ชื่อยังไม่ตรงกับภาพ (ตรวจซ้ำแล้วยังเป็นอยู่)
-
-`tool_esd_strap` (เป็นคีม) · `tool_usb_installer` · `tool_hex_driver` · `ram_tool_vacuum` — ตัดสินใจว่าจะแก้ภาพให้ตรงชื่อ หรือเปลี่ยนชื่อให้ตรงภาพ ก่อนเอาไปผูกใน `ToolDef`
-
----
-
-## 🟠 งานจัดระเบียบที่ยังค้าง (ไม่ต้อง gen ใหม่)
-
-### พื้นหลังผิดขนาด 6 ไฟล์ — จอเกมคือ 1152 × 648
-
-| ไฟล์ | ขนาดจริง |
+| งาน | รายละเอียด |
 |---|---|
-| `RoomBG.jpg` · `HomeBG.jpg` · `Market.jpg` · `Chapter2_bg.jpg` | 1920 × 1080 |
-| `stargBG.jpg` | 2048 × 1448 |
-| `Office.png` | 740 × 555 (เล็กกว่าจอ จะถูกยืดเบลอ) |
+| **`speaker.png` ผิดทั้งชื่อและขนาด** | ไฟล์ใหม่จากทีม ขนาด 1024×1024 · ต้องเปลี่ยนชื่อเป็น `ram_speaker_icon.png` และย่อเป็น 120×120 · อ้างอยู่ที่ `Scene/MiniGame/part_ram.tscn` |
+| **เปลี่ยนชื่อไฟล์ 38 ไฟล์** | 22 ไฟล์มีโค้ดอ้างอยู่ ต้องเปลี่ยนในหน้า FileSystem ของ Godot · 16 ไฟล์เปลี่ยนได้เลย — ดู `ASSET_RENAME.md` |
+| **ผูกตัวละครเข้า `_CharacterMap`** | `Scene/Global.tscn` มีแค่ `"ขม"` กับ `"ยาย"` · sprite มี 23 ไฟล์ 13 ตัวละคร |
+| **ย่อพื้นหลัง 6 ไฟล์** | `RoomBG` `HomeBG` `Market` `Chapter2_bg` (1920×1080) · `stargBG` (2048×1448) · `Office.png` (740×555 เล็กกว่าจอ) |
+| **บีบไฟล์ใหญ่ 4 ไฟล์** | `mb_mainboard` 1.4 MB · `mb_case_open` 1.35 MB · `gpu_cable_messy` 1.1 MB · `gpu_cable_tidy` 866 KB |
+| **สไลด์ tutorial ชื่อภาษาไทย 2 ไฟล์** | `Tutorial สอนเล่น.png` · `Tutorial ขัดแรม.png` · **ห้ามลบเฉย ๆ** เพราะ `Resources/tutorial1.tres` กับ `ram_cleaning.tres` อ้างอยู่ ต้องทำชุด `tut_*` มาแทนแล้วแก้ `.tres` ก่อน |
 
-> พื้นหลังอีก 14 ไฟล์ขนาด 1152 × 648 ถูกต้องแล้ว
+## ไฟล์ที่ไม่มีโค้ดอ้างและไม่อยู่ในเอกสาร
 
-### ไฟล์ใหญ่เกินงบ 4 ไฟล์
-
-`mb_mainboard.png` 1.4 MB · `mb_case_open.png` 1.35 MB · `gpu_cable_messy.png` 1.1 MB · `gpu_cable_tidy.png` 866 KB
-
-### asset ชุดเก่าที่ยังไม่ได้ลบ
-
-`MiniGame/ram.png` · `ramDirty.png` · `ramSligtDirty.png` (สะกดผิด) · `eraser.png` · `box.png` · `box_on_hover.png` · `caution.png` · `cautionHover.png` · `cautionPress.png` — ตัวใหม่ย้ายไป `PartRam/` และ `UI/` หมดแล้ว รอเปลี่ยนโค้ดให้ชี้ตัวใหม่ก่อนถึงลบได้
-
-### ตัวละคร — sprite ครบแต่ยังผูกไม่ครบ
-
-`Scene/Global.tscn` มี `_CharacterMap` แค่ 2 คน (`"ขม"` · `"ยาย"`) แต่ `Assets/CharacterSprite/` มี sprite **23 ไฟล์ / 13 ตัวละคร**
-
-🔴 **บทพูดที่เขียนไว้เรียกใช้ `"ปิ๊บ"` ซึ่งยังไม่มีใน map** → บทปิ๊บทั้ง 6 ไฟล์ (219 บรรทัด) ใช้ไม่ได้เลยจนกว่าจะเพิ่ม เป็นงานโค้ดไม่กี่นาทีแต่บล็อกทั้งมินิเกม
-
-ตัวละครที่มี sprite แล้วแต่ยังไม่ผูก: `ปิ๊บ` (5 อารมณ์) · `มิน` (2) · `อำนวย` · `ผู้ใหญ่บ้าน` · `ครู` · `ผอ.` · `เพื่อนร่วมงาน` · `เจ้านาย` · `เด็ก` · `เด็กหญิง`
-
----
+ดูรายการ 11 ไฟล์พร้อมคำตัดสินในหัวข้อท้ายของ `ASSET_NAMING.md`
 
 ## ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
-| 24 ก.ย. 2569 | สร้างเอกสาร — สแกนไฟล์จริงเทียบเช็กลิสต์ พบเพิ่มใหม่ 29 ไฟล์ (ชุด B + E ครบ) เหลือขาด 118 ไฟล์ และ 7 ไฟล์ที่มีแล้วแต่เนื้อหาผิด |
+| 24 ก.ย. 2569 | สร้างเอกสาร — พบเพิ่มใหม่ 29 ไฟล์ เหลือขาด 118 และ 7 ไฟล์ที่เนื้อหาในภาพผิด |
+| 29 ก.ย. 2569 | ตรวจใหม่หลัง commit `fc660aa` — ปิด 🟠 ครบทั้ง 7 ไฟล์ · มีไฟล์ใช้ได้ 43 เหลือขาด 99 · เพิ่มงาน `speaker.png` และงานเปลี่ยนชื่อ 38 ไฟล์ |

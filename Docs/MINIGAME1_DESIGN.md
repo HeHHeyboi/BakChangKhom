@@ -678,8 +678,8 @@ func _on_tool_used(tool: CleanTool, step: CleanStep) -> void:
 | `ram_tool_wet_cloth.png`                                                                      | 200 × 200 | ผ้าชุบน้ำ (มีหยดน้ำ)                                |
 | `ram_tool_hairdryer.png`                                                                      | 200 × 200 | ไดร์เป่าผม                                          |
 | `ram_tool_vacuum.png`                                                                         | 200 × 200 | เครื่องดูดฝุ่นบ้าน                                  |
-| `ram_tray.png`                                                                                | 900 × 220 | ถาด/โต๊ะวางเครื่องมือ                               |
-| `ui_tool_card.png`                                                                            | 320 × 200 | กรอบการ์ดคุณสมบัติ                                  |
+| `ram_tray.png`                                                                                | 580 × 320 | ถาด/โต๊ะวางเครื่องมือ                               |
+| `ui_tool_card.png`                                                                            | 290 × 380 | กรอบการ์ดคุณสมบัติ                                  |
 | `ui_meter_pip_on.png` / `_off.png`                                                            | 24 × 24   | จุดวัดความแข็ง ▮▯                                   |
 | `ram_icon_moisture.png` · `ram_icon_esd.png` · `ram_icon_residue.png` · `ram_icon_narrow.png` | 48 × 48   | ไอคอนบนการ์ด                                        |
 
