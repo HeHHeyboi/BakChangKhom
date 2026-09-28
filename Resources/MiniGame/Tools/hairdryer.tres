@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CleanTool" format=3]
+
+[ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
+[ext_resource type="Texture2D" uid="uid://d0wsbnatk4qk3" path="res://Assets/MiniGame/PartRam/ram_tool_hairdryer.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"hairdryer"
+display_name = "ไดร์เป่าผม"
+icon = ExtResource("2_icon")
+hardness = 0
+has_moisture = false
+esd_risk = true
+leaves_residue = false
+reaches_narrow = true
+fit_per_step = Dictionary[int, int]({0: 0, 1: 0, 2: 0})
+line_ideal = ""
+line_limited = ""
+line_forbidden = "ไดร์เป่าผมทั้งร้อนและสร้างไฟฟ้าสถิต ชิปพังแบบมองไม่เห็นได้เลย"

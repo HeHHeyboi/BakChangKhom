@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CleanTool" format=3]
+
+[ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
+[ext_resource type="Texture2D" uid="uid://dtvdd1oauaqu5" path="res://Assets/MiniGame/PartRam/ram_tool_vacuum.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"vacuum"
+display_name = "เครื่องดูดฝุ่นบ้าน"
+icon = ExtResource("2_icon")
+hardness = 0
+has_moisture = false
+esd_risk = true
+leaves_residue = false
+reaches_narrow = true
+fit_per_step = Dictionary[int, int]({0: 0, 1: 0, 2: 0})
+line_ideal = ""
+line_limited = ""
+line_forbidden = "หัวดูดพลาสติกเสียดสีกับอากาศแล้วเกิดไฟฟ้าสถิต ไฟฟ้าสถิตนิดเดียวก็ทำชิปพังได้"

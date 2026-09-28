@@ -10,10 +10,23 @@
 
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
-| 🔴 Critical | 10 | 0 | 3 | 13 |
-| 🟡 High | 9 | 0 | 3 | 12 |
+| 🔴 Critical | 11 | 0 | 3 | 14 |
+| 🟡 High | 10 | 0 | 2 | 12 |
 | 🟢 Low | 4 | 0 | 6 | 10 |
-| **รวม** | **23** | **0** | **12** | **35** |
+| **รวม** | **25** | **0** | **11** | **36** |
+
+---
+
+## 🆕 ตรวจเพิ่ม 29 ก.ย. 2569 — หลัง commit `47fbfd7` (Briefing phase + class `Phase`)
+
+### BUG-36 🔴 → ✅ `PibHint.all_lines_finished` ทำให้ phase เลื่อนผิด
+
+| | |
+|---|---|
+| ไฟล์ | `phase_diagnosis.gd` · `phase_briefing.gd` · `part_ram.gd` (ทั้งหมดใน `Scripts/MiniGame/part_ram/`) |
+| อาการ | ตอบ Diagnosis ผิดแล้วเกมข้าม phase ไปเอง · ตอบถูกแล้วข้าม Briefing ไป Power Off ทันที |
+| สาเหตุ | สัญญาณ `all_lines_finished` ต่อเข้าทั้ง 2 phase ใน `part_ram.tscn` และ handler ไม่เช็กว่าตัวเองเป็น phase ที่เล่นอยู่ · ตอนตอบถูก `_advance_phase()` เปิด Briefing ในรอบ emit เดียวกัน Briefing จึงรับสัญญาณเดียวกันต่อทันที |
+| แก้ | ใส่ `if not visible: return` ใน handler ทั้งสอง + `phase_completed.connect(_advance_phase, CONNECT_DEFERRED)` (ตอนนี้อยู่ใน `part_minigame.gd`) · +7 บรรทัด · รายละเอียดและรายการที่ยังไม่แก้ดู `Docs/MINIGAME1_EARLY_PHASES.md` |
 
 ---
 
@@ -43,7 +56,9 @@
 | หมายเหตุ | โหนดทั้ง 8 มีครบแล้วใน `Scene/MiniGame/part_ram.tscn` (`PhaseBriefing` ถึง `PhaseSummary`) แค่ยังไม่ได้ลงทะเบียน และสคริปต์ยังเป็นสตับ 2 บรรทัด ยกเว้น `phase_clean.gd` ที่เขียนไป 39 บรรทัดแล้ว |
 | แก้ | uncomment ทั้ง 7 บรรทัดเมื่อแต่ละ phase พร้อม · และเลิกใช้ `_phase_nodes.size()` เป็นตัวเทียบกับค่า enum เพราะถ้าลงทะเบียนไม่ต่อเนื่องจะพังเงียบแบบเดียวกัน เปลี่ยนเป็น `if not _phase_nodes.has(current_phase): return` จะตรงความตั้งใจกว่า |
 
-### BUG-33 🟡 `pib_toggle()` อ่าน Dictionary ด้วยคีย์ที่อาจไม่มี
+### BUG-33 🟡 → ✅ `pib_toggle()` อ่าน Dictionary ด้วยคีย์ที่อาจไม่มี
+
+> ✅ 29 ก.ย. 2569 — แก้ตอนย้าย `pib_toggle()` ไป `Scripts/MiniGame/part_minigame.gd` (เช็ก `has()` ก่อนทั้ง SAY และ TOAST) · ดู `Docs/MINIGAME_PREFAB.md`
 
 | | |
 |---|---|
@@ -310,4 +325,6 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 | 23 ก.ย. 2569 | commit `7c291e5` — ปิด BUG-28 ถึง BUG-31 (load/instantiate, QuestStep→String, main.tres 5 task, minigame_end/dialog_finish logic) ด้วยระบบ `isDone`/`EmitType` ต่อสัญญาณ `on_dialog_end`/`on_minigame_end`/`on_tutorial_finish` แบบ one-shot · ปิด BUG-20 (data-driven เต็มรูปแบบ) และ BUG-26 (`Event.reset()` + เรียกจาก `_ready()`) ไปด้วย |
 | 22 ก.ย. 2569 | ตรวจเพิ่มหลัง refactor QuestStep — พบบั๊กใหม่ 4 ข้อ (BUG-28 ถึง BUG-31) ที่ทำให้เกมเดินไม่ได้ · ปิด BUG-19 และ BUG-20 |
 | 21 ก.ย. 2569 | สร้างเอกสาร — รวมบั๊ก 27 รายการจากการไล่โค้ดทั้งโปรเจกต์ที่ commit `1c9040a` · แก้แล้ว 13 · รอทำใน Godot 2 · ยังไม่แก้ 12 |
+| 29 ก.ย. 2569 (ครั้งที่ 2) | ปิด BUG-33 ระหว่างแยกระบบ phase เป็น `PartMinigame` (prefab) |
+| 29 ก.ย. 2569 | เพิ่มและแก้ BUG-36 (สัญญาณ PibHint ส่งถึงทุก phase) · รวมเป็น 36 รายการ |
 | 27 ก.ย. 2569 | เพิ่ม BUG-32 ถึง BUG-35 หลังทีมลง state machine 8 phase · ยืนยัน BUG-28 ถึง 31 แก้ครบ · รวมเป็น 35 รายการ |

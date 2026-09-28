@@ -9,7 +9,7 @@ BakChangKhom — a Godot 4.7 2D game (GL Compatibility renderer). GDScript codeb
 ## Directory Structure
 
 - `Scripts/` — GDScript classes, subdivided by area: `Home/`, `Map/`, `Market/`, `MiniGame/`, `Room/`, `StartMenu/`, `EventManager/`, `DialogSystem/`, `Resources/`
-- `Scene/` — `.tscn` scene files (also contains legacy `.scn` files, e.g. `Scene/Computer_test.scn.depren`)
+- `Scene/` — `.tscn` scene files — minigames for Core Parts inherit from `Scene/MiniGame/PartBase/part_base.tscn` (see `Docs/MINIGAME_PREFAB.md`); unused legacy scenes live in `prototype_minigame/`
 - `Assets/` — textures, sprites, and dialog `.txt` files
 - `Resources/` — `.tres` resources (events, tutorial slides)
 - `Test/` — manual test scenes/scripts, not part of any automated suite

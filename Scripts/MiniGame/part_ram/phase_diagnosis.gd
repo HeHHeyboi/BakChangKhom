@@ -11,6 +11,20 @@ enum Clue {
 var clues = [Clue.SCREEN, Clue.SPEAKER, Clue.CASE]
 var show_choices = false
 var is_correct = false
+var _wrong_count := 0 # [Claude 29 ก.ย.] นับตอบผิด ครบ 3 ครั้งปิ๊บใบ้
+
+
+# [Claude 29 ก.ย.] เพิ่ม init(): รีเซ็ตค่าให้เล่นซ้ำได้ + ปิ๊บพูดบทเปิด DIAGNOSIS_INTRO
+func init():
+	clues = [Clue.SCREEN, Clue.SPEAKER, Clue.CASE]
+	show_choices = false
+	is_correct = false
+	_wrong_count = 0
+	for c in notebook.get_children():
+		c.queue_free()
+	choices.hide()
+	show()
+	pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_INTRO))
 
 
 func _on_pib_line_finish() -> void:
@@ -32,8 +46,9 @@ func _on_clue_screen_pressed() -> void:
 		return
 	clues.erase(Clue.SCREEN)
 	var label = Label.new()
-	label.text = "Screen"
+	label.text = "จอขึ้นบล็อกสีแล้วค้าง" # [Claude 29 ก.ย.] เดิม "Screen" → ภาษาไทย
 	notebook.add_child(label)
+	pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_CLUE_SCREEN)) # [Claude 29 ก.ย.] บทปิ๊บของเบาะแส
 
 
 func _on_clue_speaker_pressed() -> void:
@@ -41,8 +56,9 @@ func _on_clue_speaker_pressed() -> void:
 		return
 	clues.erase(Clue.SPEAKER)
 	var label = Label.new()
-	label.text = "Speaker"
+	label.text = "ลำโพงบี๊บสั้น ๆ ซ้ำ ๆ" # [Claude 29 ก.ย.] เดิม "Speaker" → ภาษาไทย
 	notebook.add_child(label)
+	pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_CLUE_SPEAKER)) # [Claude 29 ก.ย.] บทปิ๊บของเบาะแส
 
 
 func _on_clue_case_pressed() -> void:
@@ -50,8 +66,9 @@ func _on_clue_case_pressed() -> void:
 		return
 	clues.erase(Clue.CASE)
 	var label = Label.new()
-	label.text = "Case"
+	label.text = "ฝุ่นจับหนาที่แผงแรม" # [Claude 29 ก.ย.] เดิม "Case" → ภาษาไทย
 	notebook.add_child(label)
+	pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_CLUE_DUST)) # [Claude 29 ก.ย.] บทปิ๊บของเบาะแส
 
 
 func _on_choice_select(btn: Button):
@@ -71,9 +88,18 @@ func _on_choice_select(btn: Button):
 			pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_WRONG_PSU))
 		"virus":
 			pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_WRONG_VIRUS))
+	# [Claude 29 ก.ย.] ตอบผิด = หักความแม่นยำ −10 · ผิดครบ 3 ครั้งให้ปิ๊บใบ้ (MINIGAME1_DESIGN.md 4.2 / 9)
+	if not is_correct:
+		mistake.emit(&"diagnosis", 10)
+		_wrong_count += 1
+		if _wrong_count == 3:
+			pib_toggle.emit(PibHint.Data.say(MinigameHeader.DIAGNOSIS_HINT))
 
 
 func _on_pib_hint_all_lines_finished() -> void:
+	# [Claude 29 ก.ย.] BUG-36: PibHint ส่งสัญญาณถึงทุก phase — ทำงานเฉพาะตอนเป็น phase ที่แสดงอยู่
+	if not visible:
+		return
 	if is_correct:
 		self.hide()
 		phase_completed.emit()

@@ -74,7 +74,9 @@ func point_at(target: Node2D, line: String) -> void:
 
 
 func _on_timer_timeout() -> void:
-	self.hide()
+	# [Claude 29 ก.ย.] ซ่อนทั้ง layer เฉพาะตอนแผงบทพูดปิดอยู่ — เดิมซ่อนเสมอ ทำให้บทที่กำลังพูดหายไปด้วย
+	if not dialog_panel.visible:
+		self.hide()
 	toast_text.hide()
 	pass # Replace with function body.
 

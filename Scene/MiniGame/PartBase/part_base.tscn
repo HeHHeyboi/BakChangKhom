@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/part_minigame.gd" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://hqki6nb8aski" path="res://Assets/MiniGame/PCCaseBG.jpg" id="2_bg"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="3_pib"]
+
+[node name="PartBase" type="Node2D" node_paths=PackedStringArray("pib")]
+script = ExtResource("1_base")
+pib = NodePath("PibHint")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(576, 322)
+scale = Vector2(1, 1.0061728)
+texture = ExtResource("2_bg")
+metadata/_edit_lock_ = true
+
+[node name="PibHint" parent="." instance=ExtResource("3_pib")]

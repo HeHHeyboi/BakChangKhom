@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CleanTool" format=3]
+
+[ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
+[ext_resource type="Texture2D" uid="uid://cbnbaqwy4r6y0" path="res://Assets/MiniGame/PartRam/ram_tool_brush.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"brush"
+display_name = "แปรงขนนุ่มกันไฟฟ้าสถิต"
+icon = ExtResource("2_icon")
+hardness = 1
+has_moisture = false
+esd_risk = false
+leaves_residue = false
+reaches_narrow = true
+fit_per_step = Dictionary[int, int]({0: 2, 1: 1, 2: 2})
+line_ideal = "แปรงขนนุ่มปัดฝุ่นได้ดี เข้าซอกก็ได้ และไม่สร้างไฟฟ้าสถิต"
+line_limited = "แปรงปัดฝุ่นได้ แต่คราบที่ติดแน่นต้องขัดเบา ๆ ด้วยของอย่างอื่น"
+line_forbidden = ""
