@@ -1,6 +1,4 @@
-class_name PhasePoweroff extends Control
-signal phase_completed
-signal pib_toggle(data: PibHint.Data)
+class_name PhasePoweroff extends Phase
 
 enum Step {
 	SHUTDOWN,

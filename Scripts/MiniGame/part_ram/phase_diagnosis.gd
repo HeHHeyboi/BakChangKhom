@@ -1,6 +1,4 @@
-class_name PhaseDiagnosis extends Control
-signal phase_completed
-signal pib_toggle(data: PibHint.Data)
+class_name PhaseDiagnosis extends Phase
 
 @onready var notebook = $"ClueNotebook" as VBoxContainer
 @onready var choices = $"CauseChoices" as VBoxContainer

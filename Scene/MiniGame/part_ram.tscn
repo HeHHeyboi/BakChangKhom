@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/pib_hint.gd" id="5_jxkp8"]
 [ext_resource type="PackedScene" uid="uid://0ammkthrqna6" path="res://Scene/DialogChoice.tscn" id="7_a0o4c"]
 [ext_resource type="Script" uid="uid://k2j3wadd7rp5" path="res://Scripts/MiniGame/part_ram/phase_poweroff.gd" id="8_8lhnf"]
+[ext_resource type="Script" uid="uid://cqtim350r1nb5" path="res://Scripts/MiniGame/part_ram/phase_briefing.gd" id="8_un0ic"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a0o4c"]
 
@@ -20,7 +21,7 @@ bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0.7058824)
 [node name="part_ram" type="Node2D" unique_id=1125874144 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_x7ph2")
 pib = NodePath("PibHint")
-start_phase = 3
+start_phase = 2
 
 [node name="Background" type="Sprite2D" parent="." unique_id=481430171]
 position = Vector2(576, 322)
@@ -142,6 +143,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("8_un0ic")
 
 [node name="PhasePoweroff" type="Control" parent="." unique_id=1596112704]
 visible = false
@@ -328,5 +330,6 @@ one_shot = true
 [connection signal="pressed" from="PhasePoweroff/Unplugged" to="PhasePoweroff" method="_on_unplugged_pressed"]
 [connection signal="pressed" from="PhasePoweroff/TouchCase" to="PhasePoweroff" method="_on_touch_case_pressed"]
 [connection signal="all_lines_finished" from="PibHint" to="PhaseDiagnosis" method="_on_pib_hint_all_lines_finished"]
+[connection signal="all_lines_finished" from="PibHint" to="PhaseBriefing" method="_on_pib_hint_all_lines_finished"]
 [connection signal="pressed" from="PibHint/DialogPanel" to="PibHint" method="_on_dialog_panel_pressed"]
 [connection signal="timeout" from="PibHint/Timer" to="PibHint" method="_on_timer_timeout"]
