@@ -1,6 +1,6 @@
 # MINIGAME1_DESIGN.md — มินิเกม **Part RAM**: ทำความสะอาดแรม
 
-> อ้างอิงโค้ดจริงที่ commit `52715cd` · 25 ก.ย. 2569 (เดิมเขียนไว้ที่ commit `86b719f` · 16 ก.ย. 2569) · อัปเดตหัวข้อ 6/8/12 ตาม working tree ที่ยังไม่ commit ณ 28 ก.ย. 2569 (เพิ่ม `PhasePoweroff` จริง + `PibHint.toast()` implement แล้ว) · Godot 4.7
+> อ้างอิงโค้ดจริงที่ commit `52715cd` · 25 ก.ย. 2569 (เดิมเขียนไว้ที่ commit `86b719f` · 16 ก.ย. 2569) · Godot 4.7
 > หัวข้อ 8 (สเปกโค้ด) อัปเดตให้ตรงกับ implementation จริงแล้ว — ดูหัวข้อ 15 สำหรับรายละเอียดที่เปลี่ยน
 > ชุดเดียวกับ: `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md` · `PART_BIOS_DESIGN.md` (สารบัญ: `Docs/README.md`)
 > เอกสารคู่กัน: `Docs/REPAIR_FLOW.md` (ลูปงานซ่อม 5 scene ที่ครอบมินิเกมนี้อยู่), `Docs/ASSET_GUIDE.md` (สเปก asset), `CLAUDE.md` (โครงสร้างโค้ด), GDD v1.7 หัวข้อ 4.7–4.11
@@ -162,8 +162,6 @@ room.gd: กดปุ่ม caution
 | 2     | ดึงปลั๊กไฟออก         | "ปิดแล้วยังมีไฟค้างในเครื่องนะ ต้องถอดปลั๊กด้วย"           | "ยังไม่ได้ปิดเครื่องเลยขม!"         |
 | 3     | แตะโครงเคสโลหะ        | "แตะโครงเคสก่อน ไฟฟ้าสถิตในตัวเราทำให้ชิ้นส่วนพังได้เลยนะ" | "ยังมีไฟอยู่ อย่าเพิ่งจับอะไรในเคส" |
 
-> **สถานะ implementation (working tree 28 ก.ย. 2569):** Phase นี้เป็น phase ที่ 2 ต่อจาก `PhaseDiagnosis` ที่มี node จริงในซีนแล้ว — `Scripts/MiniGame/part_ram/phase_poweroff.gd` (`class_name PhasePoweroff`) มีปุ่ม 3 ปุ่ม (`Shutdown`/`Unplugged`/`TouchCase`, label ยังเป็นข้อความอังกฤษ placeholder ไม่ใช่ art จริง) บังคับลำดับด้วยคิว `var step: Array[Step] = [SHUTDOWN, UNPLUGGED, TOUCH_CASE]` — กดถูกลำดับ `pop_front()` แล้วส่ง toast ผ่าน `pib_toggle.emit(PibHint.Data.toast(MinigameHeader.SAFETY_SHUTDOWN|SAFETY_UNPLUG|SAFETY_TOUCH_CASE))`, กดข้ามขั้น (เฉพาะปุ่ม 2/3) ส่ง toast header `UNSAFE_UNPLUG`/`UNSAFE_TOUCH_CASE` แทน (คนละ header จากที่ตารางข้างบนเขียนไว้ตอนแรกว่าเป็น `SAFETY_SKIPPED` เดี่ยว ๆ) **ปุ่ม Shutdown ที่กดผิดลำดับไม่มี else-branch เลย — กดไม่ตรงคิวจะเงียบ ไม่มีบทเตือนอะไร** ต่างจากปุ่ม 2/3 ที่มี — ถือเป็นช่องโหว่เล็ก ๆ ที่ยังไม่ได้แก้ กดถูกครบ 3 ปุ่มจึง `phase_completed.emit()`
-
 ### Phase 3 · REMOVE (ถอดแรม)
 
 1. คลิก **สลักล็อกซ้าย** → สลักกางออก (`ram_clip_left_open.png`)
@@ -250,9 +248,8 @@ class_name PartRam extends Node2D
 @export var pib: PibHint
 
 enum Phase {
-    NONE,        # sentinel — "ไม่ override" ให้ start_phase ด้านล่าง
-    BRIEFING,    # 0 ปิ๊บสอน — ยังไม่มี node ในซีน (stub)
-    DIAGNOSIS,   # 1 สังเกตอาการ + เลือกสาเหตุ
+    DIAGNOSIS,   # 0 สังเกตอาการ + เลือกสาเหตุ
+    BRIEFING,    # 1 ปิ๊บสอน
     POWER_OFF,   # 2 ปิดเครื่อง/ถอดปลั๊ก/แตะเคส
     REMOVE,      # 3 ปลดสลัก + ดึงแรม
     CLEAN,       # 4 ขัด (กลไกเดิม)
@@ -268,11 +265,10 @@ var current_phase: Phase = Phase.DIAGNOSIS
 var _mistakes := {"diagnosis": 0, "safety": 0, "handling": 0}
 var dialog_dict: Dictionary   # Dictionary[String, Array[DialogToken]] — จาก PhaseDialogParser
 
-@export var start_phase: Phase   # debug: บังคับ phase เริ่มต้น, NONE = เริ่มที่ DIAGNOSIS ตามปกติ
 @onready var _phase_nodes: Dictionary = {
-    Phase.DIAGNOSIS: $PhaseDiagnosis as PhaseDiagnosis,
-    Phase.POWER_OFF: $PhasePoweroff as PhasePoweroff,
+    Phase.DIAGNOSIS: $PhaseDiagnosis,
     #Phase.BRIEFING: $PhaseBriefing,      ← ยังไม่ผูก รอ node ในซีน
+    #Phase.POWER_OFF: $PhasePoweroff,
     #Phase.REMOVE: $PhaseRemove,
     #Phase.CLEAN: $PhaseClean,
     #Phase.INSTALL: $PhaseInstall,
@@ -281,38 +277,28 @@ var dialog_dict: Dictionary   # Dictionary[String, Array[DialogToken]] — จ�
 }
 ```
 
-ต่างจากข้อเสนอเดิม 3 จุด (สถานะเดิม 25 ก.ย.): (1) class ชื่อ `PartRam` ไม่ใช่ `MiniGameRam`, ไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/` ไม่ใช่ `Scripts/MiniGame/minigame1.gd` เดี่ยว ๆ — สคริปต์เดิมทั้งไฟล์ถูกลบไปแล้วตั้งแต่ commit `29b706d` (2) แต่ละ phase เป็น node ลูกจริงตาม `_phase_nodes` dict — ตอนนี้ผูกใช้งานจริง 2 phase คือ `PhaseDiagnosis` และ `PhasePoweroff` (ใหม่ในรอบนี้) — อีก 6 phase มีสคริปต์ stub รออยู่แล้วแต่ยังไม่ได้เพิ่ม node ในซีนจริง (3) `_advance_phase()` ไล่ตาม `current_phase + 1` ตรง ๆ
-
-**หมายเหตุลำดับ enum (working tree 28 ก.ย. 2569, ยังไม่ commit):** `Phase.BRIEFING` ถูกย้ายไปวางไว้**ก่อน** `Phase.DIAGNOSIS` ในตัว enum (ตัว int จริงคือ `BRIEFING=1, DIAGNOSIS=2, POWER_OFF=3`) ทั้งที่ในดีไซน์หัวข้อ 3–7 นับ "Phase 0 = DIAGNOSIS, Phase 1 = BRIEFING" — ตัวเลขในคอมเมนต์โค้ด (`# 0`/`# 1`/…) จึงไม่ตรงกับเลข Phase ที่ใช้อ้างอิงในเอกสารนี้ แต่เป็นการจัดลำดับ enum ให้ตรงกับสิ่งที่ implement จริงตอนนี้: `_advance_phase()` ไล่ตาม `current_phase + 1` ตรง ๆ ไม่มี logic ข้าม phase ที่ยังไม่มี node ดังนั้นสลับให้ `DIAGNOSIS + 1 == POWER_OFF` พอดี (ตำแหน่งของ 2 phase เดียวที่ผูก node จริงตอนนี้) ส่วน `BRIEFING` (ยัง stub) เลยไม่ถูกไล่ผ่านโดยบังเอิญระหว่างพัฒนา — ต้องย้ายกลับไปตำแหน่งเดิม (ระหว่าง DIAGNOSIS กับ POWER_OFF) ตอนที่ `PhaseBriefing` มี node จริงแล้ว ไม่งั้นลำดับ Phase 0→1→2 ตามดีไซน์จะขาดหายไป
-
-> `current_phase` เอง (`var current_phase: Phase = Phase.DIAGNOSIS`) ยังไม่ถูก reassign ที่ไหนเลยในไฟล์นี้ (`_set_phase()` ไม่ได้ set ค่านี้) — ตอนนี้ยังไม่กระทบเพราะมีแค่ 2 phase ที่ไล่ต่อกันได้จริง แต่เป็นงานที่ต้องกลับมาทำก่อนต่อ phase ที่ 3 เป็นต้นไป ไม่งั้น `_advance_phase()` จะคำนวณจาก `Phase.DIAGNOSIS` เดิมซ้ำตลอด ไม่ใช่ phase ที่กำลังแสดงอยู่จริง — จอว่างที่อาจเจอตอนไล่เลยจาก `POWER_OFF` ไปยัง phase ที่ยังไม่มี node ถือเป็นพฤติกรรมที่คาดไว้ระหว่างพัฒนา (WIP) ไม่ใช่บั๊ก จะหายไปเองเมื่อ implement phase ถัดไปครบ
+ต่างจากข้อเสนอเดิม 3 จุด: (1) class ชื่อ `PartRam` ไม่ใช่ `MiniGameRam`, ไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/` ไม่ใช่ `Scripts/MiniGame/minigame1.gd` เดี่ยว ๆ — สคริปต์เดิมทั้งไฟล์ถูกลบไปแล้วตั้งแต่ commit `29b706d` (2) แต่ละ phase เป็น node ลูกจริงตาม `_phase_nodes` dict แต่ **ตอนนี้ผูกใช้งานจริงแค่ `PhaseDiagnosis`** — อีก 7 phase มีสคริปต์ stub รออยู่แล้ว (`phase_briefing.gd` … `phase_summary.gd`, ทุกไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/`) แต่ยังไม่ได้เพิ่ม node ในซีนจริง จึงคอมเมนต์ไว้ใน dict (3) `_advance_phase()` ไล่ตาม `current_phase + 1` ตรง ๆ, `_set_phase()` มีการ์ด `if current_phase >= _phase_nodes.size(): return` กันพังตอนไล่เกินจำนวน phase ที่ผูกไว้จริง
 
 ### 8.2 โครง Scene ปัจจุบัน
 
 ```
-Scene/MiniGame/part_ram.tscn  (Node2D "part_ram", script: part_ram.gd, start_phase=POWER_OFF)
+Scene/MiniGame/part_ram.tscn  (Node2D "part_ram", script: part_ram.gd)
 ├── Background        (Sprite2D)
-├── PhaseDiagnosis    (Control, visible=false)  → phase_diagnosis.gd
+├── PhaseDiagnosis    (Control, visible=false)  → phase_diagnosis.gd   ← ตัวเดียวที่ implement จริง
 │   ├── ClueScreen / ClueSpeaker / ClueCase   (TextureButton ×3, pressed → _on_clue_*_pressed)
 │   ├── ClueNotebook  (VBoxContainer)
 │   └── CauseChoices  (VBoxContainer — 4× DialogChoice, get_choice → _on_choice_select)
-├── PhasePoweroff     (Control, visible=false)  → phase_poweroff.gd   ← ใหม่ในรอบนี้
-│   ├── Shutdown      (Button, label ยังเป็น "Shutdown" ภาษาอังกฤษ placeholder, pressed → _on_shutdown_pressed)
-│   ├── Unplugged     (Button, "Unplugged", pressed → _on_unplugged_pressed)
-│   └── TouchCase     (Button, "TouchCase", pressed → _on_touch_case_pressed)
 └── PibHint           (CanvasLayer, layer=120, visible=false) → pib_hint.gd
-    ├── DialogPanel   (Button, full-rect anchored, visible=false, pressed → _on_dialog_panel_pressed)
-    │   └── Container (HBoxContainer)
-    │       ├── VSeparator
-    │       ├── VBoxContainer
-    │       │   ├── Name    (RichTextLabel)
-    │       │   └── Dialog  (RichTextLabel)
-    │       └── VSeparator2
-    ├── ToastText     (RichTextLabel, visible=false)   ← ใหม่ในรอบนี้ — ใช้โดย toast()
-    └── Timer         (Timer, one_shot=true)           ← ใหม่ในรอบนี้ — timeout → _on_timer_timeout() ซ่อน toast
+    └── DialogPanel   (Button, full-rect anchored, pressed → _on_dialog_panel_pressed)
+        └── Container (HBoxContainer)
+            ├── VSeparator
+            ├── VBoxContainer
+            │   ├── Name    (RichTextLabel)
+            │   └── Dialog  (RichTextLabel)
+            └── VSeparator2
 ```
 
-`PhaseBriefing`/`PhaseRemove`/`PhaseClean`/`PhaseInstall`/`PhaseVerify`/`PhaseSummary` ยังไม่มี node ในซีนนี้ (สคริปต์ stub มีแล้ว ดูหัวข้อ 12) — โครง `Minigame1.tscn` ที่เสนอไว้เดิมถูกแทนที่ด้วย `part_ram.tscn` (ไฟล์ `.scn` เดิมยังอยู่ในดิสก์เป็นไฟล์กำพร้า ไม่ได้ใช้แล้ว) ตอนนี้ `part_ram.tscn` ตั้ง `start_phase = 3` (`Phase.POWER_OFF`) ไว้ — เข้าเกมจะข้าม `PhaseDiagnosis` ไปเริ่มที่ Phase 2 ตรง ๆ (สำหรับทดสอบ `PhasePoweroff` ระหว่างพัฒนา ไม่ใช่ flow ที่ตั้งใจให้ผู้เล่นเจอจริง)
+`PhaseBriefing`/`PhasePoweroff`/`PhaseRemove`/`PhaseClean`/`PhaseInstall`/`PhaseVerify`/`PhaseSummary` ยังไม่มี node ในซีนนี้ (สคริปต์ stub มีแล้ว ดูหัวข้อ 12) — โครง `Minigame1.tscn` ที่เสนอไว้เดิมถูกแทนที่ด้วย `part_ram.tscn` (ไฟล์ `.scn` เดิมยังอยู่ในดิสก์เป็นไฟล์กำพร้า ไม่ได้ใช้แล้ว)
 
 ### 8.3 `PibHint` — คอมโพเนนต์ปิ๊บ (ใช้ซ้ำได้ทุก Part)
 
@@ -321,11 +307,8 @@ Scene/MiniGame/part_ram.tscn  (Node2D "part_ram", script: part_ram.gd, start_pha
 ```gdscript
 # Scripts/MiniGame/pib_hint.gd
 class_name PibHint extends CanvasLayer
-@onready var dialog_panel = $DialogPanel
 @onready var name_label = $DialogPanel/Container/VBoxContainer/Name
 @onready var dialog_label = $DialogPanel/Container/VBoxContainer/Dialog
-@onready var toast_text = $ToastText
-@onready var timer = $Timer as Timer
 
 enum Mood { NORMAL, HAPPY, WORRY, POINT }
 
@@ -338,22 +321,19 @@ var cur_dialog: Array[DialogToken] = []
 ## รับ Array ของ String หรือ DialogToken ปนกันได้ (String ถูกแปลงเป็น DialogToken ชื่อ "ปิ๊บ")
 func say(lines: Array, mood: Mood = Mood.NORMAL) -> void
 
-## พูดบรรทัดเดียวแล้วหายไปเองใน N วินาที (ใช้ตอนเตือนระหว่างเล่น) — implement แล้วในรอบนี้
-func toast(line: DialogToken, seconds: float = 3.0, mood: Mood = Mood.WORRY) -> void
+## พูดบรรทัดเดียวแล้วหายไปเองใน N วินาที (ใช้ตอนเตือนระหว่างเล่น) — ยังเป็น stub (pass)
+func toast(line: String, mood: Mood = Mood.WORRY, seconds: float = 3.0) -> void
 
 ## ชี้ไปที่ node เป้าหมาย (วาดลูกศรจากปิ๊บไปยัง target) — ยังเป็น stub (pass)
 func point_at(target: Node2D, line: String) -> void
 
 ## คำสั่งย่อยส่งผ่าน signal จาก phase ไปหา PibHint — ดูหัวข้อ 8.4
 class Data extends RefCounted:
-    enum Act { SAY, TOAST, POINT_AT }   # ตอนนี้ implement จริง SAY + TOAST
+    enum Act { SAY, TOAST, POINT_AT }   # ตอนนี้ implement จริงแค่ SAY
     static func say(p_header: String, p_mood: Mood = Mood.NORMAL) -> Data
-    static func toast(p_header: String, p_seconds: float = 3.0, p_mood: Mood = Mood.WORRY) -> Data
 ```
 
 ต่างจากข้อเสนอเดิม: `say()` ไม่ได้แค่ `print()` เนื้อหาแล้ว — แสดง `DialogPanel` จริง เก็บคิวบรรทัดใน `cur_dialog`, โชว์บรรทัดแรกทันที แล้วรอผู้เล่นคลิก `DialogPanel` (`_on_dialog_panel_pressed()`) เพื่อ pop บรรทัดถัดไปทีละบรรทัด — คลิกครั้งสุดท้ายที่คิวว่างจะซ่อนพาเนลแล้ว emit `all_lines_finished`
-
-**`toast()` implement แล้วในรอบนี้ (working tree 28 ก.ย. 2569)** — ต่างจากข้อเสนอเดิมที่รับ `line: String` ตอนนี้รับ **`line: DialogToken`** (ลำดับ parameter ก็เปลี่ยนเป็น `(line, seconds, mood)` ไม่ใช่ `(line, mood, seconds)`), แสดง `toast_text` (RichTextLabel ใหม่ในซีน) ทับจอ แล้วตั้ง `Timer` ให้ `timeout` ไปเรียก `_on_timer_timeout()` ซ่อนทั้ง `PibHint` และ `toast_text` เอง — เรียกจาก `PartRam.pib_toggle()` ผ่าน `data.Act.TOAST`: อ่านบรรทัดแรกของ `dialog_dict[data.header]` เสมอ (`dialog_dict[data.header][0]`) แม้ header จะมีหลายบรรทัดก็ใช้แค่บรรทัดแรก
 
 บทพูดเก็บเป็นไฟล์ `.txt` รูปแบบเดียวกับระบบ dialog เดิม (`ชื่อ,ข้อความ`) ที่
 `Assets/Dialog/MiniGame/Ram_Pib.txt` — ใช้บรรทัด `@SECTION_NAME` (ต้องขึ้นต้นด้วย `@` ล้วน ๆ ห้ามมี `#` นำหน้า) คั่นเป็นบล็อกต่อ phase เพื่อให้ทีมเนื้อหาแก้ได้โดยไม่แตะโค้ด — อ่านโดย `Scripts/MiniGame/phase_dialog_parser.gd` (`PhaseDialogParser.parse()`) คืนค่าเป็น `Dictionary[String, Array[DialogToken]]` เก็บไว้ใน `PartRam.dialog_dict`
@@ -469,9 +449,9 @@ phase เรียกใช้แค่ `pib_toggle.emit(PibHint.Data.say(Miniga
 | `ram_hand_touch_case.png`                          | 300 × 300                  | มือแตะโครงเคส                        |
 | `ram_slot_empty.png`                               | 560 × 90                   | สลอตแรมว่าง                          |
 | `ram_clip_closed.png` / `ram_clip_open.png`        | 70 × 120                   | สลักล็อก (ใช้ซ้าย–ขวา flip ได้)      |
-| `ram_dirty.png` / `ram_half.png` / `ram_clean.png` | **600 × 215 เท่ากันทุกใบ** | แทนของเดิมที่ 597/593/589 ไม่เท่ากัน |
-| `ram_ghost.png`                                    | 600 × 215                  | เงาโปร่งบอกจุดวางตอนใส่กลับ          |
-| `ram_eraser.png`                                   | 360 × 370                  | ใช้ของเดิมได้ (rename)               |
+| `ram_dirty.png` / `ram_better.png` / `ram_clean.png` | **600 × 214 เท่ากันทุกใบ** | ไฟล์จริงในรีโปเป็น 600 × 214 แล้ว (แทนของเดิมที่ 597/593/589 ไม่เท่ากัน) · ชื่อกลางคือ `ram_better` ไม่ใช่ `ram_half` |
+| `ram_ghost.png`                                    | 600 × 214                  | เงาโปร่งบอกจุดวางตอนใส่กลับ ต้องเท่ากับ `ram_dirty` เป๊ะ |
+| `ram_eraser.png`                                   | 200 × 200                  | ไฟล์จริงเป็น 200 × 200 เข้าชุดกับเครื่องมือชิ้นอื่น |
 | `ram_dust_particle.png`                            | 32 × 32                    | particle ฝุ่นฟุ้งตอนขัด              |
 | `ram_spark.png`                                    | 200 × 200                  | ประกายไฟตอนข้ามขั้นตัดไฟ             |
 | `ram_star_full.png` / `ram_star_empty.png`         | 96 × 96                    | ดาวในหน้าสรุป                        |
@@ -499,14 +479,13 @@ phase เรียกใช้แค่ `pib_toggle.emit(PibHint.Data.say(Miniga
 | 6    | Phase 6/7 + ระบบคะแนน                                                                     | จบเกมมีคะแนน                              |
 | 7    | แทน placeholder ด้วย asset จริง + เสียง                                                   | พร้อมโชว์                                 |
 
-**ความคืบหน้าจริง (28 ก.ย. 2569, working tree ยังไม่ commit — ต่อจาก commit `52715cd`):**
+**ความคืบหน้าจริง (25 ก.ย. 2569, commit `52715cd`):**
 
 - **ขั้น 1** ✅ ทำแล้ว (B1–B4 หมดสถานะ, D3–D5 ทำแล้ว — ดูหัวข้อ 2)
-- **ขั้น 2** ✅ `PibHint` ใช้งานได้จริงแล้ว — มี `DialogPanel` UI ให้คลิกไปทีละบรรทัด ไม่ใช่แค่ `print()` เหมือนตอนเสนอแรก (หัวข้อ 8.3) และรอบนี้ `toast()` ก็ implement แล้วเช่นกัน (ไม่ใช่ stub อีกต่อไป)
-- **ขั้น 3** 🟡 ก้าวหน้าขึ้น — นอกจาก `PhaseDiagnosis` แล้วตอนนี้ `PhasePoweroff` ก็ถูกเพิ่มเป็น node จริงในซีนด้วย (Phase 2 กด 3 ปุ่มตามลำดับได้แล้ว) และ `DIAGNOSIS → POWER_OFF` ไล่ต่อกันได้ถูกต้องแล้วหลังสลับตำแหน่ง `Phase.BRIEFING` ไปไว้ก่อน `DIAGNOSIS` ใน enum (ดูหัวข้อ 8.1) — จอว่างที่จะเจอถ้าไล่ phase เลยจาก `POWER_OFF` ไปต่อเป็นเรื่องคาดไว้ระหว่างพัฒนา (WIP) ไม่ใช่บั๊ก เพราะอีก 6 phase ที่เหลือยังไม่มี node ให้ `_phase_nodes` ชี้ถึง
+- **ขั้น 2** ✅ `PibHint` ใช้งานได้จริงแล้ว — มี `DialogPanel` UI ให้คลิกไปทีละบรรทัด ไม่ใช่แค่ `print()` เหมือนตอนเสนอแรก (หัวข้อ 8.3)
+- **ขั้น 3** 🟡 ทำบางส่วน — มี state machine 8 phase + stub script ครบทั้ง 8 ไฟล์ใต้ `Scripts/MiniGame/part_ram/` (รวม `phase_clean.gd` ที่มีโครง `CleanStep`/`_build_tray()`/`_on_tool_used()` ตามหัวข้อ 14.7 แล้วแต่ตัวฟังก์ชันยังเป็น `pass`) **แต่มีแค่ `PhaseDiagnosis` เท่านั้นที่ถูกเพิ่มเป็น node จริงในซีน** — อีก 7 phase ยังกด "ถัดไป" ไล่ไม่ได้เพราะไม่มี node ให้ `_phase_nodes` ชี้ถึง
 - **ขั้น 4** 🟡 Phase 0 วินิจฉัยเล่นจบได้แล้ว — คลิกเบาะแสครบ 3 จุด → เลือกสาเหตุ → ตอบถูกให้ปิ๊บพูดจบก่อนค่อยข้าม phase (`_on_pib_hint_all_lines_finished`) ตรงตามกติกาหัวข้อ 4 **แต่** ข้อความเบาะแสยังเป็น placeholder ภาษาอังกฤษ ("Screen"/"Speaker"/"Case") ไม่ใช่บทปิ๊บภาษาไทยตามหัวข้อ 4.3 และยังไม่มีการนับจำนวนตอบผิด/ใบ้หลัง 3 ครั้งผิดตามหัวข้อ 4.2
-- **ขั้น 5** 🟡 เริ่มแล้วบางส่วน — Phase 2 (POWER_OFF) เล่นได้ครบตามกติกาหัวข้อ 6 แล้ว (บทปิ๊บผ่าน toast ตรงตามหัวข้อ 4.3 เพราะดึงจาก `Ram_Pib.txt` จริง ไม่ใช่ placeholder) ปุ่มยังเป็น label อังกฤษ ไม่ใช่ art จริง · Phase 3/5 (ถอด–ใส่) ยังไม่เริ่ม
-- **ขั้น 6–7** ⬜ ยังไม่เริ่ม
+- **ขั้น 5–7** ⬜ ยังไม่เริ่ม
 
 ---
 
@@ -718,8 +697,6 @@ transparent background, <Base Style Prompt>
 
 | วันที่           | การเปลี่ยนแปลง                                                                                                                                                                                                                              |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 28 ก.ย. 2569 (2) | ทีมยืนยัน: จอว่างหลังไล่ผ่าน `POWER_OFF` เป็นพฤติกรรมที่ตั้งใจระหว่างพัฒนา (WIP) ไม่ใช่บั๊ก และแก้ลำดับ phase ให้ถูกแล้วด้วยการสลับ `Phase.BRIEFING` ไปไว้ก่อน `Phase.DIAGNOSIS` ใน enum (`DIAGNOSIS + 1 == POWER_OFF` พอดีตามที่ implement จริง) — ถอน BUG-36 ออกจาก `Docs/BUG_LIST.md` แล้ว, แก้หัวข้อ 8.1/12 ให้ตรงกับความเข้าใจนี้ |
-| 28 ก.ย. 2569     | working tree (ยังไม่ commit) — เพิ่ม `PhasePoweroff` เป็น node จริงตัวที่สองในซีน (ปุ่ม 3 ปุ่มตามลำดับ, toast ผ่าน `MinigameHeader.SAFETY_*`/`UNSAFE_*`) · `PibHint.toast()` implement จริงแล้ว (รับ `DialogToken` ไม่ใช่ `String`, ใช้ node `ToastText`/`Timer` ใหม่) พร้อม `Data.toast()` static ctor · เพิ่ม `Phase.NONE` และ `@export var start_phase` สำหรับ debug ข้ามไป phase ใดก็ได้ (ตอนนี้ `part_ram.tscn` ตั้งไว้ที่ `POWER_OFF`) · เปลี่ยนชื่อ header บทปิ๊บ `SAFETY_SKIPPED` → `UNSAFE_UNPLUG` และเพิ่ม `UNSAFE_TOUCH_CASE` ใน `Ram_Pib.txt`/`MinigameHeader` — อัปเดตหัวข้อ 6 (ตาราง Phase 2), 8.1–8.3, 12 ให้ตรงกับโค้ดจริง |
 | 25 ก.ย. 2569     | commit `52715cd` — เขียนหัวข้อ 8 (สเปกโค้ด) ใหม่ให้ตรงกับโค้ดจริง: class `PartRam` (ไม่ใช่ `MiniGameRam`), ไฟล์อยู่ใต้ `Scripts/MiniGame/part_ram/` (`minigame1.gd` เดิมถูกลบทิ้งใน commit `29b706d`), `PibHint.say()` แสดง `DialogPanel` UI ให้คลิกไปทีละบรรทัดจริงแล้ว (ไม่ใช่แค่ `print()`), เพิ่มรูปแบบ `PibHint.Data`/`pib_toggle` signal ที่ phase ใช้เรียกปิ๊บผ่าน `part_ram.gd` กลาง และค่าคงที่ header รวมศูนย์ที่ `MinigameHeader` · ปิดสถานะ B2/B3 เป็น ✅, ทำเครื่องหมาย B4 ว่า "ไม่เกี่ยวแล้ว" (กลไกเดิมถูกแทนด้วยระบบเลือกอุปกรณ์หัวข้อ 14) · เพิ่มหัวข้อความคืบหน้าจริงในหัวข้อ 12 (มีแค่ Phase 0 วินิจฉัยที่ผูก node จริงในซีน) · ตั้งข้อสังเกต (ยังไม่ฟันธง) ว่า `Global.in_minigame` อาจไม่ถูก clear หลัง `EventManager.minigame_end()` อีกแล้วหลัง refactor |
 | 23 ก.ย. 2569     | commit `7c291e5` — อัปเดตหัวข้อ 8.4 ให้ตรงกับ `trigger_step()`/`_process_data()` แบบ data-driven ใหม่ (ไม่ match เลข task แล้ว ใช้ `QuestStep.action`/`emitType`/`isDone` แทน) และปิดหมายเหตุเก่าเรื่อง `Global.in_minigame` ค้าง (แก้แล้ว) |
 | 16 ก.ย. 2569 (2) | เพิ่มหัวข้อ 14 — ระบบเลือกอุปกรณ์ทำความสะอาด (3 ขั้นย่อย, อุปกรณ์ 10 ชิ้นพร้อมการ์ดคุณสมบัติ, ผลของการเลือกถูก/พอใช้/ห้ามใช้, สเปก `CleanTool` แบบ data-driven) และปรับตารางคะแนนให้มีหมวด "การเลือกอุปกรณ์"                                |
