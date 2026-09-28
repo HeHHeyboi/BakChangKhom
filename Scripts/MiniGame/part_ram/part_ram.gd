@@ -2,8 +2,9 @@ class_name PartRam extends Node2D
 @export var pib: PibHint
 
 enum Phase {
-	DIAGNOSIS, # 0 สังเกตอาการ + เลือกสาเหตุ
-	BRIEFING, # 1 ปิ๊บสอน
+	NONE,
+	BRIEFING, # 0 ปิ๊บสอน
+	DIAGNOSIS, # 1 สังเกตอาการ + เลือกสาเหตุ
 	POWER_OFF, # 2 ปิดเครื่อง/ถอดปลั๊ก/แตะเคส
 	REMOVE, # 3 ปลดสลัก + ดึงแรม
 	CLEAN, # 4 ขัด (กลไกเดิม)
@@ -20,11 +21,11 @@ var _mistakes := { "diagnosis": 0, "safety": 0, "handling": 0 }
 var dialog_dict: Dictionary
 
 @export var RAM_PIB_PATH = "res://Assets/Dialog/MiniGame/Ram_Pib.txt"
-
+@export var start_phase: Phase
 @onready var _phase_nodes: Dictionary = {
-	Phase.DIAGNOSIS: $PhaseDiagnosis,
+	Phase.DIAGNOSIS: $PhaseDiagnosis as PhaseDiagnosis,
+	Phase.POWER_OFF: $PhasePoweroff as PhasePoweroff,
 	#Phase.BRIEFING: $PhaseBriefing,
-	#Phase.POWER_OFF: $PhasePoweroff,
 	#Phase.REMOVE: $PhaseRemove,
 	#Phase.CLEAN: $PhaseClean,
 	#Phase.INSTALL: $PhaseInstall,
@@ -46,17 +47,16 @@ func _ready() -> void:
 		_phase_nodes[phase].pib_toggle.connect(self.pib_toggle)
 
 	#pib.say(dialog_dict["REMOVE"])
-	_set_phase(Phase.DIAGNOSIS)
+	#_set_phase(Phase.DIAGNOSIS)
+	if start_phase != Phase.NONE:
+		_set_phase(start_phase)
+	else:
+		_set_phase(Phase.DIAGNOSIS)
 
 
 func _set_phase(phase: Phase) -> void:
-	_phase_nodes[current_phase].visible = false
-	# for p in _phase_nodes:
-	# 	_phase_nodes[p].visible = (p == phase)
-	current_phase = phase
-	if current_phase >= _phase_nodes.size():
-		return
-	_phase_nodes[current_phase].visible = true
+	for p in _phase_nodes:
+		_phase_nodes[p].visible = (p == phase)
 	phase_changed.emit(phase)
 
 
@@ -75,3 +75,9 @@ func pib_toggle(data: PibHint.Data):
 				pib.say(lines, data.mood)
 			else:
 				push_error("There is no header %s" % data.header)
+		data.Act.TOAST:
+			if !dialog_dict.has(data.header):
+				push_error("There is no header %s" % data.header)
+				return
+			var dialog = dialog_dict[data.header][0]
+			pib.toast(dialog, data.seconds)

@@ -1,7 +1,7 @@
 # BUG_LIST.md — รายการบั๊กทั้งหมดที่ตรวจพบ
 
-> ตรวจจากโค้ดจริงที่ commit `4b84c10` · อัปเดต 27 ก.ย. 2569 (audit หลังทีมลง state machine 8 phase ของ Part RAM) · Godot 4.7
-> เอกสารคู่กัน: `Docs/SYNC_REVIEW.md` (รายละเอียดวิธีแก้) · `Docs/ASSET_TODO.md` (asset ที่ต้องทำ)
+> ตรวจจากโค้ดจริงที่ commit `4b84c10` · อัปเดต 28 ก.ย. 2569 (audit เพิ่มบน working tree ที่ยังไม่ commit — เพิ่ม `PhasePoweroff` + `PibHint.toast()`; audit หลักครั้งก่อนคือ 27 ก.ย. 2569 หลังทีมลง state machine 8 phase ของ Part RAM) · Godot 4.7
+> เอกสารคู่กัน: `Docs/SYNC_REVIEW.md` (รายละเอียดวิธีแก้) · `Docs/ASSET_TODO.md` (asset ที่ต้องทำ) · `Docs/MINIGAME1_DESIGN.md` (ดีไซน์เต็ม)
 > สถานะ: ✅ แก้แล้วในรีโป · 🔧 รอทำใน Godot · ⬜ ยังไม่แก้
 
 ---
@@ -14,6 +14,18 @@
 | 🟡 High | 9 | 0 | 3 | 12 |
 | 🟢 Low | 4 | 0 | 6 | 10 |
 | **รวม** | **23** | **0** | **12** | **35** |
+
+---
+
+## 🆕 ตรวจเพิ่ม 28 ก.ย. 2569 — working tree ยังไม่ commit (เพิ่ม `PhasePoweroff` + `PibHint.toast()`)
+
+**ทีมยืนยันแล้วว่าจอว่างหลังไล่ผ่าน `POWER_OFF` (ที่เคยตั้งข้อสังเกตไว้ในรอบตรวจก่อนหน้าว่าอาจเป็นบั๊ก) เป็นพฤติกรรมที่ตั้งใจระหว่างพัฒนา (WIP) — ไม่ใช่บั๊ก** เพราะ `BRIEFING`/`REMOVE`/… ยังไม่มี node จริงในซีน จึงคาดได้ว่าจะจอว่างจนกว่าจะ implement phase ถัดไป — ถอนรายการที่เคยเขียนไว้ในหัวข้อนี้ออกแล้ว
+
+### BUG-32 — อัปเดตสถานะ: ไล่ 2 phase ที่ implement แล้วได้ถูกต้อง
+
+ทีมแก้ให้ `DIAGNOSIS → POWER_OFF` ไล่ต่อกันถูกต้องแล้ว ด้วยการสลับตำแหน่ง `Phase.BRIEFING` ไปไว้**ก่อน** `Phase.DIAGNOSIS` ใน enum (`Scripts/MiniGame/part_ram/part_ram.gd`) ทำให้ `current_phase + 1` จาก `DIAGNOSIS` คำนวณตรงไป `POWER_OFF` พอดี — ตรงกับ 2 node เดียวที่ผูกจริงตอนนี้ (`PhaseDiagnosis`, `PhasePoweroff`) การ์ดเดิม `if current_phase >= _phase_nodes.size(): return` ที่เคยทำให้ `return` กลางทางก็ถูกลบไปแล้วเช่นกัน (ไม่มี return แปลก ๆ อีกต่อไป) — ปิดสถานะเป็น ✅ สำหรับ 2 phase ที่มีอยู่ตอนนี้ ที่เหลือ (uncomment node ทีละ phase) ยังคงค้างตามเดิม (ดู `Docs/MINIGAME1_DESIGN.md` หัวข้อ 8.1/12)
+
+> หมายเหตุ (ไม่ใช่บั๊ก แต่เป็นงานที่ต้องทำต่อ): `var current_phase` ในไฟล์เดียวกันยังไม่ถูก reassign ที่ไหนเลย ตอนนี้ยังไม่กระทบเพราะมีแค่ 2 phase ที่ไล่ต่อกัน แต่ต้องกลับมาใส่ `current_phase = phase` ใน `_set_phase()` ก่อนจะต่อ phase ที่ 3 เป็นต้นไป ไม่งั้น `_advance_phase()` จะคำนวณจาก `Phase.DIAGNOSIS` ซ้ำเดิมตลอด
 
 ---
 

@@ -1,4 +1,4 @@
-extends Control
+class_name PhaseDiagnosis extends Control
 signal phase_completed
 signal pib_toggle(data: PibHint.Data)
 
