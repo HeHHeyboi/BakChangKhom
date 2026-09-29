@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://b4cc5tkrxane1"]
+
+[ext_resource type="Script" uid="uid://b6uubm5xrit3e" path="res://Test/place.gd" id="1_vew7k"]
+[ext_resource type="Texture2D" uid="uid://dggbo116mnf" path="res://Assets/MiniGame/PartRam/ram_clean.png" id="1_wjo31"]
+[ext_resource type="Script" uid="uid://cpk3kh82vbqk3" path="res://Test/part.gd" id="3_ff1r7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_60m6x"]
+size = Vector3(500, 500, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_orn6i"]
+radius = 32.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_orn6i"]
+radius = 86.4646
+height = 276.68677
+
+[node name="Assembly" type="CanvasLayer" unique_id=2028688640]
+
+[node name="BG" type="MeshInstance2D" parent="." unique_id=602687075]
+position = Vector2(418, 370)
+mesh = SubResource("BoxMesh_60m6x")
+
+[node name="place" type="Node2D" parent="." unique_id=1733896508]
+position = Vector2(226, 178)
+script = ExtResource("1_vew7k")
+
+[node name="Area2D" type="Area2D" parent="place" unique_id=94732652]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="place/Area2D" unique_id=1432054933]
+shape = SubResource("CircleShape2D_orn6i")
+
+[node name="place2" type="Node2D" parent="." unique_id=885115842]
+position = Vector2(224, 256)
+script = ExtResource("1_vew7k")
+
+[node name="Area2D" type="Area2D" parent="place2" unique_id=414543027]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="place2/Area2D" unique_id=209351541]
+shape = SubResource("CircleShape2D_orn6i")
+
+[node name="place3" type="Node2D" parent="." unique_id=1866121599]
+position = Vector2(224, 360)
+script = ExtResource("1_vew7k")
+
+[node name="Area2D" type="Area2D" parent="place3" unique_id=334837145]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="place3/Area2D" unique_id=180310625]
+shape = SubResource("CircleShape2D_orn6i")
+
+[node name="part" type="Sprite2D" parent="." unique_id=1391522986]
+position = Vector2(898, 298)
+scale = Vector2(0.46261683, 0.46261683)
+texture = ExtResource("1_wjo31")
+script = ExtResource("3_ff1r7")
+
+[node name="Area2D" type="Area2D" parent="part" unique_id=764082701]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="part/Area2D" unique_id=779642608]
+position = Vector2(17.292929, -4.7683716e-07)
+rotation = 1.3089969
+shape = SubResource("CapsuleShape2D_orn6i")
+
+[node name="part2" type="Sprite2D" parent="." unique_id=664297861]
+position = Vector2(912, 440)
+scale = Vector2(0.46261683, 0.46261683)
+texture = ExtResource("1_wjo31")
+script = ExtResource("3_ff1r7")
+
+[node name="Area2D" type="Area2D" parent="part2" unique_id=563835085]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="part2/Area2D" unique_id=1002130361]
+position = Vector2(17.292929, -4.7683716e-07)
+rotation = 1.3089969
+shape = SubResource("CapsuleShape2D_orn6i")
+
+[connection signal="input_event" from="place/Area2D" to="place" method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="place/Area2D" to="place" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="place/Area2D" to="place" method="_on_area_2d_mouse_exited"]
+[connection signal="input_event" from="place2/Area2D" to="place2" method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="place2/Area2D" to="place2" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="place2/Area2D" to="place2" method="_on_area_2d_mouse_exited"]
+[connection signal="input_event" from="place3/Area2D" to="place3" method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="place3/Area2D" to="place3" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="place3/Area2D" to="place3" method="_on_area_2d_mouse_exited"]
+[connection signal="input_event" from="part/Area2D" to="part" method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="part/Area2D" to="part" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="part/Area2D" to="part" method="_on_area_2d_mouse_exited"]
+[connection signal="input_event" from="part2/Area2D" to="part2" method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="part2/Area2D" to="part2" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="part2/Area2D" to="part2" method="_on_area_2d_mouse_exited"]
