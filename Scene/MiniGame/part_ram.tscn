@@ -9,7 +9,6 @@
 [ext_resource type="PackedScene" uid="uid://0ammkthrqna6" path="res://Scene/DialogChoice.tscn" id="7_a0o4c"]
 [ext_resource type="Script" uid="uid://k2j3wadd7rp5" path="res://Scripts/MiniGame/part_ram/phase_poweroff.gd" id="8_8lhnf"]
 [ext_resource type="Script" uid="uid://cqtim350r1nb5" path="res://Scripts/MiniGame/part_ram/phase_briefing.gd" id="8_un0ic"]
-[ext_resource type="Texture2D" uid="uid://b82rnc3t0grl7" path="res://Assets/MiniGame/PartRam/ram_dirty.png" id="11_v7qk5"]
 [ext_resource type="Script" uid="uid://cskvobeaec5g" path="res://Scripts/MiniGame/part_ram/phase_clean.gd" id="20_clean"]
 [ext_resource type="Script" uid="uid://07ul710kvim6" path="res://Scripts/MiniGame/part_ram/phase_install.gd" id="20_install"]
 [ext_resource type="Script" uid="uid://dox25w0ylyxns" path="res://Scripts/MiniGame/part_ram/phase_remove.gd" id="20_remove"]
@@ -18,7 +17,7 @@
 
 [node name="part_ram" unique_id=767611073 instance=ExtResource("0_base")]
 script = ExtResource("1_x7ph2")
-start_phase = 4
+start_phase = 2
 dialog_path = "res://Assets/Dialog/MiniGame/Ram_Pib.txt"
 
 [node name="PhaseDiagnosis" type="Control" parent="." index="2" unique_id=1733273461]
@@ -194,63 +193,13 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "TouchCase"
 
-[node name="PhaseRemove" type="Control" parent="." index="5" unique_id=1863753010 node_paths=PackedStringArray("ram", "clip_left", "clip_right")]
+[node name="PhaseRemove" type="Control" parent="." index="5" unique_id=1863753010]
+visible = false
 layout_mode = 3
 anchors_preset = 0
-offset_right = 1152.0
-offset_bottom = 648.0
+offset_right = 40.0
+offset_bottom = 40.0
 script = ExtResource("20_remove")
-ram = NodePath("Ram")
-clip_left = NodePath("LeftLock")
-clip_right = NodePath("RightLock")
-
-[node name="Ram" type="TextureRect" parent="PhaseRemove" index="0" unique_id=1255536147]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -153.5
-offset_top = -107.0
-offset_right = 153.5
-offset_bottom = 107.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_default_cursor_shape = 6
-texture = ExtResource("11_v7qk5")
-
-[node name="LeftLock" type="Button" parent="PhaseRemove" index="1" unique_id=755159936]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 168.0
-offset_top = -4.0
-offset_right = 248.0
-offset_bottom = 92.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="RightLock" type="Button" parent="PhaseRemove" index="2" unique_id=824454495]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -272.0
-offset_top = -4.0
-offset_right = -192.0
-offset_bottom = 92.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 20
 
 [node name="PhaseClean" type="Control" parent="." index="6" unique_id=1150638246]
 visible = false

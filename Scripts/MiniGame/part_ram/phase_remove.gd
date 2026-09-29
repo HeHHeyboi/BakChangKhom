@@ -17,42 +17,51 @@ var _warned_force := false
 var _warned_tilt := false
 var _done := false
 
-@export var ram: TextureRect
+var _ram: TextureRect
 var _ram_home := Vector2.ZERO
-@export var clip_left: Button
-@export var clip_right: Button
+var _clip_left: Button
+var _clip_right: Button
 var _chk_left: Label
 var _chk_right: Label
 var _chk_pull: Label
 
 
 func init():
-	# if not _built:
-	# _build()
-	self.show()
-	pib_toggle.emit(PibHint.Data.say(MinigameHeader.REMOVE))
-	ram.mouse_filter = Control.MOUSE_FILTER_STOP
-	ram.mouse_default_cursor_shape = Control.CURSOR_DRAG
-	ram.gui_input.connect(_on_ram_input)
-
-	var rail := PhaseUI.make_frame(self, "ทำความสะอาดแรม — ขั้นที่ 4/8 · ถอดแรม")
-	PhaseUI.label(rail, "เป้าหมาย", 20, PhaseUI.COL_OK)
-	PhaseUI.label(rail, "ปลดสลักทั้งสองข้าง แล้วลากแรมขึ้นตรง ๆ", 18)
-	_chk_left = PhaseUI.check_item(rail, "สลักซ้าย")
-	_chk_right = PhaseUI.check_item(rail, "สลักขวา")
-	_chk_pull = PhaseUI.check_item(rail, "ดึงแรมขึ้น")
-	clip_left.pressed.connect(self._on_clip_left)
-	clip_right.pressed.connect(self._on_clip_right)
-
-	_update_clips()
+	if not _built:
+		_build()
 	_left_open = false
 	_right_open = false
 	_dragging = false
 	_done = false
 	_warned_force = false
 	_warned_tilt = false
-	_ram_home = ram.position
-	ram.modulate = Color.WHITE
+	_ram.position = _ram_home
+	_ram.modulate = Color.WHITE
+	_update_clips()
+	show()
+	pib_toggle.emit(PibHint.Data.say(MinigameHeader.REMOVE))
+
+
+func _build() -> void:
+	_built = true
+	var rail := PhaseUI.make_frame(self, "ทำความสะอาดแรม — ขั้นที่ 4/8 · ถอดแรม")
+	PhaseUI.label(rail, "เป้าหมาย", 20, PhaseUI.COL_OK)
+	PhaseUI.label(rail, "ปลดสลักทั้งสองข้าง แล้วลากแรมขึ้นตรง ๆ", 18)
+	_chk_left = PhaseUI.check_item(rail, "สลักซ้าย")
+	_chk_right = PhaseUI.check_item(rail, "สลักขวา")
+	_chk_pull = PhaseUI.check_item(rail, "ดึงแรมขึ้น")
+
+	# สลอตบนเมนบอร์ด (placeholder ของ ram_slot_empty.png 560×90)
+	PhaseUI.placeholder(self, Rect2(150, 330, 560, 60), Color(0.15, 0.15, 0.18), "ram_slot_empty")
+
+	_ram = PhaseUI.texture(self, RAM_TEX, Rect2(170, 200, 520, 185))
+	_ram.mouse_filter = Control.MOUSE_FILTER_STOP
+	_ram.mouse_default_cursor_shape = Control.CURSOR_DRAG
+	_ram.gui_input.connect(_on_ram_input)
+	_ram_home = _ram.position
+
+	_clip_left = PhaseUI.button(self, "", Rect2(90, 290, 60, 120), _on_clip_left)
+	_clip_right = PhaseUI.button(self, "", Rect2(710, 290, 60, 120), _on_clip_right)
 
 
 func _on_clip_left() -> void:
@@ -65,13 +74,9 @@ func _on_clip_right() -> void:
 	_update_clips()
 
 
-const LOCK_TEXT = "▮\nล็อก"
-const OPEN_TEXT = "◣\nเปิด"
-
-
 func _update_clips() -> void:
-	clip_left.text = OPEN_TEXT if _left_open else LOCK_TEXT
-	clip_right.text = OPEN_TEXT if _right_open else LOCK_TEXT
+	_clip_left.text = "◣\nเปิด" if _left_open else "▮\nล็อก"
+	_clip_right.text = "◢\nเปิด" if _right_open else "▮\nล็อก"
 	PhaseUI.set_check(_chk_left, _left_open)
 	PhaseUI.set_check(_chk_right, _right_open)
 	PhaseUI.set_check(_chk_pull, _done)
@@ -95,11 +100,11 @@ func _on_ram_input(event: InputEvent) -> void:
 		# สลักยังปิด → ขยับได้นิดเดียว (รู้สึกว่าติด)
 		if not (_left_open and _right_open):
 			lift = min(lift, 12.0)
-		ram.position = _ram_home + Vector2(clampf(delta.x, -20, 20), -lift)
+		_ram.position = _ram_home + Vector2(clampf(delta.x, -20, 20), -lift)
 
 
 func _on_release(mouse_pos: Vector2) -> void:
-	var lifted := _ram_home.y - ram.position.y
+	var lifted := _ram_home.y - _ram.position.y
 	var raw_lift := _drag_start.y - mouse_pos.y
 	if not (_left_open and _right_open):
 		if raw_lift > 20.0:
@@ -121,7 +126,7 @@ func _on_release(mouse_pos: Vector2) -> void:
 		_done = true
 		_update_clips()
 		var tw := create_tween()
-		tw.tween_property(ram, "position:y", _ram_home.y - 220, 0.35)
+		tw.tween_property(_ram, "position:y", _ram_home.y - 220, 0.35)
 		tw.tween_interval(0.3)
 		tw.tween_callback(_finish)
 	else:
@@ -129,15 +134,15 @@ func _on_release(mouse_pos: Vector2) -> void:
 
 
 func _snap_back() -> void:
-	create_tween().tween_property(ram, "position", _ram_home, 0.2)
+	create_tween().tween_property(_ram, "position", _ram_home, 0.2)
 
 
 func _shake() -> void:
 	var tw := create_tween()
 	for i in 3:
-		tw.tween_property(ram, "position:x", _ram_home.x + 8, 0.04)
-		tw.tween_property(ram, "position:x", _ram_home.x - 8, 0.04)
-	tw.tween_property(ram, "position:x", _ram_home.x, 0.04)
+		tw.tween_property(_ram, "position:x", _ram_home.x + 8, 0.04)
+		tw.tween_property(_ram, "position:x", _ram_home.x - 8, 0.04)
+	tw.tween_property(_ram, "position:x", _ram_home.x, 0.04)
 
 
 func _finish() -> void:

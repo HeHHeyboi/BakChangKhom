@@ -57,7 +57,6 @@ var _penalty := 0
 var _finishing := false
 
 var _built := false
-var _bar_tween: Tween
 var _target: TextureRect
 var _slot: ColorRect
 var _bar: ProgressBar
@@ -104,12 +103,7 @@ func _build() -> void:
 	add_child(_bar)
 
 	_target = PhaseUI.texture(self, "res://Assets/MiniGame/PartRam/ram_dirty.png", Rect2(160, 135, 540, 190))
-	_slot = PhaseUI.placeholder(
-		self,
-		Rect2(150, 200, 560, 70),
-		Color(0.12, 0.12, 0.15),
-		"สลอตบนเมนบอร์ด (ram_slot_empty)",
-	)
+	_slot = PhaseUI.placeholder(self, Rect2(150, 200, 560, 70), Color(0.12, 0.12, 0.15), "สลอตบนเมนบอร์ด (ram_slot_empty)")
 
 	# ถาดเครื่องมือ (placeholder ของ ram_tray.png) · y 336–476 ตาม storyboard
 	PhaseUI.panel(self, Rect2(20, 336, 820, 136), "Tray", Color(0.35, 0.25, 0.15, 0.85))
@@ -123,8 +117,6 @@ func _build() -> void:
 func _set_step(step: CleanStep) -> void:
 	_step = step
 	_progress = 0.0
-	if _bar_tween:
-		_bar_tween.kill()
 	_bar.value = 0
 	_step_label.text = STEP_TEXT[step]
 	_target.visible = step != CleanStep.CLEAN_SLOT
@@ -150,10 +142,7 @@ func _build_tray(step: CleanStep) -> Array[CleanTool]:
 	var tray: Array[CleanTool] = []
 	tray.append_array(ideal.slice(0, 1))
 	tray.append_array(bad.slice(0, 2))
-	var rest := _tools.filter(
-		func(t):
-			return not tray.has(t),
-	)
+	var rest := _tools.filter(func(t): return not tray.has(t))
 	rest.shuffle()
 	for t in rest:
 		if tray.size() >= TRAY_SIZE:
@@ -174,19 +163,14 @@ func _fill_tray(tray: Array[CleanTool]) -> void:
 		b.custom_minimum_size = Vector2(120, 116)
 		b.tooltip_text = t.display_name
 		b.mouse_entered.connect(_show_card.bind(t))
-		b.pressed.connect(
-			func():
-				_on_tool_used(t, _step),
-		)
+		b.pressed.connect(func(): _on_tool_used(t, _step))
 		_tray.add_child(b)
 
 
 func _show_card(t: CleanTool) -> void:
 	var pips := "▮".repeat(t.hardness) + "▯".repeat(5 - t.hardness)
 	_card.text = "%s\nความแข็ง %s %d/5\nความชื้น %s\nไฟฟ้าสถิต %s\nเศษตกค้าง %s\nเข้าซอกแคบ %s" % [
-		t.display_name,
-		pips,
-		t.hardness,
+		t.display_name, pips, t.hardness,
 		"มี" if t.has_moisture else "ไม่มี",
 		"เสี่ยง" if t.esd_risk else "ปลอดภัย",
 		"มี" if t.leaves_residue else "ไม่มี",
@@ -239,10 +223,7 @@ func _say_for(tool: CleanTool, step: int, fallback: String, mood: PibHint.Mood) 
 
 func _progress_by(amount: float) -> void:
 	_progress = min(_progress + amount, 100.0)
-	if _bar_tween:
-		_bar_tween.kill()
-	_bar_tween = create_tween()
-	_bar_tween.tween_property(_bar, "value", _progress, 0.25)
+	create_tween().tween_property(_bar, "value", _progress, 0.25)
 	_update_target()
 	if _progress >= 100.0:
 		step_completed.emit(_step)
