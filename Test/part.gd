@@ -2,6 +2,8 @@ class_name Part extends Sprite2D
 
 @onready var _area = $Area2D
 
+@export var place_to: Place.PlaceType = Place.PlaceType.NONE
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -40,7 +42,7 @@ func _input(event: InputEvent) -> void:
 func _drop() -> void:
 	for area in _area.get_overlapping_areas():
 		var place: Node = area.get_parent()
-		if place.is_in_group("place") and place.try_place(self):
+		if place.is_in_group("place") and place.try_place(self, place_to):
 			current_place = place
 			return
 

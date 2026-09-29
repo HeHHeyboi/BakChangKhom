@@ -2,6 +2,13 @@ class_name Place extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 var occupant: Node2D = null
+enum PlaceType {
+	NONE,
+	RAM,
+	GPU,
+	CPU,
+}
+@export var place_type: PlaceType = PlaceType.NONE
 
 
 func _ready() -> void:
@@ -9,8 +16,9 @@ func _ready() -> void:
 
 
 # วาง part ลงช่องนี้ ถ้าช่องว่างอยู่ (หรือเป็น part ตัวเดิม)
-func try_place(part: Node2D) -> bool:
-	if occupant != null and occupant != part:
+func try_place(part: Node2D, type: PlaceType) -> bool:
+	# if (occupant != null && occupant != part):
+	if (occupant != null && occupant != part || type != place_type):
 		return false
 	occupant = part
 	part.global_position = self.global_position

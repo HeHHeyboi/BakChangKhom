@@ -23,6 +23,7 @@ mesh = SubResource("BoxMesh_60m6x")
 [node name="place" type="Node2D" parent="." unique_id=1733896508]
 position = Vector2(226, 178)
 script = ExtResource("1_vew7k")
+place_type = 1
 
 [node name="Area2D" type="Area2D" parent="place" unique_id=94732652]
 
@@ -32,6 +33,7 @@ shape = SubResource("CircleShape2D_orn6i")
 [node name="place2" type="Node2D" parent="." unique_id=885115842]
 position = Vector2(224, 256)
 script = ExtResource("1_vew7k")
+place_type = 2
 
 [node name="Area2D" type="Area2D" parent="place2" unique_id=414543027]
 
@@ -41,6 +43,7 @@ shape = SubResource("CircleShape2D_orn6i")
 [node name="place3" type="Node2D" parent="." unique_id=1866121599]
 position = Vector2(224, 360)
 script = ExtResource("1_vew7k")
+place_type = 1
 
 [node name="Area2D" type="Area2D" parent="place3" unique_id=334837145]
 
@@ -52,6 +55,7 @@ position = Vector2(898, 298)
 scale = Vector2(0.46261683, 0.46261683)
 texture = ExtResource("1_wjo31")
 script = ExtResource("3_ff1r7")
+place_to = 1
 
 [node name="Area2D" type="Area2D" parent="part" unique_id=764082701]
 
@@ -65,6 +69,7 @@ position = Vector2(912, 440)
 scale = Vector2(0.46261683, 0.46261683)
 texture = ExtResource("1_wjo31")
 script = ExtResource("3_ff1r7")
+place_to = 2
 
 [node name="Area2D" type="Area2D" parent="part2" unique_id=563835085]
 
