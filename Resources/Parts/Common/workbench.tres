@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"workbench"
+display_name = "โต๊ะช่าง"
+size = Vector3(9, 0.1, 6)
+color = Color(0.33, 0.33, 0.35, 1)
+texture_face = 0

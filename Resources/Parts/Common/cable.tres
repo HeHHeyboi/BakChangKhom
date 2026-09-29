@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"cable"
+display_name = "สายไฟ"
+size = Vector3(1.2, 0.05, 0.05)
+color = Color(0.12, 0.12, 0.13, 1)
+texture_face = 0

@@ -1,5 +1,7 @@
 # MINIGAME1_PHASE_GUIDE.md — คู่มือสร้าง phase ของมินิเกม Part RAM
 
+> ⚠️ **29 ก.ย. 2569: Part RAM ย้ายเป็น 2.5D แล้ว** — phase ทั้ง 8 เขียนใหม่ใน `Scripts/MiniGame/PartRam/` (extends `Phase3D`) · UI 2D placeholder ในเอกสารนี้ถูกแทนด้วยฉาก 3D · ดูของปัจจุบันที่ `RAM_3D_GAMEPLAY.md` · กติกา/คะแนนในเอกสารนี้ยังใช้ได้
+
 > 29 ก.ย. 2569 · ใช้คู่กับ `MINIGAME1_DESIGN.md` (กติกา/เหตุผลดีไซน์) · `MINIGAME_PREFAB.md` (โครง prefab) · `ASSET_NAMING.md` (ขนาดไฟล์)
 > เอกสารนี้ตอบคำถามเดียว: **แต่ละ phase ต้องใส่อะไรลงไปบ้าง** (node · สคริปต์ · บทปิ๊บ · การหักคะแนน · รูป · เงื่อนไขจบ)
 
@@ -16,7 +18,7 @@
 | 6 | ตรวจผล | `VERIFY` | `PhaseVerify` | `phase_verify.gd` | 🟢 เล่นได้ · UI เบื้องต้น |
 | 7 | สรุป | `SUMMARY` | `PhaseSummary` | `phase_summary.gd` | 🟢 เล่นได้ · ปิดซีน + เดินเควสต์ต่อ |
 
-🟢 = โค้ดครบตามดีไซน์ แต่หน้าตาเป็น placeholder (กล่องสี/ปุ่มตัวหนังสือ) สร้างจากโค้ดด้วย `Scripts/MiniGame/phase_ui.gd` ตามเลย์เอาต์ `STORYBOARD.md` หัวข้อ 0 · ภาพตัวอย่าง `Docs/Mockups/phase_placeholder_preview.png`
+🟢 = โค้ดครบตามดีไซน์ แต่หน้าตาเป็น placeholder (กล่องสี/ปุ่มตัวหนังสือ) สร้างจากโค้ดด้วย `Scripts/MiniGame/PartBase/phase_ui.gd` ตามเลย์เอาต์ `STORYBOARD.md` หัวข้อ 0 · ภาพตัวอย่าง `Docs/Mockups/phase_placeholder_preview.png`
 
 ---
 
@@ -113,7 +115,7 @@ PhaseRemove (Control, full rect 1152×648)
 
 **เป้าหมาย:** 3 ขั้นย่อย S1 ปัดฝุ่นบนแผง → S2 ขัดขาทอง → S3 ทำความสะอาดสลอต · แต่ละขั้นเลือกอุปกรณ์จากถาด 6 ชิ้น (สุ่มจาก 10)
 
-**ต้องทำก่อน: ข้อมูลอุปกรณ์ 10 ไฟล์** — สร้าง `Resources/MiniGame/Tools/*.tres` (คลิกขวา → New Resource → `CleanTool`) ตามตาราง `MINIGAME1_DESIGN.md` หัวข้อ 14.4 · `icon` ใช้ `PartRam/ram_tool_*.png` ที่มีครบแล้ว · `fit_per_step` key 0/1/2 = S1/S2/S3 · value 0/1/2 = ❌/🟡/✅ · บทปิ๊บใส่ใน `line_*` หรืออ้าง header ใน `Ram_Pib.txt` (`CLEAN_S2_ERASER` · `CLEAN_SANDPAPER` · …)
+**ต้องทำก่อน: ข้อมูลอุปกรณ์ 10 ไฟล์** — สร้าง `Resources/Parts/Ram/Tools/*.tres` (คลิกขวา → New Resource → `CleanTool`) ตามตาราง `MINIGAME1_DESIGN.md` หัวข้อ 14.4 · `icon` ใช้ `PartRam/ram_tool_*.png` ที่มีครบแล้ว · `fit_per_step` key 0/1/2 = S1/S2/S3 · value 0/1/2 = ❌/🟡/✅ · บทปิ๊บใส่ใน `line_*` หรืออ้าง header ใน `Ram_Pib.txt` (`CLEAN_S2_ERASER` · `CLEAN_SANDPAPER` · …)
 
 **Node ใต้ `PhaseClean`** (ตาม Mockup 3 `Docs/Mockups/ui_mock_03_minigame_ram.png`)
 
@@ -207,11 +209,11 @@ func _score() -> int:
 
 | ไฟล์ | เปลี่ยน |
 |---|---|
-| `Scripts/MiniGame/phase.gd` | เพิ่ม `signal mistake(category: StringName, points: int)` |
-| `Scripts/MiniGame/part_minigame.gd` | ต่อ `mistake` ทุก phase → `_on_mistake()` สะสมใน `_mistakes` |
-| `Scripts/MiniGame/part_ram/part_ram.gd` | `_mistakes` เปลี่ยนเป็น 5 หมวดตามหัวข้อ 9 (ค่า = แต้มที่ถูกหัก) |
+| `Scripts/MiniGame/PartBase/phase.gd` | เพิ่ม `signal mistake(category: StringName, points: int)` |
+| `Scripts/MiniGame/PartBase/part_minigame.gd` | ต่อ `mistake` ทุก phase → `_on_mistake()` สะสมใน `_mistakes` |
+| `Scripts/MiniGame/PartRam/part_ram.gd` | `_mistakes` เปลี่ยนเป็น 5 หมวดตามหัวข้อ 9 (ค่า = แต้มที่ถูกหัก) |
 | `phase_remove/install/verify/summary.gd` · `phase_clean.gd` | `extends Control` + `signal phase_completed` → `extends Phase` |
-| `Scene/MiniGame/part_ram.tscn` | ผูกสคริปต์ 5 ไฟล์ข้างบนเข้า node `PhaseRemove`–`PhaseSummary` (เดิม node ไม่มีสคริปต์) |
+| `Scene/MiniGame/PartRam/part_ram.tscn` | ผูกสคริปต์ 5 ไฟล์ข้างบนเข้า node `PhaseRemove`–`PhaseSummary` (เดิม node ไม่มีสคริปต์) |
 
 ทดสอบ headless: uncomment ครบ 8 phase → กระโดดไป SUMMARY → กดจบ → `minigame_finished` ส่ง `_mistakes` ถูกต้อง และซีนปิดตัวเองได้ด้วยโค้ดในหัวข้อ Phase 7
 
@@ -224,14 +226,14 @@ func _score() -> int:
 
 | ไฟล์ | ของใคร | เปลี่ยน |
 |---|---|---|
-| `Scripts/MiniGame/phase_ui.gd` | ใหม่ | ตัวช่วยสร้าง UI placeholder ตาม storyboard (แถบหัวข้อ · info rail · เช็กลิสต์ · ปุ่ม · กล่องแทนรูป) |
-| `part_ram/phase_remove.gd` · `phase_install.gd` · `phase_verify.gd` · `phase_summary.gd` | stub เดิม → เขียนใหม่ | โค้ดเต็มตามตารางหัวข้อ Phase 3, 5, 6, 7 ด้านบน |
-| `part_ram/phase_clean.gd` | เพื่อน (โครง) | เติมฟังก์ชันที่เป็น `pass` · ชื่อ enum/signal/ฟังก์ชันเดิมคงไว้ |
-| `Resources/MiniGame/Tools/*.tres` | ใหม่ | อุปกรณ์ 10 ชิ้นตาม `MINIGAME1_DESIGN.md` 14.4 · ไอคอน `PartRam/ram_tool_*.png` (ยางลบขาวใช้ `ram_eraser.png`) |
-| `part_ram/part_ram.gd` | เพื่อน | เปิดใช้ phase 3–7 · ตัวแปร `ram_damaged` / `ram_seated` · `_on_minigame_finished()` ปิดซีนแบบ `find_item_minigame.gd` |
-| `part_ram/phase_diagnosis.gd` | เพื่อน | `init()` รีเซ็ต + บท INTRO · ป้ายเบาะแสเป็นไทย + บท CLUE · ตอบผิด −10 · ผิด 3 ครั้งใบ้ |
-| `part_ram/phase_poweroff.gd` | เพื่อน | `init()` รีเซ็ตลำดับ · กดผิดลำดับ −12 safety · กันกดหลังจบ |
-| `Scripts/MiniGame/pib_hint.gd` | เพื่อน | `_on_timer_timeout()` ไม่ซ่อนแผงบทพูดที่เปิดอยู่ (แก้ข้อ 5 ใน `MINIGAME1_EARLY_PHASES.md`) |
+| `Scripts/MiniGame/PartBase/phase_ui.gd` | ใหม่ | ตัวช่วยสร้าง UI placeholder ตาม storyboard (แถบหัวข้อ · info rail · เช็กลิสต์ · ปุ่ม · กล่องแทนรูป) |
+| `PartRam/phase_remove.gd` · `phase_install.gd` · `phase_verify.gd` · `phase_summary.gd` | stub เดิม → เขียนใหม่ | โค้ดเต็มตามตารางหัวข้อ Phase 3, 5, 6, 7 ด้านบน |
+| `PartRam/phase_clean.gd` | เพื่อน (โครง) | เติมฟังก์ชันที่เป็น `pass` · ชื่อ enum/signal/ฟังก์ชันเดิมคงไว้ |
+| `Resources/Parts/Ram/Tools/*.tres` | ใหม่ | อุปกรณ์ 10 ชิ้นตาม `MINIGAME1_DESIGN.md` 14.4 · ไอคอน `PartRam/ram_tool_*.png` (ยางลบขาวใช้ `ram_eraser.png`) |
+| `PartRam/part_ram.gd` | เพื่อน | เปิดใช้ phase 3–7 · ตัวแปร `ram_damaged` / `ram_seated` · `_on_minigame_finished()` ปิดซีนแบบ `find_item_minigame.gd` |
+| `PartRam/phase_diagnosis.gd` | เพื่อน | `init()` รีเซ็ต + บท INTRO · ป้ายเบาะแสเป็นไทย + บท CLUE · ตอบผิด −10 · ผิด 3 ครั้งใบ้ |
+| `PartRam/phase_poweroff.gd` | เพื่อน | `init()` รีเซ็ตลำดับ · กดผิดลำดับ −12 safety · กันกดหลังจบ |
+| `Scripts/MiniGame/PartBase/pib_hint.gd` | เพื่อน | `_on_timer_timeout()` ไม่ซ่อนแผงบทพูดที่เปิดอยู่ (แก้ข้อ 5 ใน `MINIGAME1_EARLY_PHASES.md`) |
 | `Assets/Dialog/MiniGame/Ram_Pib.txt` | เพื่อน | `@UNSAFE_TOUCH_CASE` ชื่อ `ปิ๊ป, ` → `ปิ๊บ,` |
 
 **ทดสอบ (Godot 4.7 headless + ถ่ายภาพจอจริง):** เล่นครบ 8 phase — Diagnosis ตอบผิด 1 (−10) → Briefing → Power Off แตะเคสก่อน (−12) → Remove ฝืนดึงตอนสลักล็อก (−5) แล้วปลดสลักดึงผ่าน → Clean เลือก ❌ ชิ้นเดิม 2 ครั้ง (−16 + เสียหาย) แล้วทำ S1–S3 ด้วยชิ้น ✅ → Install วางถูกด้านแล้วกด "เสร็จแล้ว" ก่อนสลักดีด → Verify บูตไม่ผ่าน (−10) → Summary 47/100 ☆☆☆ → กดกลับห้อง ซีนปิดเอง

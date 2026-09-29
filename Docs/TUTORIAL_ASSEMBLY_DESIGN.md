@@ -1,8 +1,8 @@
 # TUTORIAL_ASSEMBLY_DESIGN.md — มินิเกม Tutorial: ประกอบคอมพิวเตอร์ (2.5D)
 
 > 29 ก.ย. 2569 · Godot 4.7 · GL Compatibility · จอ 1152 × 648
-> สถานะ: **ดีไซน์ ยังไม่เริ่มโค้ด** · ClickUp: [🎓 [FEAT] Tutorial: ประกอบคอมพิวเตอร์ (2.5D)](https://app.clickup.com/t/z93r0b50zc)
-> เอกสารคู่กัน: `MINIGAME_PREFAB.md` (โครง prefab) · `REPAIR_FLOW.md` (S2 ถอด / S4 ประกอบกลับ ใช้ฉาก 3D ชุดเดียวกัน) · `STORYBOARD.md` หัวข้อ 0.5
+> สถานะ: **มีเวอร์ชันเล่นได้แล้ว (30 ก.ย.)** — ดูหัวข้อ "สถานะโค้ด 30 ก.ย." ท้ายไฟล์ · ClickUp: [🎓 [FEAT] Tutorial: ประกอบคอมพิวเตอร์ (2.5D)](https://app.clickup.com/t/z93r0b50zc)
+> เอกสารคู่กัน: `ART_25D_PLAN.md` (วิธีทำโมเดล) · `MINIGAME_PREFAB.md` (โครง prefab) · `REPAIR_FLOW.md` (S2 ถอด / S4 ประกอบกลับ ใช้ฉาก 3D ชุดเดียวกัน) · `STORYBOARD.md` หัวข้อ 0.5
 
 ---
 
@@ -223,8 +223,8 @@ class_name PcPart extends Resource
 
 | ขั้น | งาน | ทดสอบได้ |
 |---|---|---|
-| 1 | `part_stage_3d.tscn` + เคส CSG + กล้องหมุนได้ | เห็นเคส 3D ใน play area |
-| 2 | `PcPart` + `PartBody3D` + `Socket3D` + ลาก/snap | ลาก RAM ลงสล็อตได้ |
+| 1 | ✅ `PartStage3D` (สร้างจากโค้ด ไม่ต้องมี .tscn) + กล้องหมุนได้ · ⬜ เคส CSG | เห็นฉาก 3D ใน play area |
+| 2 | ✅ `PcPart` + `PartBody3D` + `Socket3D` + ลาก/snap — ต้นแบบ `Test/stage3d_ram_demo.tscn` | ลาก RAM ลงสล็อตได้ ✅ |
 | 3 | `phase_build.gd` + `.tres` 9 ชิ้น + กฎ 4 ข้อ | ประกอบครบได้ |
 | 4 | INTRO · SAFETY · CABLES (แบบง่าย) · CLOSE · POWER_TEST · SUMMARY | เล่นจบลูป |
 | 5 | `Assembly_Pib.txt` + ต่อ `main.tres` | เล่นต่อจาก prologue ได้ |
@@ -239,3 +239,45 @@ class_name PcPart extends Resource
 - [ ] หมุนกล้องสุดทั้งสองทาง → ยังลาก/วางถูกตำแหน่ง
 - [ ] เล่นจบ → กลับห้อง · เควสต์เดินไป Part RAM
 - [ ] export เว็บ → ฉาก 3D แสดงได้ (GL Compatibility)
+
+
+---
+
+## สถานะโค้ด 30 ก.ย. 2569 (เวอร์ชันแรกที่เล่นได้)
+
+**เปิดเทส:** รันซีน `Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn` ตรง ๆ (F6) · ยังไม่ได้ผูกเข้า `Global.MiniGames` / EventManager — ผูกเมื่อพร้อมโดยเรียกซีนนี้แบบเดียวกับ Part RAM
+
+**ย่อ flow เหลือ 4 phase** (ตัด SAFETY / CABLES / CLOSE ไว้ทำรอบหลัง)
+
+| # | enum | ไฟล์ | ผู้เล่นทำอะไร |
+|---|---|---|---|
+| 1 | `INTRO` | `phase_intro.gd` | คลิกชิ้นบนแผ่นรองครบ 7 ชิ้น → การ์ดกระดาษ ชื่อ · หน้าที่ · "จะได้ซ่อมใน Part ___" |
+| 2 | `BUILD` | `phase_build.gd` | ลากชิ้นลงเคส · ผิดช่อง/ผิดลำดับ → เด้งกลับ + ปิ๊บบอกเหตุผล (ไม่หักคะแนน) · ไกด์ชี้ชิ้นถัดไป + socket เรืองแสง |
+| 3 | `POWER_TEST` | `phase_power.gd` | กดปุ่มหน้าเคส → LED ติด → จอบูตผ่าน |
+| 4 | `SUMMARY` | `phase_summary.gd` | ตาราง ชิ้นส่วน → Part ที่จะได้ซ่อม · ปุ่ม "ไปงานซ่อมแรก" |
+
+**โครงโหนด** (`tutorial_assembly.tscn` สืบทอด `part_base.tscn`)
+```
+TutorialAssembly (tutorial_assembly.gd)
+├── Background · PibHint                 (จาก part_base)
+├── Stage (part_stage_3d.tscn)
+│   └── SubViewport/World
+│       ├── Workbench (override ขนาดโต๊ะ) · Room (workshop_room.tscn ใช้ร่วมกับ Part RAM)
+│       ├── PcCase    CaseFloor/Rear/Side/Bottom/Bezel · %PowerButton · %PowerLed · PsuBay · MbStandoff (Socket3D)
+│       ├── %Monitor · MonitorStand · MonitorNeck · EsdMat (แผ่นรองวางชิ้น)
+│       ├── %Parts    ★ ลำดับลูก = ลำดับประกอบ: %Psu → %Mainboard → %Cpu → %Cooler → %Ram → %Ssd → %Gpu
+│       │   └── Mainboard/ CpuSocket · CoolerMount · RamSlot · M2Slot · PcieSlot  (ติดไปกับบอร์ด)
+│       └── Views     Overview · Tray · Build · Front · Monitor (CameraPoint3D)
+└── PhaseIntro · PhaseBuild · PhasePower · PhaseSummary (Control)
+```
+
+**ข้อมูล = PcPart .tres** (`Resources/Parts/Common/`) — ใหม่: `cpu` · `cpu_cooler` · `gpu` · `ssd_m2` · เพิ่ม `socket_type`/`core_part` ให้ `psu` · `pib_wrong_socket` ให้ `mainboard`
+- กฎวาง = `socket_type` ต้องตรง + `requires` ต้องติดตั้งก่อน (Socket3D.check) · ข้อความผิด = `pib_wrong_order` / `pib_wrong_socket` → หัวข้อใน `Assets/Dialog/MiniGame/Assembly_Pib.txt`
+- เพิ่ม/สลับชิ้น = ใส่ PartBody3D ใต้ `Parts` + Socket3D ที่ตรง `socket_type` (ไม่ต้องแก้โค้ด)
+- ชื่อ Part บนการ์ด = `TutorialAssembly.CORE_NAME`
+
+**ของที่แก้ในชุดกลาง:** `PartStage3D` ไม่นับ socket ที่ติดมากับชิ้นในมือ · `PhaseUI.part_card()` / `hide_card()` · แยกห้องออกเป็น `workshop_room.tscn` (Part RAM ใช้ตัวเดียวกันแล้ว)
+
+**โค้ดทดลอง 2D ของเพื่อน** (`Test/assembly.tscn`, `part.gd`, `place.gd` — HeHHeyboi) **ไม่ได้แตะ** · แนวคิด `Place.PlaceType` = `Socket3D.socket_type` ในเวอร์ชัน 2.5D นี้
+
+**ยังไม่ทำ:** SAFETY (สายรัด ESD) · CABLES · CLOSE · หันทิศ CPU/แรม (ตอนนี้ไม่เช็กทิศ) · ซิลิโคน · รูปจริงของ SSD

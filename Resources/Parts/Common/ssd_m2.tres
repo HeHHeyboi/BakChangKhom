@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"ssd_m2"
+display_name = "SSD (M.2)"
+role = "ที่เก็บข้อมูลถาวร ระบบปฏิบัติการกับไฟล์ทั้งหมดอยู่ที่นี่ ปิดเครื่องแล้วไม่หาย"
+size = Vector3(0.8, 0.03, 0.22)
+color = Color(0.12, 0.3, 0.55, 1)
+texture_face = 0
+socket_type = &"m2_slot"
+requires = Array[StringName]([&"mainboard"])
+core_part = &"bios"
+pib_wrong_order = "ASM_NEED_MAINBOARD"

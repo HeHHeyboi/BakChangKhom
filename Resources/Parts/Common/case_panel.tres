@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"case_panel"
+display_name = "แผ่นเหล็กเคส"
+role = "โครงเคสเหล็ก แตะเพื่อปล่อยไฟฟ้าสถิตออกจากตัวได้"
+size = Vector3(1, 1, 1)
+color = Color(0.93, 0.93, 0.91, 1)
+texture_face = 0

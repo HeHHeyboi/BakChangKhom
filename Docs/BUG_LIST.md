@@ -23,7 +23,7 @@
 
 | | |
 |---|---|
-| ไฟล์ | `phase_diagnosis.gd` · `phase_briefing.gd` · `part_ram.gd` (ทั้งหมดใน `Scripts/MiniGame/part_ram/`) |
+| ไฟล์ | `phase_diagnosis.gd` · `phase_briefing.gd` · `part_ram.gd` (ทั้งหมดใน `Scripts/MiniGame/PartRam/`) |
 | อาการ | ตอบ Diagnosis ผิดแล้วเกมข้าม phase ไปเอง · ตอบถูกแล้วข้าม Briefing ไป Power Off ทันที |
 | สาเหตุ | สัญญาณ `all_lines_finished` ต่อเข้าทั้ง 2 phase ใน `part_ram.tscn` และ handler ไม่เช็กว่าตัวเองเป็น phase ที่เล่นอยู่ · ตอนตอบถูก `_advance_phase()` เปิด Briefing ในรอบ emit เดียวกัน Briefing จึงรับสัญญาณเดียวกันต่อทันที |
 | แก้ | ใส่ `if not visible: return` ใน handler ทั้งสอง + `phase_completed.connect(_advance_phase, CONNECT_DEFERRED)` (ตอนนี้อยู่ใน `part_minigame.gd`) · +7 บรรทัด · รายละเอียดและรายการที่ยังไม่แก้ดู `Docs/MINIGAME1_EARLY_PHASES.md` |
@@ -36,7 +36,7 @@
 
 ### BUG-32 — อัปเดตสถานะ: ไล่ 2 phase ที่ implement แล้วได้ถูกต้อง
 
-ทีมแก้ให้ `DIAGNOSIS → POWER_OFF` ไล่ต่อกันถูกต้องแล้ว ด้วยการสลับตำแหน่ง `Phase.BRIEFING` ไปไว้**ก่อน** `Phase.DIAGNOSIS` ใน enum (`Scripts/MiniGame/part_ram/part_ram.gd`) ทำให้ `current_phase + 1` จาก `DIAGNOSIS` คำนวณตรงไป `POWER_OFF` พอดี — ตรงกับ 2 node เดียวที่ผูกจริงตอนนี้ (`PhaseDiagnosis`, `PhasePoweroff`) การ์ดเดิม `if current_phase >= _phase_nodes.size(): return` ที่เคยทำให้ `return` กลางทางก็ถูกลบไปแล้วเช่นกัน (ไม่มี return แปลก ๆ อีกต่อไป) — ปิดสถานะเป็น ✅ สำหรับ 2 phase ที่มีอยู่ตอนนี้ ที่เหลือ (uncomment node ทีละ phase) ยังคงค้างตามเดิม (ดู `Docs/MINIGAME1_DESIGN.md` หัวข้อ 8.1/12)
+ทีมแก้ให้ `DIAGNOSIS → POWER_OFF` ไล่ต่อกันถูกต้องแล้ว ด้วยการสลับตำแหน่ง `Phase.BRIEFING` ไปไว้**ก่อน** `Phase.DIAGNOSIS` ใน enum (`Scripts/MiniGame/PartRam/part_ram.gd`) ทำให้ `current_phase + 1` จาก `DIAGNOSIS` คำนวณตรงไป `POWER_OFF` พอดี — ตรงกับ 2 node เดียวที่ผูกจริงตอนนี้ (`PhaseDiagnosis`, `PhasePoweroff`) การ์ดเดิม `if current_phase >= _phase_nodes.size(): return` ที่เคยทำให้ `return` กลางทางก็ถูกลบไปแล้วเช่นกัน (ไม่มี return แปลก ๆ อีกต่อไป) — ปิดสถานะเป็น ✅ สำหรับ 2 phase ที่มีอยู่ตอนนี้ ที่เหลือ (uncomment node ทีละ phase) ยังคงค้างตามเดิม (ดู `Docs/MINIGAME1_DESIGN.md` หัวข้อ 8.1/12)
 
 > หมายเหตุ (ไม่ใช่บั๊ก แต่เป็นงานที่ต้องทำต่อ): `var current_phase` ในไฟล์เดียวกันยังไม่ถูก reassign ที่ไหนเลย ตอนนี้ยังไม่กระทบเพราะมีแค่ 2 phase ที่ไล่ต่อกัน แต่ต้องกลับมาใส่ `current_phase = phase` ใน `_set_phase()` ก่อนจะต่อ phase ที่ 3 เป็นต้นไป ไม่งั้น `_advance_phase()` จะคำนวณจาก `Phase.DIAGNOSIS` ซ้ำเดิมตลอด
 
@@ -50,19 +50,19 @@
 
 | | |
 |---|---|
-| ไฟล์ | `Scripts/MiniGame/part_ram/part_ram.gd` บล็อก `_phase_nodes` |
+| ไฟล์ | `Scripts/MiniGame/PartRam/part_ram.gd` บล็อก `_phase_nodes` |
 | อาการ | Phase 0 DIAGNOSIS เล่นได้ปกติ ตอบสาเหตุถูกแล้วหน้าจอว่างเปล่า เล่นต่อไม่ได้ ไม่มี error แดง |
 | สาเหตุ | `_phase_nodes` มีแค่ `Phase.DIAGNOSIS: $PhaseDiagnosis` อีก 7 บรรทัดยังคอมเมนต์อยู่ · `_advance_phase()` เรียก `_set_phase(BRIEFING)` ซึ่งซ่อน diagnosis ทิ้งก่อน แล้วเจอเงื่อนไข `current_phase >= _phase_nodes.size()` (1 >= 1) เป็นจริง จึง `return` ออกไปโดยไม่แสดงอะไรต่อ |
-| หมายเหตุ | โหนดทั้ง 8 มีครบแล้วใน `Scene/MiniGame/part_ram.tscn` (`PhaseBriefing` ถึง `PhaseSummary`) แค่ยังไม่ได้ลงทะเบียน และสคริปต์ยังเป็นสตับ 2 บรรทัด ยกเว้น `phase_clean.gd` ที่เขียนไป 39 บรรทัดแล้ว |
+| หมายเหตุ | โหนดทั้ง 8 มีครบแล้วใน `Scene/MiniGame/PartRam/part_ram.tscn` (`PhaseBriefing` ถึง `PhaseSummary`) แค่ยังไม่ได้ลงทะเบียน และสคริปต์ยังเป็นสตับ 2 บรรทัด ยกเว้น `phase_clean.gd` ที่เขียนไป 39 บรรทัดแล้ว |
 | แก้ | uncomment ทั้ง 7 บรรทัดเมื่อแต่ละ phase พร้อม · และเลิกใช้ `_phase_nodes.size()` เป็นตัวเทียบกับค่า enum เพราะถ้าลงทะเบียนไม่ต่อเนื่องจะพังเงียบแบบเดียวกัน เปลี่ยนเป็น `if not _phase_nodes.has(current_phase): return` จะตรงความตั้งใจกว่า |
 
 ### BUG-33 🟡 → ✅ `pib_toggle()` อ่าน Dictionary ด้วยคีย์ที่อาจไม่มี
 
-> ✅ 29 ก.ย. 2569 — แก้ตอนย้าย `pib_toggle()` ไป `Scripts/MiniGame/part_minigame.gd` (เช็ก `has()` ก่อนทั้ง SAY และ TOAST) · ดู `Docs/MINIGAME_PREFAB.md`
+> ✅ 29 ก.ย. 2569 — แก้ตอนย้าย `pib_toggle()` ไป `Scripts/MiniGame/PartBase/part_minigame.gd` (เช็ก `has()` ก่อนทั้ง SAY และ TOAST) · ดู `Docs/MINIGAME_PREFAB.md`
 
 | | |
 |---|---|
-| ไฟล์ | `Scripts/MiniGame/part_ram/part_ram.gd` ฟังก์ชัน `pib_toggle()` |
+| ไฟล์ | `Scripts/MiniGame/PartRam/part_ram.gd` ฟังก์ชัน `pib_toggle()` |
 | อาการ | ถ้าหัวข้อใน `MinigameHeader` ไม่ตรงกับ `@SECTION` ในไฟล์บท จะขึ้น error แดงตอนรัน |
 | สาเหตุ | `var lines = dialog_dict[data.header]` เข้าถึงคีย์ตรง ๆ Godot จะ push error ทันทีที่คีย์ไม่มี ก่อนจะไปถึงบรรทัด `if lines != null` ที่ตั้งใจดักไว้ |
 | แก้ | `if not dialog_dict.has(data.header): push_error(...); return` ก่อน หรือใช้ `dialog_dict.get(data.header)` |
@@ -82,7 +82,7 @@
 | BUG-28 ถึง BUG-31 | ✅ ยืนยันซ้ำแล้วว่าแก้ครบทั้ง 4 จุด เควสต์หลักเดินได้ |
 | `PibHint` (ข้อเสนอใน `MINIGAME1_DESIGN.md` 8.3) | ✅ เขียนแล้ว 85 บรรทัด เป็น CanvasLayer แยกจาก `DialogScene` มี enum `Mood` 4 อารมณ์ |
 | บทปิ๊บใช้ไม่ได้เพราะ `_CharacterMap` | ✅ **หมดปัญหาสำหรับมินิเกม** — `PibHint` มีแผงบทของตัวเอง ไม่ผ่าน `_CharacterMap` แล้ว (แต่บท NPC อีก 10 ตัวยังติดปัญหาเดิมอยู่) |
-| parser หัวข้อ `@SECTION` | ✅ `Scripts/MiniGame/phase_dialog_parser.gd` 83 บรรทัด + แปลงไฟล์บททั้ง 5 ไฟล์แล้ว |
+| parser หัวข้อ `@SECTION` | ✅ `Scripts/MiniGame/PartBase/phase_dialog_parser.gd` 83 บรรทัด + แปลงไฟล์บททั้ง 5 ไฟล์แล้ว |
 | `CleanTool` resource (ข้อเสนอ 14.7) | ✅ สร้างแล้ว |
 
 ### ⬜ ที่ยังค้างเหมือนเดิม
@@ -127,7 +127,7 @@ QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
 
 | บั๊ก | สถานะใหม่ |
 |---|---|
-| BUG-19 `.scn` binary | ✅ มี `Scene/MiniGame/part_ram.tscn` แล้ว และ `Constant.MINIGAME1_SCENE` ชี้ถูก (ตรวจซ้ำ 23 ก.ย. — ยืนยันแล้ว ปิดสถานะเป็น ✅ เต็มตัว) |
+| BUG-19 `.scn` binary | ✅ มี `Scene/MiniGame/PartRam/part_ram.tscn` แล้ว และ `Constant.MINIGAME1_SCENE` ชี้ถูก (ตรวจซ้ำ 23 ก.ย. — ยืนยันแล้ว ปิดสถานะเป็น ✅ เต็มตัว) |
 | BUG-20 `minigame_end` อิงเลข task | ✅ เปลี่ยนเป็น data-driven เต็มรูปแบบแล้ว (ดู BUG-31) — ไม่มี hardcode เลข task เหลืออยู่ |
 | BUG-26 `Event` ไม่มี `reset()` | ✅ เพิ่ม `Event.reset()` (รีเซ็ต `currentTask`/`isDone`/`isDone` ของทุก task) แล้วเรียกจาก `EventManager._ready()` ทุกครั้งที่โปรเซสเริ่มใหม่ |
 | ข้อเสนอ 4.1 QuestStep resource | ✅ ทำแล้ว |
@@ -240,8 +240,8 @@ BUG-14 (`simple_npc.gd` signature ผิด) · BUG-15 (ไม่มี Player /
 
 ### BUG-19 ✅ `Scene/MiniGame/Minigame1.scn` เป็นไฟล์ binary
 
-diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น `Scene/MiniGame/part_ram.tscn` แล้วแก้ `Constant.MINIGAME1_SCENE`
-ตรวจซ้ำ 23 ก.ย. 2569: `Scripts/constant.gd:17` ชี้ `res://Scene/MiniGame/part_ram.tscn` แล้ว และไฟล์นั้นมีอยู่จริง ปิดเป็น ✅
+diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น `Scene/MiniGame/PartRam/part_ram.tscn` แล้วแก้ `Constant.MINIGAME1_SCENE`
+ตรวจซ้ำ 23 ก.ย. 2569: `Scripts/constant.gd:17` ชี้ `res://Scene/MiniGame/PartRam/part_ram.tscn` แล้ว และไฟล์นั้นมีอยู่จริง ปิดเป็น ✅
 *(หมายเหตุ: ไฟล์ binary เก่า `Scene/MiniGame/Minigame1.scn` ยังค้างอยู่ในดิสก์แบบไม่มีใครอ้างถึง — ไม่ใช่บั๊ก แค่ dead file รอลบตอนล้าง asset)*
 
 ### BUG-16 ⬜ tutorial กับมินิเกมขึ้นพร้อมกัน — คลิกทะลุ

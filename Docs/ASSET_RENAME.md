@@ -21,8 +21,8 @@
 | `Home/doorHighlight.png` | 606×844 | `Home/home_door_highlight.png` | — | `Scene/Location/Home.tscn` · `Scene/Location/Room.tscn` |  |
 | `Home/pc_down.png` | 814×514 | `Home/home_pc_down.png` | — | `Scene/Location/Home.tscn` |  |
 | `Home/pc_up.png` | 814×514 | `Home/home_pc_up.png` | — | `Scene/Location/Home.tscn` |  |
-| `MiniGame/PCCaseBG.jpg` | 1152×648 | `Background/bg_pc_case.jpg` | 1152×648 | `Scene/MiniGame/part_ram.tscn` | เป็นพื้นหลังเต็มจอ ควรย้ายไปอยู่ `Background/` ให้เหมือนพื้นหลังอื่น |
-| `MiniGame/PartRam/speaker.png` | 1024×1024 | `MiniGame/PartRam/ram_speaker_icon.png` | 120×120 | `Scene/MiniGame/part_ram.tscn` | ไฟล์ใหม่ของเพื่อน · สเปกใน ASSET_NAMING คือ 120×120 แต่ไฟล์จริง 1024×1024 |
+| `MiniGame/PCCaseBG.jpg` | 1152×648 | `Background/bg_pc_case.jpg` | 1152×648 | `Scene/MiniGame/PartRam/part_ram.tscn` | เป็นพื้นหลังเต็มจอ ควรย้ายไปอยู่ `Background/` ให้เหมือนพื้นหลังอื่น |
+| `MiniGame/PartRam/speaker.png` | 1024×1024 | `MiniGame/PartRam/ram_speaker_icon.png` | 120×120 | `Scene/MiniGame/PartRam/part_ram.tscn` | ไฟล์ใหม่ของเพื่อน · สเปกใน ASSET_NAMING คือ 120×120 แต่ไฟล์จริง 1024×1024 |
 | `MiniGame/box.png` | 256×256 | `MiniGame/PartRam/ram_box_normal.png` | 256×256 | `Scene/MiniGame/find_item_minigame.tscn` | ตัวใหม่มีอยู่แล้วใน PartRam/ · เปลี่ยนโค้ดให้ชี้ตัวใหม่แล้วลบตัวเก่า |
 | `MiniGame/box_on_hover.png` | 256×256 | `MiniGame/PartRam/ram_box_hover.png` | 256×256 | `Scene/MiniGame/find_item_minigame.tscn` | ตัวใหม่มีอยู่แล้วใน PartRam/ |
 | `MiniGame/caution.png` | 250×250 | `UI/ui_marker_caution.png` | 250×250 | `Scene/caution_button.tscn` · `Scene/caution_marker.tscn` | ตัวใหม่มีอยู่แล้วใน UI/ |

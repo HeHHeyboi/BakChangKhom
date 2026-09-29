@@ -8,8 +8,8 @@ BakChangKhom — a Godot 4.7 2D game (GL Compatibility renderer). GDScript codeb
 
 ## Directory Structure
 
-- `Scripts/` — GDScript classes, subdivided by area: `Home/`, `Map/`, `Market/`, `MiniGame/`, `Room/`, `StartMenu/`, `EventManager/`, `DialogSystem/`, `Resources/`
-- `Scene/` — `.tscn` scene files — minigames for Core Parts inherit from `Scene/MiniGame/PartBase/part_base.tscn` (see `Docs/MINIGAME_PREFAB.md`); unused legacy scenes live in `prototype_minigame/`. The first minigame is a 2.5D PC-assembly tutorial (3D SubViewport inside the 2D minigame layout; player/overworld stay 2D) — see `Docs/TUTORIAL_ASSEMBLY_DESIGN.md`
+- `Scripts/` — GDScript classes, subdivided by area: `Home/`, `Map/`, `Market/`, `MiniGame/` (`PartBase/` shared minigame framework + `PartBase/stage3d/` 3D stage classes, `PartRam/` Part RAM phases), `Room/`, `StartMenu/`, `EventManager/`, `DialogSystem/`, `Resources/`
+- `Scene/` — `.tscn` scene files — Core Part minigames live in `Scene/MiniGame/Part<Name>/` and inherit from `Scene/MiniGame/PartBase/part_base.tscn`; their 2.5D play area is an instance of `Scene/MiniGame/PartBase/part_stage_3d.tscn` (see `Docs/MINIGAME_PREFAB.md`, `Docs/RAM_3D_GAMEPLAY.md`); unused legacy scenes live in `prototype_minigame/`. The first minigame is a 2.5D PC-assembly tutorial (3D SubViewport inside the 2D minigame layout; player/overworld stay 2D) — see `Docs/TUTORIAL_ASSEMBLY_DESIGN.md`
 - `Assets/` — textures, sprites, and dialog `.txt` files
 - `Resources/` — `.tres` resources (events, tutorial slides)
 - `Test/` — manual test scenes/scripts, not part of any automated suite

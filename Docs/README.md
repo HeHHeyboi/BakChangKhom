@@ -19,6 +19,14 @@
 | `Storyboard/CROP_REPORT.md` | ผลตรวจ asset ที่ crop มาจาก sheet (ผ่าน/ลบเศษ/ต้องทำใหม่) |
 | `SYNC_REVIEW.md` | ผลเทียบโค้ดจริงกับดีไซน์ + วิธีแก้ทีละข้อ |
 
+## แนวภาพ 2.5D
+
+`ART_25D_PLAN.md` — แผน 3 ช่วง (Core Part ก่อน → ฉากนิ่ง → world แบบ HD-2D) + วิธีทำโมเดลแบบกล่องแปะรูปให้เปลือง token น้อยสุด
+
+## เกมเพลย์ 2.5D
+
+`RAM_3D_GAMEPLAY.md` — **Part RAM เล่นได้ครบ 8 phase ในฉาก 3D** · flow · node ในซีน · มุมกล้อง · asset · โครงไฟล์ใหม่
+
 ## มินิเกม Tutorial (เล่นก่อน Core Part)
 
 | มินิเกม | ไฟล์ | ความรู้หลัก |
@@ -73,9 +81,9 @@
 2. **ห้ามมีเครื่องหมาย colon** ในบรรทัดบท — parser จะคิดว่าเป็น header ของ choice block
 3. ชื่อหน้าคอมมาต้องตรงกับ key ใน `Global._CharacterMap` เป๊ะ
 4. ไฟล์ต้องเป็น `.txt` และอยู่ใต้ `Assets/` (export preset กรองด้วย `include_filter="*.txt"`)
-5. หัวข้อ phase ต้องเป็น `@SECTION_NAME` ล้วน ๆ — `Scripts/MiniGame/phase_dialog_parser.gd` เช็ก `#` ก่อน `@` เสมอ ถ้าเขียน `# @SECTION_NAME` จะโดนอ่านเป็นคอมเมนต์เฉย ๆ แล้ว section นั้นหายไปทั้งก้อนแบบเงียบ ๆ
+5. หัวข้อ phase ต้องเป็น `@SECTION_NAME` ล้วน ๆ — `Scripts/MiniGame/PartBase/phase_dialog_parser.gd` เช็ก `#` ก่อน `@` เสมอ ถ้าเขียน `# @SECTION_NAME` จะโดนอ่านเป็นคอมเมนต์เฉย ๆ แล้ว section นั้นหายไปทั้งก้อนแบบเงียบ ๆ
 
 ### ⚠️ ต้องทำก่อนใช้ไฟล์เหล่านี้
 
 - [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
-- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริงแค่ `Ram_Pib.txt` ผ่าน `part_ram.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)
+- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/PartBase/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/PartBase/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริงแค่ `Ram_Pib.txt` ผ่าน `part_ram.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)

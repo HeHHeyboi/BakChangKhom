@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://Scripts/MiniGame/part_minigame.gd" id="1_base"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/part_minigame.gd" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://hqki6nb8aski" path="res://Assets/MiniGame/PCCaseBG.jpg" id="2_bg"]
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="3_pib"]
 

@@ -1,7 +1,7 @@
 # MINIGAME1_EARLY_PHASES.md — มินิเกม Part RAM ช่วงแรก (Diagnosis → Briefing → Power Off)
 
 > 29 ก.ย. 2569 · ตรวจจาก commit `ff2ce58` · Godot 4.7 · จอ 1152 × 648
-> ขอบเขต: 3 phase แรกที่มี node ผูกจริงใน `Scene/MiniGame/part_ram.tscn` เท่านั้น — phase อื่นยังเป็น WIP ตามที่ทีมตั้งใจ
+> ขอบเขต: 3 phase แรกที่มี node ผูกจริงใน `Scene/MiniGame/PartRam/part_ram.tscn` เท่านั้น — phase อื่นยังเป็น WIP ตามที่ทีมตั้งใจ
 > เอกสารคู่กัน: `BUG_LIST.md` (BUG-36) · `ASSET_NAMING.md` (ชื่อและขนาด canvas) · `UI_MOCKUP.md` · `MINIGAME1_DESIGN.md`
 
 ---
@@ -21,15 +21,15 @@
 
 | ไฟล์ | เปลี่ยน |
 |---|---|
-| `Scripts/MiniGame/part_ram/phase_diagnosis.gd` | บรรทัดแรกของ `_on_pib_hint_all_lines_finished()` ใส่ `if not visible: return` |
-| `Scripts/MiniGame/part_ram/phase_briefing.gd` | เหมือนกัน |
-| `Scripts/MiniGame/part_ram/part_ram.gd` | `phase_completed.connect(_advance_phase)` → `connect(_advance_phase, CONNECT_DEFERRED)` |
+| `Scripts/MiniGame/PartRam/phase_diagnosis.gd` | บรรทัดแรกของ `_on_pib_hint_all_lines_finished()` ใส่ `if not visible: return` |
+| `Scripts/MiniGame/PartRam/phase_briefing.gd` | เหมือนกัน |
+| `Scripts/MiniGame/PartRam/part_ram.gd` | `phase_completed.connect(_advance_phase)` → `connect(_advance_phase, CONNECT_DEFERRED)` |
 
 ต้องใช้ **ทั้งสองอย่าง** — guard อย่างเดียวไม่พอสำหรับกรณีตอบถูก เพราะ Briefing กลายเป็น visible ก่อนสัญญาณรอบนั้นจะส่งถึงมัน `CONNECT_DEFERRED` เลื่อนการเปลี่ยน phase ไปทำหลังสัญญาณรอบนั้นส่งครบแล้ว
 
 > **ข้อควรจำสำหรับ phase ถัดไป** — ถ้า phase ใหม่ต่อ `all_lines_finished` จาก Editor ด้วย ให้ใส่ `if not visible: return` บรรทัดแรกเสมอ
 
-> **อัปเดต 29 ก.ย. (ครั้งที่ 2)** — ระบบ phase ย้ายไป `Scripts/MiniGame/part_minigame.gd` แล้ว บรรทัด `CONNECT_DEFERRED` อยู่ที่นั่น · BUG-33 (ตารางข้อ 2 แถว 2) แก้แล้ว · PibHint แยกเป็น `Scene/MiniGame/PartBase/pib_hint.tscn` — ข้อ 3.3 ให้เพิ่ม `PibSprite` ในไฟล์นั้นแทน · ดู `Docs/MINIGAME_PREFAB.md`
+> **อัปเดต 29 ก.ย. (ครั้งที่ 2)** — ระบบ phase ย้ายไป `Scripts/MiniGame/PartBase/part_minigame.gd` แล้ว บรรทัด `CONNECT_DEFERRED` อยู่ที่นั่น · BUG-33 (ตารางข้อ 2 แถว 2) แก้แล้ว · PibHint แยกเป็น `Scene/MiniGame/PartBase/pib_hint.tscn` — ข้อ 3.3 ให้เพิ่ม `PibSprite` ในไฟล์นั้นแทน · ดู `Docs/MINIGAME_PREFAB.md`
 
 ---
 

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartMainboard/mb_cpu.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"cpu"
+display_name = "ซีพียู (CPU)"
+role = "สมองของคอม คิดและคำนวณทุกอย่าง ชิ้นเล็กแต่สำคัญที่สุด"
+size = Vector3(0.375, 0.03, 0.375)
+color = Color(0.75, 0.72, 0.62, 1)
+texture = ExtResource("2_tex")
+texture_face = 1
+socket_type = &"cpu_socket"
+requires = Array[StringName]([&"mainboard"])
+core_part = &"mainboard"
+pib_wrong_order = "ASM_NEED_MAINBOARD"

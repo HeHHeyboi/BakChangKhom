@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+[ext_resource type="Texture2D" uid="uid://cw5rb82t545sd" path="res://Assets/MiniGame/PartMainboard/mb_mainboard.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"mainboard"
+display_name = "เมนบอร์ด (mATX)"
+role = "แผงวงจรหลักที่ทุกชิ้นส่วนมาเสียบ เหมือนถนนที่เชื่อมทุกบ้านเข้าด้วยกัน"
+size = Vector3(2.63, 0.016, 2.5)
+color = Color(0.1, 0.28, 0.16, 1)
+texture = ExtResource("2_tex")
+texture_face = 1
+socket_type = &"mb_standoff"
+core_part = &"mainboard"
+pib_wrong_socket = "ASM_WRONG_SOCKET"

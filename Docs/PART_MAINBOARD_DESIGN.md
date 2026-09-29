@@ -216,7 +216,7 @@ var screw_order: Array[int] = []
 var temp_result := 0.0
 ```
 
-* อุปกรณ์เช็ดซิลิโคนใช้ `CleanTool` resource ตัวเดิม เพิ่มไฟล์ `.tres` ที่ `Resources/MiniGame/Tools/`
+* อุปกรณ์เช็ดซิลิโคนใช้ `CleanTool` resource ตัวเดิม เพิ่มไฟล์ `.tres` ที่ `Resources/Parts/Ram/Tools/`
 * ลำดับขันน็อตตรวจด้วย `_is_diagonal(order)` — คู่ทแยงคือ (0,2) และ (1,3)
 * อุณหภูมิผลลัพธ์ = `base_temp + paste_penalty + screw_penalty + dust_penalty`
 

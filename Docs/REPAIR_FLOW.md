@@ -481,7 +481,7 @@ func can_remove(part: PartDef) -> bool:
 | `Scene/Repair/ToolTray.tscn`     | Control     | `Scripts/Repair/tool_tray.gd` (ใช้ซ้ำทุก scene)            |
 | `Scene/Repair/ClueNotebook.tscn` | Control     | `Scripts/Repair/clue_notebook.gd`                          |
 | `Scene/MiniGame/PartRam.tscn`    | Node2D      | มินิเกม Part RAM (จาก `Minigame1.scn` ที่แปลงเป็น `.tscn`) |
-| `Scene/Common/PibHint.tscn`      | CanvasLayer | `Scripts/MiniGame/pib_hint.gd` — ใช้ทุก scene              |
+| `Scene/Common/PibHint.tscn`      | CanvasLayer | `Scripts/MiniGame/PartBase/pib_hint.gd` — ใช้ทุก scene              |
 
 โฟลเดอร์ข้อมูล:
 

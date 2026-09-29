@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"ram_stick"
+display_name = "แรม (RAM) DDR4"
+role = "ที่พักงานชั่วคราวของคอม เหมือนโต๊ะทำงาน ยิ่งใหญ่ยิ่งวางของได้เยอะ"
+size = Vector3(0.013, 0.3125, 1.3335)
+color = Color(0.1, 0.4, 0.18, 1)
+texture_face = 0
+notch_pos = 0.46
+procedural = "dimm"
+socket_type = &"ram_slot"
+requires = Array[StringName]([&"mainboard"])
+needs_orientation = true
+core_part = &"ram"
+pib_before = "INSTALL"
+pib_wrong_orientation = "INSTALL_FLIPPED"

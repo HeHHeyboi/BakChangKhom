@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/pib_hint.gd" id="5_jxkp8"]
+[ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/PartBase/pib_hint.gd" id="5_jxkp8"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a0o4c"]
 

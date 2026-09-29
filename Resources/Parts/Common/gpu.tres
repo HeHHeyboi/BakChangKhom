@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PcPart" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_card.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_part")
+id = &"gpu"
+display_name = "การ์ดจอ (GPU)"
+role = "วาดภาพทุกอย่างที่เห็นบนจอ เสียบช่อง PCIe ยาวช่องบนสุด"
+size = Vector3(0.28, 0.9, 2.0)
+color = Color(0.15, 0.15, 0.17, 1)
+texture = ExtResource("2_tex")
+texture_face = 2
+socket_type = &"pcie_x16"
+requires = Array[StringName]([&"mainboard"])
+core_part = &"gpu"
+pib_wrong_order = "ASM_NEED_MAINBOARD"

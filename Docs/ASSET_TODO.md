@@ -338,3 +338,24 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 | ⬜ | `asm_socket_glow.png` | 256 × 256 | วงแสงนุ่ม ๆ บอกจุดวาง (ขาวบนโปร่ง ย้อมสีในเกม) |
 | ⬜ | `asm_part_card.png` | 320 × 200 | กรอบการ์ดชื่อชิ้นส่วนใน info rail |
 | ⬜ | `asm_bios_logo.png` | 1152 × 648 | จอตอนเปิดเครื่องติด |
+
+---
+
+## Part RAM 2.5D — เพิ่ม 29 ก.ย. 2569 (ดู `RAM_3D_GAMEPLAY.md` ข้อ 5)
+
+| สถานะ | ไฟล์ | ขนาด | เนื้อหา |
+|---|---|---|---|
+| ✅ placeholder | `ram_tex_screen_desktop.png` | 512 × 320 | จอเดสก์ท็อปมีปุ่ม Shut down |
+| ✅ placeholder | `ram_tex_screen_glitch.png` | 512 × 320 | จอค้างเป็นบล็อกสี |
+| ✅ placeholder | `ram_tex_screen_boot_ok.png` | 512 × 320 | จอ POST ผ่าน |
+| ✅ placeholder | `ram_tex_dust.png` | 256 × 256 โปร่ง | ชั้นฝุ่น |
+| ✅ placeholder | `ram_tex_beep.png` | 256 × 256 โปร่ง | วงเสียงบี๊บ |
+| ⬜ | `ram_tex_case_side.png` | 1024 × 1024 | ผิวเหล็กเคส |
+| ⬜ | `ram_tex_esd_mat.png` | 1024 × 512 | ลายแผ่น ESD |
+
+placeholder สร้างจากสคริปต์ — วาดใหม่ทับชื่อเดิมได้เลย ไม่ต้องแก้โค้ด
+
+| `Assets/MiniGame/PartCommon/part_bg_workshop_wall.png` | 1152×648 ผนังร้านซ่อม (placeholder สร้างด้วยโค้ด) | ✅ placeholder — ควรให้ทีมอาร์ตวาดใหม่สไตล์เดียวกับ PCCaseBG |
+| `Resources/Parts/Common/power_strip.tres` | ปลั๊กพ่วง (กล่อง procedural) | ✅ |
+| `Assets/MiniGame/PartCommon/ui_icon_guidebook.png` | 64×64 ไอคอนสมุดคู่มือ (placeholder สร้างด้วยโค้ด) | ✅ placeholder — ให้ทีมอาร์ตวาดใหม่ได้ ชื่อไฟล์เดิม |
+| (ไม่บังคับ) `Assets/MiniGame/PartCommon/ui_book_page.png` + `ui_book_corner.png` | กระดาษ/มุมตกแต่งสมุดคู่มือ ตอนนี้วาดด้วย StyleBox | ⬜ |

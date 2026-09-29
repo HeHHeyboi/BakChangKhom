@@ -97,7 +97,44 @@ Core Part ทั้ง 5 จะเปลี่ยนเป็น 2.5D — **เ�
 | ของใหม่ | ที่อยู่ | ใช้ทำอะไร |
 |---|---|---|
 | `part_stage_3d.tscn` | `Scene/MiniGame/PartBase/` | SubViewport + กล้อง 3/4 + แสง + เคส · instance เพิ่มเข้า Part ที่ต้องการ ไม่ต้องแก้ `part_base.tscn` |
-| `Socket3D` · `PartBody3D` | `Scripts/MiniGame/stage3d/` | จุดติดตั้ง + ชิ้นที่ลากได้ · snap ด้วย raycast |
+| `Socket3D` · `PartBody3D` | `Scripts/MiniGame/PartBase/stage3d/` | จุดติดตั้ง + ชิ้นที่ลากได้ · snap ด้วย raycast |
 | `PcPart` | `Scripts/Resources/pc_part.gd` | ข้อมูลชิ้นส่วน (socket · ต้องมีก่อน · ทิศ · Part ที่ผูก) |
 
 สร้างครั้งแรกในมินิเกม Tutorial ประกอบคอม — ดูสเปกเต็มใน `TUTORIAL_ASSEMBLY_DESIGN.md` หัวข้อ 2 และ 5 · ระบบ phase / ปิ๊บ / คะแนนเดิมใช้ได้ทั้งหมด
+
+### ✅ ชุดร่วม 3D (อัปเดต 29 ก.ย. 2569 — Part RAM ใช้จริงครบ 8 phase)
+
+ไฟล์อยู่ที่ `Scripts/MiniGame/PartBase/stage3d/` และ `Scene/MiniGame/PartBase/part_stage_3d.tscn` · **ตัวอย่างการใช้จริงดูที่ `Scene/MiniGame/PartRam/part_ram.tscn`** (ต้นแบบ `Test/stage3d_ram_demo` ลบแล้ว)
+
+| คลาส | หน้าที่ |
+|---|---|
+| `PartStage3D` | ฉาก 3D · กล้องหน่วงนุ่ม (`smoothing`) · `go_to(&"มุม")` · `focus_on()` · ลาก/snap นุ่ม (`drag_smoothing`) · `allowed` (ชิ้นที่คลิกได้) · `allowed_sockets` · เรืองแสงตอนเมาส์ชี้ |
+| `PartBody3D` (@tool) | `STATIC` / `DRAGGABLE` / `TOGGLE` / `CLICK` · `size_override` / `color_override` / `texture_override` (ใช้ .tres เดียวหลายขนาด) · `add_overlay()` ชั้นฝุ่น · `set_texture()` |
+| `Socket3D` (@tool) | จุดติดตั้ง · Locks · Start Occupant |
+| `CameraPoint3D` (@tool) | มุมกล้องสำเร็จรูป (ตำแหน่ง = จุดโฟกัส · yaw · pitch · distance) — วางใต้ `World/Views` |
+| `Phase3D` | ฐานของ phase ในฉาก 3D: `listen()` (ถอดสัญญาณเองตอนจบ) · `cam()` · `allow()` · `allow_sockets()` · `say()` · `toast()` · `rail_button()` · `finish()` |
+
+**สัญญาณ `PartStage3D`:** `part_picked` · `part_installed` · `part_removed` · `part_returned` · `drop_rejected` · `part_toggled` · `part_clicked` · `view_changed`
+
+**ทำ Part ใหม่:** คัดลอกโครง `part_ram.tscn` → เปลี่ยนของใน `Stage/SubViewport/World` + มุมใน `Views` → เขียน phase ที่ extends `Phase3D` (ดู `RAM_3D_GAMEPLAY.md` ข้อ 7)
+
+### PartStage3D — View style (30 ก.ย.)
+`lock_yaw`, `fixed_yaw`, `orthographic`, `transparent_background`, `pan_limits` + ฟังก์ชัน `pan(dx)` · PartBody3D มี `TOON`/`OUTLINE_PX` ใช้ shader `Scripts/MiniGame/PartBase/stage3d/toon_outline.gdshader` · ถ้าเปิด `transparent_background` ให้ตั้งรูปใน `Background` ของ part_base (ดู RAM_3D_GAMEPLAY.md)
+
+### สมุดคู่มือ + โหมดสถานี (30 ก.ย. ครั้งที่ 2)
+ทุก phase ที่เรียก `PhaseUI.make_frame()` ได้ไอคอนสมุด + เป้าหมายบนหัวข้ออัตโนมัติ ไม่ต้องเขียนเพิ่ม · `PartStage3D.station_mode` = กล้องตายตัวต่อสถานี · `Phase3D.SAY_MAX_LINES` = จำกัดบรรทัดที่ปิ๊บพูด (ที่เกินไปสมุด) — รายละเอียดใน RAM_3D_GAMEPLAY.md
+
+### ห้องใช้ร่วม + การ์ดชิ้นส่วน (30 ก.ย. ครั้งที่ 3)
+- `Scene/MiniGame/PartBase/workshop_room.tscn` = ห้อง diorama (พื้น ผนัง หน้าต่าง ชั้น ขาโต๊ะ) → instance ใต้ `Stage/SubViewport/World` ชื่อ `Room` · Part RAM + Tutorial ประกอบใช้ตัวนี้
+- `PhaseUI.part_card(phase, title, body, footer)` การ์ดกระดาษมุมซ้ายล่าง · `hide_card(phase)`
+- Socket3D ที่เป็นลูกของชิ้นส่วน (เช่นช่องบนเมนบอร์ด) ขยับตามชิ้นได้ และไม่ถูกนับตอนถือชิ้นนั้นอยู่
+
+### ปุ่มย้อนกลับ + สลับมุมกล้อง (30 ก.ย. ครั้งที่ 4) — `ViewNav`
+- `Scripts/MiniGame/PartBase/view_nav.gd` แถบบนซ้ายของฉาก: **◀ กลับ** (ขึ้นเมื่อมีมุมก่อนหน้า) + ปุ่มมุมกล้อง · มุมที่อยู่ตอนนี้สีส้ม
+- คีย์ลัดกลับ: **Esc / Backspace / ปุ่มข้างเมาส์** (ไม่ทำงานตอนสมุดคู่มือเปิด — สมุดอยู่กลุ่ม `modal`)
+- ปุ่มมาจาก **`CameraPoint3D.label`** — ตั้งชื่อ = มีปุ่ม · ว่าง = มุมซูมย่อย (เช่นลำโพง/สล็อตใกล้) ออกด้วย "กลับ"
+  - Part RAM: ภาพรวม · จอ · ในเคส · เมนบอร์ด · ปลั๊กพ่วง · แผ่นรอง ESD
+  - Tutorial ประกอบ: ภาพรวม · ชิ้นส่วน · ในเคส · หน้าเคส · จอ
+- `PartStage3D`: `current_view` · `can_back()` · `back()` · `clear_history()` · `nav_views()` · สัญญาณ `view_name_changed` · `go_to(view, instant, record)`
+- `Phase3D.nav_enabled = false` ซ่อนแถบ (ใช้ในช่วงปิ๊บสอนแรม + หน้าสรุปทั้งสองมินิเกม) · จบ phase = ล้างประวัติมุม
+- สร้างเองตอน phase เรียก `cam()` ครั้งแรก ไม่ต้องวางในซีน
