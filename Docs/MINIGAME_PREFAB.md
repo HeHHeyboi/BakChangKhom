@@ -89,3 +89,15 @@ func _last_phase() -> int:
 ทดสอบด้วย Godot 4.7 headless: ไล่ Diagnosis (ตอบผิด/ถูก) → Briefing → Power Off ได้ผลเหมือนก่อน refactor ทุกขั้น
 
 > **ถ้าเพื่อนเปิด `part_ram.tscn` ค้างใน Editor อยู่** ให้ปิดแท็บแล้วเปิดใหม่ก่อนแก้ต่อ ไม่งั้น Editor จะเซฟเวอร์ชันเก่าทับ
+
+## ฉาก 3D สำหรับแนว 2.5D (วางแผน 29 ก.ย. 2569)
+
+Core Part ทั้ง 5 จะเปลี่ยนเป็น 2.5D — **เฉพาะ play area** (860×420) เป็น `SubViewportContainer` ที่มีฉาก 3D ส่วนแถบหัวข้อ / info rail / ปิ๊บ ยังเป็น 2D เหมือนเดิม · Player และฉากเดินไม่เปลี่ยน
+
+| ของใหม่ | ที่อยู่ | ใช้ทำอะไร |
+|---|---|---|
+| `part_stage_3d.tscn` | `Scene/MiniGame/PartBase/` | SubViewport + กล้อง 3/4 + แสง + เคส · instance เพิ่มเข้า Part ที่ต้องการ ไม่ต้องแก้ `part_base.tscn` |
+| `Socket3D` · `PartBody3D` | `Scripts/MiniGame/stage3d/` | จุดติดตั้ง + ชิ้นที่ลากได้ · snap ด้วย raycast |
+| `PcPart` | `Scripts/Resources/pc_part.gd` | ข้อมูลชิ้นส่วน (socket · ต้องมีก่อน · ทิศ · Part ที่ผูก) |
+
+สร้างครั้งแรกในมินิเกม Tutorial ประกอบคอม — ดูสเปกเต็มใน `TUTORIAL_ASSEMBLY_DESIGN.md` หัวข้อ 2 และ 5 · ระบบ phase / ปิ๊บ / คะแนนเดิมใช้ได้ทั้งหมด
