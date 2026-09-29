@@ -44,7 +44,10 @@ signal view_name_changed(view: StringName) ## ย้ายไปมุมที�
 
 @export_group("Drag")
 @export var hold_lift := 0.35 ## ยกชิ้นสูงจากจุดที่หยิบเท่านี้ตอนถือ (หน่วย 10 ซม.)
-@export var snap_dist := 0.12 ## ระยะแกน XZ ที่ socket เริ่มดูด
+@export var snap_dist := 0.12 ## ระยะแกน XZ ที่ socket เริ่มดูด (ใช้ตอนสั่งย้ายจากโค้ด)
+## ระยะบนจอ (พิกเซล) ที่ socket เริ่มดูดตอนลากด้วยเมาส์ [30 ก.ย.] — เดิมเทียบแกน XZ ที่ความสูงชิ้นในมือ
+## ทำให้มุมกล้องก้มมาก ๆ ต้องลากเลยเป้าไปไกล → วางไม่ลง (ถอดแรมไปแผ่น ESD ไม่ได้)
+@export var snap_px := 48.0
 @export var drag_smoothing := 18.0
 
 @onready var viewport: SubViewport = $SubViewport
@@ -417,7 +420,12 @@ func _move_held(screen_pos: Vector2) -> void:
 	if t < 0:
 		return
 	var p := from + dir * t
+	_mouse_screen = screen_pos
 	move_held_to(Vector3(p.x, _hold_y, p.z))
+	_mouse_screen = Vector2(-1, -1)
+
+
+var _mouse_screen := Vector2(-1, -1) # ตำแหน่งเมาส์ตอนลาก (พิกัดใน viewport) · -1 = สั่งจากโค้ด
 
 
 func move_held_to(p: Vector3, instant := false) -> void:
@@ -433,8 +441,13 @@ func _update_hover() -> void:
 	var best: Socket3D = null
 	var best_d := snap_dist
 	var hp := Vector2(_held_target.x, _held_target.z)
+	var by_screen := _mouse_screen.x >= 0.0
+	if by_screen:
+		best_d = snap_px
 	for s in sockets:
 		var d := hp.distance_to(Vector2(s.global_position.x, s.global_position.z))
+		if by_screen:
+			d = _mouse_screen.distance_to(camera.unproject_position(s.global_position))
 		if not allowed_sockets.is_empty() and not allowed_sockets.has(s) and s != _held_origin:
 			continue
 		if _held.is_ancestor_of(s): # socket ที่ติดมากับชิ้นในมือ (เช่นช่อง CPU บนเมนบอร์ด) ไม่นับ [30 ก.ย.]
