@@ -132,6 +132,33 @@ func read_file(file_path: StringName):
 	file.close()
 
 
+## คำในวงเล็บหลังชื่อผู้พูด → อารมณ์ เช่น "ขม (ยิ้ม)" → name "ขม" · mood "happy"
+## อารมณ์ที่ตรงก่อน (ตามลำดับ key) ชนะ · ไม่ตรงเลย = ""
+const MOOD_WORDS := {
+	"happy": ["ยิ้ม", "ดีใจ", "หัวเราะ", "ภูมิใจ", "ตื่นเต้น"],
+	"worry": ["กังวล", "เครียด", "ถอนหายใจ", "ตกใจ", "เศร้า", "เหนื่อย", "สั่น"],
+}
+
+
+## แยก "ชื่อ (คำกำกับ)" ออกเป็นชื่อ + อารมณ์ + คำกำกับ แล้วสร้าง token
+func from_raw(raw_name: String, p_dialog: String) -> DialogToken:
+	var base := raw_name.strip_edges()
+	var extra := ""
+	var i := base.find("(")
+	if i > 0:
+		extra = base.substr(i)
+		base = base.substr(0, i).strip_edges()
+	var mood := ""
+	for m in MOOD_WORDS:
+		for w in MOOD_WORDS[m]:
+			if extra.contains(w):
+				mood = m
+				break
+		if !mood.is_empty():
+			break
+	return DialogToken.new(base, p_dialog, mood, extra)
+
+
 func parse_text(text: String):
 	var header: String = ""
 	var body
@@ -156,7 +183,7 @@ func parse_text(text: String):
 				return null
 			for i in range(len(body)):
 				body[i] = body.get(i).lstrip(" ")
-			return DialogToken.new(body[0], body[1])
+			return from_raw(body[0], body[1])
 
 
 func show_text(token) -> void:
@@ -165,10 +192,10 @@ func show_text(token) -> void:
 
 	match token:
 		var dialog when token is DialogToken:
-			NameBox.text = dialog.name
+			NameBox.text = dialog.name + " " + dialog.note
 			TextBox.clear()
 			TextBox.add_text(dialog.dialog)
-			_show_speaker(dialog.name)
+			_show_speaker(dialog)
 		var choice when token is ChoiceToken:
 			create_choice_buttons(choice.choices)
 			skip_btn.disabled = true
@@ -178,40 +205,22 @@ func show_text(token) -> void:
 
 ## [Claude 1 ต.ค.] รูปคนพูดขึ้นเองตามชื่อในสคริปต์ — "ยาย (น้ำเสียงอ่อนโยน)" → ยาย · อารมณ์ในวงเล็บเปลี่ยนรูป เช่น "ขม (ยิ้ม)" → ขม:happy
 ## ชื่อที่ไม่มีรูป (คำบรรยาย · โทรศัพท์) = ไม่ขึ้นรูป · เพิ่มตัวละครได้ที่ _CharacterMap ใน Scene/Global.tscn
-const MOOD_WORDS := {
-	"happy": ["ยิ้ม", "ดีใจ", "หัวเราะ", "ภูมิใจ", "ตื่นเต้น"],
-	"worry": ["กังวล", "เครียด", "ถอนหายใจ", "ตกใจ", "เศร้า", "เหนื่อย", "สั่น"],
-}
-
-
-func _speaker_key(raw: String) -> Array:
-	var base := raw.strip_edges()
-	var extra := ""
-	var i := base.find("(")
-	if i > 0:
-		extra = base.substr(i)
-		base = base.substr(0, i).strip_edges()
-	var mood := ""
-	for m in MOOD_WORDS:
-		for w in MOOD_WORDS[m]:
-			if extra.contains(w):
-				mood = m
-	return [base, mood]
-
-
+## (แยกชื่อ/อารมณ์ทำตอนอ่านไฟล์ใน DialogToken.from_raw — ดู MOOD_WORDS ที่นั่น)
 const PORTRAIT_SCALE := 0.85
 var _recent: Array[CharacterSprite] = [] # คนพูดล่าสุดอยู่ท้าย
 
 
 ## โชว์ได้ทีละ 2 คน (ซ้าย/ขวา) ไม่ซ้อนกัน · คนที่ 3 มาแทนคนที่ไม่ได้พูดนานสุด
-func _show_speaker(raw: String) -> void:
-	var k: Array = _speaker_key(raw)
-	var base: String = k[0]
+func _show_speaker(token: DialogToken) -> void:
+	var base := token.name
 	if not Global.hasCharacter(base):
 		return
-	var mood_key: String = base + ":" + String(k[1])
-	var tex = Global.getCharacterTexture(mood_key if k[1] != "" and Global.hasCharacter(mood_key) else base)
-	_recent = _recent.filter(func(c): return is_instance_valid(c) and not c.is_queued_for_deletion())
+	var mood_key := base + ":" + token.mood
+	var tex = Global.getCharacterTexture(mood_key if token.mood != "" and Global.hasCharacter(mood_key) else base)
+	_recent = _recent.filter(
+		func(c):
+			return is_instance_valid(c) and not c.is_queued_for_deletion(),
+	)
 	for n in ShowSprites.get_children():
 		if n is CharacterSprite and n.name == base.validate_node_name() and not n.is_queued_for_deletion():
 			curSprite = n
