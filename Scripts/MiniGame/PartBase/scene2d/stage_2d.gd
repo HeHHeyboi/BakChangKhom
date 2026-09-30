@@ -389,7 +389,7 @@ func begin_drag(b: Item2D) -> bool:
 	b.modulate.a = 0.92
 	for s in sockets:
 		if view_of(s) and _socket_ok(s) and s.check(b, installed_ids) == Socket2D.Result.OK:
-			s.highlight(3)
+			s.highlight(Socket2D.HL.HINT)
 	part_picked.emit(b)
 	return true
 
@@ -419,10 +419,14 @@ func _update_socket_hover() -> void:
 			best_d = d
 			best = s
 	if _hover and _hover != best:
-		_hover.highlight(3 if _hover.check(_held, installed_ids) == Socket2D.Result.OK else 0)
+		_hover.highlight(
+			(Socket2D.HL.HINT if _hover.check(_held, installed_ids) == Socket2D.Result.OK else Socket2D.HL.CLOSE)
+		)
 	_hover = best
 	if _hover:
-		_hover.highlight(1 if _hover.check(_held, installed_ids) == Socket2D.Result.OK else 2)
+		_hover.highlight(
+			Socket2D.HL.VALID if _hover.check(_held, installed_ids) == Socket2D.Result.OK else Socket2D.HL.INVALID
+		)
 
 
 func _update_portal() -> void:
@@ -466,7 +470,7 @@ func _drop() -> void:
 		_portal.set_hover(false)
 		_portal = null
 	for s in sockets:
-		s.highlight(0)
+		s.highlight(Socket2D.HL.CLOSE)
 	var s := _hover
 	_hover = null
 	if s:

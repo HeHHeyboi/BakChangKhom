@@ -4,7 +4,7 @@ extends Phase2D
 ## ผิด → ชิ้นเด้งกลับ + ปิ๊บบอกเหตุผล (PcPart.pib_wrong_order / pib_wrong_socket) · Tutorial ไม่หักคะแนน
 
 var _built := false
-var _checks := {} # Item2D → Label
+var _checks := { } # Item2D → Label
 
 
 func init():
@@ -40,7 +40,7 @@ func _next_hint() -> void:
 	var s := _socket_for(p)
 	hint(p, "ลาก" + p.data.display_name.get_slice(" ", 0) + "ไปวางในเคส", 6.0)
 	if s:
-		s.highlight(1) # กรอบเรืองแสงตรงที่ต้องวาง
+		s.highlight(Socket2D.HL.INVALID) # กรอบเรืองแสงตรงที่ต้องวาง
 
 
 func _socket_for(p: Item2D) -> Socket2D:
@@ -53,7 +53,7 @@ func _socket_for(p: Item2D) -> Socket2D:
 func _on_installed(p: Item2D, s: Socket2D) -> void:
 	if not _checks.has(p) or s.accept_any:
 		return
-	s.highlight(0)
+	s.highlight(Socket2D.HL.CLOSE)
 	p.mode = Item2D.Mode.STATIC # วางแล้วล็อกไว้ ไม่ให้หลุดออกระหว่าง Tutorial
 	PhaseUI.set_check(_checks[p], true)
 	PhaseUI.part_card(self, p.data.display_name, "ติดตั้งแล้ว ✓", owner.core_name(p.data))

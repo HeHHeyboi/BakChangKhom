@@ -4,7 +4,14 @@ class_name Socket2D extends Control
 ## ตรวจตามกฎ TUTORIAL_ASSEMBLY_DESIGN.md ข้อ 4 · ใน Editor เห็นเป็นกรอบฟ้าจาง ๆ
 ## [Claude 30 ก.ย. 2569] แทน Socket3D/Socket25D
 
-enum Result { OK, WRONG_SOCKET, WRONG_ORDER, WRONG_ORIENTATION, OCCUPIED, LOCKED }
+enum Result {
+	OK,
+	WRONG_SOCKET,
+	WRONG_ORDER,
+	WRONG_ORIENTATION,
+	OCCUPIED,
+	LOCKED,
+}
 
 @export var socket_type: StringName
 @export var accept_any := false ## ถาดพักชิ้นส่วน: รับทุกชิ้น
@@ -16,7 +23,13 @@ enum Result { OK, WRONG_SOCKET, WRONG_ORDER, WRONG_ORIENTATION, OCCUPIED, LOCKED
 @export var look := ""
 
 var occupant: Item2D
-var _hl := 0 # 0 ปิด · 1 เขียว · 2 แดง · 3 ใบ้ (ถือชิ้นที่ใส่ได้)
+enum HL {
+	CLOSE,
+	VALID,
+	INVALID,
+	HINT,
+}
+var _hl := HL.CLOSE # 0 ปิด · 1 เขียว · 2 แดง · 3 ใบ้ (ถือชิ้นที่ใส่ได้)
 
 
 func _ready() -> void:
@@ -48,7 +61,7 @@ func check(part: Item2D, installed_ids: Array) -> Result:
 
 
 ## 0 = ปิด · 1 = เขียว (ใส่ได้) · 2 = แดง (ผิด) · 3 = กรอบประให้รู้ว่าวางตรงนี้ได้
-func highlight(state: int) -> void:
+func highlight(state: HL) -> void:
 	_hl = state
 	queue_redraw()
 
@@ -56,13 +69,13 @@ func highlight(state: int) -> void:
 func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size).grow(-2)
 	match _hl:
-		1:
+		HL.VALID:
 			draw_rect(r, Color(0.3, 1, 0.45, 0.28))
 			draw_rect(r, Color(0.3, 1, 0.45, 0.9), false, 3)
-		2:
+		HL.INVALID:
 			draw_rect(r, Color(1, 0.3, 0.3, 0.28))
 			draw_rect(r, Color(1, 0.3, 0.3, 0.9), false, 3)
-		3:
+		HL.HINT:
 			var c := Color(1, 0.9, 0.5, 0.85)
 			var pts := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y), r.position]
 			for i in 4:
