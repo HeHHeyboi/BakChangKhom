@@ -329,7 +329,7 @@ C01 (แรมสกปรก) มีพัดลมเคสฝืดซ่อ�
 
 ## 6. S4 · Reassemble — ประกอบกลับและทดสอบ
 
-> **29 ก.ย. 2569** — S2 (ถอด) และ S4 (ประกอบกลับ) จะใช้ฉาก 3D `part_stage_3d.tscn` + `Socket3D` ชุดเดียวกับมินิเกม Tutorial ประกอบคอม (`TUTORIAL_ASSEMBLY_DESIGN.md`) · ลำดับ dependency ใช้ `PcPart.requires` ตัวเดียวกัน
+> **29 ก.ย. 2569** — S2 (ถอด) และ S4 (ประกอบกลับ) จะใช้ฉาก 2D `part_stage_2d.tscn` + `Socket2D` (เดิมร่างเป็น 3D — เปลี่ยนเป็น 2D เมื่อ 30 ก.ย. ดู `SCENE_2D.md`) ชุดเดียวกับมินิเกม Tutorial ประกอบคอม (`TUTORIAL_ASSEMBLY_DESIGN.md`) · ลำดับ dependency ใช้ `PcPart.requires` ตัวเดียวกัน
 
 1. **ประกอบย้อนลำดับ** — ระบบเช็ค dependency กลับด้าน (ใส่เมนบอร์ดก่อน จึงใส่ CPU cooler ได้)
 2. **เช็คลิสต์ก่อนปิดฝา** (ปิ๊บอ่านให้ทีละข้อ):

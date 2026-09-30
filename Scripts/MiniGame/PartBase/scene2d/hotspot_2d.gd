@@ -60,4 +60,12 @@ func _draw() -> void:
 		draw_rect(Rect2(box.position + Vector2(2, 3), box.size), Color(0, 0, 0, 0.35))
 		draw_rect(box, COL_PLATE)
 		draw_rect(box, COL_INK, false, 3)
-		draw_string(f, Vector2(box.position.x + 12, box.position.y + 20), label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, COL_INK)
+		draw_string(
+			f,
+			Vector2(box.position.x + 12, box.position.y + 20),
+			label_text,
+			HORIZONTAL_ALIGNMENT_LEFT,
+			-1,
+			fs,
+			COL_INK,
+		)

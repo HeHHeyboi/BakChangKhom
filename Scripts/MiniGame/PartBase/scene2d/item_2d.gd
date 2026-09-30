@@ -214,7 +214,7 @@ static func _mask(t: Texture2D) -> BitMap:
 		if img.is_compressed():
 			img.decompress()
 		bm = BitMap.new()
-		bm.create_from_image_alpha(img, 0.1)
+		bm.create_from_image_alpha(img, 0.5)
 	m[t] = bm
 	return bm
 

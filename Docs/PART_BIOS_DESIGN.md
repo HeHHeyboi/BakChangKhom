@@ -4,6 +4,8 @@
 > ชุดเดียวกับ: `MINIGAME1_DESIGN.md` · `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md`
 > อยู่ใน Scene S3 ของลูปงานซ่อม (ทำ **หลังประกอบเครื่องเสร็จ**) — `REPAIR_FLOW.md` · asset: `Assets/MiniGame/PartBios/` (`bios_*`)
 
+> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · ยังไม่มีซีนของ Part นี้ในรีโป
+
 ---
 
 ## 1. ความรู้ที่ Part นี้สอน

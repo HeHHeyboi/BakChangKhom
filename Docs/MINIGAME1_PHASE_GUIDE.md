@@ -1,6 +1,6 @@
 # MINIGAME1_PHASE_GUIDE.md — คู่มือสร้าง phase ของมินิเกม Part RAM
 
-> ⚠️ **29 ก.ย. 2569: Part RAM ย้ายเป็น 2.5D แล้ว** — phase ทั้ง 8 เขียนใหม่ใน `Scripts/MiniGame/PartRam/` (extends `Phase3D`) · UI 2D placeholder ในเอกสารนี้ถูกแทนด้วยฉาก 3D · ดูของปัจจุบันที่ `RAM_3D_GAMEPLAY.md` · กติกา/คะแนนในเอกสารนี้ยังใช้ได้
+> ⚠️ **30 ก.ย. 2569: Part RAM เป็น 2D แล้ว** — phase ทั้ง 8 อยู่ใน `Scripts/MiniGame/PartRam/` (extends `Phase2D`) เล่นได้ครบทุก phase · UI placeholder ในเอกสารนี้ถูกแทนด้วยฉาก 2D (`Stage2D`/`View2D`/`Item2D`) · ดูของปัจจุบันที่ `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บในเอกสารนี้ยังใช้ได้ · ตารางสถานะด้านล่างเป็นของ 29 ก.ย. (ตอนนี้ทุก phase ✅)
 
 > 29 ก.ย. 2569 · ใช้คู่กับ `MINIGAME1_DESIGN.md` (กติกา/เหตุผลดีไซน์) · `MINIGAME_PREFAB.md` (โครง prefab) · `ASSET_NAMING.md` (ขนาดไฟล์)
 > เอกสารนี้ตอบคำถามเดียว: **แต่ละ phase ต้องใส่อะไรลงไปบ้าง** (node · สคริปต์ · บทปิ๊บ · การหักคะแนน · รูป · เงื่อนไขจบ)

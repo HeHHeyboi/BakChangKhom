@@ -359,3 +359,16 @@ placeholder สร้างจากสคริปต์ — วาดใหม
 | `Resources/Parts/Common/power_strip.tres` | ปลั๊กพ่วง (กล่อง procedural) | ✅ |
 | `Assets/MiniGame/PartCommon/ui_icon_guidebook.png` | 64×64 ไอคอนสมุดคู่มือ (placeholder สร้างด้วยโค้ด) | ✅ placeholder — ให้ทีมอาร์ตวาดใหม่ได้ ชื่อไฟล์เดิม |
 | (ไม่บังคับ) `Assets/MiniGame/PartCommon/ui_book_page.png` + `ui_book_corner.png` | กระดาษ/มุมตกแต่งสมุดคู่มือ ตอนนี้วาดด้วย StyleBox | ⬜ |
+
+---
+
+## Scene2D — เพิ่ม 30 ก.ย. 2569 (ดู `SCENE_2D.md` ข้อ 3)
+
+> ฉากมินิเกม 2D ใช้รูปใน `Assets/MiniGame/Scene2D/` (ต้นฉบับ SVG ใน `src/` · แก้ใน Inkscape แล้ว export PNG ขนาดเดิมทับได้) · ส่วนใหญ่เป็น placeholder วาดจากโค้ด/SVG ให้ทีมอาร์ตวาดใหม่ทับชื่อเดิม
+
+| สถานะ | ไฟล์ |
+|---|---|
+| ✅ placeholder | `overview_shop.jpg` · `desk_pc.png` · `inside_bg.png` · `build_bg.png` · `esd_mat_view.png` · `power_strip_view.png` · `slots_zoom.png` · `mb_in_case.png` |
+| ✅ placeholder | `ram_slot` · `ram_slot_dirty` · `ram_mini` · `clip_closed/open` · `slot_dust` · `case_glass` · `desk_bg` · `plug_in/out` · `ssd_m2` |
+
+ไฟล์ `ram_tex_*` และ `part_bg_workshop_wall.png` ของแนว 3D ใช้ต่อบางส่วน (`ram_tex_screen_*` · `ram_tex_beep`)

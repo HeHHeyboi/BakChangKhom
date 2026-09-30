@@ -132,8 +132,8 @@ func _layout() -> void:
 		x = clampf(x, minf(0.0, size.x - View2D.DESIGN.x), 0.0)
 		v.position = Vector2(x, (size.y - View2D.DESIGN.y) / 2.0)
 
-
 # ---------------------------------------------------------------- มุม
+
 
 func go_to(view_name: StringName, instant := false, record := true) -> void:
 	var v := find_view(view_name)
@@ -215,8 +215,8 @@ func reset_view() -> void:
 func pan(_dx: float) -> void:
 	pass
 
-
 # ---------------------------------------------------------------- ตำแหน่งบนจอ
+
 
 ## ตำแหน่งบนจอ (canvas) ของ node — ถ้าอยู่มุมอื่น ชี้ไปที่ Hotspot ที่พาไปมุมนั้นแทน · null = ไม่มีให้ชี้
 func screen_pos_of_node(n: Control):
@@ -234,8 +234,8 @@ func screen_pos_of_node(n: Control):
 			return c.get_global_transform_with_canvas() * (c.size / 2.0)
 	return null
 
-
 # ---------------------------------------------------------------- ติดตั้ง
+
 
 func install(part: Item2D, s: Socket2D, animate := true, emit := true) -> void:
 	s.occupant = part
@@ -279,8 +279,8 @@ func _can_use(b: Control) -> bool:
 		return false
 	return b.mode != Item2D.Mode.STATIC and (allowed.is_empty() or allowed.has(b))
 
-
 # ---------------------------------------------------------------- input
+
 
 func _gui_input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
@@ -381,7 +381,9 @@ func begin_drag(b: Item2D) -> bool:
 	# ย้ายขึ้นชั้นบนสุด ลอยตามเมาส์
 	b.reparent(top)
 	b.position = top.get_global_transform_with_canvas().affine_inverse() * gp
-	var local_mouse := top.get_global_transform_with_canvas().affine_inverse() * (get_global_transform_with_canvas() * _mouse)
+	var local_mouse := top.get_global_transform_with_canvas().affine_inverse() * (
+		get_global_transform_with_canvas() * _mouse
+	)
 	_grab = local_mouse - b.position
 	_grab = _grab.lerp(b.size / 2.0, 0.5) # ดึงเข้ากลางนิด ๆ ให้ถือถนัด
 	b.modulate.a = 0.92
@@ -450,7 +452,9 @@ func drop() -> void:
 func move_mouse(p: Vector2) -> void:
 	_mouse = p
 	if _held:
-		_held.position = top.get_global_transform_with_canvas().affine_inverse() * (get_global_transform_with_canvas() * p) - _grab
+		_held.position = top.get_global_transform_with_canvas().affine_inverse() * (
+			get_global_transform_with_canvas() * p
+		) - _grab
 		_update_socket_hover()
 
 

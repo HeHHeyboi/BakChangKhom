@@ -247,7 +247,7 @@ class_name PcPart extends Resource
 
 ## สถานะโค้ด 30 ก.ย. 2569 (เวอร์ชันแรกที่เล่นได้)
 
-**เปิดเทส:** รันซีน `Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn` ตรง ๆ (F6) · ยังไม่ได้ผูกเข้า `Global.MiniGames` / EventManager — ผูกเมื่อพร้อมโดยเรียกซีนนี้แบบเดียวกับ Part RAM
+**เปิดเทส:** รันซีน `Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn` ตรง ๆ (F6) · **ผูกเข้าเควสต์หลักแล้ว (commit `65bddbf`)** — `Resources/main.tres` step ที่ 4 ใน 6 step (index 3 · MINIGAME, `scene_path` = ซีนนี้) ต่อจากหายางลบ และอยู่ก่อน tutorial/มินิเกมแรม · จบซีนแล้ว `tutorial_assembly.gd` ตั้ง `Global.in_minigame = false` และเรียก `EventManager.minigame_end()` · บทปิ๊บอยู่ `Assets/Dialog/MiniGame/Assembly_Pib.txt`
 
 **ย่อ flow เหลือ 4 phase** (ตัด SAFETY / CABLES / CLOSE ไว้ทำรอบหลัง)
 

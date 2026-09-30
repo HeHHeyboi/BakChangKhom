@@ -17,6 +17,16 @@
 
 ---
 
+## 🆕 อัปเดต 30 ก.ย. 2569 — ฉากมินิเกมเปลี่ยนเป็น 2D (commit `8c8a81f`, `65bddbf`)
+
+- **BUG-32 (จอว่างหลัง Phase 0) และหมายเหตุ `current_phase` ของ 28 ก.ย.:** ปิดแล้ว — `part_ram.gd` ลงทะเบียนครบ 8 phase ใน `_register_phases()` และ Part RAM เล่นจบทั้ง 8 phase ได้ (ดู `MINIGAME1_PHASE_GUIDE.md`)
+- **หมายเหตุ `Global.in_minigame` ค้าง (จาก `MINIGAME1_DESIGN.md` 8.4):** ✅ ไม่เป็นปัญหาแล้ว — `part_ram.gd:104` และ `tutorial_assembly.gd:77` ตั้ง `false` ตอนจบเอง (`find_item_minigame.gd:21` เหมือนเดิม) · แนวทางยั่งยืนกว่าคือย้ายไป `EventManager.minigame_end()` ที่เดียว
+- **BUG-34 (ข้อความเควสต์ภาษาอังกฤษ):** ✅ `main.tres` เป็นภาษาไทยทุก step แล้ว และมี 6 step (คุยยาย → เข้าห้อง → หายางลบ → **ประกอบคอมกับปิ๊บ** → tutorial ขัดแรม → ซ่อมแรม)
+- **ยังเปิดอยู่:** BUG-14 · 15 · 16 · 17 · 21–23 · 25 · ยังไม่มี Save System · ยังไม่มี Audio · `"ปิ๊บ"` ยังไม่อยู่ใน `_CharacterMap` (ไม่กระทบมินิเกมเพราะ `PibHint` มีแผงของตัวเอง แต่บท NPC ยังติด)
+- **ข้อจำกัดที่รู้ของ 2D (ไม่ใช่บั๊ก):** VERIFY ไม่ผ่านย้อนกลับไม่ได้ · ฝากระจกเปิดแล้วไม่ปิดกลับ · CLEAN ใช้อุปกรณ์ทีละครั้ง ไม่มี "รอให้แห้ง"/`CLEAN_OVERDONE` · Tutorial ยังไม่เช็กทิศ CPU/แรม · ดู `SCENE_2D.md` หัวข้อ 5
+
+---
+
 ## 🆕 ตรวจเพิ่ม 29 ก.ย. 2569 — หลัง commit `47fbfd7` (Briefing phase + class `Phase`)
 
 ### BUG-36 🔴 → ✅ `PibHint.all_lines_finished` ทำให้ phase เลื่อนผิด

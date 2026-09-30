@@ -1,6 +1,6 @@
 # Docs — สารบัญเอกสารออกแบบ BakChangKhom
 
-อัปเดต 22 ก.ย. 2569 · อ้างอิงโค้ดที่ commit `1c9040a`
+อัปเดต 30 ก.ย. 2569 · อ้างอิงโค้ดที่ commit `65bddbf` (ฉากมินิเกมเป็น 2D ทั้งหมดแล้ว — ดู `SCENE_2D.md`)
 
 ## ภาพรวมระบบ
 
@@ -19,19 +19,25 @@
 | `Storyboard/CROP_REPORT.md` | ผลตรวจ asset ที่ crop มาจาก sheet (ผ่าน/ลบเศษ/ต้องทำใหม่) |
 | `SYNC_REVIEW.md` | ผลเทียบโค้ดจริงกับดีไซน์ + วิธีแก้ทีละข้อ |
 
-## แนวภาพ 2.5D
+## ฉากมินิเกม 2D (ปัจจุบัน)
+
+`SCENE_2D.md` — **เริ่มอ่านที่นี่ถ้าจะแตะฉากมินิเกม** · 30 ก.ย. แทนระบบ 3D/2.5D เดิมทั้งหมดด้วย Control 2D (`Stage2D` · `View2D` · `Item2D` · `Socket2D` · `Hotspot2D` · `Phase2D`) · รูปอยู่ `Assets/MiniGame/Scene2D/` (ต้นฉบับ SVG ใน `src/`)
+
+## แนวภาพ 2.5D (เอกสารประวัติ)
+
+> ⚠️ ใช้เป็นประวัติเท่านั้น — ชื่อคลาส/กล้อง/พิกัด 3D ล้าสมัยแล้ว
 
 `ART_25D_PLAN.md` — แผน 3 ช่วง (Core Part ก่อน → ฉากนิ่ง → world แบบ HD-2D) + วิธีทำโมเดลแบบกล่องแปะรูปให้เปลือง token น้อยสุด
 
 ## เกมเพลย์ 2.5D
 
-`RAM_3D_GAMEPLAY.md` — **Part RAM เล่นได้ครบ 8 phase ในฉาก 2.5D** (30 ก.ย. เปลี่ยนเป็น 2D Dimetric → `SCENE_2D.md`) · flow · node ในซีน · มุมกล้อง · asset · โครงไฟล์ใหม่
+`RAM_3D_GAMEPLAY.md` — **Part RAM เล่นได้ครบ 8 phase** (เขียนตอนเป็น 3D · 30 ก.ย. เปลี่ยนเป็น 2D แล้ว → flow/คะแนนยังใช้ได้ ส่วนโหนดและกล้องดู `SCENE_2D.md`) · flow · node ในซีน · มุมกล้อง · asset · โครงไฟล์ใหม่
 
 ## มินิเกม Tutorial (เล่นก่อน Core Part)
 
 | มินิเกม | ไฟล์ | ความรู้หลัก |
 |---|---|---|
-| ประกอบคอมพิวเตอร์ (2.5D) | `TUTORIAL_ASSEMBLY_DESIGN.md` | ชื่อ/หน้าที่/ตำแหน่งชิ้นส่วน 9 ชิ้น · ลำดับประกอบ · ESD · ฉาก 2.5D ที่ Core Part ยืมใช้ |
+| ประกอบคอมพิวเตอร์ (2D) | `TUTORIAL_ASSEMBLY_DESIGN.md` | **เล่นได้แล้ว 4 phase และผูกเข้าเควสต์หลักแล้ว** (ต่อจากหายางลบ ก่อน tutorial/มินิเกมแรม) · ชื่อ/หน้าที่ชิ้นส่วน 7 ชิ้น · ลำดับประกอบ · ยังขาด SAFETY/CABLES/CLOSE |
 
 ## มินิเกม Core Part 5 ตัว
 
@@ -50,7 +56,8 @@
 1. แก้ที่เหลือใน `BUG_LIST.md` (ที่ยังเป็น ⬜)
 2. ตัดสินใจเรื่อง Player / MainGame.tscn (BUG-15) ก่อนเริ่ม scene ใหม่
 3. ทำ asset ชุด A + B ใน `ASSET_TODO.md`
-4. implement Core Part: RAM ให้ครบ 8 phase เป็นต้นแบบ
+4. ~~implement Core Part: RAM ให้ครบ 8 phase เป็นต้นแบบ~~ ✅ เล่นได้ครบแล้ว (2D) — เหลือภาพจริง เสียง และย้อน phase ตอน VERIFY ไม่ผ่าน
+4b. ต่อยอด Tutorial ประกอบคอม (SAFETY · CABLES · CLOSE · เช็กทิศ CPU/แรม) แล้วทำ Core Part ถัดไปจากโครง `part_ram.tscn`
 5. ทำ `RepairManager` + Scene S1/S2 ตาม `REPAIR_FLOW.md`
 6. ขยาย Core Part ที่เหลือทีละตัวด้วยโครงเดียวกัน
 
@@ -64,6 +71,7 @@
 | `Gpu_Pib.txt` | 36 | 24 | Core Part GPU |
 | `FrontPanel_Pib.txt` | 28 | 20 | Core Part Front Panel |
 | `Bios_Pib.txt` | 34 | 21 | Core Part BIOS |
+| `Assembly_Pib.txt` | — | — | Tutorial ประกอบคอม (ใช้งานจริงแล้ว) |
 | `FindEraser.txt` | 4 | 4 | มินิเกมหายางลบ (แทน `dialog_arr` ในสคริปต์) |
 
 ### ฟอร์แมต
@@ -86,4 +94,4 @@
 ### ⚠️ ต้องทำก่อนใช้ไฟล์เหล่านี้
 
 - [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
-- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/PartBase/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/PartBase/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริงแค่ `Ram_Pib.txt` ผ่าน `part_ram.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)
+- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/PartBase/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/PartBase/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริง `Ram_Pib.txt` ผ่าน `part_ram.gd` และ `Assembly_Pib.txt` ผ่าน `tutorial_assembly.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)
