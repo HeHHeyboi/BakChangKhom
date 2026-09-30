@@ -1,94 +1,191 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/PartBase/pib_hint.gd" id="5_jxkp8"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_normal.png" id="t_normal"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_happy.png" id="t_happy"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_worry.png" id="t_worry"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_point.png" id="t_point"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a0o4c"]
+[sub_resource type="StyleBoxEmpty" id="empty"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8lhnf"]
+[sub_resource type="StyleBoxFlat" id="bubble"]
+bg_color = Color(1, 0.964706, 0.886275, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.172549, 0.0941176, 0.0627451, 0.3)
+shadow_size = 2
+shadow_offset = Vector2(5, 7)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orn6i"]
-bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0.7058824)
+[sub_resource type="StyleBoxFlat" id="chip"]
+content_margin_left = 16.0
+content_margin_top = 2.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(0.909804, 0.658824, 0.329412, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
-[node name="PibHint" type="CanvasLayer" unique_id=307941609]
+[node name="PibHint" type="CanvasLayer"]
 layer = 120
 visible = false
 script = ExtResource("5_jxkp8")
+mood_textures = Dictionary[int, Texture2D]({
+0: ExtResource("t_normal"),
+1: ExtResource("t_happy"),
+2: ExtResource("t_worry"),
+3: ExtResource("t_point")
+})
 
-[node name="DialogPanel" type="Button" parent="." unique_id=961198624]
+[node name="DialogPanel" type="Button" parent="."]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 480.0
+offset_top = 440.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("empty")
+theme_override_styles/disabled = SubResource("empty")
+theme_override_styles/hover_pressed = SubResource("empty")
+theme_override_styles/hover = SubResource("empty")
+theme_override_styles/pressed = SubResource("empty")
+theme_override_styles/normal = SubResource("empty")
 
-[node name="Container" type="HBoxContainer" parent="DialogPanel" unique_id=2023095318]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Pib" type="TextureRect" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -44.0
+offset_right = 204.0
+offset_bottom = 206.0
+mouse_filter = 2
+texture = ExtResource("t_normal")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="VSeparator" type="VSeparator" parent="DialogPanel/Container" unique_id=1412869140]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.25
-mouse_filter = 1
-theme_override_styles/separator = SubResource("StyleBoxEmpty_a0o4c")
+[node name="Bubble" type="Panel" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 206.0
+offset_top = 46.0
+offset_right = 1136.0
+offset_bottom = 196.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("bubble")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="DialogPanel/Container" unique_id=191156297]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 10.0
-theme_override_constants/separation = 6
+[node name="Tail" type="Polygon2D" parent="DialogPanel/Bubble"]
+position = Vector2(3, 0)
+color = Color(1, 0.964706, 0.886275, 1)
+polygon = PackedVector2Array(0, 50, -30, 74, 0, 92)
 
-[node name="Name" type="RichTextLabel" parent="DialogPanel/Container/VBoxContainer" unique_id=837285019]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-mouse_filter = 1
+[node name="TailLine" type="Line2D" parent="DialogPanel/Bubble"]
+points = PackedVector2Array(3, 48, -28, 74, 3, 94)
+width = 5.0
+default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+joint_mode = 2
+
+[node name="Name" type="Label" parent="DialogPanel/Bubble"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = -22.0
+offset_right = 110.0
+offset_bottom = 14.0
+theme_override_colors/font_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("chip")
+text = "ปิ๊บ"
+
+[node name="Dialog" type="RichTextLabel" parent="DialogPanel/Bubble"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 900.0
+offset_bottom = 138.0
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
 theme_override_font_sizes/normal_font_size = 24
 theme_override_font_sizes/bold_font_size = 24
-theme_override_font_sizes/bold_italics_font_size = 24
-theme_override_font_sizes/italics_font_size = 24
-theme_override_font_sizes/mono_font_size = 24
-text = "sdfsdfasdf"
-vertical_alignment = 1
+bbcode_enabled = true
+text = "..."
+scroll_active = false
 
-[node name="Dialog" type="RichTextLabel" parent="DialogPanel/Container/VBoxContainer" unique_id=1072533843]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 3.0
-mouse_filter = 1
-text = "sdfsdfasdf"
+[node name="Next" type="Label" parent="DialogPanel/Bubble"]
+layout_mode = 0
+offset_left = 890.0
+offset_top = 104.0
+offset_right = 918.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(0.909804, 0.658824, 0.329412, 1)
+theme_override_colors/font_outline_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "▼"
 
-[node name="VSeparator2" type="VSeparator" parent="DialogPanel/Container" unique_id=379491990]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.25
-theme_override_styles/separator = SubResource("StyleBoxTexture_8lhnf")
-
-[node name="ToastText" type="RichTextLabel" parent="." unique_id=1722404478]
+[node name="Toast" type="Control" parent="."]
 visible = false
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -20.0
-offset_right = 312.0
-offset_bottom = 20.0
-grow_vertical = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_orn6i")
-text = "Place holder"
-fit_content = true
-horizontal_alignment = 1
-vertical_alignment = 1
+layout_mode = 3
+anchors_preset = 0
+offset_top = 300.0
+offset_right = 540.0
+offset_bottom = 420.0
+mouse_filter = 2
 
-[node name="Timer" type="Timer" parent="." unique_id=1093035097]
+[node name="Pib" type="TextureRect" parent="Toast"]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 104.0
+offset_bottom = 125.0
+mouse_filter = 2
+texture = ExtResource("t_worry")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bubble" type="Panel" parent="Toast"]
+layout_mode = 0
+offset_left = 108.0
+offset_top = 26.0
+offset_right = 532.0
+offset_bottom = 96.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("bubble")
+
+[node name="Tail" type="Polygon2D" parent="Toast/Bubble"]
+position = Vector2(3, 0)
+color = Color(1, 0.964706, 0.886275, 1)
+polygon = PackedVector2Array(0, 18, -20, 34, 0, 48)
+
+[node name="TailLine" type="Line2D" parent="Toast/Bubble"]
+points = PackedVector2Array(3, 16, -18, 34, 3, 50)
+width = 5.0
+default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+joint_mode = 2
+
+[node name="Text" type="Label" parent="Toast/Bubble"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 8.0
+offset_right = 408.0
+offset_bottom = 62.0
+theme_override_colors/font_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+theme_override_font_sizes/font_size = 20
+text = "..."
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Timer" type="Timer" parent="."]
 one_shot = true
 
 [connection signal="pressed" from="DialogPanel" to="." method="_on_dialog_panel_pressed"]
