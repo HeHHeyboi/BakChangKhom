@@ -20,6 +20,12 @@ func _ready() -> void:
 			"task_index": 1,
 			"scene": Constant.HOME_SCENE,
 		},
+		{
+			"label": "ข้ามไป Tutorial ประกอบคอม (กด ! ในห้อง)",
+			"event_id": EventManager.EventID.MAIN,
+			"task_index": 3,
+			"scene": Constant.ROOM_SCENE,
+		},
 	]
 	_build_ui()
 

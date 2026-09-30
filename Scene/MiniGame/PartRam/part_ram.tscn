@@ -45,7 +45,7 @@
 
 [node name="part_ram" unique_id=767611073 instance=ExtResource("0_base")]
 script = ExtResource("1_x7ph2")
-start_phase = 4
+start_phase = 1
 dialog_path = "res://Assets/Dialog/MiniGame/Ram_Pib.txt"
 
 [node name="Background" parent="." index="0"]

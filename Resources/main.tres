@@ -9,7 +9,7 @@ title = "ที่นาของยาย"
 dialog_file = "res://Assets/Dialog/Chapter1ReturnHome.txt"
 bg_name = "uid://dvdbswncu5tnq"
 chars = Array[String](["ขม", "ยาย"])
-quest_text_th = "Talk to gradma"
+quest_text_th = "คุยกับยาย"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_42x1i"]
@@ -17,7 +17,7 @@ script = ExtResource("1_naor1")
 title = "ห้องของขม"
 dialog_file = "res://Assets/Dialog/MainQuest/GoToRoom.txt"
 bg_name = "uid://0abmohme5tku"
-quest_text_th = "go in to your room and inspect computer"
+quest_text_th = "เข้าห้องไปดูคอมพิวเตอร์"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_ur0up"]
@@ -26,14 +26,22 @@ action = 1
 emitType = 1
 scene_path = "uid://d3tpe65flyrex"
 showHUD = true
-quest_text_th = "find eraser"
+quest_text_th = "หายางลบ"
+metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
+
+[sub_resource type="Resource" id="Resource_asm01"]
+script = ExtResource("1_naor1")
+action = 1
+scene_path = "res://Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn"
+quest_text_th = "เรียนประกอบคอมกับปิ๊บ (กด ! ที่คอมในห้อง)"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_xrra5"]
 script = ExtResource("1_naor1")
 action = 2
+emitType = 2
 tutorial = 2
-quest_text_th = "clean a ram"
+quest_text_th = "ดูวิธีทำความสะอาดแรม"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_rvjks"]
@@ -41,10 +49,11 @@ script = ExtResource("1_naor1")
 action = 1
 emitType = 3
 scene_path = "uid://bbcfansu05shj"
+quest_text_th = "ซ่อมแรมให้เสร็จ"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [resource]
 script = ExtResource("1_vbkmp")
 name = "main"
-Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_naor1"), SubResource("Resource_42x1i"), SubResource("Resource_ur0up"), SubResource("Resource_xrra5"), SubResource("Resource_rvjks")])
+Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_naor1"), SubResource("Resource_42x1i"), SubResource("Resource_ur0up"), SubResource("Resource_asm01"), SubResource("Resource_xrra5"), SubResource("Resource_rvjks")])
 metadata/_custom_type_script = "uid://db0chdbe7jurd"
