@@ -101,9 +101,8 @@ func hint(target: Control, text := "คลิกตรงนี้", delay := 4.
 	if view != &"":
 		cam(view)
 	_hint_marker = GuideMarker.follow(self, stage(), target, text)
-	var is_flip = target.get_meta("flip")
-	if is_flip != null:
-		_hint_marker.flip = is_flip
+	if target is Item2D:
+		_hint_marker.flip_below = (target as Item2D).hint_flip
 
 
 func clear_hint() -> void:

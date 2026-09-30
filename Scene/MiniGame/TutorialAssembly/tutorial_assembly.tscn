@@ -99,6 +99,7 @@ target_view = &"Tray"
 label_text = "ชิ้นส่วน"
 
 [node name="Tray" type="Control" parent="Stage/Views" index="1" unique_id=248641645]
+visible = false
 clip_contents = true
 anchors_preset = 0
 offset_right = 1152.0
@@ -131,7 +132,7 @@ texture = ExtResource("g6")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g6")
 })
-metadata/flip = true
+hint_flip = true
 
 [node name="Mainboard" type="Control" parent="Stage/Views/Tray/Parts" index="1" unique_id=1929261817]
 unique_name_in_owner = true
@@ -148,7 +149,7 @@ texture = ExtResource("g9")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g10")
 })
-metadata/flip = true
+hint_flip = true
 
 [node name="Cpu" type="Control" parent="Stage/Views/Tray/Parts" index="2" unique_id=903886534]
 unique_name_in_owner = true
@@ -165,7 +166,7 @@ texture = ExtResource("g12")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g12")
 })
-metadata/flip = true
+hint_flip = true
 
 [node name="Cooler" type="Control" parent="Stage/Views/Tray/Parts" index="3" unique_id=1630376424]
 unique_name_in_owner = true
@@ -182,7 +183,7 @@ texture = ExtResource("g14")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g14")
 })
-metadata/flip = true
+hint_flip = true
 
 [node name="Ram" type="Control" parent="Stage/Views/Tray/Parts" index="4" unique_id=1807030065]
 unique_name_in_owner = true
@@ -199,7 +200,6 @@ texture = ExtResource("g16")
 looks = Dictionary[String, Texture2D]({
 "mini": ExtResource("g17")
 })
-metadata/flip = false
 
 [node name="Ssd" type="Control" parent="Stage/Views/Tray/Parts" index="5" unique_id=1622454354]
 unique_name_in_owner = true
@@ -216,7 +216,6 @@ texture = ExtResource("g19")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g19")
 })
-metadata/flip = false
 
 [node name="Gpu" type="Control" parent="Stage/Views/Tray/Parts" index="6" unique_id=2080681975]
 unique_name_in_owner = true
@@ -233,7 +232,6 @@ texture = ExtResource("g21")
 looks = Dictionary[String, Texture2D]({
 "case": ExtResource("g21")
 })
-metadata/flip = false
 
 [node name="ToBuild" type="Control" parent="Stage/Views/Tray" index="1" unique_id=2131298440]
 anchors_preset = 0

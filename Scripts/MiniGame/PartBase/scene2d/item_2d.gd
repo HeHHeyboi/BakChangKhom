@@ -41,6 +41,8 @@ const COL_INK := Color(0.28, 0.18, 0.1)
 @export var mirror := false
 ## ป้ายชื่อตอนเมาส์ชี้ (แนว Volcano Princess) · ว่าง = ไม่มีป้าย
 @export var label_text := ""
+## true = ลูกศร/ป้ายไกด์ของชิ้นนี้ไปอยู่ใต้วงกลม (ชี้ขึ้น) — ใช้กับชิ้นที่ป้ายบนไปบังของอื่น
+@export var hint_flip := false
 
 var socket: Socket2D
 ## ทิศ: 0 = ปกติ · 180 = กลับด้าน (รูปกลับซ้าย-ขวา) — ใช้ตรวจร่องบากแรม

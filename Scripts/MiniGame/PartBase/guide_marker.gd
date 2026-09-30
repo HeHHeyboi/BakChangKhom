@@ -14,7 +14,7 @@ var stage: Stage2D
 var target: Control
 var _t := 0.0
 var _font: Font
-var flip = false
+var flip_below := false
 
 
 ## สร้างจากซีน guide_marker.tscn (ปรับสี/ขนาดใน Editor ได้)
@@ -55,7 +55,7 @@ func _draw() -> void:
 	draw_arc(Vector2.ZERO, r + 4, 0, TAU, 48, Color(col_ring, 0.6 + 0.4 * pulse), 4, true)
 	# ลูกศรชี้ลงเหนือวง
 	# ชิดขอบบนจอ → ย้ายลูกศร/ป้ายไปไว้ใต้วงกลม (ชี้ขึ้น)
-	var flip := global_position.y < 150.0 or flip
+	var flip := global_position.y < 150.0 or flip_below
 	var sgn := -1.0 if flip else 1.0
 	var y: float = sgn * (-r - 26 - 8 * abs(sin(_t * 4.0)))
 	var tri := PackedVector2Array([Vector2(-14, y - 16 * sgn), Vector2(14, y - 16 * sgn), Vector2(0, y + 4 * sgn)])
