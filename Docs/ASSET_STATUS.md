@@ -1,5 +1,6 @@
 # ASSET_STATUS.md — ผลตรวจ asset จริงในโฟลเดอร์
 > ตรวจ 29 ก.ย. 2569 · commit `47fbfd7` · สแกนไฟล์จริงเทียบ `ASSET_NAMING.md`
+> **Prologue + Core เกมแรก → ดู `ASSET_CORE1.md` (30 ก.ย.)**
 > เอกสารคู่กัน: `ASSET_NAMING.md` (ชื่อ+ขนาดฉบับอ้างอิง) · `ASSET_RENAME.md` (ไฟล์ที่ชื่อยังไม่ตรงกฎ) · `ASSET_TODO.md` (เช็กลิสต์งาน)
 
 ## สรุป

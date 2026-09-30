@@ -1,8 +1,12 @@
 [gd_resource type="Resource" script_class="TutorialSlides" format=3 uid="uid://dex66o3vsog27"]
 
-[ext_resource type="Texture2D" uid="uid://bnp5nnykt7teb" path="res://Assets/Tutorial/BasicStart/Tutorial สอนเล่น.png" id="1_te3jq"]
-[ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="1_u8nrn"]
+[ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_01.png" id="t0"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_02.png" id="t1"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_03.png" id="t2"]
 
 [resource]
-script = ExtResource("1_u8nrn")
-ImageSlide = Array[Texture2D]([ExtResource("1_te3jq")])
+script = ExtResource("1_s")
+ImageSlide = Array[Texture2D]([ExtResource("t0"), ExtResource("t1"), ExtResource("t2")])
+Captions = Array[String](["คลิกที่ของหรือคนในฉากเพื่อโต้ตอบ", "เห็นเครื่องหมาย ! ที่ไหน แปลว่ามีเรื่องรออยู่ตรงนั้น กดได้เลย", "มุมขวาบนคือภารกิจที่ต้องทำ และช่วงเวลาของวัน เช้า · เที่ยง · เย็น"])
+metadata/_custom_type_script = "uid://wqsge0jtfd64"

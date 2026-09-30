@@ -43,7 +43,7 @@ offset_top = -80.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 32
-text = "Next"
+text = "ถัดไป"
 
 [node name="Previous" type="Button" parent="Control" unique_id=773762281]
 layout_mode = 1
@@ -54,7 +54,19 @@ offset_top = -80.0
 offset_right = 228.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 32
-text = "Previous"
+text = "ย้อนกลับ"
+
+[node name="Caption" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 42.0
+offset_right = 1042.0
+offset_bottom = 118.0
+theme_override_colors/font_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
 [connection signal="pressed" from="Control/Next" to="." method="_on_next_btn_pressed"]
 [connection signal="pressed" from="Control/Previous" to="." method="_on_prev_btn_pressed"]

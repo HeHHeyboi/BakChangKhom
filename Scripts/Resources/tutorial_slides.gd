@@ -4,6 +4,9 @@ class_name TutorialSlides extends Resource
 		_slides = value
 		totalSlide = value.size()
 
+## ข้อความไทยของแต่ละสไลด์ (ลำดับเดียวกับ ImageSlide) — แสดงในแถบบนของสไลด์ · ห้ามฝังตัวหนังสือในรูป
+@export_multiline var Captions: Array[String] = []
+
 var totalSlide = 0
 var _slides = []
 var curIndex = 0
@@ -19,6 +22,12 @@ func get_cur_slide() -> Texture2D:
 	if _slides.is_empty():
 		return null
 	return _slides[curIndex]
+
+
+func get_caption() -> String:
+	if curIndex < 0 or curIndex >= Captions.size():
+		return ""
+	return Captions[curIndex]
 
 
 func get_next_slide() -> Texture2D:

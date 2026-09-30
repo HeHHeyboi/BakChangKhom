@@ -17,6 +17,7 @@ enum TutorialState {
 @onready var slide_show = $"Control/Slide" as TextureRect
 @onready var next_btn = $"Control/Next" as Button
 @onready var prev_btn = $"Control/Previous" as Button
+@onready var caption = get_node_or_null("Control/Caption") as Label
 
 var tutorial_seen: Dictionary[TutorialState, bool] = { }
 
@@ -56,16 +57,18 @@ func _process(delta: float) -> void:
 	if cur_slide == null:
 		return
 
+	if caption:
+		caption.text = cur_slide.get_caption()
 	if cur_slide.curIndex == 0:
 		prev_btn.disabled = true
 	else:
 		prev_btn.disabled = false
 
 	if cur_slide.is_finish():
-		next_btn.text = "Close"
+		next_btn.text = "เข้าใจแล้ว"
 		_finished = true
 	else:
-		next_btn.text = "Next"
+		next_btn.text = "ถัดไป"
 		_finished = false
 
 
