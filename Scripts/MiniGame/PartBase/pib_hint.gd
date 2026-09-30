@@ -39,6 +39,7 @@ var _toast_home_y := 0.0
 var _t := 0.0
 var _type_tw: Tween
 var _pop_tw: Tween
+var _closing := false # กำลังลอยลง (ยังเห็นอยู่แต่กำลังจะซ่อน)
 
 
 func _ready() -> void:
@@ -46,6 +47,9 @@ func _ready() -> void:
 	_toast_home_y = toast_pib.position.y
 	pib_sprite.pivot_offset = Vector2(pib_sprite.size.x / 2.0, pib_sprite.size.y)
 	toast_box.hide()
+	# เริ่มต้นซ่อนเสมอ ไม่ขึ้นกับค่า visible ที่เซฟใน .tscn
+	dialog_panel.hide()
+	hide()
 
 
 func _process(delta: float) -> void:
@@ -96,7 +100,12 @@ func say(lines: Array, mood: Mood = Mood.NORMAL) -> void:
 	if cur_dialog.is_empty():
 		return
 	_set_mood(pib_sprite, mood)
-	var was_open: bool = visible and dialog_panel.visible
+	# [Claude 1 ต.ค.] บทใหม่มาระหว่างกำลังลอยลง (phase ถัดไปพูดต่อทันที) → ยกเลิกการซ่อน แล้วลอยขึ้นใหม่
+	#   เดิมตัวซ่อนทำงานทีหลังแล้วซ่อนบทใหม่ไปด้วย ผู้เล่นเลยไม่เห็นกล่องให้กด
+	var was_open: bool = visible and dialog_panel.visible and not _closing
+	if _closing and _pop_tw:
+		_pop_tw.kill()
+	_closing = false
 	self.show()
 	dialog_panel.show()
 	if not was_open:
@@ -147,17 +156,20 @@ func _pop_in() -> void:
 func _pop_out() -> void:
 	if _pop_tw:
 		_pop_tw.kill()
+	_closing = true
 	_pop_tw = create_tween().set_parallel()
 	_pop_tw.tween_property(bubble, "modulate:a", 0.0, 0.12)
 	_pop_tw.tween_property(pib_sprite, "position:y", _pib_home_y + 220.0, 0.25).set_trans(Tween.TRANS_BACK).set_ease(
 		Tween.EASE_IN
 	)
-	_pop_tw.chain().tween_callback(
-		func():
-			dialog_panel.hide()
-			if not toast_box.visible:
-				self.hide(),
-	)
+	_pop_tw.chain().tween_callback(_after_pop_out)
+
+
+func _after_pop_out() -> void:
+	_closing = false
+	dialog_panel.hide()
+	if not toast_box.visible:
+		hide()
 
 
 func _set_mood(rect: TextureRect, mood: Mood) -> void:
@@ -192,12 +204,13 @@ func _on_timer_timeout() -> void:
 	# ซ่อนทั้ง layer เฉพาะตอนกล่องคำพูดปิดอยู่ — ไม่งั้นบทที่กำลังพูดจะหายไปด้วย
 	var tw := create_tween()
 	tw.tween_property(toast_box, "position:x", -toast_box.size.x, 0.2).set_ease(Tween.EASE_IN)
-	tw.tween_callback(
-		func():
-			toast_box.hide()
-			if not dialog_panel.visible:
-				self.hide(),
-	)
+	tw.tween_callback(_after_toast)
+
+
+func _after_toast() -> void:
+	toast_box.hide()
+	if not dialog_panel.visible:
+		hide()
 
 
 class Data extends RefCounted:

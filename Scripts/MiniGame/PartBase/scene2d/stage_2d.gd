@@ -17,6 +17,8 @@ signal view_changed(view: StringName)
 signal view_name_changed(view: StringName)
 
 @export var start_view: StringName = &"Overview"
+## ปุ่ม "กลับ" (ViewNav ตั้งให้) — ไกด์ชี้ปุ่มนี้เมื่อไปมุมเป้าหมายด้วยจุดกดในฉากไม่ได้
+var back_anchor: Control
 ## id ชิ้นที่ถือว่าติดตั้งอยู่แล้ว แต่ไม่มี node (วาดอยู่ในรูปพื้นหลัง) เช่น "mainboard"
 @export var preinstalled: Array[StringName] = []
 @export var transition_time := 0.32
@@ -110,7 +112,7 @@ func view_of(n: Node) -> View2D:
 func _process(delta: float) -> void:
 	_layout()
 	if _held:
-		var target := _mouse - _grab
+		var target := top.get_global_transform_with_canvas().affine_inverse() * (get_global_transform_with_canvas() * _mouse) - _grab
 		_held.position = _held.position.lerp(target, 1.0 - exp(-22.0 * delta))
 		# ค้างบนประตู → ย้ายมุม
 		if _portal:
@@ -125,12 +127,21 @@ func _process(delta: float) -> void:
 
 
 ## จัดมุมให้อยู่กลางพื้นที่ (จอแคบ = ตัดขอบ ยึด focus_x)
+## [Claude 1 ต.ค.] ฉากสูงกว่า 420 (ไม่มีแถบหัวข้อแล้ว) → ขยายทั้งชุดมุม + ชั้นบนเท่ากันให้เต็มความสูง แล้วตัดขอบซ้าย-ขวาแทน
+func view_scale() -> float:
+	return maxf(1.0, size.y / View2D.DESIGN.y)
+
+
 func _layout() -> void:
+	var k := view_scale()
+	views_root.scale = Vector2(k, k)
+	top.scale = Vector2(k, k)
+	var sz := size / k
 	for v in views():
 		v.size = View2D.DESIGN
-		var x := size.x / 2.0 - v.focus_x
-		x = clampf(x, minf(0.0, size.x - View2D.DESIGN.x), 0.0)
-		v.position = Vector2(x, (size.y - View2D.DESIGN.y) / 2.0)
+		var x := sz.x / 2.0 - v.focus_x
+		x = clampf(x, minf(0.0, sz.x - View2D.DESIGN.x), 0.0)
+		v.position = Vector2(x, (sz.y - View2D.DESIGN.y) / 2.0)
 
 # ---------------------------------------------------------------- มุม
 
@@ -229,9 +240,32 @@ func screen_pos_of_node(n: Control):
 		return n.get_global_transform_with_canvas() * (n.size / 2.0)
 	if v == null or _view == null:
 		return null
-	for c in _all(_view):
-		if c is Hotspot2D and find_view(c.target_view) == v:
-			return c.get_global_transform_with_canvas() * (c.size / 2.0)
+	var hop := _first_hop(_view, v)
+	if hop:
+		return hop.get_global_transform_with_canvas() * (hop.size / 2.0)
+	if back_anchor and back_anchor.is_visible_in_tree():
+		return back_anchor.get_global_transform_with_canvas() * (back_anchor.size / 2.0)
+	return null
+
+
+## [Claude 1 ต.ค.] หาจุดกดแรกในมุม from ที่พาไปถึงมุม to ได้สั้นที่สุด (เดินต่อกันหลายมุมได้) · ไม่มีทาง = null
+func _first_hop(from: View2D, to: View2D) -> Hotspot2D:
+	var first := {} # View2D → Hotspot2D แรกที่ออกจาก from
+	var queue: Array[View2D] = [from]
+	var seen := { from: true }
+	while not queue.is_empty():
+		var cur: View2D = queue.pop_front()
+		for c in _all(cur):
+			if not (c is Hotspot2D) or not c.is_visible_in_tree() and cur == from:
+				continue
+			var nv := find_view(c.target_view)
+			if nv == null or seen.has(nv):
+				continue
+			seen[nv] = true
+			first[nv] = c if cur == from else first[cur]
+			if nv == to:
+				return first[nv]
+			queue.append(nv)
 	return null
 
 # ---------------------------------------------------------------- ติดตั้ง

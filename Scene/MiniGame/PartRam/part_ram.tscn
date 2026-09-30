@@ -53,7 +53,7 @@ texture = ExtResource("6_wall")
 
 [node name="Stage" parent="." index="2" unique_id=1651062468 instance=ExtResource("st2d")]
 unique_name_in_owner = true
-offset_top = 56.0
+offset_top = 0.0
 offset_bottom = 476.0
 preinstalled = Array[StringName]([&"mainboard"])
 

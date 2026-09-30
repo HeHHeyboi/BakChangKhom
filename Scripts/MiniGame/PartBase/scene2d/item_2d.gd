@@ -158,7 +158,11 @@ func _draw() -> void:
 func _draw_tex(t: Texture2D, mod: Color) -> void:
 	var r := _tex_rect(t)
 	if _flip():
-		r = Rect2(r.position.x + r.size.x, r.position.y, -r.size.x, r.size.y)
+		# [Claude 1 ต.ค.] กลับซ้าย-ขวารอบกลางชิ้น — เดิมใช้ Rect ความกว้างติดลบ รูปเลยเลื่อนออกไปทางขวาเท่าความกว้าง (สลักขวาลอยห่างสล็อต)
+		draw_set_transform(Vector2(size.x, 0), 0.0, Vector2(-1, 1))
+		draw_texture_rect(t, r, false, mod)
+		draw_set_transform(Vector2.ZERO)
+		return
 	draw_texture_rect(t, r, false, mod)
 
 

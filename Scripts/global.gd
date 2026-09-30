@@ -8,7 +8,12 @@ var cur_pib: PibHint = null
 
 
 func getCharacterTexture(t_name: String):
-	return _CharacterMap[t_name]
+	return _CharacterMap.get(t_name)
+
+
+## มีรูปตัวละครชื่อนี้ไหม (ชื่อ หรือ "ชื่อ:อารมณ์" เช่น "ขม:happy")
+func hasCharacter(t_name: String) -> bool:
+	return _CharacterMap.has(t_name)
 
 
 func getCharacterSprite(char_name: String) -> CharacterSprite:

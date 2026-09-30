@@ -37,6 +37,10 @@ window/stretch/mode="canvas_items"
 
 project/assembly_name="BakChangKhom"
 
+[gui]
+
+theme/custom_font="res://Assets/Fonts/Sarabun-Regular.ttf"
+
 [input]
 
 next_text={

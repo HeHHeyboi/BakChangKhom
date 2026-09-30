@@ -1,10 +1,10 @@
 class_name ViewNav extends CanvasLayer
-## แถบนำทางกล้อง (บนซ้ายของฉาก) — ปุ่ม "◀ กลับ" + ปุ่มสลับมุม (ภาพรวม · จอ · ในเคส · เมนบอร์ด …)
-## ปุ่มมาจาก View2D ที่ตั้ง label ไว้ · มุมที่อยู่ตอนนี้เป็นสีส้ม · มุมซูมย่อย (ไม่มี label) กด "กลับ" ออก
+## ปุ่ม "◀ กลับ" ลอยมุมซ้าย (ใต้การ์ดความคืบหน้า) — ย้ายมุมกล้องด้วยการกดจุดในฉาก (Hotspot2D) แล้วกดปุ่มนี้ถอยออก
+## [Claude 1 ต.ค.] เอาแถบแท็บสลับมุมออกแล้ว ฉากโล่งขึ้น · ไกด์ชี้ที่ปุ่มนี้เมื่อเป้าหมายอยู่มุมอื่นที่ไม่มีทางกดไปตรง ๆ
 ## คีย์ลัด: Esc / Backspace / ปุ่มข้างเมาส์ = กลับ · สร้างเองผ่าน Phase2D.cam() ไม่ต้องวางในซีน
 ## [Claude 30 ก.ย. 2569]
 
-const POS := Vector2(12, 64)
+const POS := Vector2(12, 86)
 
 var stage: Stage2D
 var _back: Button
@@ -23,19 +23,12 @@ static func ensure(host: Node, st: Stage2D) -> ViewNav:
 
 func _ready() -> void:
 	layer = 110 # ใต้แถบปิ๊บ (120) และสมุด (128)
-	var row := HBoxContainer.new()
-	row.position = POS
-	row.add_theme_constant_override("separation", 6)
-	add_child(row)
 	_back = _button("◀ กลับ", true)
-	_back.tooltip_text = "กลับไปมุมก่อนหน้า (Esc)"
-	_back.pressed.connect(stage.back)
-	row.add_child(_back)
-	for p in stage.nav_views():
-		var b := _button(p.label, false)
-		b.pressed.connect(stage.go_to.bind(p.name))
-		row.add_child(b)
-		_chips[p.name] = b
+	_back.tooltip_text = "กลับ (Esc)"
+	_back.position = POS
+	_back.pressed.connect(_go_back)
+	add_child(_back)
+	stage.back_anchor = _back
 	stage.view_name_changed.connect(_refresh)
 	_refresh(stage.current_view)
 
@@ -44,14 +37,24 @@ func set_enabled(on: bool) -> void:
 	visible = on
 
 
-func _refresh(view: StringName) -> void:
-	_back.visible = stage.can_back()
-	for k in _chips:
-		_style(_chips[k], k == view)
+func _can_go_back() -> bool:
+	return stage.can_back() or stage.current_view != stage.start_view
+
+
+## ย้อนมุมก่อนหน้า · ไม่มีประวัติ (มาด้วย cam() ของ phase) → กลับภาพรวม
+func _go_back() -> void:
+	if stage.can_back():
+		stage.back()
+	else:
+		stage.reset_view()
+
+
+func _refresh(_view: StringName) -> void:
+	_back.visible = _can_go_back()
 
 
 func _unhandled_input(e: InputEvent) -> void:
-	if not visible or not stage.can_back() or not get_tree().get_nodes_in_group("modal").is_empty():
+	if not visible or not _can_go_back() or not get_tree().get_nodes_in_group("modal").is_empty():
 		return
 	var go := false
 	if e is InputEventKey and e.pressed and not e.echo:
@@ -59,7 +62,7 @@ func _unhandled_input(e: InputEvent) -> void:
 	elif e is InputEventMouseButton and e.pressed:
 		go = e.button_index == MOUSE_BUTTON_XBUTTON1
 	if go:
-		stage.back()
+		_go_back()
 		get_viewport().set_input_as_handled()
 
 

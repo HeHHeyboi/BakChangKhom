@@ -69,9 +69,11 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 	Global.showDialog()
 	bg_node.scale = Vector2(1, 1)
 	if !chars.is_empty():
-		for char_name in chars:
-			var c = Global.getCharacterSprite(char_name)
-			ShowSprites.addCharacterSprite(c)
+		for entry in chars:
+			for char_name in String(entry).split(",", false):
+				char_name = char_name.strip_edges()
+				if Global.hasCharacter(char_name) and not ShowSprites.has_node(NodePath(char_name.validate_node_name())):
+					ShowSprites.addCharacterSprite(Global.getCharacterSprite(char_name))
 
 	if bg_name.is_empty():
 		var transparent_img = Image.create(1, 1, false, Image.FORMAT_RGBA8)
@@ -166,16 +168,70 @@ func show_text(token) -> void:
 			NameBox.text = dialog.name
 			TextBox.clear()
 			TextBox.add_text(dialog.dialog)
-			for n in ShowSprites.get_children():
-				if n.name == dialog.name:
-					curSprite = n as CharacterSprite
-					curSprite.highlight()
-					break
+			_show_speaker(dialog.name)
 		var choice when token is ChoiceToken:
 			create_choice_buttons(choice.choices)
 			skip_btn.disabled = true
 			ChoiceContainer.visible = true
 			DialogButton.disabled = true
+
+
+## [Claude 1 ต.ค.] รูปคนพูดขึ้นเองตามชื่อในสคริปต์ — "ยาย (น้ำเสียงอ่อนโยน)" → ยาย · อารมณ์ในวงเล็บเปลี่ยนรูป เช่น "ขม (ยิ้ม)" → ขม:happy
+## ชื่อที่ไม่มีรูป (คำบรรยาย · โทรศัพท์) = ไม่ขึ้นรูป · เพิ่มตัวละครได้ที่ _CharacterMap ใน Scene/Global.tscn
+const MOOD_WORDS := {
+	"happy": ["ยิ้ม", "ดีใจ", "หัวเราะ", "ภูมิใจ", "ตื่นเต้น"],
+	"worry": ["กังวล", "เครียด", "ถอนหายใจ", "ตกใจ", "เศร้า", "เหนื่อย", "สั่น"],
+}
+
+
+func _speaker_key(raw: String) -> Array:
+	var base := raw.strip_edges()
+	var extra := ""
+	var i := base.find("(")
+	if i > 0:
+		extra = base.substr(i)
+		base = base.substr(0, i).strip_edges()
+	var mood := ""
+	for m in MOOD_WORDS:
+		for w in MOOD_WORDS[m]:
+			if extra.contains(w):
+				mood = m
+	return [base, mood]
+
+
+const PORTRAIT_SCALE := 0.85
+var _recent: Array[CharacterSprite] = [] # คนพูดล่าสุดอยู่ท้าย
+
+
+## โชว์ได้ทีละ 2 คน (ซ้าย/ขวา) ไม่ซ้อนกัน · คนที่ 3 มาแทนคนที่ไม่ได้พูดนานสุด
+func _show_speaker(raw: String) -> void:
+	var k: Array = _speaker_key(raw)
+	var base: String = k[0]
+	if not Global.hasCharacter(base):
+		return
+	var mood_key: String = base + ":" + String(k[1])
+	var tex = Global.getCharacterTexture(mood_key if k[1] != "" and Global.hasCharacter(mood_key) else base)
+	_recent = _recent.filter(func(c): return is_instance_valid(c) and not c.is_queued_for_deletion())
+	for n in ShowSprites.get_children():
+		if n is CharacterSprite and n.name == base.validate_node_name() and not n.is_queued_for_deletion():
+			curSprite = n
+	if curSprite == null:
+		var slot := 0
+		if _recent.size() >= 2:
+			var old: CharacterSprite = _recent.pop_front()
+			slot = old.get_meta("slot", 0)
+			ShowSprites.remove_child(old)
+			old.queue_free()
+		elif _recent.size() == 1:
+			slot = 1 - int(_recent[0].get_meta("slot", 0))
+		curSprite = Global.getCharacterSprite(base)
+		curSprite.set_meta("slot", slot)
+		curSprite.scale = Vector2.ONE * PORTRAIT_SCALE
+		ShowSprites.addCharacterSprite(curSprite, slot)
+	_recent.erase(curSprite)
+	_recent.append(curSprite)
+	curSprite.texture = tex
+	curSprite.highlight()
 
 
 func create_choice_buttons(choices: Array) -> void:
@@ -221,6 +277,7 @@ func dialog_end() -> void:
 	dialog_stack.clear()
 	DialogDict[DIALOG] = []
 	ShowSprites.reset()
+	_recent.clear()
 
 
 func click_choice(button: Button) -> void:

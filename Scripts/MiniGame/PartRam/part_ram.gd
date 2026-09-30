@@ -43,6 +43,7 @@ func _ready() -> void:
 		dialog_path = RAM_PIB_PATH
 	minigame_finished.connect(_on_minigame_finished)
 	_setup_dirt()
+	_setup_slot_focus()
 	super._ready()
 
 
@@ -58,6 +59,27 @@ func _setup_dirt() -> void:
 	(%BeepFx as Item2D).texture = TEX_BEEP
 	(%Monitor as Item2D).set_state("glitch")
 	set_led(true)
+
+
+## [Claude 1 ต.ค.] มุมสล็อต: หรี่แถวอื่นให้มืดลง เหลือแถว A2 (แรมตัวที่ต้องซ่อม) สว่างอยู่แถวเดียว → รู้ทันทีว่าต้องดูตรงไหน
+const SLOT_FOCUS_BAND := Vector2(58, 214) # ช่วง y (ในมุม Slots) ที่ไม่หรี่
+const SLOT_FOCUS_DIM := Color(0, 0, 0, 0.45)
+
+
+func _setup_slot_focus() -> void:
+	var view := (%SlotA2 as Control).get_parent() as Control
+	for r in [Rect2(0, 0, view.size.x, SLOT_FOCUS_BAND.x), Rect2(0, SLOT_FOCUS_BAND.y, view.size.x, view.size.y - SLOT_FOCUS_BAND.y)]:
+		var dim := ColorRect.new()
+		dim.name = "FocusDim"
+		dim.color = SLOT_FOCUS_DIM
+		dim.position = r.position
+		dim.size = r.size
+		dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		dim.z_index = 1
+		view.add_child(dim)
+	(%SlotA2 as Control).z_index = 2
+	(%SlotBodyA2 as Control).z_index = 2
+	(%RamA2 as Control).z_index = 2
 
 
 ## 0 = ขาทองหมอง · 1 = เงาวาว

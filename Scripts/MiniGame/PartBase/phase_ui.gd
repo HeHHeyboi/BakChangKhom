@@ -4,8 +4,8 @@ class_name PhaseUI extends RefCounted
 ## เขียนโดย Claude 29 ก.ย. 2569 — เมื่อมีรูปจริงแล้วจะย้าย node ไปวางใน Editor แทนก็ได้ ฟังก์ชันพวกนี้แค่ช่วยให้เล่นได้ก่อน
 
 const SCREEN := Vector2(1152, 648)
-const PLAY := Rect2(0, 56, 860, 420)
-const RAIL := Rect2(860, 56, 292, 420)
+const PLAY := Rect2(0, 0, 860, 476)
+const RAIL := Rect2(860, 64, 292, 412)
 const CONFIRM_POS := Vector2(700, 410)
 
 const COL_PANEL := Color(0.10, 0.10, 0.12, 0.78)
@@ -20,22 +20,118 @@ const COL_GOAL := Color(1.0, 0.86, 0.45)
 ##   แผงข้าง (Info rail) โชว์เฉพาะตอนมีปุ่ม/อุปกรณ์ให้กด · ไม่มี → ซ่อน และขยายฉาก 2.5D เต็มความกว้างจอ
 const BOOK_ICON := "res://Assets/MiniGame/PartCommon/ui_icon_guidebook.png"
 const BOOK_RECT := Rect2(1092, 4, 48, 48)
+const CARD_POS := Vector2(12, 10)
+const COL_CARD := Color(0.10, 0.07, 0.05, 0.72)
+const COL_CHIP_TAG_TEXT := Color(0.17, 0.09, 0.06)
+const COL_STEP_DONE := Color(0.42, 0.69, 0.32)
+const COL_STEP_NOW := Color(0.91, 0.66, 0.33)
+const COL_STEP_TODO := Color(1, 1, 1, 0.18)
 
 
-## สร้างแถบหัวข้อ + Info rail ให้ phase แล้วคืน VBoxContainer ใน rail ไว้ใส่ข้อความ
+## "ซ่อมแรม — ขั้นที่ 2/8 · รู้จักแรม" → {game, idx, total, name} (รูปแบบอื่น = ไม่มีแถบขั้นตอน)
+static func _parse_title(title: String) -> Dictionary:
+	var d := { "game": title, "idx": 0, "total": 0, "name": "" }
+	var re := RegEx.create_from_string("^(.*?)\\s*—\\s*ขั้นที่\\s*(\\d+)\\s*/\\s*(\\d+)\\s*·?\\s*(.*)$")
+	var m := re.search(title)
+	if m:
+		d.game = m.get_string(1)
+		d.idx = m.get_string(2).to_int()
+		d.total = m.get_string(3).to_int()
+		d.name = m.get_string(4)
+	return d
+
+
+static func _flat(bg: Color, radius := 8, border := Color(0, 0, 0, 0), bw := 0) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = bg
+	sb.set_corner_radius_all(radius)
+	if bw > 0:
+		sb.border_color = border
+		sb.set_border_width_all(bw)
+	return sb
+
+
+## [Claude 1 ต.ค.] การ์ดความคืบหน้าลอยมุมซ้ายบน (แทนแถบหัวข้อเต็มจอ) — ฉากได้พื้นที่เต็มความสูง
+##   แถวบน: ชื่องาน + ช่องขั้นตอน (เขียว = ผ่าน · ส้มกะพริบ = ขั้นนี้ · จาง = ยังไม่ถึง) + i/n
+##   แถวล่าง: ป้าย "เป้าหมาย" + สิ่งที่ต้องทำตอนนี้ + จำนวนข้อที่เสร็จ
+static func _make_card(phase: Control, info: Dictionary) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.name = "Header"
+	card.position = CARD_POS
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := _flat(COL_CARD, 14, Color(1, 1, 1, 0.14), 2)
+	sb.content_margin_left = 14
+	sb.content_margin_right = 14
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = 8
+	sb.shadow_color = Color(0, 0, 0, 0.25)
+	sb.shadow_size = 6
+	card.add_theme_stylebox_override("panel", sb)
+	phase.add_child(card)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 4)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(v)
+	var row1 := HBoxContainer.new()
+	row1.add_theme_constant_override("separation", 10)
+	row1.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(row1)
+	var t := label(row1, info.game, 18)
+	t.autowrap_mode = TextServer.AUTOWRAP_OFF
+	phase.set_meta("title_label", t)
+	if info.total > 0:
+		var segs := HBoxContainer.new()
+		segs.add_theme_constant_override("separation", 3)
+		segs.alignment = BoxContainer.ALIGNMENT_CENTER
+		segs.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row1.add_child(segs)
+		for k in info.total:
+			var col := COL_STEP_DONE if k + 1 < info.idx else (COL_STEP_NOW if k + 1 == info.idx else COL_STEP_TODO)
+			var seg := Panel.new()
+			seg.custom_minimum_size = Vector2(16, 8)
+			seg.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			seg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			seg.add_theme_stylebox_override("panel", _flat(col, 4))
+			segs.add_child(seg)
+			if k + 1 == info.idx:
+				var tw := seg.create_tween().set_loops()
+				tw.tween_property(seg, "modulate:a", 0.5, 0.6)
+				tw.tween_property(seg, "modulate:a", 1.0, 0.6)
+		var st := label(row1, "%d/%d · %s" % [info.idx, info.total, info.name], 14, Color(1, 1, 1, 0.75))
+		st.autowrap_mode = TextServer.AUTOWRAP_OFF
+		st.name = "StepName"
+	var row2 := HBoxContainer.new()
+	row2.add_theme_constant_override("separation", 8)
+	row2.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(row2)
+	var tag := label(row2, "เป้าหมาย", 13, COL_CHIP_TAG_TEXT)
+	tag.name = "Tag"
+	tag.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var tsb := _flat(COL_GOAL, 7)
+	tsb.content_margin_left = 7
+	tsb.content_margin_right = 7
+	tag.add_theme_stylebox_override("normal", tsb)
+	tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var goal := label(row2, "", 17, COL_TEXT)
+	goal.name = "Goal"
+	goal.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var count := label(row2, "", 15, COL_OK)
+	count.name = "GoalCount"
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF
+	count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	phase.set_meta("goal", goal)
+	phase.set_meta("goal_count", count)
+	return card
+
+
+## สร้างการ์ดความคืบหน้า + Info rail ให้ phase แล้วคืน VBoxContainer ใน rail ไว้ใส่ข้อความ
 static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	phase.set_anchors_preset(Control.PRESET_FULL_RECT)
 	phase.position = Vector2.ZERO
 	phase.size = SCREEN
 	phase.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	var header := panel(phase, Rect2(0, 0, SCREEN.x, 56), "Header")
-	var t := label(header, title, 24)
-	t.position = Vector2(20, 10)
-	phase.set_meta("title_label", t)
-	var goal := label(header, "", 20, COL_GOAL)
-	goal.name = "Goal"
-	goal.position = Vector2(500, 14)
+	phase.set_meta("title_text", title)
+	_make_card(phase, _parse_title(title))
 
 	var rail := panel(phase, RAIL, "InfoRail")
 	var box := VBoxContainer.new()
@@ -47,8 +143,7 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	box.set_meta("phase", phase)
 	phase.set_meta("rail", rail)
 	phase.set_meta("rail_box", box)
-	phase.set_meta("goal", goal)
-	phase.set_meta("book", _make_book(phase, header))
+	phase.set_meta("book", _make_book(phase, phase))
 	phase.visibility_changed.connect(
 		func():
 			if phase.visible:
@@ -69,7 +164,6 @@ static func _make_book(phase: Control, header: Control) -> TextureButton:
 	b.size = BOOK_RECT.size
 	b.pivot_offset = BOOK_RECT.size / 2
 	b.tooltip_text = "สมุดคู่มือ — ต้องทำอะไรบ้าง"
-	header.mouse_filter = Control.MOUSE_FILTER_PASS
 	header.add_child(b)
 	var dot := panel(b, Rect2(34, -2, 16, 16), "Badge", COL_BAD)
 	dot.visible = false
@@ -136,23 +230,30 @@ static func ping_book(phase: Control) -> void:
 
 
 ## ตั้งข้อความเป้าหมายบนแถบหัวข้อเอง (phase ที่ไม่มีเช็กลิสต์)
-static func set_goal(phase: Control, text: String) -> void:
+static func set_goal(phase: Control, text: String, done := -1, total := -1) -> void:
 	if phase.has_meta("goal"):
-		(phase.get_meta("goal") as Label).text = ("▶ " + text) if text != "" else ""
+		(phase.get_meta("goal") as Label).text = text
+	if phase.has_meta("goal_count"):
+		var c := phase.get_meta("goal_count") as Label
+		c.text = ("%d/%d" % [done, total] + (" ✓" if done >= total else "")) if total > 0 else ""
+		c.add_theme_color_override("font_color", COL_OK if done >= total else COL_GOAL)
 
 
 static func _refresh_goal(box: Node) -> void:
 	if box == null or not box.has_meta("phase"):
 		return
 	var items := 0
+	var done := 0
+	var first := ""
 	for c in box.get_children():
 		if c is Label and c.has_meta("text"):
 			items += 1
-			if not c.get_meta("done", false):
-				set_goal(box.get_meta("phase"), String(c.get_meta("text")))
-				return
+			if c.get_meta("done", false):
+				done += 1
+			elif first == "":
+				first = String(c.get_meta("text"))
 	if items > 0:
-		set_goal(box.get_meta("phase"), "เรียบร้อย ✓")
+		set_goal(box.get_meta("phase"), first if first != "" else "เรียบร้อย", done, items)
 
 
 ## บันทึกของปิ๊บในสมุด — บทยาว ๆ ย้ายมาอยู่ที่นี่แทนการให้คลิกผ่านทีละบรรทัด
@@ -330,7 +431,7 @@ static func open_book(phase: Control) -> void:
 	scroll.add_child(v)
 
 	var box := phase.get_meta("rail_box") as Node
-	var title := String((phase.get_meta("title_label") as Label).text) if phase.has_meta("title_label") else "สมุดคู่มือ"
+	var title := String(phase.get_meta("title_text", "สมุดคู่มือ"))
 	_book_label(v, title.get_slice("·", title.get_slice_count("·") - 1).strip_edges(), 28, COL_INK, true)
 	_book_label(v, (phase.get_meta("goal") as Label).text, 18, COL_HEAD, true)
 
