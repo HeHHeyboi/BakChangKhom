@@ -40,11 +40,11 @@ Stage (part_stage_2d.tscn · Stage2D)
 |---|---|
 | `Stage2D` | จัดการมุม · คลิก · ลาก/วาง · สัญญาณเดิมทุกตัว (`part_clicked` `part_installed` `drop_rejected` ฯลฯ) · `go_to()` `back()` `allowed` `allowed_sockets` `preinstalled` `snapshot()` |
 | `View2D` | มุม 1 มุม ขนาด 1152 × 420 · `background` `bg_offset` `label` (ปุ่มในแถบนำทาง) `aliases` (ชื่อเก่าที่ phase เรียก) `focus_x` (จุดที่ต้องเห็นเมื่อมีแผงข้าง) |
-| `Item2D` | ชิ้น/จุดคลิก: `mode` · `texture` · `texture_on` (สลักเปิด) · `looks` · `state` · `label_text` · `mirror` · `stretch` · ไม่มีรูป = จุดคลิกล่องหน |
+| `Item2D` | ชิ้น/จุดคลิก: `mode` · `texture` · `texture_on` (สลักเปิด) · `looks` · `state` · `label_text` · `mirror` · `stretch` · `hint_flip` (true = ลูกศร/ป้ายไกด์ไปอยู่ใต้วงกลม ใช้กับชิ้นที่ป้ายบนบังของอื่น) · ไม่มีรูป = จุดคลิกล่องหน |
 | `Socket2D` | กรอบวางชิ้น: `socket_type` `required_yaw` (0/180) `locks` `start_occupant` `look` |
 | `Hotspot2D` | ป้าย + จุดกดไปมุมอื่น · `portal` = ถือชิ้นลากมาค้างแป๊บเดียว → ไปมุมนั้นทั้งที่ยังถืออยู่ (เช่นลากแรมจากสล็อต → "→ แผ่น ESD") |
 | `MiniSpot2D` | ภาพย่อของชิ้นที่อยู่ใน socket ของอีกมุม (หน้าตา `"mini"`) |
-| `Phase2D` | ฐานของ phase (เหมือน Phase3D/25D เดิม) · `cam()` `allow()` `hint()` `say()` `finish()` |
+| `Phase2D` | ฐานของ phase (เหมือน Phase3D/25D เดิม) · `cam()` `allow()` `hint()` `say()` `finish()` · `hint()` สร้าง `GuideMarker` จากซีน `PartBase/guide_marker.tscn` แล้วอ่าน `Item2D.hint_flip` ของเป้า (เป้าที่ไม่ใช่ Item2D เช่น Hotspot2D ไม่ flip) |
 
 ### หน้าตาของ Item2D (`looks`)
 ลำดับการหา: `บริบท@สถานะ` → `บริบท` → `@สถานะ` / `สถานะ` → `texture`

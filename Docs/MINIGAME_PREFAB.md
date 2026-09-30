@@ -128,7 +128,8 @@ Core Part ทั้ง 5 จะเปลี่ยนเป็น 2.5D — **เ�
 
 ### ห้องใช้ร่วม + การ์ดชิ้นส่วน (30 ก.ย. ครั้งที่ 3)
 - `Scene/MiniGame/PartBase/workshop_room.tscn` = ห้อง diorama (พื้น ผนัง หน้าต่าง ชั้น ขาโต๊ะ) → instance ใต้ `Stage/Views` ชื่อ `Room` · Part RAM + Tutorial ประกอบใช้ตัวนี้
-- `PhaseUI.part_card(phase, title, body, footer)` การ์ดกระดาษมุมซ้ายล่าง · `hide_card(phase)`
+- `PhaseUI.part_card(phase, title, body, footer, rect = CARD_RECT, timer_enable = true)` การ์ดกระดาษ (ค่าเริ่มต้นมุมซ้ายล่าง · ส่ง `rect` เพื่อย้ายที่) · `timer_enable` = จางหายเองด้วย tween `modulate:a` หลังครบ 3 วินาที · `hide_card(phase)`
+- `GuideMarker` เป็นซีน `PartBase/guide_marker.tscn` (สี `col_ring` `col_ink` `col_paper` · `text` · `radius` ปรับใน Editor ได้) สร้างด้วย `GuideMarker.create()` · `flip_below` = ลูกศร/ป้ายไปอยู่ใต้วงกลม (ตั้งจาก `Item2D.hint_flip` โดย `Phase2D.hint()`)
 - Socket2D ที่เป็นลูกของชิ้นส่วน (เช่นช่องบนเมนบอร์ด) ขยับตามชิ้นได้ และไม่ถูกนับตอนถือชิ้นนั้นอยู่
 
 ### ปุ่มย้อนกลับ + สลับมุมกล้อง (30 ก.ย. ครั้งที่ 4) — `ViewNav`

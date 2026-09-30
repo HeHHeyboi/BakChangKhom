@@ -190,7 +190,7 @@ Assets/MiniGame/PartRam/ram_tex_*.png   ← texture ใหม่ 5 ไฟล์ 
 
 ## อัปเดต 30 ก.ย. (3) — ไกด์ "คลิกตรงนี้" + สมุดคู่มือแบบหน้ากระดาษ (แนว Volcano Princess)
 
-**ไกด์ไฮไลท์** — `GuideMarker` (`Scripts/MiniGame/PartBase/guide_marker.gd`) · เรียกผ่าน `Phase2D.hint(target, text, delay, view)` / `clear_hint()`
+**ไกด์ไฮไลท์** — `GuideMarker` (`Scripts/MiniGame/PartBase/guide_marker.gd`) · เรียกผ่าน `Phase2D.hint(target, text, delay, view)` / `clear_hint()` · **30 ก.ย. (หลังสุด)** แยกเป็นซีน `guide_marker.tscn` (สี/ข้อความ/รัศมีเป็น `@export`) สร้างด้วย `GuideMarker.create()` · ป้ายกลับไปอยู่ใต้วงกลมได้ด้วย `Item2D.hint_flip`
 - วงกลมกะพริบ + ลูกศรเด้ง + ป้ายข้อความ ตามชิ้น 3D (ตามกล้องได้) · ขึ้นหลังผู้เล่นไม่ทำอะไร `delay` วินาที · หายเองตอน `finish()`
 - ดูอาการ: จอ (5 วิ) → ฝากระจก (4 วิ) → **ลำโพง (3 วิ, กล้องซูมไปที่ลำโพงให้เอง)**
 - ตัดไฟ: Shut down → ปลั๊ก → โครงเคส (5/4/4 วิ)

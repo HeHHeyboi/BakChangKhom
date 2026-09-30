@@ -278,7 +278,7 @@ TutorialAssembly (tutorial_assembly.gd)
 - เพิ่ม/สลับชิ้น = ใส่ Item2D ใต้ `Parts` + Socket2D ที่ตรง `socket_type` (ไม่ต้องแก้โค้ด)
 - ชื่อ Part บนการ์ด = `TutorialAssembly.CORE_NAME`
 
-**ของที่แก้ในชุดกลาง:** `Stage2D` ไม่นับ socket ที่ติดมากับชิ้นในมือ · `PhaseUI.part_card()` / `hide_card()` · แยกห้องออกเป็น `workshop_room.tscn` (Part RAM ใช้ตัวเดียวกันแล้ว)
+**ของที่แก้ในชุดกลาง:** `Stage2D` ไม่นับ socket ที่ติดมากับชิ้นในมือ · `PhaseUI.part_card()` (จางหายเองใน 3 วิ · PhaseIntro วางที่ y=450) / `hide_card()` · `Item2D.hint_flip` (ตั้ง true ที่ Psu · Mainboard · Cpu · Cooler ให้ป้ายไกด์ไปอยู่ใต้วงกลม · PhaseIntro แสดงไกด์หลังไม่ทำอะไร 3 วิ) · แยกห้องออกเป็น `workshop_room.tscn` (Part RAM ใช้ตัวเดียวกันแล้ว)
 
 **โค้ดทดลอง 2D ของเพื่อน** (`Test/assembly.tscn`, `part.gd`, `place.gd` — HeHHeyboi) **ไม่ได้แตะ** · แนวคิด `Place.PlaceType` = `Socket2D.socket_type` ในเวอร์ชัน 2.5D นี้
 
