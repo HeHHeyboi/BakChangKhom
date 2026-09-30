@@ -49,9 +49,11 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	phase.set_meta("rail_box", box)
 	phase.set_meta("goal", goal)
 	phase.set_meta("book", _make_book(phase, header))
-	phase.visibility_changed.connect(func():
-		if phase.visible:
-			_auto_rail.call_deferred(phase))
+	phase.visibility_changed.connect(
+		func():
+			if phase.visible:
+				_auto_rail.call_deferred(phase),
+	)
 	_auto_rail.call_deferred(phase) # ครั้งแรก phase โชว์ก่อนสร้าง frame → สัญญาณข้างบนยังไม่ทันต่อ
 	return box
 
@@ -71,7 +73,10 @@ static func _make_book(phase: Control, header: Control) -> TextureButton:
 	header.add_child(b)
 	var dot := panel(b, Rect2(34, -2, 16, 16), "Badge", COL_BAD)
 	dot.visible = false
-	b.pressed.connect(func(): open_book(phase))
+	b.pressed.connect(
+		func():
+			open_book(phase),
+	)
 	return b
 
 
@@ -254,7 +259,6 @@ static func pib_say_text(lines: Array, mood := PibHint.Mood.NORMAL) -> void:
 	if Global.cur_pib:
 		Global.cur_pib.say(lines, mood)
 
-
 # ---------------------------------------------------------------- หน้าสมุดคู่มือ (popup)
 
 const COL_PAPER := Color(0.97, 0.92, 0.80)
@@ -283,7 +287,11 @@ static func open_book(phase: Control) -> void:
 	dim.color = Color(0, 0, 0, 0.45)
 	dim.size = SCREEN
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
-	dim.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: root.queue_free())
+	dim.gui_input.connect(
+		func(e):
+			if e is InputEventMouseButton and e.pressed:
+				root.queue_free(),
+	)
 	root.add_child(dim)
 
 	var page := Panel.new()
@@ -298,7 +306,12 @@ static func open_book(phase: Control) -> void:
 	sb.shadow_color = Color(0, 0, 0, 0.4)
 	page.add_theme_stylebox_override("panel", sb)
 	root.add_child(page)
-	for c in [Vector2(10, 10), Vector2(BOOK_SIZE.x - 34, 10), Vector2(10, BOOK_SIZE.y - 34), Vector2(BOOK_SIZE.x - 34, BOOK_SIZE.y - 34)]:
+	for c in [
+		Vector2(10, 10),
+		Vector2(BOOK_SIZE.x - 34, 10),
+		Vector2(10, BOOK_SIZE.y - 34),
+		Vector2(BOOK_SIZE.x - 34, BOOK_SIZE.y - 34),
+	]:
 		var o := ColorRect.new() # มุมตกแต่ง (placeholder — แทนด้วยรูปได้)
 		o.color = Color(COL_HEAD, 0.55)
 		o.position = c
@@ -397,14 +410,15 @@ static func _book_snapshot(phase: Control, v: Container) -> void:
 	if t is Control and is_instance_valid(t):
 		if st.view_of(t) != st.view_of(st.find_view(st.current_view)):
 			return
-		var p: Vector2 = st.get_global_transform_with_canvas().affine_inverse() * (t.get_global_transform_with_canvas() * (t.size / 2.0))
-		var m := GuideMarker.new()
+		var p: Vector2 = st.get_global_transform_with_canvas().affine_inverse() * (
+			t.get_global_transform_with_canvas() * (t.size / 2.0)
+		)
+		var m := GuideMarker.create()
 		m.text = ""
 		m.radius = 20
 		m.position = p * Vector2(w, h) / st.size
 		frame.add_child(m)
 		m.top_level = false
-
 
 # ---------------------------------------------------------------- การ์ดชิ้นส่วน [30 ก.ย.]
 
@@ -412,14 +426,21 @@ const CARD_RECT := Rect2(16, 300, 440, 168)
 
 
 ## การ์ดกระดาษมุมซ้ายล่างของฉาก: ชื่อชิ้น · หน้าที่ · "จะได้ซ่อมใน Part ___" (footer ว่าง = ไม่โชว์)
-static func part_card(phase: Control, title: String, body: String, footer := "") -> Panel:
+static func part_card(
+	phase: Control,
+	title: String,
+	body: String,
+	footer := "",
+	rect: Rect2 = CARD_RECT,
+	timer_enable: bool = true,
+) -> Panel:
 	var old := phase.get_node_or_null("PartCard")
 	if old:
 		old.free()
 	var p := Panel.new()
 	p.name = "PartCard"
-	p.position = CARD_RECT.position
-	p.size = CARD_RECT.size
+	p.position = rect.position
+	p.size = rect.size
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = COL_PAPER
@@ -430,7 +451,7 @@ static func part_card(phase: Control, title: String, body: String, footer := "")
 	phase.add_child(p)
 	var v := VBoxContainer.new()
 	v.position = Vector2(18, 12)
-	v.size = CARD_RECT.size - Vector2(36, 24)
+	v.size = rect.size - Vector2(36, 24)
 	v.add_theme_constant_override("separation", 4)
 	p.add_child(v)
 	label(v, title, 22, COL_HEAD)
@@ -439,6 +460,18 @@ static func part_card(phase: Control, title: String, body: String, footer := "")
 		label(v, footer, 16, COL_OK.darkened(0.4))
 	p.modulate.a = 0.0
 	phase.create_tween().tween_property(p, "modulate:a", 1.0, 0.15)
+	if timer_enable:
+		var timer = Timer.new()
+		timer.one_shot = true
+		timer.wait_time = 3
+		timer.timeout.connect(
+			func():
+				var tw := p.create_tween()
+				tw.tween_property(p, "modulate:a", 0.0, 0.15)
+				tw.tween_callback(p.hide),
+		)
+		p.add_child(timer)
+		timer.start()
 	return p
 
 

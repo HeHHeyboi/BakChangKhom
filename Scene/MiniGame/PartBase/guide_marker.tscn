@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cf3tdsovxeydj"]
+
+[ext_resource type="Script" uid="uid://bllbh16ytvj2" path="res://Scripts/MiniGame/PartBase/guide_marker.gd" id="1_marker"]
+
+[node name="GuideMarker" type="Control" unique_id=1517279700]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_marker")

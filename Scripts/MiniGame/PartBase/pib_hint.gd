@@ -21,7 +21,7 @@ enum Mood {
 }
 
 ## รูปปิ๊บของแต่ละอารมณ์ — เปลี่ยนรูปได้ใน Inspector ของ pib_hint.tscn
-@export var mood_textures: Dictionary[Mood, Texture2D] = {}
+@export var mood_textures: Dictionary[Mood, Texture2D] = { }
 ## ตัวอักษรต่อวินาที (0 = ขึ้นทั้งบรรทัดทันที)
 @export var chars_per_sec := 45.0
 
@@ -134,8 +134,12 @@ func _pop_in() -> void:
 	bubble.scale = Vector2(0.6, 0.6)
 	bubble.modulate.a = 0.0
 	_pop_tw = create_tween().set_parallel()
-	_pop_tw.tween_property(pib_sprite, "position:y", _pib_home_y, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_pop_tw.tween_property(bubble, "scale", Vector2.ONE, 0.25).set_delay(0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_pop_tw.tween_property(pib_sprite, "position:y", _pib_home_y, 0.35).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_OUT
+	)
+	_pop_tw.tween_property(bubble, "scale", Vector2.ONE, 0.25).set_delay(0.12).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_OUT
+	)
 	_pop_tw.tween_property(bubble, "modulate:a", 1.0, 0.15).set_delay(0.12)
 
 
@@ -145,11 +149,14 @@ func _pop_out() -> void:
 		_pop_tw.kill()
 	_pop_tw = create_tween().set_parallel()
 	_pop_tw.tween_property(bubble, "modulate:a", 0.0, 0.12)
-	_pop_tw.tween_property(pib_sprite, "position:y", _pib_home_y + 220.0, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	_pop_tw.chain().tween_callback(func():
-		dialog_panel.hide()
-		if not toast_box.visible:
-			self.hide()
+	_pop_tw.tween_property(pib_sprite, "position:y", _pib_home_y + 220.0, 0.25).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_IN
+	)
+	_pop_tw.chain().tween_callback(
+		func():
+			dialog_panel.hide()
+			if not toast_box.visible:
+				self.hide(),
 	)
 
 
@@ -168,7 +175,9 @@ func toast(line: DialogToken, seconds: float = 3.0, mood: Mood = Mood.WORRY) -> 
 	toast_box.show()
 	if fresh:
 		toast_box.position.x = -toast_box.size.x
-		create_tween().tween_property(toast_box, "position:x", 0.0, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		create_tween().tween_property(toast_box, "position:x", 0.0, 0.3).set_trans(Tween.TRANS_BACK).set_ease(
+			Tween.EASE_OUT
+		)
 	timer.wait_time = seconds
 	timer.one_shot = true
 	timer.start()
@@ -183,10 +192,11 @@ func _on_timer_timeout() -> void:
 	# ซ่อนทั้ง layer เฉพาะตอนกล่องคำพูดปิดอยู่ — ไม่งั้นบทที่กำลังพูดจะหายไปด้วย
 	var tw := create_tween()
 	tw.tween_property(toast_box, "position:x", -toast_box.size.x, 0.2).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func():
-		toast_box.hide()
-		if not dialog_panel.visible:
-			self.hide()
+	tw.tween_callback(
+		func():
+			toast_box.hide()
+			if not dialog_panel.visible:
+				self.hide(),
 	)
 
 

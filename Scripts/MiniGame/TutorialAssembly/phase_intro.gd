@@ -3,7 +3,7 @@ extends Phase2D
 ## ระหว่าง phase นี้ชิ้นส่วนเป็นโหมด CLICK (ลากไม่ได้) · BUILD จะเปลี่ยนกลับเป็น DRAGGABLE
 
 var _built := false
-var _checks := {} # Item2D → Label
+var _checks := { } # Item2D → Label
 var _done := false
 
 
@@ -31,7 +31,9 @@ func _on_clicked(p: Item2D) -> void:
 	if not _checks.has(p):
 		return
 	PhaseUI.set_check(_checks[p], true)
-	PhaseUI.part_card(self, p.data.display_name, p.data.role, owner.core_name(p.data))
+	var rect = PhaseUI.CARD_RECT
+	rect.position = Vector2(16, 450)
+	PhaseUI.part_card(self, p.data.display_name, p.data.role, owner.core_name(p.data), rect)
 	p.tint(Color(1, 0.95, 0.7))
 	get_tree().create_timer(0.4).timeout.connect(p.clear_tint)
 	_next_hint()
@@ -40,7 +42,7 @@ func _on_clicked(p: Item2D) -> void:
 func _next_hint() -> void:
 	for p in owner.parts():
 		if not _checks[p].get_meta("done", false):
-			hint(p, "คลิกดูชิ้นนี้", 6.0)
+			hint(p, "คลิกดูชิ้นนี้", 3.0)
 			return
 	clear_hint()
 	if not _done:

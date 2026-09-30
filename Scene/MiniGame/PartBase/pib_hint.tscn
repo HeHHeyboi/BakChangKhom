@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bdf1p3qywimo3"]
 
 [ext_resource type="Script" uid="uid://b76tk3iv0er0j" path="res://Scripts/MiniGame/PartBase/pib_hint.gd" id="5_jxkp8"]
-[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_normal.png" id="t_normal"]
-[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_happy.png" id="t_happy"]
-[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_worry.png" id="t_worry"]
-[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_pib_point.png" id="t_point"]
+[ext_resource type="Texture2D" uid="uid://c16rueah2nblt" path="res://Assets/CharacterSprite/char_pib_happy.png" id="t_happy"]
+[ext_resource type="Texture2D" uid="uid://cr48r4t03reb2" path="res://Assets/CharacterSprite/char_pib_normal.png" id="t_normal"]
+[ext_resource type="Texture2D" uid="uid://btwqjmuop50qa" path="res://Assets/CharacterSprite/char_pib_point.png" id="t_point"]
+[ext_resource type="Texture2D" uid="uid://3ohhugj4drqd" path="res://Assets/CharacterSprite/char_pib_worry.png" id="t_worry"]
 
 [sub_resource type="StyleBoxEmpty" id="empty"]
 
@@ -39,9 +39,8 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
-[node name="PibHint" type="CanvasLayer"]
+[node name="PibHint" type="CanvasLayer" unique_id=1190068433]
 layer = 120
-visible = false
 script = ExtResource("5_jxkp8")
 mood_textures = Dictionary[int, Texture2D]({
 0: ExtResource("t_normal"),
@@ -50,8 +49,7 @@ mood_textures = Dictionary[int, Texture2D]({
 3: ExtResource("t_point")
 })
 
-[node name="DialogPanel" type="Button" parent="."]
-visible = false
+[node name="DialogPanel" type="Button" parent="." unique_id=1774107930]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -59,14 +57,14 @@ offset_top = 440.0
 grow_horizontal = 2
 grow_vertical = 2
 focus_mode = 0
-theme_override_styles/focus = SubResource("empty")
-theme_override_styles/disabled = SubResource("empty")
-theme_override_styles/hover_pressed = SubResource("empty")
-theme_override_styles/hover = SubResource("empty")
-theme_override_styles/pressed = SubResource("empty")
 theme_override_styles/normal = SubResource("empty")
+theme_override_styles/pressed = SubResource("empty")
+theme_override_styles/hover = SubResource("empty")
+theme_override_styles/hover_pressed = SubResource("empty")
+theme_override_styles/disabled = SubResource("empty")
+theme_override_styles/focus = SubResource("empty")
 
-[node name="Pib" type="TextureRect" parent="DialogPanel"]
+[node name="Pib" type="TextureRect" parent="DialogPanel" unique_id=2088472803]
 layout_mode = 0
 offset_left = 4.0
 offset_top = -44.0
@@ -77,7 +75,7 @@ texture = ExtResource("t_normal")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Bubble" type="Panel" parent="DialogPanel"]
+[node name="Bubble" type="Panel" parent="DialogPanel" unique_id=559452193]
 layout_mode = 0
 offset_left = 206.0
 offset_top = 46.0
@@ -86,18 +84,18 @@ offset_bottom = 196.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("bubble")
 
-[node name="Tail" type="Polygon2D" parent="DialogPanel/Bubble"]
+[node name="Tail" type="Polygon2D" parent="DialogPanel/Bubble" unique_id=1509030509]
 position = Vector2(3, 0)
 color = Color(1, 0.964706, 0.886275, 1)
 polygon = PackedVector2Array(0, 50, -30, 74, 0, 92)
 
-[node name="TailLine" type="Line2D" parent="DialogPanel/Bubble"]
+[node name="TailLine" type="Line2D" parent="DialogPanel/Bubble" unique_id=1351795650]
 points = PackedVector2Array(3, 48, -28, 74, 3, 94)
 width = 5.0
 default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
 joint_mode = 2
 
-[node name="Name" type="Label" parent="DialogPanel/Bubble"]
+[node name="Name" type="Label" parent="DialogPanel/Bubble" unique_id=2008537613]
 layout_mode = 0
 offset_left = 22.0
 offset_top = -22.0
@@ -108,7 +106,7 @@ theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("chip")
 text = "ปิ๊บ"
 
-[node name="Dialog" type="RichTextLabel" parent="DialogPanel/Bubble"]
+[node name="Dialog" type="RichTextLabel" parent="DialogPanel/Bubble" unique_id=1490661562]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 24.0
@@ -122,7 +120,7 @@ bbcode_enabled = true
 text = "..."
 scroll_active = false
 
-[node name="Next" type="Label" parent="DialogPanel/Bubble"]
+[node name="Next" type="Label" parent="DialogPanel/Bubble" unique_id=545484328]
 layout_mode = 0
 offset_left = 890.0
 offset_top = 104.0
@@ -134,7 +132,7 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
 text = "▼"
 
-[node name="Toast" type="Control" parent="."]
+[node name="Toast" type="Control" parent="." unique_id=1123315960]
 visible = false
 layout_mode = 3
 anchors_preset = 0
@@ -143,7 +141,7 @@ offset_right = 540.0
 offset_bottom = 420.0
 mouse_filter = 2
 
-[node name="Pib" type="TextureRect" parent="Toast"]
+[node name="Pib" type="TextureRect" parent="Toast" unique_id=1707694535]
 layout_mode = 0
 offset_left = 4.0
 offset_right = 104.0
@@ -153,7 +151,7 @@ texture = ExtResource("t_worry")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Bubble" type="Panel" parent="Toast"]
+[node name="Bubble" type="Panel" parent="Toast" unique_id=1759454497]
 layout_mode = 0
 offset_left = 108.0
 offset_top = 26.0
@@ -162,18 +160,18 @@ offset_bottom = 96.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("bubble")
 
-[node name="Tail" type="Polygon2D" parent="Toast/Bubble"]
+[node name="Tail" type="Polygon2D" parent="Toast/Bubble" unique_id=1665206185]
 position = Vector2(3, 0)
 color = Color(1, 0.964706, 0.886275, 1)
 polygon = PackedVector2Array(0, 18, -20, 34, 0, 48)
 
-[node name="TailLine" type="Line2D" parent="Toast/Bubble"]
+[node name="TailLine" type="Line2D" parent="Toast/Bubble" unique_id=251189684]
 points = PackedVector2Array(3, 16, -18, 34, 3, 50)
 width = 5.0
 default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
 joint_mode = 2
 
-[node name="Text" type="Label" parent="Toast/Bubble"]
+[node name="Text" type="Label" parent="Toast/Bubble" unique_id=11893109]
 layout_mode = 0
 offset_left = 18.0
 offset_top = 8.0
@@ -185,7 +183,7 @@ text = "..."
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Timer" type="Timer" parent="."]
+[node name="Timer" type="Timer" parent="." unique_id=844625109]
 one_shot = true
 
 [connection signal="pressed" from="DialogPanel" to="." method="_on_dialog_panel_pressed"]
