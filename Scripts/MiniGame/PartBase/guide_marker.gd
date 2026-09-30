@@ -1,20 +1,20 @@
 class_name GuideMarker extends Control
-## ไกด์ "คลิกตรงนี้" — วงกลมกะพริบ + ลูกศรเด้ง + ป้ายข้อความ ตามชิ้นใน 3D (หรือจุดคงที่)
-## สร้างผ่าน Phase3D.hint() — ไม่ต้องวางในซีน · [Claude 30 ก.ย. 2569]
+## ไกด์ "คลิกตรงนี้" — วงกลมกะพริบ + ลูกศรเด้ง + ป้ายข้อความ ตามชิ้นในฉาก 2D (ชิ้นอยู่มุมอื่น = ชี้ที่จุดกดที่พาไปมุมนั้น)
+## สร้างผ่าน Phase2D.hint() — ไม่ต้องวางในซีน · [Claude 30 ก.ย. 2569]
 
 const COL_RING := Color(1.0, 0.82, 0.3)
 const COL_INK := Color(0.2, 0.12, 0.06)
 const COL_PAPER := Color(0.98, 0.93, 0.8)
 
-var stage: PartStage3D
-var target: Node3D
+var stage: Stage2D
+var target: Control
 var text := "คลิกตรงนี้"
 var radius := 34.0
 var _t := 0.0
 var _font: Font
 
 
-static func follow(p_parent: Control, p_stage: PartStage3D, p_target: Node3D, p_text: String) -> GuideMarker:
+static func follow(p_parent: Control, p_stage: Stage2D, p_target: Control, p_text: String) -> GuideMarker:
 	var m := GuideMarker.new()
 	m.stage = p_stage
 	m.target = p_target
@@ -33,7 +33,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	if stage and is_instance_valid(target):
-		global_position = stage.screen_pos_of(target.global_position)
+		var p = stage.screen_pos_of_node(target)
+		visible = p != null
+		if p != null:
+			global_position = p
 	queue_redraw()
 
 

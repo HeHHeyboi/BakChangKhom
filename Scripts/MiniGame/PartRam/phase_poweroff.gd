@@ -1,6 +1,6 @@
-class_name PhasePoweroff extends Phase3D
+class_name PhasePoweroff extends Phase2D
 ## Phase 3 · POWER_OFF — กด Shut down บนจอ → ถอดปลั๊กที่ปลั๊กพ่วง → แตะโครงเคส (ตามลำดับ)
-## [Claude 29 ก.ย. 2569] ย้ายจากปุ่ม 2D เป็นคลิกของจริงในฉาก 3D · กล้องเลื่อนไปจุดถัดไปเองหลังทำถูก · กดผิดลำดับ −12 safety
+## [Claude 29 ก.ย. 2569] ย้ายจากปุ่ม 2D เป็นคลิกของจริงในฉาก 2.5D · กล้องเลื่อนไปจุดถัดไปเองหลังทำถูก · กดผิดลำดับ −12 safety
 
 enum Step { SHUTDOWN, UNPLUGGED, TOUCH_CASE, DONE }
 
@@ -19,7 +19,7 @@ func init():
 	step = Step.SHUTDOWN
 	for c in _checks:
 		PhaseUI.set_check(c, false)
-	(node("Monitor") as PartBody3D).set_texture(owner.TEX_DESKTOP)
+	(node("Monitor") as Item2D).set_state("desktop")
 	show()
 	allow([node("Monitor"), node("Plug"), node("CaseFrame")])
 	cam(&"Monitor")
@@ -36,12 +36,12 @@ func _step_hint() -> void:
 		_: clear_hint()
 
 
-func _on_clicked(p: PartBody3D) -> void:
+func _on_clicked(p: Item2D) -> void:
 	if step == Step.DONE:
 		return
 	if p == node("Monitor"):
 		if step == Step.SHUTDOWN:
-			(node("Monitor") as PartBody3D).set_texture(null) # จอดับ
+			(node("Monitor") as Item2D).set_state("off") # จอดับ (crossfade)
 			owner.set_led(false)
 			toast(MinigameHeader.SAFETY_SHUTDOWN)
 			_next(&"Rear")
@@ -56,7 +56,7 @@ func _on_clicked(p: PartBody3D) -> void:
 	elif p == node("CaseFrame"):
 		if step == Step.TOUCH_CASE:
 			toast(MinigameHeader.SAFETY_TOUCH_CASE)
-			(p as PartBody3D).tint(Color(0.6, 0.8, 1))
+			(p as Item2D).tint(Color(0.6, 0.8, 1))
 			_next(&"")
 			await wait(1.2)
 			p.clear_tint()
@@ -76,10 +76,5 @@ func _next(view: StringName) -> void:
 
 func _unplug() -> void:
 	# ดึงปลั๊กออกจากปลั๊กพ่วง (ตำแหน่งเดิมเก็บไว้ให้ VERIFY เสียบคืน)
-	var plug := node("Plug") as Node3D
-	plug.set_meta("home", plug.position)
 	owner.plugged = false
-	var tw := create_tween()
-	tw.tween_property(plug, "position:y", plug.position.y + 0.35, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(plug, "position:x", plug.position.x - 0.5, 0.25)
-	tw.tween_property(plug, "position:y", 0.14, 0.2)
+	(node("Plug") as Item2D).set_state("out") # รูปปลั๊กเสียบ → รูปปลั๊กหลุดวางข้าง ๆ (crossfade)

@@ -1,5 +1,5 @@
 class_name PcPart extends Resource
-## ข้อมูลชิ้นส่วนคอม 1 ชิ้น — ใช้สร้างโมเดล "กล่องแปะรูป" ในฉาก 3D (Docs/ART_25D_PLAN.md ข้อ 2–3)
+## ข้อมูลชิ้นส่วนคอม 1 ชิ้น — ข้อมูลที่ Item2D ใช้ (ชื่อ · หน้าที่ · socket · ลำดับติดตั้ง · บทปิ๊บ) — หน้าตาอยู่ที่รูปใน Item2D.looks ส่วน Model ด้านล่างเป็นของระบบเก่า (Docs/ART_25D_PLAN.md ข้อ 2–3)
 ## ชิ้นใหม่ = ไฟล์ .tres ใหม่ 1 ไฟล์ ไม่ต้องมีไฟล์โมเดล
 ## หน่วย: 1 = 10 ซม.
 
@@ -18,7 +18,7 @@ enum Face { NONE, TOP, SIDE_X, SIDE_Z }
 @export var texture_face: Face = Face.TOP
 ## ร่องบาก/สัญลักษณ์บอกทิศ — ตำแหน่งเป็นสัดส่วนตามแกนยาว 0–1 · < 0 = ไม่มี
 @export_range(-1.0, 1.0) var notch_pos := -1.0
-## รายละเอียดที่สร้างจากโค้ดแทนรูป (ดู PartBody3D._build_procedural)
+## รายละเอียดที่สร้างจากโค้ดแทนรูป (ระบบเก่า ไม่ได้ใช้แล้ว)
 ##   dimm = แรมแท่ง (PCB + ชิป 8 ตัวต่อด้าน + ขาทอง + ร่องบาก) · dimm_slot = สล็อตแรม (+ สันกันเสียบกลับด้าน)
 @export_enum("none", "dimm", "dimm_slot") var procedural: String = "none"
 

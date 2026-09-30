@@ -1,32 +1,39 @@
 [gd_scene format=3]
-
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_base.tscn" id="0_base"]
 [ext_resource type="Script" path="res://Scripts/MiniGame/TutorialAssembly/tutorial_assembly.gd" id="1_main"]
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_3d.tscn" id="2_stage"]
-[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/stage3d/part_body_3d.gd" id="3_body"]
-[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/stage3d/socket_3d.gd" id="4_socket"]
-[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/stage3d/camera_point_3d.gd" id="5_cam"]
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/workshop_room.tscn" id="6_room"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="8_wall"]
 [ext_resource type="Script" path="res://Scripts/MiniGame/TutorialAssembly/phase_intro.gd" id="7_intro"]
 [ext_resource type="Script" path="res://Scripts/MiniGame/TutorialAssembly/phase_build.gd" id="7_build"]
 [ext_resource type="Script" path="res://Scripts/MiniGame/TutorialAssembly/phase_power.gd" id="7_power"]
 [ext_resource type="Script" path="res://Scripts/MiniGame/TutorialAssembly/phase_summary.gd" id="7_summary"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/case_panel.tres" id="r_case_panel"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/case_bezel.tres" id="r_case_bezel"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_button.tres" id="r_power_button"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_led.tres" id="r_power_led"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/monitor.tres" id="r_monitor"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/monitor_stand.tres" id="r_monitor_stand"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/esd_mat.tres" id="r_esd_mat"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/psu.tres" id="r_psu"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/mainboard.tres" id="r_mainboard"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/cpu.tres" id="r_cpu"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/cpu_cooler.tres" id="r_cpu_cooler"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/gpu.tres" id="r_gpu"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/ssd_m2.tres" id="r_ssd_m2"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stick.tres" id="r_ram_stick"]
-
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="g1"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="g2"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="g3"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/esd_mat_view.png" id="g4"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/psu.tres" id="g5"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_psu.png" id="g6"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/item_2d.gd" id="g7"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/mainboard.tres" id="g8"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartMainboard/mb_mainboard.png" id="g9"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/mb_in_case.png" id="g10"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/cpu.tres" id="g11"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartMainboard/mb_cpu.png" id="g12"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/cpu_cooler.tres" id="g13"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartMainboard/mb_cooler.png" id="g14"]
+[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stick.tres" id="g15"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_clean.png" id="g16"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/ram_mini.png" id="g17"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/ssd_m2.tres" id="g18"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/ssd_m2.png" id="g19"]
+[ext_resource type="Resource" path="res://Resources/Parts/Common/gpu.tres" id="g20"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_card.png" id="g21"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/build_bg.png" id="g22"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/socket_2d.gd" id="g23"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="g24"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="g25"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_on.png" id="g26"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="g27"]
 [node name="TutorialAssembly" instance=ExtResource("0_base")]
 script = ExtResource("1_main")
 dialog_path = "res://Assets/Dialog/MiniGame/Assembly_Pib.txt"
@@ -34,239 +41,12 @@ dialog_path = "res://Assets/Dialog/MiniGame/Assembly_Pib.txt"
 [node name="Background" parent="." index="0"]
 texture = ExtResource("8_wall")
 
-[node name="Stage" parent="." instance=ExtResource("2_stage")]
+[node name="Stage" parent="." index="2" instance=ExtResource("st2d")]
 unique_name_in_owner = true
 offset_top = 56.0
-offset_right = 860.0
+offset_right = 1152.0
 offset_bottom = 476.0
 start_view = &"Overview"
-transparent_background = false
-
-[node name="Workbench" parent="Stage/SubViewport/World" index="3"]
-position = Vector3(0.35, -0.08, 0)
-size_override = Vector3(13.9, 0.16, 5.4)
-color_override = Color(0.66, 0.45, 0.29, 1)
-
-[node name="Room" parent="Stage/SubViewport/World" instance=ExtResource("6_room")]
-
-[node name="PcCase" type="Node3D" parent="Stage/SubViewport/World"]
-
-[node name="CaseFloor" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(0, 0.02, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(3.8, 0.04, 4.2)
-color_override = Color(0.15, 0.15, 0.16, 1)
-
-[node name="CaseRear" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(0, 0.95, -2.08)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(3.8, 1.9, 0.04)
-
-[node name="CaseSide" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(1.88, 0.95, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(0.04, 1.9, 4.2)
-
-[node name="CaseBottom" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(-1.88, 0.95, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(0.04, 1.9, 4.2)
-
-[node name="CaseBezel" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(0, 0.95, 2.14)
-script = ExtResource("3_body")
-data = ExtResource("r_case_bezel")
-mode = 0
-
-[node name="PowerButton" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-unique_name_in_owner = true
-position = Vector3(1.2, 1.45, 2.215)
-rotation_degrees = Vector3(90, 0, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_power_button")
-mode = 3
-
-[node name="PowerLed" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase"]
-unique_name_in_owner = true
-position = Vector3(0.8, 1.45, 2.205)
-script = ExtResource("3_body")
-data = ExtResource("r_power_led")
-mode = 0
-color_override = Color(0.15, 0.05, 0.05, 1)
-
-[node name="PsuBay" type="Node3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(-1.43, 0.04, -1.33)
-script = ExtResource("4_socket")
-socket_type = &"psu_bay"
-hint_size = Vector3(0.86, 0.1, 1.46)
-
-[node name="MbStandoff" type="Node3D" parent="Stage/SubViewport/World/PcCase"]
-position = Vector3(0.3, 0.1, -0.35)
-script = ExtResource("4_socket")
-socket_type = &"mb_standoff"
-hint_size = Vector3(2.5, 0.05, 2.63)
-
-[node name="Monitor" type="StaticBody3D" parent="Stage/SubViewport/World"]
-unique_name_in_owner = true
-position = Vector3(-4.8, 1.85, -1.2)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor")
-mode = 0
-
-[node name="MonitorStand" type="StaticBody3D" parent="Stage/SubViewport/World"]
-position = Vector3(-4.8, 0.02, -1.2)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor_stand")
-mode = 0
-
-[node name="MonitorNeck" type="StaticBody3D" parent="Stage/SubViewport/World"]
-position = Vector3(-4.8, 0.5, -1.26)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor_stand")
-mode = 0
-size_override = Vector3(0.12, 1.0, 0.08)
-
-[node name="EsdMat" type="StaticBody3D" parent="Stage/SubViewport/World"]
-position = Vector3(4.6, 0.0, 0.0)
-script = ExtResource("3_body")
-data = ExtResource("r_esd_mat")
-mode = 0
-size_override = Vector3(5.2, 0.04, 5.2)
-
-[node name="Parts" type="Node3D" parent="Stage/SubViewport/World"]
-unique_name_in_owner = true
-
-[node name="Psu" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(6.6, 0.44, -1.7)
-script = ExtResource("3_body")
-data = ExtResource("r_psu")
-mode = 1
-size_override = Vector3(0.86, 0.86, 1.46)
-
-[node name="Mainboard" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(3.3, 0.06, 0.0)
-rotation_degrees = Vector3(0, -90, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_mainboard")
-mode = 1
-
-[node name="CpuSocket" type="Node3D" parent="Stage/SubViewport/World/Parts/Mainboard"]
-position = Vector3(-0.05, 0.008, -0.5)
-script = ExtResource("4_socket")
-socket_type = &"cpu_socket"
-hint_size = Vector3(0.4, 0.03, 0.4)
-
-[node name="CoolerMount" type="Node3D" parent="Stage/SubViewport/World/Parts/Mainboard"]
-position = Vector3(-0.05, 0.04, -0.5)
-script = ExtResource("4_socket")
-socket_type = &"cooler_mount"
-hint_size = Vector3(0.9, 0.05, 0.9)
-
-[node name="RamSlot" type="Node3D" parent="Stage/SubViewport/World/Parts/Mainboard"]
-position = Vector3(0.679, 0.028, -0.393)
-script = ExtResource("4_socket")
-socket_type = &"ram_slot"
-hint_size = Vector3(0.05, 0.3, 1.34)
-
-[node name="M2Slot" type="Node3D" parent="Stage/SubViewport/World/Parts/Mainboard"]
-position = Vector3(0.0, 0.008, 0.5)
-script = ExtResource("4_socket")
-socket_type = &"m2_slot"
-hint_size = Vector3(0.22, 0.03, 0.8)
-
-[node name="PcieSlot" type="Node3D" parent="Stage/SubViewport/World/Parts/Mainboard"]
-position = Vector3(-0.316, 0.008, 0.275)
-script = ExtResource("4_socket")
-socket_type = &"pcie_x16"
-hint_size = Vector3(2.0, 0.05, 0.3)
-
-[node name="Cpu" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(5.0, 0.07, -1.9)
-script = ExtResource("3_body")
-data = ExtResource("r_cpu")
-mode = 1
-
-[node name="Cooler" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(5.3, 0.29, -0.9)
-script = ExtResource("3_body")
-data = ExtResource("r_cpu_cooler")
-mode = 1
-
-[node name="Ram" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(5.9, 0.2, 0.1)
-rotation_degrees = Vector3(0, -90, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_stick")
-mode = 1
-
-[node name="Ssd" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(6.8, 0.07, 0.8)
-script = ExtResource("3_body")
-data = ExtResource("r_ssd_m2")
-mode = 1
-
-[node name="Gpu" type="StaticBody3D" parent="Stage/SubViewport/World/Parts"]
-unique_name_in_owner = true
-position = Vector3(5.6, 0.46, 1.6)
-script = ExtResource("3_body")
-data = ExtResource("r_gpu")
-mode = 1
-
-[node name="Views" type="Node3D" parent="Stage/SubViewport/World"]
-
-[node name="Overview" type="Marker3D" parent="Stage/SubViewport/World/Views"]
-position = Vector3(0.8, 0.3, 0.2)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 36.0
-distance = 9.0
-label = "ภาพรวม"
-
-[node name="Tray" type="Marker3D" parent="Stage/SubViewport/World/Views"]
-position = Vector3(4.7, 0.2, 0.0)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 50.0
-distance = 6.4
-label = "ชิ้นส่วน"
-
-[node name="Build" type="Marker3D" parent="Stage/SubViewport/World/Views"]
-position = Vector3(2.4, 0.2, -0.1)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 55.0
-distance = 8.0
-label = "ในเคส"
-
-[node name="Front" type="Marker3D" parent="Stage/SubViewport/World/Views"]
-position = Vector3(1.0, 1.1, 2.2)
-script = ExtResource("5_cam")
-yaw = 30.0
-pitch = 20.0
-distance = 2.8
-label = "หน้าเคส"
-
-[node name="Monitor" type="Marker3D" parent="Stage/SubViewport/World/Views"]
-position = Vector3(-4.8, 1.7, -1.2)
-script = ExtResource("5_cam")
-yaw = 28.0
-pitch = 18.0
-distance = 3.6
-label = "จอ"
 
 [node name="PhaseIntro" type="Control" parent="."]
 visible = false
@@ -296,3 +76,324 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("7_summary")
 
+[node name="Overview" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("g2")
+background = ExtResource("g1")
+label = "ภาพรวมร้าน"
+focus_x = 330.0
+bg_offset = Vector2(0, -150)
+
+[node name="ToBuild" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 122.0
+offset_right = 356.0
+offset_bottom = 275.0
+script = ExtResource("g3")
+target_view = &"Build"
+label_text = "ประกอบในเคส"
+always_show_label = true
+portal = true
+
+[node name="ToMonitor" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 158.0
+offset_right = 80.0
+offset_bottom = 305.0
+script = ExtResource("g3")
+target_view = &"Monitor"
+label_text = "จอ/คอม"
+always_show_label = true
+portal = true
+
+[node name="ToTray" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 238.0
+offset_right = 500.0
+offset_bottom = 300.0
+script = ExtResource("g3")
+target_view = &"Tray"
+label_text = "ชิ้นส่วน"
+always_show_label = true
+portal = true
+
+[node name="Tray" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("g2")
+background = ExtResource("g4")
+label = "ชิ้นส่วน"
+focus_x = 576.0
+
+[node name="Parts" type="Control" parent="Stage/Views/Tray"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+
+[node name="Psu" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 262.0
+offset_top = 52.0
+offset_right = 432.0
+offset_bottom = 173.0
+script = ExtResource("g7")
+data = ExtResource("g5")
+mode = 3
+texture = ExtResource("g6")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g6")})
+
+[node name="Mainboard" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 452.0
+offset_top = 40.0
+offset_right = 652.0
+offset_bottom = 230.0
+script = ExtResource("g7")
+data = ExtResource("g8")
+mode = 3
+texture = ExtResource("g9")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g10")})
+
+[node name="Cpu" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 682.0
+offset_top = 62.0
+offset_right = 772.0
+offset_bottom = 152.0
+script = ExtResource("g7")
+data = ExtResource("g11")
+mode = 3
+texture = ExtResource("g12")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g12")})
+
+[node name="Cooler" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 792.0
+offset_top = 48.0
+offset_right = 912.0
+offset_bottom = 168.0
+script = ExtResource("g7")
+data = ExtResource("g13")
+mode = 3
+texture = ExtResource("g14")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g14")})
+
+[node name="Ram" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 236.0
+offset_right = 510.0
+offset_bottom = 322.0
+script = ExtResource("g7")
+data = ExtResource("g15")
+mode = 3
+texture = ExtResource("g16")
+looks = Dictionary[String, Texture2D]({"mini": ExtResource("g17")})
+
+[node name="Ssd" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 540.0
+offset_top = 262.0
+offset_right = 740.0
+offset_bottom = 318.0
+script = ExtResource("g7")
+data = ExtResource("g18")
+mode = 3
+texture = ExtResource("g19")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g19")})
+
+[node name="Gpu" type="Control" parent="Stage/Views/Tray/Parts"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 752.0
+offset_top = 212.0
+offset_right = 922.0
+offset_bottom = 274.0
+script = ExtResource("g7")
+data = ExtResource("g20")
+mode = 3
+texture = ExtResource("g21")
+looks = Dictionary[String, Texture2D]({"case": ExtResource("g21")})
+
+[node name="ToBuild" type="Control" parent="Stage/Views/Tray"]
+layout_mode = 0
+offset_left = 940.0
+offset_top = 130.0
+offset_right = 1130.0
+offset_bottom = 280.0
+script = ExtResource("g3")
+target_view = &"Build"
+label_text = "→ เคส"
+always_show_label = false
+portal = true
+
+[node name="Build" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("g2")
+background = ExtResource("g22")
+label = "ประกอบในเคส"
+focus_x = 576.0
+
+[node name="PsuBay" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 651.0
+offset_top = 228.0
+offset_right = 740.0
+offset_bottom = 317.0
+script = ExtResource("g23")
+socket_type = &"psu_bay"
+look = "case"
+
+[node name="MbStandoff" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 460.0
+offset_top = 124.0
+offset_right = 655.0
+offset_bottom = 332.0
+script = ExtResource("g23")
+socket_type = &"mb_standoff"
+look = "case"
+
+[node name="PcieSlot" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 514.0
+offset_top = 222.0
+offset_right = 612.0
+offset_bottom = 258.0
+script = ExtResource("g23")
+socket_type = &"pcie_x16"
+look = "case"
+
+[node name="M2Slot" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 546.0
+offset_top = 266.0
+offset_right = 594.0
+offset_bottom = 280.0
+script = ExtResource("g23")
+socket_type = &"m2_slot"
+look = "case"
+
+[node name="RamSlot" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 136.0
+offset_right = 612.0
+offset_bottom = 226.0
+script = ExtResource("g23")
+socket_type = &"ram_slot"
+look = "mini"
+
+[node name="CpuSocket" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 554.0
+offset_top = 148.0
+offset_right = 586.0
+offset_bottom = 184.0
+script = ExtResource("g23")
+socket_type = &"cpu_socket"
+look = "case"
+
+[node name="CoolerMount" type="Control" parent="Stage/Views/Build"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 540.0
+offset_top = 134.0
+offset_right = 600.0
+offset_bottom = 198.0
+script = ExtResource("g23")
+socket_type = &"cooler_mount"
+look = "case"
+
+[node name="ToTray" type="Control" parent="Stage/Views/Build"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 130.0
+offset_right = 220.0
+offset_bottom = 280.0
+script = ExtResource("g3")
+target_view = &"Tray"
+label_text = "→ ชิ้นส่วน"
+always_show_label = false
+portal = true
+
+[node name="Monitor" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("g2")
+background = ExtResource("g24")
+label = "จอ/คอม"
+focus_x = 560.0
+aliases = PackedStringArray("Front")
+
+[node name="Monitor" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 452.0
+offset_top = 57.0
+offset_right = 768.0
+offset_bottom = 240.0
+script = ExtResource("g7")
+mode = 0
+looks = Dictionary[String, Texture2D]({"boot_ok": ExtResource("g25"), "off": null})
+state = "off"
+stretch = true
+label_text = "จอ"
+
+[node name="PowerButton" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 319.0
+offset_top = 167.0
+offset_right = 351.0
+offset_bottom = 199.0
+script = ExtResource("g7")
+mode = 3
+label_text = "ปุ่มเปิดเครื่อง"
+
+[node name="PowerLed" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 308.0
+offset_top = 127.0
+offset_right = 328.0
+offset_bottom = 147.0
+script = ExtResource("g7")
+mode = 0
+looks = Dictionary[String, Texture2D]({"on": ExtResource("g26"), "off": ExtResource("g27")})
+state = "off"
+
+[editable path="Stage"]

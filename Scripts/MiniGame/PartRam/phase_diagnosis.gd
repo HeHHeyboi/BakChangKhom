@@ -1,6 +1,6 @@
-class_name PhaseDiagnosis extends Phase3D
-## Phase 1 · DIAGNOSIS — ดูอาการ 3 จุดในฉาก 3D (จอ · ลำโพงบนเมนบอร์ด · ในเคส) แล้วเลือกสาเหตุ
-## [Claude 29 ก.ย. 2569] ย้ายจากปุ่ม 2D ของเดิมเป็นจุดคลิกในฉาก 3D · กติกาเดิม (ครบ 3 จุดถึงเลือกได้ · ผิด −10 · ผิด 3 ครั้งใบ้)
+class_name PhaseDiagnosis extends Phase2D
+## Phase 1 · DIAGNOSIS — ดูอาการ 3 จุดในฉาก 2.5D (จอ · ลำโพงบนเมนบอร์ด · ในเคส) แล้วเลือกสาเหตุ
+## [Claude 29 ก.ย. 2569] ย้ายจากปุ่ม 2D ของเดิมเป็นจุดคลิกในฉาก 2.5D · กติกาเดิม (ครบ 3 จุดถึงเลือกได้ · ผิด −10 · ผิด 3 ครั้งใบ้)
 
 const CHOICES := [
 	["แรมหน้าสัมผัสไม่ดี", "correct"],
@@ -49,7 +49,7 @@ func _build() -> void:
 		rail_button(_choice_box, c[0], _on_choice.bind(c[1]))
 
 
-func _on_clicked(p: PartBody3D) -> void:
+func _on_clicked(p: Item2D) -> void:
 	if p == node("Monitor"):
 		_clue("screen", &"Monitor", MinigameHeader.DIAGNOSIS_CLUE_SCREEN)
 	elif p == node("Speaker"):
@@ -83,12 +83,13 @@ func _next_hint() -> void:
 
 
 func _beep() -> void:
-	var fx := node("BeepFx") as Sprite3D
+	var fx := node("BeepFx") as Control
+	fx.pivot_offset = fx.size / 2.0
 	fx.show()
-	fx.scale = Vector3.ONE * 0.6
+	fx.scale = Vector2.ONE * 0.6
 	var tw := create_tween().set_loops(3)
-	tw.tween_property(fx, "scale", Vector3.ONE * 1.2, 0.25)
-	tw.tween_property(fx, "scale", Vector3.ONE * 0.6, 0.05)
+	tw.tween_property(fx, "scale", Vector2.ONE * 1.2, 0.25)
+	tw.tween_property(fx, "scale", Vector2.ONE * 0.6, 0.05)
 	tw.finished.connect(fx.hide)
 
 

@@ -1,9 +1,9 @@
-extends Phase3D
+extends Phase2D
 ## Phase 1 · INTRO — คลิกชิ้นบนแผ่นรองทีละชิ้น → การ์ดชื่อ/หน้าที่/Part ที่จะได้ซ่อม · ครบทุกชิ้นแล้วไปต่อ
 ## ระหว่าง phase นี้ชิ้นส่วนเป็นโหมด CLICK (ลากไม่ได้) · BUILD จะเปลี่ยนกลับเป็น DRAGGABLE
 
 var _built := false
-var _checks := {} # PartBody3D → Label
+var _checks := {} # Item2D → Label
 var _done := false
 
 
@@ -16,7 +16,7 @@ func init():
 			_checks[p] = PhaseUI.check_item(rail, p.data.display_name)
 	_done = false
 	for p in owner.parts():
-		p.mode = PartBody3D.Mode.CLICK
+		p.mode = Item2D.Mode.CLICK
 		PhaseUI.set_check(_checks[p], false)
 	show()
 	allow(owner.parts())
@@ -27,7 +27,7 @@ func init():
 	_next_hint()
 
 
-func _on_clicked(p: PartBody3D) -> void:
+func _on_clicked(p: Item2D) -> void:
 	if not _checks.has(p):
 		return
 	PhaseUI.set_check(_checks[p], true)

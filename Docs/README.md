@@ -25,13 +25,13 @@
 
 ## เกมเพลย์ 2.5D
 
-`RAM_3D_GAMEPLAY.md` — **Part RAM เล่นได้ครบ 8 phase ในฉาก 3D** · flow · node ในซีน · มุมกล้อง · asset · โครงไฟล์ใหม่
+`RAM_3D_GAMEPLAY.md` — **Part RAM เล่นได้ครบ 8 phase ในฉาก 2.5D** (30 ก.ย. เปลี่ยนเป็น 2D Dimetric → `SCENE_2D.md`) · flow · node ในซีน · มุมกล้อง · asset · โครงไฟล์ใหม่
 
 ## มินิเกม Tutorial (เล่นก่อน Core Part)
 
 | มินิเกม | ไฟล์ | ความรู้หลัก |
 |---|---|---|
-| ประกอบคอมพิวเตอร์ (2.5D) | `TUTORIAL_ASSEMBLY_DESIGN.md` | ชื่อ/หน้าที่/ตำแหน่งชิ้นส่วน 9 ชิ้น · ลำดับประกอบ · ESD · ฉาก 3D ที่ Core Part ยืมใช้ |
+| ประกอบคอมพิวเตอร์ (2.5D) | `TUTORIAL_ASSEMBLY_DESIGN.md` | ชื่อ/หน้าที่/ตำแหน่งชิ้นส่วน 9 ชิ้น · ลำดับประกอบ · ESD · ฉาก 2.5D ที่ Core Part ยืมใช้ |
 
 ## มินิเกม Core Part 5 ตัว
 

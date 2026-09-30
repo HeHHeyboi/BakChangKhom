@@ -25,7 +25,7 @@ const TEX_BOOT_OK := preload("res://Assets/MiniGame/PartRam/ram_tex_screen_boot_
 
 @export var start_phase: PhaseState
 
-@onready var stage: PartStage3D = %Stage
+@onready var stage: Stage2D = %Stage
 
 
 func _ready() -> void:
@@ -36,12 +36,20 @@ func _ready() -> void:
 
 
 ## ชิ้นส่วนทั้งหมดบนแผ่นรอง (ลูกของ node Parts) เรียงตามลำดับประกอบ
-func parts() -> Array[PartBody3D]:
-	var a: Array[PartBody3D] = []
-	for n in %Parts.get_children():
-		if n is PartBody3D:
+func parts() -> Array[Item2D]:
+	var a: Array[Item2D] = []
+	for n in %Parts.get_children() + _installed_parts():
+		if n is Item2D:
 			a.append(n)
 	return a
+
+
+## ชิ้นที่ประกอบลงเคสแล้ว (ย้ายออกจาก Parts ไปอยู่ในมุม Build) — เรียงตามลำดับเดิมด้วย _order
+var _order: Array[Item2D] = []
+
+
+func _installed_parts() -> Array:
+	return []
 
 
 func core_name(p: PcPart) -> String:

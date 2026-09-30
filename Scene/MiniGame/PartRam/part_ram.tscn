@@ -2,13 +2,8 @@
 
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_base.tscn" id="0_base"]
 [ext_resource type="Script" uid="uid://sh2dsdiu5r7p" path="res://Scripts/MiniGame/PartRam/part_ram.gd" id="1_x7ph2"]
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_3d.tscn" id="2_stage"]
-[ext_resource type="Script" uid="uid://crggb1kom5ell" path="res://Scripts/MiniGame/PartBase/stage3d/part_body_3d.gd" id="3_body"]
 [ext_resource type="Script" uid="uid://dwe4g0duiavhg" path="res://Scripts/MiniGame/PartRam/phase_diagnosis.gd" id="3_dhngu"]
-[ext_resource type="Script" uid="uid://bk2rpeq5jtnq2" path="res://Scripts/MiniGame/PartBase/stage3d/socket_3d.gd" id="4_socket"]
-[ext_resource type="Script" uid="uid://brydbjkwx0ja" path="res://Scripts/MiniGame/PartBase/stage3d/camera_point_3d.gd" id="5_cam"]
 [ext_resource type="Texture2D" uid="uid://ccixyjtudeyme" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="6_wall"]
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/workshop_room.tscn" id="7_room"]
 [ext_resource type="Script" uid="uid://k2j3wadd7rp5" path="res://Scripts/MiniGame/PartRam/phase_poweroff.gd" id="8_8lhnf"]
 [ext_resource type="Script" uid="uid://cqtim350r1nb5" path="res://Scripts/MiniGame/PartRam/phase_briefing.gd" id="8_un0ic"]
 [ext_resource type="Script" uid="uid://cskvobeaec5g" path="res://Scripts/MiniGame/PartRam/phase_clean.gd" id="20_clean"]
@@ -16,24 +11,37 @@
 [ext_resource type="Script" uid="uid://dox25w0ylyxns" path="res://Scripts/MiniGame/PartRam/phase_remove.gd" id="20_remove"]
 [ext_resource type="Script" uid="uid://csp17rghxpb3e" path="res://Scripts/MiniGame/PartRam/phase_summary.gd" id="20_summary"]
 [ext_resource type="Script" uid="uid://de41oaq0g82fi" path="res://Scripts/MiniGame/PartRam/phase_verify.gd" id="20_verify"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/cable.tres" id="r_cable"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/case_bezel.tres" id="r_case_bezel"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/case_glass.tres" id="r_case_glass"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/case_panel.tres" id="r_case_panel"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/esd_mat.tres" id="r_esd_mat"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/mainboard.tres" id="r_mainboard"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/monitor.tres" id="r_monitor"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/monitor_stand.tres" id="r_monitor_stand"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_button.tres" id="r_power_button"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_led.tres" id="r_power_led"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_plug.tres" id="r_power_plug"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/power_strip.tres" id="r_power_strip"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/psu.tres" id="r_psu"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_clip.tres" id="r_ram_clip"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_slot.tres" id="r_ram_slot"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stand.tres" id="r_ram_stand"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stick.tres" id="r_ram_stick"]
-[ext_resource type="Resource" path="res://Resources/Parts/Common/speaker.tres" id="r_speaker"]
+[ext_resource type="Texture2D" uid="uid://quiqc7xspufy" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="g1"]
+[ext_resource type="Script" uid="uid://bbj8d3fhkjtbr" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="g2"]
+[ext_resource type="Script" uid="uid://dsa2srhpy1t5h" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="g3"]
+[ext_resource type="Texture2D" uid="uid://bw4atqigc0mq8" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="g4"]
+[ext_resource type="Texture2D" uid="uid://cs8ngu36itw5c" path="res://Assets/MiniGame/PartRam/ram_tex_screen_glitch.png" id="g5"]
+[ext_resource type="Texture2D" uid="uid://ba2ot5a4ockub" path="res://Assets/MiniGame/PartRam/ram_tex_screen_desktop.png" id="g6"]
+[ext_resource type="Texture2D" uid="uid://dyyt8f1ew2xx1" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="g7"]
+[ext_resource type="Script" uid="uid://d0g1eqmi2im1e" path="res://Scripts/MiniGame/PartBase/scene2d/item_2d.gd" id="g8"]
+[ext_resource type="Texture2D" uid="uid://tg788nclphe6" path="res://Assets/MiniGame/PartFrontPanel/fp_led_on.png" id="g9"]
+[ext_resource type="Texture2D" uid="uid://dr1cdde7n47bc" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="g10"]
+[ext_resource type="Texture2D" uid="uid://bnywf5027aypk" path="res://Assets/MiniGame/Scene2D/power_strip_view.png" id="g11"]
+[ext_resource type="Texture2D" uid="uid://bppfqo1pewfnq" path="res://Assets/MiniGame/Scene2D/plug_in.png" id="g12"]
+[ext_resource type="Texture2D" uid="uid://kqjpdcqvomwe" path="res://Assets/MiniGame/Scene2D/plug_out.png" id="g13"]
+[ext_resource type="Texture2D" uid="uid://cmnimwgxdwqpr" path="res://Assets/MiniGame/Scene2D/inside_bg.png" id="g14"]
+[ext_resource type="Texture2D" uid="uid://cpdhf7tv4p4q4" path="res://Assets/MiniGame/Scene2D/case_glass.png" id="g15"]
+[ext_resource type="Script" uid="uid://bsxibe737h3l7" path="res://Scripts/MiniGame/PartBase/scene2d/mini_spot_2d.gd" id="g16"]
+[ext_resource type="Texture2D" uid="uid://cdmcl2inqixwi" path="res://Assets/MiniGame/PartRam/ram_tex_beep.png" id="g17"]
+[ext_resource type="Texture2D" uid="uid://b1brjiloiinsx" path="res://Assets/MiniGame/Scene2D/slots_zoom.png" id="g18"]
+[ext_resource type="Texture2D" uid="uid://dfykyx0bxfv2g" path="res://Assets/MiniGame/Scene2D/slot_dust.png" id="g19"]
+[ext_resource type="Script" uid="uid://cmbn5o0o6feu5" path="res://Scripts/MiniGame/PartBase/scene2d/socket_2d.gd" id="g20"]
+[ext_resource type="Texture2D" uid="uid://d12dirar5abdy" path="res://Assets/MiniGame/Scene2D/clip_closed.png" id="g21"]
+[ext_resource type="Texture2D" uid="uid://by2iigfapqw46" path="res://Assets/MiniGame/Scene2D/clip_open.png" id="g22"]
+[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stick.tres" id="g23"]
+[ext_resource type="Texture2D" uid="uid://dggbo116mnf" path="res://Assets/MiniGame/PartRam/ram_clean.png" id="g24"]
+[ext_resource type="Texture2D" uid="uid://bcuhesugpuvak" path="res://Assets/MiniGame/Scene2D/ram_slot.png" id="g25"]
+[ext_resource type="Texture2D" uid="uid://do2qcwaaoy7h7" path="res://Assets/MiniGame/Scene2D/ram_slot_dirty.png" id="g26"]
+[ext_resource type="Texture2D" uid="uid://b82rnc3t0grl7" path="res://Assets/MiniGame/PartRam/ram_dirty.png" id="g27"]
+[ext_resource type="Texture2D" uid="uid://bbwi67a0unikr" path="res://Assets/MiniGame/PartRam/ram_better.png" id="g28"]
+[ext_resource type="Texture2D" uid="uid://dl06r2jawgx6q" path="res://Assets/MiniGame/Scene2D/ram_mini.png" id="g29"]
+[ext_resource type="Texture2D" uid="uid://deqx5nsi02gtd" path="res://Assets/MiniGame/Scene2D/esd_mat_view.png" id="g30"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
 
 [node name="part_ram" unique_id=767611073 instance=ExtResource("0_base")]
 script = ExtResource("1_x7ph2")
@@ -43,399 +51,578 @@ dialog_path = "res://Assets/Dialog/MiniGame/Ram_Pib.txt"
 [node name="Background" parent="." index="0"]
 texture = ExtResource("6_wall")
 
-[node name="Stage" parent="." index="2" unique_id=443628479 instance=ExtResource("2_stage")]
+[node name="Stage" parent="." index="2" unique_id=1651062468 instance=ExtResource("st2d")]
 unique_name_in_owner = true
 offset_top = 56.0
 offset_bottom = 476.0
-transparent_background = false
-pan_limits = Vector2(-7, 8)
-start_view = &"Overview"
+preinstalled = Array[StringName]([&"mainboard"])
 
-[node name="Sun" parent="Stage/SubViewport/World" index="1"]
-transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
+[node name="Views" parent="Stage" index="0"]
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="FillLight" parent="Stage/SubViewport/World" index="2"]
-transform = Transform3D(-0.8660254, -0.25000003, 0.43301275, 0, 0.8660254, 0.5, -0.50000006, 0.4330127, -0.75, 0, 0, 0)
+[node name="Overview" type="Control" parent="Stage/Views" index="0" unique_id=811765361]
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g1")
+bg_offset = Vector2(0, -150)
+label = "ภาพรวมร้าน"
+aliases = PackedStringArray()
+focus_x = 330.0
 
-[node name="Workbench" parent="Stage/SubViewport/World" index="3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, -0.08, 0)
-size_override = Vector3(13.9, 0.16, 5.4)
-color_override = Color(0.66, 0.45, 0.29, 1)
+[node name="ToCase" type="Control" parent="Stage/Views/Overview" index="0" unique_id=820355032]
+anchors_preset = 0
+offset_left = 160.0
+offset_top = 122.0
+offset_right = 356.0
+offset_bottom = 275.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Inside"
+label_text = "ตรวจเคส"
 
-[node name="Camera3D" parent="Stage/SubViewport/World/CameraRig/Pitch" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+[node name="ToMonitor" type="Control" parent="Stage/Views/Overview" index="1" unique_id=2054105095]
+anchors_preset = 0
+offset_top = 158.0
+offset_right = 80.0
+offset_bottom = 305.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Monitor"
+label_text = "จอ/คอม"
 
-[node name="Room" parent="Stage/SubViewport/World" index="5" unique_id=1464534815 instance=ExtResource("7_room")]
+[node name="ToMat" type="Control" parent="Stage/Views/Overview" index="2" unique_id=1840843416]
+anchors_preset = 0
+offset_left = 368.0
+offset_top = 238.0
+offset_right = 500.0
+offset_bottom = 300.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Mat"
+label_text = "แผ่น ESD"
 
-[node name="PcCase" type="Node3D" parent="Stage/SubViewport/World" index="6" unique_id=1881854216]
+[node name="ToRear" type="Control" parent="Stage/Views/Overview" index="3" unique_id=1800286233]
+anchors_preset = 0
+offset_left = 244.0
+offset_top = 362.0
+offset_right = 426.0
+offset_bottom = 408.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Rear"
+label_text = "ปลั๊กพ่วง"
 
-[node name="CaseFloor" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="0" unique_id=1465854603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(3.8, 0.04, 4.2)
-color_override = Color(0.15, 0.15, 0.16, 1)
+[node name="Monitor" type="Control" parent="Stage/Views" index="1" unique_id=2094698678]
+visible = false
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g4")
+label = "โต๊ะคอม"
+aliases = PackedStringArray("Front")
+focus_x = 560.0
 
-[node name="CaseRear" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="1" unique_id=711410932]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -2.08)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 0
-size_override = Vector3(3.8, 1.9, 0.04)
-
-[node name="CaseFrame" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="2" unique_id=1536555338]
+[node name="Monitor" type="Control" parent="Stage/Views/Monitor" index="0" unique_id=45070500]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.88, 0.95, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
-mode = 3
-size_override = Vector3(0.04, 1.9, 4.2)
+anchors_preset = 0
+offset_left = 452.0
+offset_top = 57.0
+offset_right = 768.0
+offset_bottom = 240.0
+pivot_offset = Vector2(158, 91.5)
+mouse_filter = 2
+script = ExtResource("g8")
+looks = Dictionary[String, Texture2D]({
+"boot_ok": ExtResource("g7"),
+"desktop": ExtResource("g6"),
+"glitch": ExtResource("g5"),
+"off": null
+})
+state = "glitch"
+stretch = true
+label_text = "จอ"
 
-[node name="CaseBottom" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="3" unique_id=1095982021]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.88, 0.95, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_panel")
+[node name="PowerButton" type="Control" parent="Stage/Views/Monitor" index="1" unique_id=464906090]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 319.0
+offset_top = 167.0
+offset_right = 351.0
+offset_bottom = 199.0
+pivot_offset = Vector2(16, 16)
+mouse_filter = 2
+script = ExtResource("g8")
+label_text = "ปุ่มเปิดเครื่อง"
+
+[node name="PowerLed" type="Control" parent="Stage/Views/Monitor" index="2" unique_id=889471080]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 308.0
+offset_top = 127.0
+offset_right = 328.0
+offset_bottom = 147.0
+pivot_offset = Vector2(10, 10)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 0
-size_override = Vector3(0.04, 1.9, 4.2)
+looks = Dictionary[String, Texture2D]({
+"off": ExtResource("g10"),
+"on": ExtResource("g9")
+})
+state = "on"
 
-[node name="CaseBezel" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="4" unique_id=1761490555]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 2.14)
-script = ExtResource("3_body")
-data = ExtResource("r_case_bezel")
+[node name="Rear" type="Control" parent="Stage/Views" index="2" unique_id=785410424]
+visible = false
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g11")
+label = "ปลั๊กพ่วง"
+aliases = PackedStringArray()
+focus_x = 520.0
+
+[node name="Plug" type="Control" parent="Stage/Views/Rear" index="0" unique_id=1936465728]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 150.0
+offset_top = 60.0
+offset_right = 630.0
+offset_bottom = 360.0
+pivot_offset = Vector2(240, 150)
+mouse_filter = 2
+script = ExtResource("g8")
+texture = ExtResource("g12")
+looks = Dictionary[String, Texture2D]({
+"out": ExtResource("g13")
+})
+label_text = "ปลั๊กคอม"
+
+[node name="Inside" type="Control" parent="Stage/Views" index="3" unique_id=27833399]
+visible = false
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g14")
+label = "ในเคส"
+aliases = PackedStringArray("Speaker")
+
+[node name="GlassPanel" type="Control" parent="Stage/Views/Inside" index="0" unique_id=1396059270]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 376.0
+offset_top = 10.0
+offset_right = 776.0
+offset_bottom = 410.0
+pivot_offset = Vector2(200, 200)
+mouse_filter = 2
+script = ExtResource("g8")
+texture = ExtResource("g15")
+looks = Dictionary[String, Texture2D]({
+"open": null
+})
+label_text = "ฝาข้างกระจก"
+
+[node name="MiniA1" type="Control" parent="Stage/Views/Inside" index="1" unique_id=1219455030 node_paths=PackedStringArray("socket")]
+anchors_preset = 0
+offset_left = 602.5
+offset_top = 136.0
+offset_right = 608.5
+offset_bottom = 226.0
+mouse_filter = 2
+script = ExtResource("g16")
+socket = NodePath("../../Slots/SlotA1")
+
+[node name="MiniA2" type="Control" parent="Stage/Views/Inside" index="2" unique_id=412726524 node_paths=PackedStringArray("socket")]
+anchors_preset = 0
+offset_left = 607.3
+offset_top = 136.0
+offset_right = 613.3
+offset_bottom = 226.0
+mouse_filter = 2
+script = ExtResource("g16")
+socket = NodePath("../../Slots/SlotA2")
+
+[node name="MiniB1" type="Control" parent="Stage/Views/Inside" index="3" unique_id=422249385 node_paths=PackedStringArray("socket")]
+anchors_preset = 0
+offset_left = 612.5
+offset_top = 136.0
+offset_right = 618.5
+offset_bottom = 226.0
+mouse_filter = 2
+script = ExtResource("g16")
+socket = NodePath("../../Slots/SlotB1")
+
+[node name="MiniB2" type="Control" parent="Stage/Views/Inside" index="4" unique_id=1231678792 node_paths=PackedStringArray("socket")]
+anchors_preset = 0
+offset_left = 617.4
+offset_top = 136.0
+offset_right = 623.4
+offset_bottom = 226.0
+mouse_filter = 2
+script = ExtResource("g16")
+socket = NodePath("../../Slots/SlotB2")
+
+[node name="Speaker" type="Control" parent="Stage/Views/Inside" index="5" unique_id=1064334922]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 478.0
+offset_top = 286.0
+offset_right = 512.0
+offset_bottom = 318.0
+pivot_offset = Vector2(17, 16)
+mouse_filter = 2
+script = ExtResource("g8")
+label_text = "ลำโพงบนเมนบอร์ด"
+
+[node name="BeepFx" type="Control" parent="Stage/Views/Inside" index="6" unique_id=1052009523]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 0
+offset_left = 455.0
+offset_top = 262.0
+offset_right = 535.0
+offset_bottom = 342.0
+pivot_offset = Vector2(40, 40)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 0
+texture = ExtResource("g17")
 
-[node name="PowerButton" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="5" unique_id=2128057648]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 1.2, 1.45, 2.215)
-script = ExtResource("3_body")
-data = ExtResource("r_power_button")
-mode = 3
+[node name="ToSlots" type="Control" parent="Stage/Views/Inside" index="7" unique_id=375401769]
+anchors_preset = 0
+offset_left = 594.0
+offset_top = 128.0
+offset_right = 630.0
+offset_bottom = 234.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Slots"
+label_text = "สล็อตแรม"
+always_show_label = false
 
-[node name="PowerLed" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="6" unique_id=600833309]
+[node name="CaseFrame" type="Control" parent="Stage/Views/Inside" index="8" unique_id=1847157861]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.45, 2.205)
-script = ExtResource("3_body")
-data = ExtResource("r_power_led")
+anchors_preset = 0
+offset_left = 386.0
+offset_top = 322.0
+offset_right = 768.0
+offset_bottom = 402.0
+pivot_offset = Vector2(191, 40)
+mouse_filter = 2
+script = ExtResource("g8")
+label_text = "โครงเคสโลหะ"
+
+[node name="Slots" type="Control" parent="Stage/Views" index="4" unique_id=250746862]
+visible = false
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g18")
+label = "สล็อตแรม"
+aliases = PackedStringArray("SlotClose")
+
+[node name="SlotBodyA2" type="Control" parent="Stage/Views/Slots" index="0" unique_id=886137849]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 246.0
+offset_top = 180.0
+offset_right = 906.0
+offset_bottom = 204.0
+pivot_offset = Vector2(330, 12)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 0
-size_override = Vector3(0.12, 0.05, 0.03)
+looks = Dictionary[String, Texture2D]({
+"clean": null,
+"dirty": ExtResource("g19")
+})
+state = "dirty"
+stretch = true
 
-[node name="Psu" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="7" unique_id=240186457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.43, 0.47, -1.33)
-script = ExtResource("3_body")
-data = ExtResource("r_psu")
-mode = 0
-size_override = Vector3(0.86, 0.86, 1.46)
-
-[node name="GlassPanel" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="8" unique_id=519022999]
+[node name="SlotA1" type="Control" parent="Stage/Views/Slots" index="1" unique_id=101924846 node_paths=PackedStringArray("locks")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.91, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_case_glass")
-mode = 3
-
-[node name="Mainboard" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="9" unique_id=373840379]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.3, 0.108, -0.35)
-script = ExtResource("3_body")
-data = ExtResource("r_mainboard")
-mode = 0
-counts_as_installed = true
-
-[node name="Speaker" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="10" unique_id=620150177]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.151, 0.55)
-script = ExtResource("3_body")
-data = ExtResource("r_speaker")
-mode = 3
-
-[node name="SlotBodyA1" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="11" unique_id=1756132485]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.151, 0.226)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_slot")
-mode = 0
-
-[node name="SlotA1" type="Node3D" parent="Stage/SubViewport/World/PcCase" index="12" unique_id=2071992916 node_paths=PackedStringArray("locks")]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.136, 0.226)
-script = ExtResource("4_socket")
+anchors_preset = 0
+offset_left = 256.0
+offset_top = 32.0
+offset_right = 896.0
+offset_bottom = 132.0
+mouse_filter = 2
+script = ExtResource("g20")
 socket_type = &"ram_slot"
 required_yaw = 0.0
 locks = [NodePath("ClipBack"), NodePath("ClipFront")]
+look = "slot"
 
-[node name="ClipBack" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotA1" index="0" unique_id=168011855]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipBack" type="Control" parent="Stage/Views/Slots/SlotA1" index="0" unique_id=489336913]
+anchors_preset = 0
+offset_left = -30.0
+offset_top = 46.0
+offset_right = 4.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = -35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+label_text = "สลัก"
 
-[node name="ClipFront" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotA1" index="1" unique_id=1954608803]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipFront" type="Control" parent="Stage/Views/Slots/SlotA1" index="1" unique_id=1941717268]
+anchors_preset = 0
+offset_left = 636.0
+offset_top = 46.0
+offset_right = 670.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = 35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+mirror = true
+label_text = "สลัก"
 
-[node name="SlotBodyA2" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="13" unique_id=2137058368]
+[node name="SlotA2" type="Control" parent="Stage/Views/Slots" index="2" unique_id=2084487946 node_paths=PackedStringArray("locks", "start_occupant")]
 unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.151, 0.329)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_slot")
-mode = 0
-
-[node name="SlotA2" type="Node3D" parent="Stage/SubViewport/World/PcCase" index="14" unique_id=436557059 node_paths=PackedStringArray("locks", "start_occupant")]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.136, 0.329)
-script = ExtResource("4_socket")
+anchors_preset = 0
+offset_left = 256.0
+offset_top = 97.0
+offset_right = 896.0
+offset_bottom = 197.0
+mouse_filter = 2
+script = ExtResource("g20")
 socket_type = &"ram_slot"
 required_yaw = 0.0
 locks = [NodePath("ClipBack"), NodePath("ClipFront")]
 start_occupant = NodePath("../RamA2")
+look = "slot"
 
-[node name="ClipBack" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotA2" index="0" unique_id=1227705534]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipBack" type="Control" parent="Stage/Views/Slots/SlotA2" index="0" unique_id=899032743]
+anchors_preset = 0
+offset_left = -30.0
+offset_top = 46.0
+offset_right = 4.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = -35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
+label_text = "สลัก"
 
-[node name="ClipFront" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotA2" index="1" unique_id=710650544]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipFront" type="Control" parent="Stage/Views/Slots/SlotA2" index="1" unique_id=896013381]
+anchors_preset = 0
+offset_left = 636.0
+offset_top = 46.0
+offset_right = 670.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = 35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
+mirror = true
+label_text = "สลัก"
 
-[node name="SlotBodyB1" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="15" unique_id=1491424289]
+[node name="SlotB1" type="Control" parent="Stage/Views/Slots" index="3" unique_id=1523101322 node_paths=PackedStringArray("locks")]
 unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.151, 0.472)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_slot")
-mode = 0
-
-[node name="SlotB1" type="Node3D" parent="Stage/SubViewport/World/PcCase" index="16" unique_id=1770107092 node_paths=PackedStringArray("locks")]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.136, 0.472)
-script = ExtResource("4_socket")
+anchors_preset = 0
+offset_left = 256.0
+offset_top = 162.0
+offset_right = 896.0
+offset_bottom = 262.0
+mouse_filter = 2
+script = ExtResource("g20")
 socket_type = &"ram_slot"
 required_yaw = 0.0
 locks = [NodePath("ClipBack"), NodePath("ClipFront")]
+look = "slot"
 
-[node name="ClipBack" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotB1" index="0" unique_id=1733077681]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipBack" type="Control" parent="Stage/Views/Slots/SlotB1" index="0" unique_id=167382127]
+anchors_preset = 0
+offset_left = -30.0
+offset_top = 46.0
+offset_right = 4.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = -35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+label_text = "สลัก"
 
-[node name="ClipFront" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotB1" index="1" unique_id=278856759]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipFront" type="Control" parent="Stage/Views/Slots/SlotB1" index="1" unique_id=491953081]
+anchors_preset = 0
+offset_left = 636.0
+offset_top = 46.0
+offset_right = 670.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = 35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+mirror = true
+label_text = "สลัก"
 
-[node name="SlotBodyB2" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="17" unique_id=771229283]
+[node name="SlotB2" type="Control" parent="Stage/Views/Slots" index="4" unique_id=1633103778 node_paths=PackedStringArray("locks")]
 unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.151, 0.573)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_slot")
-mode = 0
-
-[node name="SlotB2" type="Node3D" parent="Stage/SubViewport/World/PcCase" index="18" unique_id=2043871068 node_paths=PackedStringArray("locks")]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.693, 0.136, 0.573)
-script = ExtResource("4_socket")
+anchors_preset = 0
+offset_left = 256.0
+offset_top = 227.0
+offset_right = 896.0
+offset_bottom = 327.0
+mouse_filter = 2
+script = ExtResource("g20")
 socket_type = &"ram_slot"
 required_yaw = 0.0
 locks = [NodePath("ClipBack"), NodePath("ClipFront")]
+look = "slot"
 
-[node name="ClipBack" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotB2" index="0" unique_id=194272161]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipBack" type="Control" parent="Stage/Views/Slots/SlotB2" index="0" unique_id=658452877]
+anchors_preset = 0
+offset_left = -30.0
+offset_top = 46.0
+offset_right = 4.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = -35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+label_text = "สลัก"
 
-[node name="ClipFront" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase/SlotB2" index="1" unique_id=1249985007]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.745)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_clip")
+[node name="ClipFront" type="Control" parent="Stage/Views/Slots/SlotB2" index="1" unique_id=2070873268]
+anchors_preset = 0
+offset_left = 636.0
+offset_top = 46.0
+offset_right = 670.0
+offset_bottom = 100.0
+pivot_offset = Vector2(17, 27)
+mouse_filter = 2
+script = ExtResource("g8")
 mode = 2
-toggle_angle = 35.0
+texture = ExtResource("g21")
+texture_on = ExtResource("g22")
 start_on = true
+mirror = true
+label_text = "สลัก"
 
-[node name="RamA2" type="StaticBody3D" parent="Stage/SubViewport/World/PcCase" index="19" unique_id=1451035705]
+[node name="RamA2" type="Control" parent="Stage/Views/Slots" index="5" unique_id=519234970]
 unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0.5, 0)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_stick")
+anchors_preset = 0
+offset_left = 256.0
+offset_top = 97.0
+offset_right = 896.0
+offset_bottom = 197.0
+pivot_offset = Vector2(320, 50)
+mouse_filter = 2
+script = ExtResource("g8")
+data = ExtResource("g23")
+mode = 1
+texture = ExtResource("g24")
+looks = Dictionary[String, Texture2D]({
+"@dirty": ExtResource("g27"),
+"@dusted": ExtResource("g28"),
+"mat@clean": ExtResource("g24"),
+"mat@dirty": ExtResource("g27"),
+"mat@dusted": ExtResource("g28"),
+"mini": ExtResource("g29"),
+"slot": ExtResource("g25"),
+"slot@dirty": ExtResource("g26")
+})
+state = "dirty"
+label_text = "แรม"
 
-[node name="BeepFx" type="Sprite3D" parent="Stage/SubViewport/World/PcCase" index="20" unique_id=2138496216]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.35, 0.55)
+[node name="ToMat" type="Control" parent="Stage/Views/Slots" index="6" unique_id=1210729018]
+anchors_preset = 0
+offset_left = 990.0
+offset_top = 300.0
+offset_right = 1140.0
+offset_bottom = 410.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Mat"
+label_text = "→ แผ่น ESD"
+always_show_label = false
+
+[node name="Mat" type="Control" parent="Stage/Views" index="5" unique_id=1660989655]
 visible = false
-pixel_size = 0.0015
-billboard = 1
-no_depth_test = true
+clip_contents = true
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 420.0
+mouse_filter = 2
+script = ExtResource("g2")
+background = ExtResource("g30")
+label = "แผ่น ESD"
+aliases = PackedStringArray("MatGold")
 
-[node name="MonitorStand" type="StaticBody3D" parent="Stage/SubViewport/World" index="7" unique_id=168270268]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.02, -1.2)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor_stand")
-mode = 0
-
-[node name="MonitorNeck" type="StaticBody3D" parent="Stage/SubViewport/World" index="8" unique_id=2120050404]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.5, -1.26)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor_stand")
-mode = 0
-size_override = Vector3(0.12, 0.95, 0.08)
-
-[node name="Monitor" type="StaticBody3D" parent="Stage/SubViewport/World" index="9" unique_id=1017798316]
+[node name="MatSocket" type="Control" parent="Stage/Views/Mat" index="0" unique_id=459596220]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 1.85, -1.2)
-script = ExtResource("3_body")
-data = ExtResource("r_monitor")
-mode = 3
-
-[node name="PowerStrip" type="StaticBody3D" parent="Stage/SubViewport/World" index="10" unique_id=48329483]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 0.09, -0.9)
-script = ExtResource("3_body")
-data = ExtResource("r_power_strip")
-mode = 0
-
-[node name="Plug" type="StaticBody3D" parent="Stage/SubViewport/World" index="11" unique_id=1172332422]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9, 0.31, -0.9)
-script = ExtResource("3_body")
-data = ExtResource("r_power_plug")
-mode = 3
-
-[node name="Cable" type="StaticBody3D" parent="Stage/SubViewport/World" index="12" unique_id=1563738457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0.03, -0.9)
-script = ExtResource("3_body")
-data = ExtResource("r_cable")
-mode = 0
-
-[node name="EsdMat" type="StaticBody3D" parent="Stage/SubViewport/World" index="13" unique_id=857140619]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 0, 0.6)
-script = ExtResource("3_body")
-data = ExtResource("r_esd_mat")
-mode = 0
-
-[node name="RamStand" type="StaticBody3D" parent="Stage/SubViewport/World" index="14" unique_id=1596190962]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 5.8, 0.04, 0.6)
-script = ExtResource("3_body")
-data = ExtResource("r_ram_stand")
-mode = 0
-size_override = Vector3(0.08, 0.03, 1.42)
-
-[node name="MatSocket" type="Node3D" parent="Stage/SubViewport/World" index="15" unique_id=1417198103]
-unique_name_in_owner = true
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 5.8, 0.07, 0.6)
-script = ExtResource("4_socket")
+anchors_preset = 0
+offset_left = 281.0
+offset_top = 103.0
+offset_right = 881.0
+offset_bottom = 317.0
+mouse_filter = 2
+script = ExtResource("g20")
 socket_type = &"ram_stand"
 accept_any = true
-hint_size = Vector3(0.08, 0.32, 1.4)
+look = "mat"
 
-[node name="ToolSprite" type="Sprite3D" parent="Stage/SubViewport/World" index="16" unique_id=143580750]
+[node name="ToSlots" type="Control" parent="Stage/Views/Mat" index="1" unique_id=990946199]
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 140.0
+offset_right = 210.0
+offset_bottom = 270.0
+mouse_filter = 2
+script = ExtResource("g3")
+target_view = &"Slots"
+label_text = "→ สล็อตแรม"
+always_show_label = false
+
+[node name="Top" parent="Stage" index="1"]
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ToolSprite" type="TextureRect" parent="Stage/Top" index="0" unique_id=1719778376]
 unique_name_in_owner = true
 visible = false
-pixel_size = 0.0022
-billboard = 1
-no_depth_test = true
-
-[node name="Views" type="Node3D" parent="Stage/SubViewport/World" index="17" unique_id=1294341639]
-
-[node name="Overview" type="Marker3D" parent="Stage/SubViewport/World/Views" index="0" unique_id=1728696218]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.3, 0)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 34.0
-distance = 8.2
-label = "ภาพรวม"
-
-[node name="Monitor" type="Marker3D" parent="Stage/SubViewport/World/Views" index="1" unique_id=516649926]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 1.7, -1.2)
-script = ExtResource("5_cam")
-yaw = 28.0
-pitch = 18.0
-distance = 3.6
-label = "จอ"
-
-[node name="Inside" type="Marker3D" parent="Stage/SubViewport/World/Views" index="2" unique_id=1068845898]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.3, -0.2)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 60.0
-distance = 5.2
-label = "ในเคส"
-
-[node name="Speaker" type="Marker3D" parent="Stage/SubViewport/World/Views" index="3" unique_id=1913248381]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.15, 0.55)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 60.0
-distance = 1.9
-
-[node name="Front" type="Marker3D" parent="Stage/SubViewport/World/Views" index="4" unique_id=1412205375]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.1, 2.2)
-script = ExtResource("5_cam")
-yaw = 30.0
-pitch = 20.0
-distance = 2.8
-
-[node name="Rear" type="Marker3D" parent="Stage/SubViewport/World/Views" index="5" unique_id=395590452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.2, -0.9)
-script = ExtResource("5_cam")
-yaw = 45.0
-pitch = 45.0
-distance = 2.4
-label = "ปลั๊กพ่วง"
-
-[node name="Slots" type="Marker3D" parent="Stage/SubViewport/World/Views" index="6" unique_id=125228828]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.2, 0.4)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 60.0
-distance = 2.2
-label = "เมนบอร์ด"
-
-[node name="Carry" type="Marker3D" parent="Stage/SubViewport/World/Views" index="7" unique_id=1784291225]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.2, 0)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 42.0
-distance = 8.0
-
-[node name="Mat" type="Marker3D" parent="Stage/SubViewport/World/Views" index="8" unique_id=1117403195]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.2, 0.6)
-script = ExtResource("5_cam")
-yaw = 45.0
-pitch = 45.0
-label = "แผ่นรอง ESD"
-
-[node name="MatGold" type="Marker3D" parent="Stage/SubViewport/World/Views" index="9" unique_id=1445780216]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0.08, 0.6)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 15.0
-distance = 1.2
-
-[node name="SlotClose" type="Marker3D" parent="Stage/SubViewport/World/Views" index="10" unique_id=2083954651]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.14, 0.33)
-script = ExtResource("5_cam")
-yaw = 40.0
-pitch = 65.0
-distance = 1.3
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 120.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="PhaseDiagnosis" type="Control" parent="." index="3" unique_id=1733273461]
 visible = false

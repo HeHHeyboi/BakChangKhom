@@ -1,4 +1,4 @@
-extends Phase3D
+extends Phase2D
 ## Phase 7 · SUMMARY — การ์ดสรุป ดาว คะแนน 5 หมวด ปุ่มกลับห้อง
 ## [Claude 29 ก.ย. 2569] โค้ด + UI เบื้องต้นตาม Docs/STORYBOARD.md R7 และ MINIGAME1_DESIGN.md หัวข้อ 7, 9
 ## กด "กลับไปที่ห้อง" → phase_completed → PartMinigame เห็นว่าเป็น phase สุดท้าย → minigame_finished → part_ram.gd ปิดซีน

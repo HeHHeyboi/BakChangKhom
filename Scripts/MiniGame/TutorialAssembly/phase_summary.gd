@@ -1,4 +1,4 @@
-extends Phase3D
+extends Phase2D
 ## Phase 4 · SUMMARY — การ์ดกระดาษ: ชิ้นส่วนทั้งหมด ↔ Part ที่จะได้ซ่อม · ปุ่มไปงานซ่อมแรก
 
 var _built := false

@@ -1,4 +1,4 @@
-extends Phase3D
+extends Phase2D
 ## Phase 7 · VERIFY — เสียบปลั๊กที่ปลั๊กพ่วง → กดปุ่มเปิดหน้าเคส → รอ 2 วิ ดูจอ
 ## [Claude 29–30 ก.ย. 2569] ปลั๊กอยู่ที่ปลั๊กพ่วงบนโต๊ะ (มุม Rear) · ผลขึ้นกับ owner.ram_damaged (CLEAN) และ owner.ram_seated (INSTALL) · ใส่ไม่สุด −10 tidiness
 ## VERIFY_NO_POWER_CUT ไม่ใช้ — Power Off บังคับลำดับไว้แล้ว
@@ -31,17 +31,13 @@ func init():
 	say_text(["ใส่กลับเรียบร้อยแล้ว เสียบปลั๊กแล้วลองเปิดเครื่องดูกัน"])
 
 
-func _on_clicked(p: PartBody3D) -> void:
+func _on_clicked(p: Item2D) -> void:
 	if p == node("Plug") and _stage == 0:
 		_stage = 1
 		owner.plugged = true
-		var plug := p as Node3D
-		var home: Vector3 = plug.get_meta("home", plug.position)
-		var tw := create_tween()
-		tw.tween_property(plug, "position", home + Vector3(0, 0.35, 0), 0.3)
-		tw.tween_property(plug, "position", home, 0.2).set_trans(Tween.TRANS_BACK)
+		p.set_state("") # รูปปลั๊กเสียบคืน (crossfade)
 		PhaseUI.set_check(_chk[0], true)
-		await tw.finished
+		await wait(0.45)
 		cam(&"Front")
 	elif p == node("PowerButton"):
 		if _stage == 0:
@@ -54,23 +50,24 @@ func _boot() -> void:
 	_stage = 2
 	PhaseUI.set_check(_chk[1], true)
 	owner.set_led(true)
-	var btn := node("PowerButton") as Node3D
+	var btn := node("PowerButton") as Control
+	btn.pivot_offset = btn.size / 2.0
 	var tw := create_tween()
-	tw.tween_property(btn, "position:z", btn.position.z - 0.02, 0.06) # ปุ่มยุบลง
-	tw.tween_property(btn, "position:z", btn.position.z, 0.06)
+	tw.tween_property(btn, "scale", Vector2.ONE * 0.85, 0.06) # ปุ่มยุบลง
+	tw.tween_property(btn, "scale", Vector2.ONE, 0.06)
 	cam(&"Monitor")
 	await wait(BOOT_TIME)
 	_stage = 3
 	PhaseUI.set_check(_chk[2], true)
 	var ok: bool = not owner.ram_damaged and owner.ram_seated
-	var mon := node("Monitor") as PartBody3D
+	var mon := node("Monitor") as Item2D
 	if ok:
-		mon.set_texture(owner.TEX_BOOT_OK)
+		mon.set_state("boot_ok")
 		_result.text = "ไม่มีเสียงบี๊บ ✓ ผ่าน"
 		_result.add_theme_color_override("font_color", PhaseUI.COL_OK)
 		say(MinigameHeader.VERIFY, PibHint.Mood.HAPPY)
 		return
-	mon.set_texture(owner.TEX_GLITCH)
+	mon.set_state("glitch")
 	_result.text = "ยังบี๊บ ✗ ไม่ผ่าน"
 	_result.add_theme_color_override("font_color", PhaseUI.COL_BAD)
 	var lines: Array = []

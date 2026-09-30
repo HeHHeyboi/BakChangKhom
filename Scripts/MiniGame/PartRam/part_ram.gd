@@ -1,8 +1,8 @@
 class_name PartRam extends PartMinigame
 ## มินิเกม Part RAM (2.5D) — ระบบ phase / PibHint มาจาก PartMinigame + part_base.tscn
-## ฉาก 3D ทั้งหมดเป็น node ใน part_ram.tscn → Stage/SubViewport/World (เคส · จอ · แผ่น ESD · มุมกล้อง Views)
-## phase แต่ละตัวอยู่ใน Scripts/MiniGame/PartRam/ และ extends Phase3D · ดู Docs/RAM_3D_GAMEPLAY.md
-## [Claude 29 ก.ย. 2569] ย้ายจาก 2D เป็น 2.5D
+## ฉาก 2D ทั้งหมดเป็น node ใน part_ram.tscn → Stage/Views/<มุม> (ภาพรวมร้าน · โต๊ะคอม · ปลั๊กพ่วง · ในเคส 2.5D · สล็อตแรม · แผ่น ESD) (เคส · จอ · แผ่น ESD · มุมกล้อง Views)
+## phase แต่ละตัวอยู่ใน Scripts/MiniGame/PartRam/ และ extends Phase2D · ดู Docs/RAM_3D_GAMEPLAY.md
+## [Claude 29 ก.ย. 2569] ย้ายจาก 2D เป็น 2.5D · [30 ก.ย.] เลิกใช้ 3D engine → วาด Dimetric ด้วย 2D ล้วน
 
 enum PhaseState {
 	NONE,
@@ -27,7 +27,7 @@ const GOLD_CLEAN := Color(0.93, 0.73, 0.25)
 
 @export var start_phase: PhaseState
 
-@onready var stage: PartStage3D = %Stage
+@onready var stage: Stage2D = %Stage
 
 # สถานะที่ส่งข้าม phase — CLEAN เขียน ram_damaged · INSTALL เขียน ram_seated · VERIFY อ่านทั้งคู่
 var ram_damaged := false
@@ -48,30 +48,32 @@ func _ready() -> void:
 
 ## แรมสกปรกตั้งแต่เริ่ม: ฝุ่นบน PCB · ขาทองหมอง · ฝุ่นในสล็อต
 func _setup_dirt() -> void:
-	var ram: PartBody3D = %RamA2
-	ram.add_overlay("Dust", TEX_DUST, Color(1, 1, 1, 1), PcPart.Face.SIDE_X, 0.9, 0.015)
+	var ram: Item2D = %RamA2
+	ram.add_overlay("Dust", TEX_DUST, Color(1, 1, 1, 1), PcPart.Face.SIDE_X, 0.9, 0.015) # ใช้ตอนยังไม่มีรูปสถานะ
 	set_gold(0.0)
-	(%SlotBodyA2 as PartBody3D).add_overlay("Dust", TEX_DUST, Color(1, 1, 1, 1), PcPart.Face.TOP)
-	(%BeepFx as Sprite3D).texture = TEX_BEEP
-	(%Monitor as PartBody3D).set_texture(TEX_GLITCH)
+	ram.set_state("dirty")
+	var slot: Item2D = %SlotBodyA2
+	slot.add_overlay("Dust", TEX_DUST, Color(1, 1, 1, 1), PcPart.Face.TOP)
+	slot.set_state("dirty")
+	(%BeepFx as Item2D).texture = TEX_BEEP
+	(%Monitor as Item2D).set_state("glitch")
 	set_led(true)
 
 
 ## 0 = ขาทองหมอง · 1 = เงาวาว
 func set_gold(t: float) -> void:
-	for n in ["Gold1", "Gold2"]:
-		var mi := (%RamA2 as Node).find_child(n, true, false) as MeshInstance3D
-		if mi:
-			mi.material_override.albedo_color = GOLD_DIRTY.lerp(GOLD_CLEAN, t)
-			mi.set_meta("base", mi.material_override.albedo_color)
+	var ram := %RamA2 as Item2D
+	ram.set_shape_color("Gold", GOLD_DIRTY.lerp(GOLD_CLEAN, t)) # ตอนวาดจากโค้ด
+	if t > 0.0:
+		ram.set_state_blend("dusted", "clean", t) # รูป PNG: ขาทองหมอง → วาว (crossfade ตามความคืบหน้า)
 
 
 func set_led(on: bool) -> void:
-	(%PowerLed as PartBody3D).color_override = Color(0.2, 1, 0.3) if on else Color(0.15, 0.05, 0.05)
+	(%PowerLed as Item2D).set_state("on" if on else "off")
 
 
 func ram_clips() -> Array:
-	var s: Socket3D = (%RamA2 as PartBody3D).socket
+	var s: Socket2D = (%RamA2 as Item2D).socket
 	return s.locks if s else []
 
 

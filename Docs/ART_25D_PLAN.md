@@ -1,5 +1,7 @@
 # ART_25D_PLAN.md — แผนเปลี่ยนภาพเป็น 2.5D + วิธีทำโมเดลให้เปลือง token น้อยสุด
 
+> **30 ก.ย. 2569: เปลี่ยนเป็น 2D ทั้งหมดแล้ว** — ภาพรวมร้าน 2D (Volcano Princess) · ในเคส 2.5D แบบภาพวาด (Lil' Guardsman) · ดู `SCENE_2D.md` · ชื่อคลาส/กล้อง/พิกัด 3 มิติในเอกสารนี้ใช้ไม่ได้แล้ว (Item2D · Socket2D · Stage2D · Phase2D แทน)
+
 > 29 ก.ย. 2569 · Godot 4.7 · GL Compatibility · ใช้คู่กับ `TUTORIAL_ASSEMBLY_DESIGN.md` (สเปกฉาก 3D ของมินิเกม)
 
 ## 1. ทำได้ไหม — ได้ แบ่ง 3 ช่วง
@@ -20,8 +22,8 @@ token ส่วนใหญ่หมดไปกับการให้ AI **�
 
 | ระดับ | วิธี | token ต่อชิ้นใหม่ | ใช้กับ |
 |---|---|---|---|
-| **A (ค่าเริ่มต้น)** | `PartBody3D` สร้าง `BoxMesh` จาก `PcPart.size` แล้วแปะ `PcPart.texture` (PNG 2D ที่มีอยู่) — **ไม่มีไฟล์โมเดลเลย** | ~15 บรรทัด `.tres` | แผงวงจร · แรม · การ์ดจอ · SSD · PSU · สาย |
-| B | shape สำเร็จรูปใน `PartBody3D`: `box` · `cylinder` · `plate` · `socket` เลือกด้วยค่า `shape` | ~15 บรรทัด | พัดลม · ฮีตซิงก์ · CPU socket |
+| **A (ค่าเริ่มต้น)** | `Item2D` สร้าง `BoxMesh` จาก `PcPart.size` แล้วแปะ `PcPart.texture` (PNG 2D ที่มีอยู่) — **ไม่มีไฟล์โมเดลเลย** | ~15 บรรทัด `.tres` | แผงวงจร · แรม · การ์ดจอ · SSD · PSU · สาย |
+| B | shape สำเร็จรูปใน `Item2D`: `box` · `cylinder` · `plate` · `socket` เลือกด้วยค่า `shape` | ~15 บรรทัด | พัดลม · ฮีตซิงก์ · CPU socket |
 | C | ของใหญ่: `CSGBox3D` ต่อเป็น kit ครั้งเดียว เซฟเป็น `.tscn` แล้ว instance ซ้ำ | เขียนครั้งเดียว | เคส · โต๊ะ |
 | D (เมื่อจำเป็นจริง) | AI แปลงรูปเป็น 3D ภายนอก (Tripo · Meshy · Hunyuan3D) จากรูป 2D ที่มี → `.glb` → `res://Assets/Models/` | **0 token ฝั่ง Claude** (ใช้เครดิตเว็บนั้น) | ชิ้นโชว์ 1–2 ชิ้น เช่น เคสหลัก |
 
@@ -74,11 +76,11 @@ ssd | SSD M.2 | plate | 0.8,0.05,0.22 | asm_ssd_m2.png | m2 | mainboard | bios
 
 ## 5. ลำดับทำ (ช่วง 1)
 
-1. ✅ `PartBody3D` ระดับ A + B (box · cylinder) + `PcPart` — ทำแล้ว 29 ก.ย. (ดู `MINIGAME_PREFAB.md` ท้ายไฟล์) · ต้นแบบ `Test/stage3d_ram_demo.tscn`
+1. ✅ `Item2D` ระดับ A + B (box · cylinder) + `PcPart` — ทำแล้ว 29 ก.ย. (ดู `MINIGAME_PREFAB.md` ท้ายไฟล์) · ต้นแบบ `Test/stage3d_ram_demo.tscn`
 2. เคส kit ระดับ C (`asm_case.tscn`)
 3. ชิ้นส่วน 9 ชิ้นของ Tutorial เป็น `.tres` (ใช้รูปที่มีแล้วก่อน — `TUTORIAL_ASSEMBLY_DESIGN.md` ข้อ 8)
 4. พิจารณาระดับ D เฉพาะเคสหลัก หลังเล่นได้ครบแล้ว
-5. Core Part อื่นยืม `part_stage_3d.tscn` + `PartBody3D` — เพิ่มแค่ `.tres`
+5. Core Part อื่นยืม `part_stage_2d.tscn` + `Item2D` — เพิ่มแค่ `.tres`
 
 ## 6. โฟลเดอร์
 
@@ -86,7 +88,7 @@ ssd | SSD M.2 | plate | 0.8,0.05,0.22 | asm_ssd_m2.png | m2 | mainboard | bios
 Assets/Models/            ← .glb จากระดับ D เท่านั้น (เพิ่ม *.glb ใน .gitattributes ให้ใช้ Git LFS ก่อน)
 Assets/Textures3D/        ← texture ผิวเคส/โต๊ะ (asm_case_side ฯลฯ)
 Resources/Tutorial/Parts/ · Resources/Parts/<PartName>/   ← PcPart .tres
-Scene/MiniGame/PartBase/asm_case.tscn · part_stage_3d.tscn
+Scene/MiniGame/PartBase/asm_case.tscn · part_stage_2d.tscn
 ```
 
 ## ตัดสินใจสไตล์ (30 ก.ย.)

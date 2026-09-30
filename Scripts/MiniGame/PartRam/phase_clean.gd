@@ -1,5 +1,5 @@
-extends Phase3D
-## Phase 5 · CLEAN — 3 ขั้นย่อย เลือกอุปกรณ์จากถาด 6 ชิ้น (สุ่มจาก 10) แล้วดูผลบนแรมในฉาก 3D
+extends Phase2D
+## Phase 5 · CLEAN — 3 ขั้นย่อย เลือกอุปกรณ์จากถาด 6 ชิ้น (สุ่มจาก 10) แล้วดูผลบนแรมในฉาก 2.5D
 ##   S1 ฝุ่นบนแผง (ฝุ่นจางลง) · S2 ขาทอง (หมอง → วาว) · S3 สล็อตบนเมนบอร์ด (กล้องเลื่อนไปที่สล็อตเอง)
 ## [Claude 29 ก.ย. 2569] ต่อยอดโครงเดิม (CleanStep · TRAY_SIZE · _tools · _blocked_once · _build_tray · _on_tool_used)
 ## ข้อมูลอุปกรณ์: Resources/Parts/Ram/Tools/*.tres · กติกาคะแนน: MINIGAME1_DESIGN.md หัวข้อ 14
@@ -197,21 +197,23 @@ func _on_tool_used(tool: CleanTool, step: CleanStep) -> void:
 				_say_for(tool, step, "เดี๋ยวก่อน! " + tool.line_forbidden, PibHint.Mood.WORRY)
 
 
-## อุปกรณ์ (ภาพ 2D แบบ billboard) ลอยมาถูไปมาที่เป้าหมาย · ห้ามใช้ = ปิ๊บคว้าไว้ก่อนถึง
+## อุปกรณ์ลอยมาถูไปมาที่เป้าหมาย (รูป 2D ในชั้นบนของฉาก) · ห้ามใช้ = ปิ๊บคว้าไว้ก่อนถึง
 func _animate_tool(tool: CleanTool, reach: bool) -> void:
-	var spr := node("ToolSprite") as Sprite3D
+	var spr := node("ToolSprite") as TextureRect
 	spr.texture = tool.icon
-	var target := _target_point()
-	spr.global_position = target + Vector3(0, 0.6, 0.6)
+	var half := spr.size / 2.0
+	var target := _target_point() - half
+	spr.position = target + Vector2(90, -120)
+	spr.modulate = Color.WHITE
 	spr.show()
 	var tw := create_tween()
 	if reach:
-		tw.tween_property(spr, "global_position", target + Vector3(0, 0.05, 0.25), 0.25)
+		tw.tween_property(spr, "position", target, 0.25)
 		for i in 3:
-			tw.tween_property(spr, "global_position:z", target.z - 0.35, 0.12)
-			tw.tween_property(spr, "global_position:z", target.z + 0.35, 0.12)
+			tw.tween_property(spr, "position:x", target.x - 70, 0.12)
+			tw.tween_property(spr, "position:x", target.x + 70, 0.12)
 	else:
-		tw.tween_property(spr, "global_position", target + Vector3(0, 0.3, 0.35), 0.25)
+		tw.tween_property(spr, "position", target + Vector2(60, -60), 0.25)
 		tw.tween_property(spr, "modulate", Color(1, 0.4, 0.4), 0.15)
 		tw.tween_interval(0.25)
 	await tw.finished
@@ -219,14 +221,18 @@ func _animate_tool(tool: CleanTool, reach: bool) -> void:
 	spr.modulate = Color.WHITE
 
 
-func _target_point() -> Vector3:
-	var ram := node("RamA2") as Node3D
+## จุดเป้าหมาย (พิกัดชั้นบนของฉาก): กลางแรม · ขาทอง (ขอบล่างแรม) · สล็อต
+func _target_point() -> Vector2:
+	var top := (node("ToolSprite") as Control).get_parent() as Control
+	var inv := top.get_global_transform_with_canvas().affine_inverse()
+	var ram := node("RamA2") as Control
+	var r := ram.get_global_rect()
 	match _step:
 		CleanStep.SCRUB_CONTACTS:
-			return ram.global_position + Vector3(0, -0.13, 0)
+			return inv * Vector2(r.get_center().x, r.end.y - r.size.y * 0.2)
 		CleanStep.CLEAN_SLOT:
-			return (node("SlotBodyA2") as Node3D).global_position + Vector3(0, 0.05, 0)
-	return ram.global_position + Vector3(0, 0.03, 0)
+			return inv * (node("SlotBodyA2") as Control).get_global_rect().get_center()
+	return inv * r.get_center()
 
 
 func _say_for(tool: CleanTool, step: int, fallback: String, mood: PibHint.Mood) -> void:
@@ -259,11 +265,15 @@ func _progress_by(amount: float) -> void:
 func _apply_visual(t: float) -> void:
 	match _step:
 		CleanStep.DUST_BOARD:
-			(node("RamA2") as PartBody3D).set_layer_alpha("Dust", 1.0 - t)
+			var ram := node("RamA2") as Item2D
+			ram.set_layer_alpha("Dust", 1.0 - t)
+			ram.set_state_blend("dirty", "dusted", t) # ฝุ่นจางลงแบบเปลี่ยนรูป
 		CleanStep.SCRUB_CONTACTS:
 			owner.set_gold(t)
 		CleanStep.CLEAN_SLOT:
-			(node("SlotBodyA2") as PartBody3D).set_layer_alpha("Dust", 1.0 - t)
+			var slot := node("SlotBodyA2") as Item2D
+			slot.set_layer_alpha("Dust", 1.0 - t)
+			slot.set_state_blend("dirty", "clean", t)
 
 
 func _on_pib_done() -> void:

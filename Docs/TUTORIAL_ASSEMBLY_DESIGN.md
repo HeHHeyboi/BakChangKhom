@@ -1,5 +1,7 @@
 # TUTORIAL_ASSEMBLY_DESIGN.md — มินิเกม Tutorial: ประกอบคอมพิวเตอร์ (2.5D)
 
+> **30 ก.ย. 2569: เปลี่ยนเป็น 2D ทั้งหมดแล้ว** — ภาพรวมร้าน 2D (Volcano Princess) · ในเคส 2.5D แบบภาพวาด (Lil' Guardsman) · ดู `SCENE_2D.md` · ชื่อคลาส/กล้อง/พิกัด 3 มิติในเอกสารนี้ใช้ไม่ได้แล้ว (Item2D · Socket2D · Stage2D · Phase2D แทน)
+
 > 29 ก.ย. 2569 · Godot 4.7 · GL Compatibility · จอ 1152 × 648
 > สถานะ: **มีเวอร์ชันเล่นได้แล้ว (30 ก.ย.)** — ดูหัวข้อ "สถานะโค้ด 30 ก.ย." ท้ายไฟล์ · ClickUp: [🎓 [FEAT] Tutorial: ประกอบคอมพิวเตอร์ (2.5D)](https://app.clickup.com/t/z93r0b50zc)
 > เอกสารคู่กัน: `ART_25D_PLAN.md` (วิธีทำโมเดล) · `MINIGAME_PREFAB.md` (โครง prefab) · `REPAIR_FLOW.md` (S2 ถอด / S4 ประกอบกลับ ใช้ฉาก 3D ชุดเดียวกัน) · `STORYBOARD.md` หัวข้อ 0.5
@@ -81,7 +83,7 @@ Prologue → Tutorial พื้นฐาน (เดิน · คุย · แผ
 | 8 | การ์ดจอ | สล็อต PCIe x16 บนสุด | 3 | ลืมถอดแผ่นปิดช่องหลังเคส · ใส่สล็อตล่าง | GPU |
 | 9 | พัดลมเคส | หน้า/หลัง | — | หันลมผิด (ลูกศร airflow) | GPU (airflow) |
 
-**กฎตรวจตอนปล่อยชิ้น (`Socket3D.accepts()`)**
+**กฎตรวจตอนปล่อยชิ้น (`Socket2D.accepts()`)**
 
 1. ชิ้นนี้เข้ากับ socket นี้ไหม (RAM ใส่ PCIe ไม่ได้) → ไม่ → ชิ้นเด้งกลับถาด + toast บอกว่าชิ้นนี้ควรไปตรงไหน
 2. ชิ้นที่ต้องมีก่อนติดตั้งแล้วหรือยัง → ยัง → ขวางไว้พร้อมเหตุผล
@@ -97,15 +99,15 @@ Prologue → Tutorial พื้นฐาน (เดิน · คุย · แผ
 ```
 Scene/MiniGame/PartBase/
 ├── part_base.tscn           (มีแล้ว)
-└── part_stage_3d.tscn       🆕 SubViewportContainer + SubViewport + Camera3D + แสง + CaseRoot
+└── part_stage_2d.tscn       🆕 SubViewportContainer + SubViewport + Camera3D + แสง + CaseRoot
 Scene/MiniGame/tutorial_assembly.tscn   🆕 Inherited จาก part_base.tscn + instance part_stage_3d
 
 Scripts/MiniGame/
 ├── part_minigame.gd · phase.gd · phase_ui.gd · pib_hint.gd   (มีแล้ว ใช้ต่อ)
 ├── stage3d/
 │   ├── part_stage_3d.gd     🆕 กล้อง · ยิง ray จากเมาส์ · ลาก · snap
-│   ├── socket_3d.gd         🆕 class_name Socket3D extends Area3D
-│   └── part_body_3d.gd      🆕 class_name PartBody3D extends Node3D (ชิ้นที่ลากได้)
+│   ├── socket_3d.gd         🆕 class_name Socket2D extends Area3D
+│   └── part_body_3d.gd      🆕 class_name Item2D extends Node3D (ชิ้นที่ลากได้)
 ├── Resources/pc_part.gd     🆕 class_name PcPart extends Resource
 └── tutorial_assembly/
     ├── tutorial_assembly.gd 🆕 extends PartMinigame (enum PhaseState ตามข้อ 3)
@@ -140,7 +142,7 @@ class_name PcPart extends Resource
 
 1. `SubViewportContainer.stretch = true` · รับ `gui_input` แล้วแปลงพิกัดเมาส์เป็นพิกัดใน SubViewport
 2. `camera.project_ray_origin()` / `project_ray_normal()` → ตัดกับระนาบ y = ความสูงของ socket ที่กำลังเล็ง → ได้ตำแหน่งลาก
-3. ระหว่างลาก หา `Socket3D` ที่ใกล้สุดภายใน 0.6 หน่วย → เรืองแสง (เขียว = ใส่ได้ / แดง = ผิด)
+3. ระหว่างลาก หา `Socket2D` ที่ใกล้สุดภายใน 0.6 หน่วย → เรืองแสง (เขียว = ใส่ได้ / แดง = ผิด)
 4. ปล่อย → `socket.accepts(part, installed_ids, yaw)` → คืน `OK` / `WRONG_SOCKET` / `WRONG_ORDER` / `WRONG_ORIENTATION`
 5. หมุนชิ้นก่อนวาง: ปุ่ม `R` หรือปุ่ม ⟳ ใน rail ทีละ 90° (ใช้กับ CPU · PSU · พัดลม)
 
@@ -197,7 +199,7 @@ class_name PcPart extends Resource
 | `project.godot` | ไม่ต้องเปลี่ยน renderer · ความละเอียดเดิม | — |
 | Player / ฉากเดิน | **ไม่แก้** | — |
 
-**Core Part ทั้ง 5 ใช้ `part_stage_3d.tscn` เดียวกันได้ภายหลัง** เช่น RAM phase Remove/Install · GPU เสียบ PCIe · Mainboard วาง CPU — ทำ Tutorial นี้ก่อนจะได้ระบบ 3D ที่ Part อื่นยืมใช้
+**Core Part ทั้ง 5 ใช้ `part_stage_2d.tscn` เดียวกันได้ภายหลัง** เช่น RAM phase Remove/Install · GPU เสียบ PCIe · Mainboard วาง CPU — ทำ Tutorial นี้ก่อนจะได้ระบบ 3D ที่ Part อื่นยืมใช้
 
 ---
 
@@ -223,8 +225,8 @@ class_name PcPart extends Resource
 
 | ขั้น | งาน | ทดสอบได้ |
 |---|---|---|
-| 1 | ✅ `PartStage3D` (สร้างจากโค้ด ไม่ต้องมี .tscn) + กล้องหมุนได้ · ⬜ เคส CSG | เห็นฉาก 3D ใน play area |
-| 2 | ✅ `PcPart` + `PartBody3D` + `Socket3D` + ลาก/snap — ต้นแบบ `Test/stage3d_ram_demo.tscn` | ลาก RAM ลงสล็อตได้ ✅ |
+| 1 | ✅ `Stage2D` (สร้างจากโค้ด ไม่ต้องมี .tscn) + กล้องหมุนได้ · ⬜ เคส CSG | เห็นฉาก 3D ใน play area |
+| 2 | ✅ `PcPart` + `Item2D` + `Socket2D` + ลาก/snap — ต้นแบบ `Test/stage3d_ram_demo.tscn` | ลาก RAM ลงสล็อตได้ ✅ |
 | 3 | `phase_build.gd` + `.tres` 9 ชิ้น + กฎ 4 ข้อ | ประกอบครบได้ |
 | 4 | INTRO · SAFETY · CABLES (แบบง่าย) · CLOSE · POWER_TEST · SUMMARY | เล่นจบลูป |
 | 5 | `Assembly_Pib.txt` + ต่อ `main.tres` | เล่นต่อจาก prologue ได้ |
@@ -260,24 +262,24 @@ class_name PcPart extends Resource
 ```
 TutorialAssembly (tutorial_assembly.gd)
 ├── Background · PibHint                 (จาก part_base)
-├── Stage (part_stage_3d.tscn)
+├── Stage (part_stage_2d.tscn)
 │   └── SubViewport/World
 │       ├── Workbench (override ขนาดโต๊ะ) · Room (workshop_room.tscn ใช้ร่วมกับ Part RAM)
-│       ├── PcCase    CaseFloor/Rear/Side/Bottom/Bezel · %PowerButton · %PowerLed · PsuBay · MbStandoff (Socket3D)
+│       ├── PcCase    CaseFloor/Rear/Side/Bottom/Bezel · %PowerButton · %PowerLed · PsuBay · MbStandoff (Socket2D)
 │       ├── %Monitor · MonitorStand · MonitorNeck · EsdMat (แผ่นรองวางชิ้น)
 │       ├── %Parts    ★ ลำดับลูก = ลำดับประกอบ: %Psu → %Mainboard → %Cpu → %Cooler → %Ram → %Ssd → %Gpu
 │       │   └── Mainboard/ CpuSocket · CoolerMount · RamSlot · M2Slot · PcieSlot  (ติดไปกับบอร์ด)
-│       └── Views     Overview · Tray · Build · Front · Monitor (CameraPoint3D)
+│       └── Views     Overview · Tray · Build · Front · Monitor (View2D)
 └── PhaseIntro · PhaseBuild · PhasePower · PhaseSummary (Control)
 ```
 
 **ข้อมูล = PcPart .tres** (`Resources/Parts/Common/`) — ใหม่: `cpu` · `cpu_cooler` · `gpu` · `ssd_m2` · เพิ่ม `socket_type`/`core_part` ให้ `psu` · `pib_wrong_socket` ให้ `mainboard`
-- กฎวาง = `socket_type` ต้องตรง + `requires` ต้องติดตั้งก่อน (Socket3D.check) · ข้อความผิด = `pib_wrong_order` / `pib_wrong_socket` → หัวข้อใน `Assets/Dialog/MiniGame/Assembly_Pib.txt`
-- เพิ่ม/สลับชิ้น = ใส่ PartBody3D ใต้ `Parts` + Socket3D ที่ตรง `socket_type` (ไม่ต้องแก้โค้ด)
+- กฎวาง = `socket_type` ต้องตรง + `requires` ต้องติดตั้งก่อน (Socket2D.check) · ข้อความผิด = `pib_wrong_order` / `pib_wrong_socket` → หัวข้อใน `Assets/Dialog/MiniGame/Assembly_Pib.txt`
+- เพิ่ม/สลับชิ้น = ใส่ Item2D ใต้ `Parts` + Socket2D ที่ตรง `socket_type` (ไม่ต้องแก้โค้ด)
 - ชื่อ Part บนการ์ด = `TutorialAssembly.CORE_NAME`
 
-**ของที่แก้ในชุดกลาง:** `PartStage3D` ไม่นับ socket ที่ติดมากับชิ้นในมือ · `PhaseUI.part_card()` / `hide_card()` · แยกห้องออกเป็น `workshop_room.tscn` (Part RAM ใช้ตัวเดียวกันแล้ว)
+**ของที่แก้ในชุดกลาง:** `Stage2D` ไม่นับ socket ที่ติดมากับชิ้นในมือ · `PhaseUI.part_card()` / `hide_card()` · แยกห้องออกเป็น `workshop_room.tscn` (Part RAM ใช้ตัวเดียวกันแล้ว)
 
-**โค้ดทดลอง 2D ของเพื่อน** (`Test/assembly.tscn`, `part.gd`, `place.gd` — HeHHeyboi) **ไม่ได้แตะ** · แนวคิด `Place.PlaceType` = `Socket3D.socket_type` ในเวอร์ชัน 2.5D นี้
+**โค้ดทดลอง 2D ของเพื่อน** (`Test/assembly.tscn`, `part.gd`, `place.gd` — HeHHeyboi) **ไม่ได้แตะ** · แนวคิด `Place.PlaceType` = `Socket2D.socket_type` ในเวอร์ชัน 2.5D นี้
 
 **ยังไม่ทำ:** SAFETY (สายรัด ESD) · CABLES · CLOSE · หันทิศ CPU/แรม (ตอนนี้ไม่เช็กทิศ) · ซิลิโคน · รูปจริงของ SSD

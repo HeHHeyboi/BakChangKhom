@@ -1,17 +1,17 @@
 class_name ViewNav extends CanvasLayer
 ## แถบนำทางกล้อง (บนซ้ายของฉาก) — ปุ่ม "◀ กลับ" + ปุ่มสลับมุม (ภาพรวม · จอ · ในเคส · เมนบอร์ด …)
-## ปุ่มมาจาก CameraPoint3D ที่ตั้ง label ไว้ · มุมที่อยู่ตอนนี้เป็นสีส้ม · มุมซูมย่อย (ไม่มี label) กด "กลับ" ออก
-## คีย์ลัด: Esc / Backspace / ปุ่มข้างเมาส์ = กลับ · สร้างเองผ่าน Phase3D.cam() ไม่ต้องวางในซีน
+## ปุ่มมาจาก View2D ที่ตั้ง label ไว้ · มุมที่อยู่ตอนนี้เป็นสีส้ม · มุมซูมย่อย (ไม่มี label) กด "กลับ" ออก
+## คีย์ลัด: Esc / Backspace / ปุ่มข้างเมาส์ = กลับ · สร้างเองผ่าน Phase2D.cam() ไม่ต้องวางในซีน
 ## [Claude 30 ก.ย. 2569]
 
 const POS := Vector2(12, 64)
 
-var stage: PartStage3D
+var stage: Stage2D
 var _back: Button
 var _chips := {} # StringName → Button
 
 
-static func ensure(host: Node, st: PartStage3D) -> ViewNav:
+static func ensure(host: Node, st: Stage2D) -> ViewNav:
 	var n := host.get_node_or_null("ViewNav") as ViewNav
 	if n == null:
 		n = ViewNav.new()

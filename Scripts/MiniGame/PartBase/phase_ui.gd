@@ -17,7 +17,7 @@ const COL_GOAL := Color(1.0, 0.86, 0.45)
 ## สมุดคู่มือ (30 ก.ย.) — ไอคอนหนังสือมุมขวาบน · กดแล้วเปิดหน้ากระดาษกลางจอ (แนว Volcano Princess)
 ##   ในสมุด: 1) ภาพฉากตอนนี้ + วงกลมตรงที่ต้องคลิก 2) ขั้นตอน ☑/☐ 3) บันทึกของปิ๊บ
 ##   แถบหัวข้อโชว์ "เป้าหมาย" = ข้อแรกในเช็กลิสต์ที่ยังไม่ติ๊ก → ผู้เล่นรู้ว่าต้องทำอะไรโดยไม่ต้องเปิดสมุด
-##   แผงข้าง (Info rail) โชว์เฉพาะตอนมีปุ่ม/อุปกรณ์ให้กด · ไม่มี → ซ่อน และขยายฉาก 3D เต็มความกว้างจอ
+##   แผงข้าง (Info rail) โชว์เฉพาะตอนมีปุ่ม/อุปกรณ์ให้กด · ไม่มี → ซ่อน และขยายฉาก 2.5D เต็มความกว้างจอ
 const BOOK_ICON := "res://Assets/MiniGame/PartCommon/ui_icon_guidebook.png"
 const BOOK_RECT := Rect2(1092, 4, 48, 48)
 
@@ -89,7 +89,7 @@ static func set_rail_open(phase: Control, open: bool) -> void:
 		phase.create_tween().tween_property(rail, "modulate:a", 1.0, 0.15)
 
 
-## มีของให้กดใน rail → เปิด · มีแต่ข้อความ → ปิด + ฉาก 3D กว้างเต็มจอ (เห็นเครื่องชัดสุด)
+## มีของให้กดใน rail → เปิด · มีแต่ข้อความ → ปิด + ฉาก 2.5D กว้างเต็มจอ (เห็นเครื่องชัดสุด)
 static func refresh(phase: Control) -> void:
 	_auto_rail(phase)
 
@@ -367,12 +367,14 @@ static func _book_label(v: Container, text: String, fs: int, col: Color, center 
 	return l
 
 
-## ภาพฉาก 3D ตอนนี้ (snapshot) + วงกลมตรงชิ้นที่ต้องคลิก (จาก Phase3D.hint)
+## ภาพฉาก 2.5D ตอนนี้ (snapshot จากจอ) + วงกลมตรงชิ้นที่ต้องคลิก (จาก Phase2D.hint)
 static func _book_snapshot(phase: Control, v: Container) -> void:
 	var st = phase.owner.get("stage") if phase.owner else null
-	if not (st is PartStage3D):
+	if not (st is Stage2D):
 		return
-	var img: Image = st.viewport.get_texture().get_image()
+	var img: Image = st.snapshot()
+	if img == null or img.is_empty():
+		return
 	var w: float = v.custom_minimum_size.x
 	var h: float = w * img.get_height() / img.get_width()
 	var frame := Panel.new()
@@ -392,12 +394,14 @@ static func _book_snapshot(phase: Control, v: Container) -> void:
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(tr)
 	var t = phase.get_meta("hint_target", null)
-	if t is Node3D and is_instance_valid(t):
-		var p: Vector2 = st.camera.unproject_position(t.global_position)
+	if t is Control and is_instance_valid(t):
+		if st.view_of(t) != st.view_of(st.find_view(st.current_view)):
+			return
+		var p: Vector2 = st.get_global_transform_with_canvas().affine_inverse() * (t.get_global_transform_with_canvas() * (t.size / 2.0))
 		var m := GuideMarker.new()
 		m.text = ""
 		m.radius = 20
-		m.position = p * Vector2(w, h) / Vector2(st.viewport.size)
+		m.position = p * Vector2(w, h) / st.size
 		frame.add_child(m)
 		m.top_level = false
 

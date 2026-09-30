@@ -1,4 +1,4 @@
-extends Phase3D
+extends Phase2D
 ## Phase 3 · POWER_TEST — กดปุ่มเปิดเครื่องหน้าเคส → ไฟ LED ติด → จอขึ้นโลโก้/บูตผ่าน
 
 var _built := false
@@ -20,19 +20,20 @@ func init():
 	hint(node("PowerButton"), "กดเปิดเครื่อง", 3.0)
 
 
-func _on_clicked(p: PartBody3D) -> void:
+func _on_clicked(p: Item2D) -> void:
 	if p != node("PowerButton") or _on:
 		return
 	_on = true
 	clear_hint()
+	p.pivot_offset = p.size / 2.0
 	var tw := create_tween()
-	tw.tween_property(p, "position:z", p.position.z - 0.03, 0.08)
-	tw.tween_property(p, "position:z", p.position.z, 0.08)
-	(node("PowerLed") as PartBody3D).color_override = Color(0.2, 1, 0.3)
+	tw.tween_property(p, "scale", Vector2.ONE * 0.85, 0.08) # ปุ่มยุบลง
+	tw.tween_property(p, "scale", Vector2.ONE, 0.08)
+	(node("PowerLed") as Item2D).set_state("on")
 	PhaseUI.set_check((get_meta("rail_box") as Node).get_child(0), true)
 	cam(&"Monitor")
 	await wait(0.8)
-	(node("Monitor") as PartBody3D).set_texture(owner.TEX_BOOT_OK)
+	(node("Monitor") as Item2D).set_state("boot_ok")
 	say("ASM_POWER_OK", PibHint.Mood.HAPPY)
 
 
