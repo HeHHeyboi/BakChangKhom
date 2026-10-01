@@ -200,8 +200,8 @@ static func _auto_rail(phase: Control) -> void:
 	var open := _has_button(rail)
 	set_rail_open(phase, open)
 	var st = phase.owner.get("stage") if phase.owner else null
-	if st is Control:
-		(st as Control).size.x = RAIL.position.x if open else SCREEN.x
+	if st is Stage2D:
+		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if open else 0.0)
 	if phase.get_meta("unread", false):
 		ping_book(phase)
 	_refresh_goal(phase.get_meta("rail_box"))
@@ -517,7 +517,7 @@ static func _book_snapshot(phase: Control, v: Container) -> void:
 		var m := GuideMarker.create()
 		m.text = ""
 		m.radius = 20
-		m.position = p * Vector2(w, h) / st.size
+		m.position = p * Vector2(w, h) / Vector2(st.visible_width(), st.size.y)
 		frame.add_child(m)
 		m.top_level = false
 

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CleanTool" format=3]
+[gd_resource type="Resource" script_class="CleanTool" format=3 uid="uid://b7hsqjdg81apk"]
 
 [ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
 [ext_resource type="Texture2D" uid="uid://b07mvw8hvy7a1" path="res://Assets/MiniGame/PartRam/ram_tool_cloth.png" id="2_icon"]
@@ -9,11 +9,11 @@ id = &"cloth"
 display_name = "ผ้าไมโครไฟเบอร์แห้ง"
 icon = ExtResource("2_icon")
 hardness = 1
-has_moisture = false
-esd_risk = false
-leaves_residue = false
-reaches_narrow = false
-fit_per_step = Dictionary[int, int]({0: 2, 1: 1, 2: 0})
+fit_per_step = Dictionary[int, int]({
+0: 2,
+1: 1,
+2: 0
+})
 line_ideal = "ผ้าไมโครไฟเบอร์แห้งเช็ดฝุ่นบนแผงได้ดีและไม่ทิ้งขุย"
 line_limited = "ผ้าเช็ดคราบได้บ้าง แต่ไม่ค่อยออก ลองของที่ขัดได้ดีกว่านี้"
 line_forbidden = "ผ้าผืนใหญ่เกินไป เข้าไปในร่องสลอตไม่ได้หรอก"

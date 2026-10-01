@@ -49,6 +49,10 @@ var _hover_item: Control
 var _portal: Hotspot2D
 var _portal_t := 0.0
 var _busy := false
+var _transition_tween: Tween
+var inset_right := 0.0 ## พื้นที่ฝั่งขวาที่ UI บัง (พิกเซลของ Stage) — ดู set_inset()
+var _pan_x := NAN ## NAN = ใช้ focus_x ของมุม · มีค่า = pan_to ค้างไว้ให้มุมปัจจุบัน
+var _pan_tween: Tween
 
 
 func _ready() -> void:
@@ -112,7 +116,9 @@ func view_of(n: Node) -> View2D:
 func _process(delta: float) -> void:
 	_layout()
 	if _held:
-		var target := top.get_global_transform_with_canvas().affine_inverse() * (get_global_transform_with_canvas() * _mouse) - _grab
+		var target := top.get_global_transform_with_canvas().affine_inverse() * (
+			get_global_transform_with_canvas() * _mouse
+		) - _grab
 		_held.position = _held.position.lerp(target, 1.0 - exp(-22.0 * delta))
 		# ค้างบนประตู → ย้ายมุม
 		if _portal:
@@ -132,14 +138,57 @@ func view_scale() -> float:
 	return maxf(1.0, size.y / View2D.DESIGN.y)
 
 
+## ความกว้างที่มองเห็นจริง — Stage กว้างเต็มเสมอ แต่หักพื้นที่ที่ UI ฝั่งขวา (Info rail) บังอยู่
+func visible_width() -> float:
+	return maxf(size.x - inset_right, 1.0)
+
+
+## UI ฝั่งขวาบังกี่พิกเซล (PhaseUI._auto_rail เรียก) — แทนการหดความกว้าง Stage
+func set_inset(right: float) -> void:
+	inset_right = maxf(right, 0.0)
+
+
+## เลื่อนมุมปัจจุบันให้กึ่งกลางอยู่ที่ x (พิกัดในมุม · หน่วยเดียวกับ focus_x) — ใช้ชั่วคราวจนเปลี่ยนมุมหรือ reset_camera()
+func pan_to(x: float, animate := true) -> void:
+	if _view == null:
+		return
+	_kill_pan()
+	if not animate:
+		_pan_x = x
+		return
+	if is_nan(_pan_x):
+		_pan_x = _view.focus_x
+	_pan_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_pan_tween.tween_property(self, "_pan_x", x, transition_time)
+
+
+## คืนมุมปัจจุบันเป็นค่าตั้งต้น: เลิก pan_to · ตัดซูม/crossfade ที่ค้างอยู่ (ไม่เปลี่ยนมุม — reset_view() เดิมคือกลับ start_view)
+func reset_camera() -> void:
+	_kill_pan()
+	_pan_x = NAN
+	reset_zoom()
+
+
+func _kill_pan() -> void:
+	if _pan_tween and _pan_tween.is_valid():
+		_pan_tween.kill()
+	_pan_tween = null
+
+
 func _layout() -> void:
+	if Engine.is_editor_hint():
+		return # Editor แสดงตำแหน่งดิบ (ไม่เขียนค่าที่คำนวณลง .tscn)
 	var k := view_scale()
+	var vis := visible_width()
 	views_root.scale = Vector2(k, k)
 	top.scale = Vector2(k, k)
-	var sz := size / k
+	views_root.clip_contents = true
+	views_root.size.x = vis / k # ตัดภาพที่ล้ำไปใต้ rail
+	var sz := Vector2(vis, size.y) / k
 	for v in views():
 		v.size = View2D.DESIGN
-		var x := sz.x / 2.0 - v.focus_x
+		var fx := _pan_x if (v == _view and not is_nan(_pan_x)) else v.focus_x
+		var x := sz.x / 2.0 - fx
 		x = clampf(x, minf(0.0, sz.x - View2D.DESIGN.x), 0.0)
 		v.position = Vector2(x, (sz.y - View2D.DESIGN.y) / 2.0)
 
@@ -161,6 +210,8 @@ func go_to(view_name: StringName, instant := false, record := true) -> void:
 	var old := _view
 	_view = v
 	current_view = v.name
+	_kill_pan() # pan_to ใช้กับมุมเดียว · เปลี่ยนมุมแล้วกลับเป็น focus_x
+	_pan_x = NAN
 	_set_hover_item(null)
 	if old == null or instant:
 		if old:
@@ -184,6 +235,7 @@ func _transition(old: View2D, v: View2D) -> void:
 	old.pivot_offset = View2D.DESIGN / 2.0
 	v.scale = Vector2.ONE * (0.94 if zoom_in else 1.06)
 	var tw := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_transition_tween = tw
 	tw.tween_property(old, "modulate:a", 0.0, transition_time)
 	tw.tween_property(old, "scale", Vector2.ONE * (1.08 if zoom_in else 0.94), transition_time)
 	tw.tween_property(v, "modulate:a", 1.0, transition_time)
@@ -194,6 +246,18 @@ func _transition(old: View2D, v: View2D) -> void:
 		old.scale = Vector2.ONE
 		old.modulate.a = 1.0
 	_busy = false
+
+
+## ยกเลิกซูม/crossfade ที่ค้างอยู่ แล้วคืนมุมปัจจุบันเป็น scale 1 · ทึบเต็ม (มุมอื่นซ่อน)
+func reset_zoom() -> void:
+	if _transition_tween and _transition_tween.is_valid():
+		_transition_tween.kill()
+	_transition_tween = null
+	_busy = false
+	for v in views():
+		v.scale = Vector2.ONE
+		v.modulate.a = 1.0
+		v.visible = v == _view
 
 
 func can_back() -> bool:
@@ -250,7 +314,7 @@ func screen_pos_of_node(n: Control):
 
 ## [Claude 1 ต.ค.] หาจุดกดแรกในมุม from ที่พาไปถึงมุม to ได้สั้นที่สุด (เดินต่อกันหลายมุมได้) · ไม่มีทาง = null
 func _first_hop(from: View2D, to: View2D) -> Hotspot2D:
-	var first := {} # View2D → Hotspot2D แรกที่ออกจาก from
+	var first := { } # View2D → Hotspot2D แรกที่ออกจาก from
 	var queue: Array[View2D] = [from]
 	var seen := { from: true }
 	while not queue.is_empty():
@@ -350,7 +414,7 @@ func _gui_input(event: InputEvent) -> void:
 
 ## ของที่อยู่บนสุดตรงจุดนี้ในมุมปัจจุบัน (พิกัดของ Stage) — คลิกทะลุชิ้นที่ยังกดไม่ได้
 func pick_at(p: Vector2) -> Control:
-	if _view == null or _busy:
+	if _view == null or _busy or p.x > visible_width(): # ส่วนใต้ rail ไม่ใช่ฉาก
 		return null
 	var gp := get_global_transform_with_canvas() * p
 	var list := _all(_view)
@@ -557,7 +621,7 @@ func snapshot() -> Image:
 	if img == null or img.is_empty():
 		return null
 	var xf := vp.get_final_transform() * get_global_transform_with_canvas()
-	var r := Rect2i(Rect2(xf * Vector2.ZERO, xf.basis_xform(size)).abs())
+	var r := Rect2i(Rect2(xf * Vector2.ZERO, xf.basis_xform(Vector2(visible_width(), size.y))).abs())
 	r = r.intersection(Rect2i(Vector2i.ZERO, img.get_size()))
 	if r.size.x <= 0 or r.size.y <= 0:
 		return null

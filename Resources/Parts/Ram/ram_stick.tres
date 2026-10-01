@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="PcPart" format=3]
+[gd_resource type="Resource" script_class="PcPart" format=3 uid="uid://b4ntdvsd2um4s"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
+[ext_resource type="Script" uid="uid://4rrp154chx0f" path="res://Scripts/Resources/pc_part.gd" id="1_part"]
 
 [resource]
 script = ExtResource("1_part")

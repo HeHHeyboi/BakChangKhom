@@ -43,7 +43,7 @@ func _ready() -> void:
 		dialog_path = RAM_PIB_PATH
 	minigame_finished.connect(_on_minigame_finished)
 	_setup_dirt()
-	_setup_slot_focus()
+	# _setup_slot_focus()
 	super._ready()
 
 
@@ -68,7 +68,10 @@ const SLOT_FOCUS_DIM := Color(0, 0, 0, 0.45)
 
 func _setup_slot_focus() -> void:
 	var view := (%SlotA2 as Control).get_parent() as Control
-	for r in [Rect2(0, 0, view.size.x, SLOT_FOCUS_BAND.x), Rect2(0, SLOT_FOCUS_BAND.y, view.size.x, view.size.y - SLOT_FOCUS_BAND.y)]:
+	for r in [
+		Rect2(0, 0, view.size.x, SLOT_FOCUS_BAND.x),
+		Rect2(0, SLOT_FOCUS_BAND.y, view.size.x, view.size.y - SLOT_FOCUS_BAND.y),
+	]:
 		var dim := ColorRect.new()
 		dim.name = "FocusDim"
 		dim.color = SLOT_FOCUS_DIM
@@ -99,6 +102,7 @@ func ram_clips() -> Array:
 	return s.locks if s else []
 
 
+# override PartMinigame._register_phases
 func _register_phases() -> Dictionary:
 	return {
 		PhaseState.DIAGNOSIS: $PhaseDiagnosis as Phase,
@@ -112,14 +116,53 @@ func _register_phases() -> Dictionary:
 	}
 
 
+# override PartMinigame._first_phase
 func _first_phase() -> int:
 	if start_phase != PhaseState.NONE:
 		return start_phase
 	return PhaseState.DIAGNOSIS
 
 
+# override PartMinigame._last_phase
 func _last_phase() -> int:
 	return PhaseState.SUMMARY
+
+
+## override PartMinigame._debug_phase_name
+func _debug_phase_name(phase: int) -> String:
+	return PhaseState.find_key(phase)
+
+
+## override PartMinigame._debug_prepare
+## จัดฉากให้เหมือนเล่นมาถึงก่อน phase นี้ (ตัวแปรที่ส่งข้าม phase + ภาพชิ้นส่วน + ตำแหน่งแรม)
+func _debug_prepare(phase: int) -> void:
+	var ram := %RamA2 as Item2D
+	var slot := %SlotA2 as Socket2D
+	var glass := %GlassPanel as Item2D
+	var unplugged := phase > PhaseState.POWER_OFF and phase < PhaseState.SUMMARY # ตัดไฟแล้วจน VERIFY เสียบคืน
+	var cleaned := phase > PhaseState.CLEAN
+	var on_mat := phase == PhaseState.CLEAN or phase == PhaseState.INSTALL # แรมวางบนแผ่น ESD
+	panel_open = phase > PhaseState.REMOVE
+	plugged = not unplugged
+	ram_damaged = false
+	ram_seated = true
+	(%Plug as Item2D).set_state("out" if unplugged else "")
+	set_led(not unplugged)
+	(%Monitor as Item2D).set_state("boot_ok" if phase == PhaseState.SUMMARY else ("off" if unplugged else "glitch"))
+	glass.set_state("open" if panel_open else "")
+	glass.mode = Item2D.Mode.STATIC if panel_open else Item2D.Mode.CLICK
+	var target := (%MatSocket as Socket2D) if on_mat else slot
+	if ram.socket != target:
+		if ram.socket:
+			ram.socket.occupant = null
+			stage.installed_ids.erase(ram.data.id)
+		stage.install(ram, target, false, false)
+	for c in slot.locks:
+		c.set_toggle(on_mat, false) # สลักกางออกตอนถอดแรม · ล็อกเมื่อแรมอยู่ในสล็อต
+	set_gold(1.0 if cleaned else 0.0)
+	ram.set_state("clean" if cleaned else "dirty")
+	(%SlotBodyA2 as Item2D).set_state("clean" if cleaned else "dirty")
+	ram.mode = Item2D.Mode.DRAGGABLE
 
 
 func _on_minigame_finished(_score: Dictionary) -> void:

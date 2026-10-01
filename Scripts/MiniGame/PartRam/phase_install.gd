@@ -13,13 +13,19 @@ var _done_btn: Button
 
 
 func init():
+	reset_zoom()
 	if not _built:
 		_built = true
 		var rail := PhaseUI.make_frame(self, "ซ่อมแรม — ขั้นที่ 6/8 · ใส่แรมกลับ")
 		PhaseUI.label(rail, "ขั้นตอน", 20, PhaseUI.COL_OK)
 		for t in ["ลากแรมลงสล็อต (ร่องบากตรงสันเหลือง)", "คลิกแรม 2 ครั้งกดลงจนสลักล็อก"]:
 			_chk.append(PhaseUI.check_item(rail, t))
-		rail_button(rail, "↻ หมุนแรมในมือ (R)", func(): stage().rotate_held())
+		rail_button(
+			rail,
+			"↻ หมุนแรมในมือ (R)",
+			func():
+				stage().rotate_held(),
+		)
 		_done_btn = rail_button(rail, "เสร็จแล้ว ►", _on_done)
 	_presses = 0
 	_slot = null
@@ -36,7 +42,11 @@ func init():
 		slots.append(node(n))
 	allow_sockets(slots)
 	cam(&"Mat")
-	listen(stage().part_returned, func(_p): cam(&"Mat"))
+	listen(
+		stage().part_returned,
+		func(_p):
+			cam(&"Mat"),
+	)
 	listen(stage().part_installed, _on_installed)
 	listen(stage().drop_rejected, _on_rejected)
 	listen(stage().part_clicked, _on_clicked)

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CleanTool" format=3]
+[gd_resource type="Resource" script_class="CleanTool" format=3 uid="uid://cfcipybtlslnx"]
 
 [ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
 [ext_resource type="Texture2D" uid="uid://drbohruiu8033" path="res://Assets/MiniGame/PartRam/ram_tool_eraser_red.png" id="2_icon"]
@@ -9,11 +9,10 @@ id = &"eraser_red"
 display_name = "ยางลบสีแดง (ยางลบหมึก)"
 icon = ExtResource("2_icon")
 hardness = 4
-has_moisture = false
-esd_risk = false
 leaves_residue = true
-reaches_narrow = false
-fit_per_step = Dictionary[int, int]({0: 0, 1: 0, 2: 0})
-line_ideal = ""
-line_limited = ""
+fit_per_step = Dictionary[int, int]({
+0: 0,
+1: 0,
+2: 0
+})
 line_forbidden = "ยางลบหมึกแข็งและหยาบเกินไป ขาทองจะเป็นรอยได้"

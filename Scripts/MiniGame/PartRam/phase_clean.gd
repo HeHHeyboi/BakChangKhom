@@ -10,6 +10,24 @@ enum CleanStep {
 	CLEAN_SLOT,
 } # S1 S2 S3
 
+
+class StepTool:
+	var ideal: Array[CleanTool]
+	var limited: Array[CleanTool]
+	var forbidden: Array[CleanTool]
+	var tools: Array[CleanTool]
+
+
+	func add(tool: CleanTool, index: int):
+		match tool.fit_per_step[index]:
+			CleanTool.Fit.IDEAL:
+				ideal.append(tool)
+			CleanTool.Fit.LIMITED:
+				limited.append(tool)
+			CleanTool.Fit.FORBIDDEN:
+				forbidden.append(tool)
+
+
 signal step_completed(step: CleanStep)
 signal clean_finished(penalty: int)
 
@@ -31,7 +49,11 @@ const STEP_TEXT := {
 	CleanStep.SCRUB_CONTACTS: "S2 · ขัดคราบที่ขาทอง",
 	CleanStep.CLEAN_SLOT: "S3 · ทำความสะอาดสล็อต",
 }
-const STEP_VIEW := { CleanStep.DUST_BOARD: &"Mat", CleanStep.SCRUB_CONTACTS: &"MatGold", CleanStep.CLEAN_SLOT: &"SlotClose" }
+const STEP_VIEW := {
+	CleanStep.DUST_BOARD: &"Mat",
+	CleanStep.SCRUB_CONTACTS: &"MatGold",
+	CleanStep.CLEAN_SLOT: &"SlotClose",
+}
 ## บทปิ๊บเฉพาะ (อุปกรณ์:ขั้น) ใน Ram_Pib.txt · -1 = ทุกขั้น · ไม่มีในนี้ใช้ line_* ของ CleanTool
 const STEP_LINES := {
 	"brush:0": MinigameHeader.CLEAN_S1_GOOD,
@@ -46,11 +68,13 @@ const STEP_LINES := {
 }
 const GAIN := { CleanTool.Fit.IDEAL: 50.0, CleanTool.Fit.LIMITED: 25.0 } # ✅ 2 ครั้ง · 🟡 4 ครั้ง
 
-var _tools: Array[CleanTool] = []
+# var _tools: Array[CleanTool] = []
 var _blocked_once: Dictionary = { } # tool_id -> true (เลือก ❌ ไปแล้วรอบหนึ่ง)
 var _limited_charged: Dictionary = { }
 var _step: CleanStep = CleanStep.DUST_BOARD
+var _step_list: Array[StepTool] = [StepTool.new(), StepTool.new(), StepTool.new()]
 var _progress := 0.0
+var _bar_tween: Tween
 var _penalty := 0
 var _busy := false
 var _finishing := false
@@ -64,11 +88,14 @@ var _chk: Array[Label] = []
 
 
 func init():
-	if _tools.is_empty():
-		for p in TOOL_PATHS:
-			var t := load(p) as CleanTool
-			if t:
-				_tools.append(t)
+	# if _tools.is_empty():
+	for p in TOOL_PATHS:
+		var t := load(p) as CleanTool
+		if t:
+			_step_list[0].add(t, 0)
+			_step_list[1].add(t, 1)
+			_step_list[2].add(t, 2)
+			# _tools.append(t)
 	if not _built:
 		_build()
 	_blocked_once.clear()
@@ -104,7 +131,10 @@ func _build() -> void:
 func _set_step(step: CleanStep) -> void:
 	_step = step
 	_progress = 0.0
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill() # tween ของขั้นก่อนยังวิ่งอยู่ จะทับค่า 0 ถ้าไม่ฆ่า
 	_bar.value = 0
+	_apply_visual(0.0) # รีเซ็ตภาพของขั้นใหม่ให้ตรงกับ progress 0
 	_step_label.text = STEP_TEXT[step]
 	for i in _chk.size():
 		PhaseUI.set_check(_chk[i], i < int(step))
@@ -114,25 +144,17 @@ func _set_step(step: CleanStep) -> void:
 
 func _build_tray(step: CleanStep) -> Array[CleanTool]:
 	# การันตี ✅ ≥ 1 และ ❌ ≥ 2 แล้วสุ่มที่เหลือให้ครบ TRAY_SIZE
-	var ideal: Array[CleanTool] = []
-	var bad: Array[CleanTool] = []
-	for t in _tools:
-		var f := _fit(t, step)
-		if f == CleanTool.Fit.IDEAL:
-			ideal.append(t)
-		elif f == CleanTool.Fit.FORBIDDEN:
-			bad.append(t)
-	ideal.shuffle()
+	var cur_step = _step_list[step]
+	var ideal: CleanTool = cur_step.ideal[randi_range(0, len(cur_step.ideal) - 1)]
+	var limited: CleanTool = cur_step.limited[randi_range(0, len(cur_step.limited) - 1)]
+	var bad: Array[CleanTool] = cur_step.forbidden
 	bad.shuffle()
 	var tray: Array[CleanTool] = []
-	tray.append_array(ideal.slice(0, 1))
-	tray.append_array(bad.slice(0, 2))
-	var rest := _tools.filter(func(t): return not tray.has(t))
-	rest.shuffle()
-	for t in rest:
-		if tray.size() >= TRAY_SIZE:
-			break
-		tray.append(t)
+	tray.append(ideal)
+	tray.append(limited)
+	tray.append_array(bad.slice(0, -1))
+	while tray.size() > 6:
+		tray.pop_back()
 	tray.shuffle()
 	return tray
 
@@ -148,14 +170,18 @@ func _fill_tray(tray: Array[CleanTool]) -> void:
 		b.custom_minimum_size = Vector2(80, 70)
 		b.tooltip_text = t.display_name
 		b.mouse_entered.connect(_show_card.bind(t))
-		b.pressed.connect(func(): _on_tool_used(t, _step))
+		b.pressed.connect(
+			func():
+				_on_tool_used(t, _step),
+		)
 		_tray.add_child(b)
 
 
 func _show_card(t: CleanTool) -> void:
 	var pips := "▮".repeat(t.hardness) + "▯".repeat(5 - t.hardness)
 	_card.text = "%s\nแข็ง %s · ชื้น %s\nไฟฟ้าสถิต %s · เศษ %s · เข้าซอก %s" % [
-		t.display_name, pips,
+		t.display_name,
+		pips,
 		"มี" if t.has_moisture else "ไม่มี",
 		"เสี่ยง" if t.esd_risk else "ปลอดภัย",
 		"มี" if t.leaves_residue else "ไม่มี",
@@ -248,7 +274,10 @@ func _say_for(tool: CleanTool, step: int, fallback: String, mood: PibHint.Mood) 
 
 func _progress_by(amount: float) -> void:
 	_progress = min(_progress + amount, 100.0)
-	create_tween().tween_property(_bar, "value", _progress, 0.25)
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_tween = create_tween()
+	_bar_tween.tween_property(_bar, "value", _progress, 0.25)
 	_apply_visual(_progress / 100.0)
 	if _progress >= 100.0:
 		step_completed.emit(_step)

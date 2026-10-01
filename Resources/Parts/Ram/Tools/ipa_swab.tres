@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CleanTool" format=3]
+[gd_resource type="Resource" script_class="CleanTool" format=3 uid="uid://dojvkt1bnveku"]
 
 [ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
 [ext_resource type="Texture2D" uid="uid://be73s25d6m757" path="res://Assets/MiniGame/PartRam/ram_tool_ipa_swab.png" id="2_icon"]
@@ -10,10 +10,11 @@ display_name = "คอตตอนบัด + IPA 99%"
 icon = ExtResource("2_icon")
 hardness = 1
 has_moisture = true
-esd_risk = false
-leaves_residue = false
 reaches_narrow = true
-fit_per_step = Dictionary[int, int]({0: 1, 1: 2, 2: 1})
+fit_per_step = Dictionary[int, int]({
+0: 1,
+1: 2,
+2: 1
+})
 line_ideal = "แอลกอฮอล์ IPA 99% ระเหยเร็วและไม่ทิ้งคราบ ช่างมืออาชีพใช้จริง"
 line_limited = "ใช้ได้ แต่ต้องรอให้แห้งสนิทก่อนเสียบกลับนะ"
-line_forbidden = ""

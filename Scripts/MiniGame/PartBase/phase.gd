@@ -8,3 +8,8 @@ signal mistake(category: StringName, points: int)
 
 func init():
 	pass
+
+
+## เก็บ phase ทิ้งกลางคัน (ใช้กับ debug jump) — ไม่ emit phase_completed
+func abort():
+	hide()

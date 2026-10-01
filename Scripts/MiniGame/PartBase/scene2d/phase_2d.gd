@@ -37,6 +37,21 @@ func cam(view_name: StringName) -> void:
 	stage().go_to(view_name)
 
 
+## รีเซ็ตซูมของมุมปัจจุบันกลับเป็นปกติ (ตัดการเปลี่ยนมุมที่ยังเล่นอยู่ทิ้ง)
+func reset_zoom() -> void:
+	stage().reset_zoom()
+
+
+## เลื่อนมุมปัจจุบันให้กึ่งกลางอยู่ที่ x (พิกัดในมุม) — ค้างจนเปลี่ยนมุมหรือ reset_camera()
+func pan(x: float, animate := true) -> void:
+	stage().pan_to(x, animate)
+
+
+## คืนมุมปัจจุบันเป็นค่าตั้งต้น (focus_x ของมุม · ไม่ซูม · ไม่ pan) โดยไม่เปลี่ยนมุม
+func reset_camera() -> void:
+	stage().reset_camera()
+
+
 ## จำกัดว่าคลิก/ลากได้เฉพาะชิ้นไหน (ว่าง = ทุกชิ้น)
 func allow(parts: Array) -> void:
 	var a: Array[Item2D] = []
@@ -114,6 +129,8 @@ func clear_hint() -> void:
 
 
 func finish() -> void:
+	if not visible: # await ค้างจาก phase ที่ถูกข้ามด้วย debug jump
+		return
 	clear_hint()
 	stage().clear_history() # phase ใหม่เริ่มประวัติมุมกล้องใหม่
 	_unlisten_all()
@@ -122,6 +139,16 @@ func finish() -> void:
 	stage().user_camera = true
 	hide()
 	phase_completed.emit()
+
+
+## ทิ้ง phase กลางคันแบบเงียบ ๆ (debug jump) — เหมือน finish() แต่ไม่ emit phase_completed
+func abort() -> void:
+	clear_hint()
+	_unlisten_all()
+	stage().allowed = []
+	stage().allowed_sockets = []
+	stage().user_camera = true
+	hide()
 
 
 ## ปุ่มใน info rail (ใช้กับ VBox ที่ได้จาก PhaseUI.make_frame)

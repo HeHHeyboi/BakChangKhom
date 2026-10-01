@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CleanTool" format=3]
+[gd_resource type="Resource" script_class="CleanTool" format=3 uid="uid://dm7n5p3dh4n20"]
 
 [ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
 [ext_resource type="Texture2D" uid="uid://cye704cldn4lc" path="res://Assets/MiniGame/PartRam/ram_tool_blower.png" id="2_icon"]
@@ -8,12 +8,11 @@ script = ExtResource("1_tool")
 id = &"blower"
 display_name = "ลูกยางเป่าลม"
 icon = ExtResource("2_icon")
-hardness = 0
-has_moisture = false
-esd_risk = false
-leaves_residue = false
 reaches_narrow = true
-fit_per_step = Dictionary[int, int]({0: 2, 1: 0, 2: 2})
+fit_per_step = Dictionary[int, int]({
+0: 2,
+1: 0,
+2: 2
+})
 line_ideal = "ลมเป่าฝุ่นหยาบออกได้ดีโดยไม่ต้องแตะชิ้นส่วนเลย"
-line_limited = ""
 line_forbidden = "ลมพัดฝุ่นออกได้ แต่คราบที่เกาะติดขาทองลมพัดไม่ออกหรอก"

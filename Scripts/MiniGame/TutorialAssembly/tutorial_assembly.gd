@@ -55,7 +55,7 @@ func _installed_parts() -> Array:
 func core_name(p: PcPart) -> String:
 	return "จะได้ซ่อมใน " + String(CORE_NAME.get(p.core_part, "งานซ่อมทั่วไป"))
 
-
+# override PartMinigame._register_phases
 func _register_phases() -> Dictionary:
 	return {
 		PhaseState.INTRO: $PhaseIntro as Phase,
@@ -64,13 +64,32 @@ func _register_phases() -> Dictionary:
 		PhaseState.SUMMARY: $PhaseSummary as Phase,
 	}
 
-
+# override PartMinigame._first_phase
 func _first_phase() -> int:
 	return start_phase if start_phase != PhaseState.NONE else PhaseState.INTRO
 
-
+# override PartMinigame._last_phase
 func _last_phase() -> int:
 	return PhaseState.SUMMARY
+
+## override Phase._debug_phase_name
+func _debug_phase_name(phase: int) -> String:
+	return PhaseState.find_key(phase)
+
+
+## override PartMinigame._debug_prepare
+## ก่อนถึง POWER_TEST / SUMMARY ต้องประกอบครบแล้ว → ใส่ทุกชิ้นลงซ็อกเก็ตให้เลย (ชิ้นที่ใส่แล้วข้ามไป)
+func _debug_prepare(phase: int) -> void:
+	if phase < PhaseState.POWER_TEST:
+		return
+	for p in parts():
+		if p.socket != null and not p.socket.accept_any:
+			continue
+		for s in stage.sockets:
+			if s.socket_type == p.data.socket_type and s.occupant == null:
+				stage.install(p, s, false, false)
+				p.mode = Item2D.Mode.STATIC
+				break
 
 
 func _on_minigame_finished(_score: Dictionary) -> void:

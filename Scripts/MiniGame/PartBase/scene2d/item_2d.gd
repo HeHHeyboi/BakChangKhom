@@ -8,7 +8,12 @@ class_name Item2D extends Control
 ## ไม่มีรูปเลย (texture ว่าง) = จุดคลิกล่องหน (hotspot) แสดงกรอบเรืองแสงตอนชี้
 ## [Claude 30 ก.ย. 2569] แทนระบบ 2.5D เดิม (PartBody25D)
 
-enum Mode { STATIC, DRAGGABLE, TOGGLE, CLICK }
+enum Mode {
+	STATIC,
+	DRAGGABLE,
+	TOGGLE,
+	CLICK,
+}
 
 signal toggled(on: bool)
 signal clicked
@@ -29,7 +34,7 @@ const COL_INK := Color(0.28, 0.18, 0.1)
 ## รูปตอน TOGGLE เปิด (สลักกางออก)
 @export var texture_on: Texture2D
 ## หน้าตาอื่น ๆ (ดูคำอธิบายด้านบน) · ค่า <empty> = ซ่อนรูป (เช่นฝากระจก "open")
-@export var looks: Dictionary[String, Texture2D] = {}
+@export var looks: Dictionary[String, Texture2D] = { }
 @export var state := "":
 	set(v):
 		state = v
@@ -57,11 +62,12 @@ var _xf_t := 1.0
 var _blend_to := ""
 var _blend := 0.0
 var _mat: ShaderMaterial
+var _plate: PanelContainer
 
 
 static func _masks() -> Dictionary:
 	if not Engine.has_meta("item2d_masks"):
-		Engine.set_meta("item2d_masks", {})
+		Engine.set_meta("item2d_masks", { })
 	return Engine.get_meta("item2d_masks")
 
 
@@ -71,9 +77,40 @@ func _ready() -> void:
 	if mode == Mode.TOGGLE:
 		toggle_on = start_on
 	_last_tex = current_texture()
+	if label_text.is_empty():
+		return
+	# ป้ายชื่อเป็น node ลูก (ไม่วาดในตัว) เพื่อไม่ให้โดน shader outline ตอนชี้ · วางไว้เหนือชิ้น กึ่งกลางแนวนอน
+	_plate = PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = COL_PLATE
+	style.border_color = COL_INK
+	style.set_border_width_all(3)
+	style.set_expand_margin_all(2)
+	_plate.add_theme_stylebox_override("panel", style)
+	_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_plate.z_index = 10
+	_plate.visible = Engine.is_editor_hint()
+	var label := Label.new()
+	label.text = label_text
+	label.add_theme_color_override("font_color", COL_INK)
+	_plate.add_child(label)
+	add_child(_plate)
+	_plate.resized.connect(_place_plate)
+	resized.connect(_place_plate)
+	_place_plate()
 
+
+## ป้ายอยู่เหนือชิ้น · ถ้าชิ้นอยู่ชิดขอบบนจอ (ป้ายจะหลุดจอ) ให้ซ้อนลงมาในชิ้นแทน
+func _place_plate() -> void:
+	if _plate == null:
+		return
+	var y := -_plate.size.y - 6.0
+	if y + get_global_rect().position.y < 60.0:
+		y = 0.0
+	_plate.position = Vector2((size.x - _plate.size.x) / 2.0, y)
 
 # ---------------------------------------------------------------- หน้าตา
+
 
 func look_context() -> String:
 	return socket.look if socket else ""
@@ -139,7 +176,6 @@ func _draw() -> void:
 			var c := Color(1, 0.86, 0.35, 0.95 if hovered else 0.35)
 			draw_rect(Rect2(Vector2.ZERO, size).grow(-2), Color(c, 0.12 if hovered else 0.0))
 			_draw_dashed_rect(Rect2(Vector2.ZERO, size).grow(-2), c)
-		_draw_label()
 		return
 	var mod := Color.WHITE
 	if _tint.a > 0.0:
@@ -152,7 +188,6 @@ func _draw() -> void:
 		var bt := texture_for(look_context(), _blend_to)
 		if bt and bt != cur:
 			_draw_tex(bt, Color(mod, _blend))
-	_draw_label()
 
 
 func _draw_tex(t: Texture2D, mod: Color) -> void:
@@ -166,25 +201,13 @@ func _draw_tex(t: Texture2D, mod: Color) -> void:
 	draw_texture_rect(t, r, false, mod)
 
 
-func _draw_label() -> void:
-	if label_text == "" or not (hovered or Engine.is_editor_hint()):
-		return
-	var f := get_theme_default_font()
-	var fs := 18
-	var w := f.get_string_size(label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var box := Rect2(size.x / 2.0 - w / 2.0 - 12, -34, w + 24, 30)
-	draw_rect(box, COL_PLATE)
-	draw_rect(box, COL_INK, false, 3)
-	draw_string(f, Vector2(box.position.x + 12, box.position.y + 22), label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, COL_INK)
-
-
 func _draw_dashed_rect(r: Rect2, c: Color) -> void:
 	var pts := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y), r.position]
 	for i in 4:
 		draw_dashed_line(pts[i], pts[i + 1], c, 3.0, 10.0)
 
-
 # ---------------------------------------------------------------- คลิก
+
 
 ## จุด (พิกัดของชิ้นนี้) โดนเนื้อรูปไหม
 func hit_local(p: Vector2) -> bool:
@@ -229,6 +252,10 @@ func set_hover(on: bool) -> void:
 	if hovered == on:
 		return
 	hovered = on
+	if _plate and not Engine.is_editor_hint():
+		_plate.visible = on
+		if on:
+			_place_plate()
 	if on and not is_hotspot():
 		if _mat == null:
 			_mat = ShaderMaterial.new()
@@ -238,8 +265,8 @@ func set_hover(on: bool) -> void:
 		material = null
 	queue_redraw()
 
-
 # ---------------------------------------------------------------- สถานะ
+
 
 ## เปลี่ยนหน้าตา (crossfade อัตโนมัติ)
 func set_state(p_state: String) -> void:
@@ -266,7 +293,10 @@ func set_state_blend(from: String, to: String, t: float) -> void:
 func fade_move(to_pos: Vector2, dur := 0.35) -> Tween:
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, dur * 0.45)
-	tw.tween_callback(func(): position = to_pos)
+	tw.tween_callback(
+		func():
+			position = to_pos,
+	)
 	tw.tween_property(self, "modulate:a", 1.0, dur * 0.55)
 	return tw
 

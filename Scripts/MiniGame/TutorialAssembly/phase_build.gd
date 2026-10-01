@@ -56,7 +56,9 @@ func _on_installed(p: Item2D, s: Socket2D) -> void:
 	s.highlight(Socket2D.HL.CLOSE)
 	p.mode = Item2D.Mode.STATIC # วางแล้วล็อกไว้ ไม่ให้หลุดออกระหว่าง Tutorial
 	PhaseUI.set_check(_checks[p], true)
-	PhaseUI.part_card(self, p.data.display_name, "ติดตั้งแล้ว ✓", owner.core_name(p.data))
+	var rect = PhaseUI.CARD_RECT
+	rect.position = Vector2(16, 450)
+	PhaseUI.part_card(self, p.data.display_name, "ติดตั้งแล้ว ✓", owner.core_name(p.data), rect)
 	if _next_part() == null:
 		clear_hint()
 		await wait(1.0)
