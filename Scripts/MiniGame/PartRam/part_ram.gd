@@ -168,6 +168,5 @@ func _debug_prepare(phase: int) -> void:
 func _on_minigame_finished(_score: Dictionary) -> void:
 	Global.in_minigame = false
 	Global.cur_pib = null
-	print(_score)
 	EventManager.minigame_end()
 	call_deferred("queue_free")

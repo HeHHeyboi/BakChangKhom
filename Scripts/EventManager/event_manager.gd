@@ -110,7 +110,6 @@ func _on_dialog_finish() -> void:
 	var data = event.get_task()
 	if data == null:
 		return
-	print(data.isDone)
 	if data.isDone && data.action == QuestStep.Action.DIALOG:
 		data = update_event(id)
 		if data == null:
@@ -147,7 +146,6 @@ func minigame_end() -> void:
 		return
 	var id = currentEvent
 	var data = event.get_task()
-	print(data.isDone)
 	if data == null:
 		return
 	if data.isDone && (data.action == QuestStep.Action.MINIGAME || data.action == QuestStep.Action.SCENE_CHANGE):
