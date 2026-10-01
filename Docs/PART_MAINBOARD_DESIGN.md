@@ -4,7 +4,8 @@
 > ชุดเดียวกับ: `MINIGAME1_DESIGN.md` (Part RAM) · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md` · `PART_BIOS_DESIGN.md`
 > อยู่ใน Scene S3 ของลูปงานซ่อม — `REPAIR_FLOW.md` · asset: `Assets/MiniGame/PartMainboard/` (`mb_*`)
 
-> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · ยังไม่มีซีนของ Part นี้ในรีโป
+> ✅ **2 ต.ค. 2569 — เล่นได้แล้วครบ 8 phase + หน้าสรุป** (ยังไม่ผูกเควสต์ · เปิดจากเมนู Debug F1 → "เล่น Part Mainboard + CPU (ทดสอบ)")
+> ซีน `Scene/MiniGame/PartMainboard/part_mainboard.tscn` · โค้ด `Scripts/MiniGame/PartMainboard/` · อุปกรณ์ `Resources/Parts/Mainboard/Tools/` · ดูหัวข้อ 14 สำหรับสิ่งที่ต่างจากดีไซน์
 
 ---
 
@@ -235,8 +236,21 @@ var temp_result := 0.0
 
 ---
 
+## 14. สิ่งที่ทำจริง (2 ต.ค. 2569)
+
+| | รายละเอียด |
+|---|---|
+| มุมกล้อง (View2D) | Overview ภาพรวมร้าน · Monitor โต๊ะคอม (จอโชว์อุณหภูมิ) · Rear ปลั๊กพ่วง · **Board** ในเคส (`inside_bg` + ฮีตซิงก์) · **Socket** ซ็อกเก็ต CPU ซูม (`mb_socket_view`) · Mat แผ่น ESD (ฐานฮีตซิงก์) |
+| phase | INSPECT · BRIEFING · SAFETY · REMOVE · CLEAN · SEAT_CPU · PASTE · MOUNT (รวม VERIFY) · SUMMARY |
+| ต่างจากดีไซน์ | SAFETY: เลือกที่วางชิ้นส่วน (ESD / โต๊ะ / โฟม) แทนการย้ายเมนบอร์ด · REMOVE: เลือก "หมุนเบา ๆ แล้วยก" / "ดึงตรง ๆ" · SEAT_CPU: กดแรงตอนหันผิด = เปลี่ยนบอร์ดสำรองแล้วเริ่มขั้นนี้ใหม่ (ไม่ต้องเริ่มทั้ง Part) · PASTE: บีบเยอะเกิน = เช็ดแล้วบีบใหม่ในขั้นเดิม (ไม่ย้อน Phase 4) · VERIFY อยู่ท้าย MOUNT |
+| อุณหภูมิ | 54°C + ซิลิโคนน้อย 8 + ขันไม่ไขว้ 8 · ≤ 65 ผ่าน (VERIFY_GOOD) · มากกว่านั้นเตือน (VERIFY_HOT) |
+| รูปใหม่ (`Assets/MiniGame/PartMainboard/` · SVG ใน `src/`) | `mb_socket_view` · `mb_retention_closed/open` · `mb_cpu_old/clean/paste_small/ok/large` · `mb_cooler_dusty` · `mb_heatsink_base_dirty/clean` · `mb_screw` · `mb_screen_temp` · `tool_tissue` · `tool_thinner` · `tool_wire_brush` |
+| บทปิ๊บเพิ่ม | ท้าย `Mainboard_Pib.txt` (INSPECT_INTRO · SAFETY_* · REMOVE_* · CLEAN_TRAY/DONE · SEAT_CPU_LIFTED/OK/DONE · PASTE_INTRO · MOUNT_DONE) |
+| ทดสอบ | บอทเล่นอัตโนมัติ 2 แบบ: ทำถูกหมด → 100/100 ⭐⭐⭐ 54°C · ทำผิดทุกจุด (ข้ามขั้น ดึงตรง น้ำ/ทิชชู หันผิดแล้วกด ยาสีฟัน บีบเยอะ ขันไล่รอบ) → 26/100 70°C · จบได้ทั้งคู่ ไม่มี error |
+
 ## 13. ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 22 ก.ย. 2569 | สร้างเอกสาร — ออกแบบมินิเกม Core Part: Mainboard + CPU 8 phase |
+| 2 ต.ค. 2569 | ทำซีน + โค้ดครบ 8 phase + หน้าสรุป · เปิดจากเมนู Debug · เพิ่มหัวข้อ 14 |

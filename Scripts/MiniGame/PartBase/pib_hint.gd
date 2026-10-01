@@ -7,7 +7,7 @@ class_name PibHint extends CanvasLayer
 @onready var pib_sprite = $DialogPanel/Pib as TextureRect
 @onready var bubble = $DialogPanel/Bubble as Control
 @onready var name_label = $DialogPanel/Bubble/Name as Label
-@onready var dialog_label = $DialogPanel/Bubble/Dialog as RichTextLabel
+@onready var dialog_label = $DialogPanel/Bubble/Dialog as Label # [Claude 2 ต.ค.] เดิม RichTextLabel — ดูหมายเหตุใน dialog_scene.gd
 @onready var next_mark = $DialogPanel/Bubble/Next as Label
 @onready var toast_box = $Toast as Control
 @onready var toast_pib = $Toast/Pib as TextureRect

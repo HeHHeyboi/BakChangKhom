@@ -44,7 +44,7 @@
 | Part | ไฟล์ | ยศ | ความรู้หลัก |
 |---|---|---|---|
 | RAM | `MINIGAME1_DESIGN.md` | ช่างมือใหม่ | ขาทอง · ทำความสะอาดหน้าสัมผัส · เลือกอุปกรณ์ |
-| Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` | ช่างฝึกหัด | standoff · ทิศ CPU · ซิลิโคน · ขันไขว้ |
+| Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` | ช่างฝึกหัด | standoff · ทิศ CPU · ซิลิโคน · ขันไขว้ — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
 | GPU | `PART_GPU_DESIGN.md` | ช่างประจำหมู่บ้าน | PCIe · สลัก · สายไฟ PCIe vs CPU · airflow |
 | Front Panel | `PART_FRONTPANEL_DESIGN.md` | ช่างเชี่ยวชาญ | pin header · ขั้ว LED · dual channel |
 | BIOS + OS | `PART_BIOS_DESIGN.md` | ช่างระดับมือโปร | boot order · XMP · ลง OS · bottleneck |

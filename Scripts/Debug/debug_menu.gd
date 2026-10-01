@@ -26,6 +26,11 @@ func _ready() -> void:
 			"task_index": 3,
 			"scene": Constant.ROOM_SCENE,
 		},
+		{
+			# [Claude 2 ต.ค. 2569] เปิดมินิเกมตรง ๆ ไม่แตะเควสต์หลัก (Part ที่ยังไม่มีเควสต์)
+			"label": "เล่น Part Mainboard + CPU (ทดสอบ)",
+			"minigame": "res://Scene/MiniGame/PartMainboard/part_mainboard.tscn",
+		},
 	]
 	_build_ui()
 
@@ -65,6 +70,10 @@ func _refresh_buttons() -> void:
 
 
 func _on_jump_point_pressed(point: Dictionary) -> void:
+	if point.has("minigame"):
+		_open_minigame(point["minigame"])
+		visible = false
+		return
 	EventManager.jump_event(point["event_id"], point["task_index"])
 	if point.get("scene", "") != "":
 		get_tree().change_scene_to_file(point["scene"])
@@ -75,3 +84,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == TOGGLE_KEY:
 		visible = !visible
 		get_viewport().set_input_as_handled()
+
+
+## เปิดมินิเกมเป็นลูกของฉากปัจจุบัน แบบไม่ผูกเควสต์ (มินิเกมเห็น meta "standalone" แล้วจะไม่เรียก EventManager.minigame_end)
+func _open_minigame(path: String) -> void:
+	var cs := get_tree().current_scene
+	for c in cs.get_children():
+		if c is PartMinigame:
+			return
+	var m := (load(path) as PackedScene).instantiate()
+	m.set_meta("standalone", true)
+	cs.add_child(m)
+	Global.in_minigame = true

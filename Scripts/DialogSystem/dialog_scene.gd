@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-@export var TextBox: RichTextLabel
+@export var TextBox: Label ## [Claude 2 ต.ค.] เดิม RichTextLabel — Godot 4.7.2 แจ้ง error "Rect2i size is negative" กับข้อความไทยบางคำ (บั๊ก engine) · Label ไม่เป็น
 @export var NameBox: Label
 @export var ChoiceContainer: VBoxContainer
 @export var DialogButton: Button
@@ -193,8 +193,7 @@ func show_text(token) -> void:
 	match token:
 		var dialog when token is DialogToken:
 			NameBox.text = dialog.name + " " + dialog.note
-			TextBox.clear()
-			TextBox.add_text(dialog.dialog)
+			TextBox.text = dialog.dialog
 			_show_speaker(dialog)
 		var choice when token is ChoiceToken:
 			create_choice_buttons(choice.choices)

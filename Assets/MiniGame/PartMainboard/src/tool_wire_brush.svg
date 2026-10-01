@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+<g transform="rotate(-30 100 100)">
+<rect x="30" y="86" width="96" height="30" rx="8" fill="#a8693a" stroke="#2C1810" stroke-width="6"/>
+<rect x="124" y="80" width="50" height="42" rx="6" fill="#7d7f86" stroke="#2C1810" stroke-width="6"/>
+<path d="M130 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M136 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M142 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M148 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M154 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M160 122 v26" stroke="#b9bcc3" stroke-width="3"/><path d="M166 122 v26" stroke="#b9bcc3" stroke-width="3"/>
+<path d="M130 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M136 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M142 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M148 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M154 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M160 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/><path d="M166 122 v26" stroke="#2C1810" stroke-width="1" opacity=".5"/>
+</g>
+</svg>

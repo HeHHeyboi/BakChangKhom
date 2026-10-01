@@ -106,19 +106,17 @@ theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("chip")
 text = "ปิ๊บ"
 
-[node name="Dialog" type="RichTextLabel" parent="DialogPanel/Bubble" unique_id=1490661562]
+[node name="Dialog" type="Label" parent="DialogPanel/Bubble" unique_id=1490661562]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 24.0
 offset_right = 900.0
 offset_bottom = 138.0
 mouse_filter = 2
-theme_override_colors/default_color = Color(0.172549, 0.0941176, 0.0627451, 1)
-theme_override_font_sizes/normal_font_size = 24
-theme_override_font_sizes/bold_font_size = 24
-bbcode_enabled = true
+theme_override_colors/font_color = Color(0.172549, 0.0941176, 0.0627451, 1)
+theme_override_font_sizes/font_size = 24
 text = "..."
-scroll_active = false
+autowrap_mode = 3
 
 [node name="Next" type="Label" parent="DialogPanel/Bubble" unique_id=545484328]
 layout_mode = 0
