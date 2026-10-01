@@ -42,9 +42,41 @@ func reset_zoom() -> void:
 	stage().reset_zoom()
 
 
-## Info rail วางทับภาพ (true) หรือให้ฉากหดหนี (false) — ตั้งใน init() ของ phase ได้เลย
+## โหมด Info rail ของ phase นี้ (ตั้งใน Inspector หรือเรียก set_rail_mode ใน init())
+##   AUTO = เปิดเมื่อมีปุ่มใน rail แล้วฉากหดหนี · SQUEEZE = เปิดเสมอ ฉากหด
+##   OVERLAY = เปิดเมื่อมีปุ่ม แต่วางทับภาพ ฉากกว้างเต็ม · HIDDEN = ซ่อน rail เสมอ
+enum RailMode { AUTO, SQUEEZE, OVERLAY, HIDDEN }
+
+@export var rail_mode: RailMode = RailMode.AUTO
+
+
+func set_rail_mode(mode: RailMode) -> void:
+	rail_mode = mode
+	refresh_layout()
+
+
+## ทางลัด: วางทับ (true) หรือกลับเป็น AUTO (false)
 func set_rail_overlay(on := true) -> void:
-	PhaseUI.set_rail_overlay(self, on)
+	set_rail_mode(RailMode.OVERLAY if on else RailMode.AUTO)
+
+
+## ตัดสินใจ layout ของ phase นี้ที่เดียว: rail เปิดไหม · Stage หดไหม — เรียกซ้ำได้เมื่อ UI เปลี่ยน (PhaseUI.refresh เรียกมาที่นี่)
+func refresh_layout() -> void:
+	if not has_meta("rail") or not visible:
+		return
+	var open: bool
+	match rail_mode:
+		RailMode.HIDDEN:
+			open = false
+		RailMode.SQUEEZE:
+			open = true
+		_:
+			open = PhaseUI.rail_wanted(self)
+	PhaseUI.apply_rail(self, open)
+	var st = owner.get("stage") if owner else null
+	if st is Stage2D:
+		var squeeze := open and rail_mode != RailMode.OVERLAY
+		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - PhaseUI.RAIL.position.x, 0.0) if squeeze else 0.0)
 
 
 ## เลื่อนมุมปัจจุบันให้กึ่งกลางอยู่ที่ x (พิกัดในมุม) — ค้างจนเปลี่ยนมุมหรือ reset_camera()

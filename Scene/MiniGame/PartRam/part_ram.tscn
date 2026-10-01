@@ -577,6 +577,7 @@ target_view = &"Mat"
 label_text = "→ แผ่น ESD"
 
 [node name="Mat" type="Control" parent="Stage/Views" index="5" unique_id=1660989655]
+visible = false
 clip_contents = true
 anchors_preset = 0
 offset_left = -37.075

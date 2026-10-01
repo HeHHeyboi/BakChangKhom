@@ -94,6 +94,7 @@ func trigger_step(id: EventID, event: Event) -> void:
 		return
 	var data = event.get_task()
 	if data == null:
+		questboard.update_task("", event)
 		return
 	elif data.emitType == QuestStep.EmitType.TRIGGER:
 		_process_data(id, data)
@@ -113,9 +114,8 @@ func _on_dialog_finish() -> void:
 	if data.isDone && data.action == QuestStep.Action.DIALOG:
 		data = update_event(id)
 		if data == null:
+			questboard.update_task("", event)
 			return
-		# if data.emitType == QuestStep.EmitType.DIALOG_END:
-		# 	_process_data(currentEvent, data)
 	if data.emitType == QuestStep.EmitType.DIALOG_END:
 		_process_data(id, data)
 
@@ -133,9 +133,8 @@ func _on_tutorial_end():
 	if data.isDone && data.action == QuestStep.Action.TUTORIAL:
 		data = update_event(id)
 		if data == null:
+			questboard.update_task("", event)
 			return
-		# if data.emitType == QuestStep.EmitType.TUTORIAL_END:
-		# 	_process_data(currentEvent, data)
 	if data.emitType == QuestStep.EmitType.TUTORIAL_END:
 		_process_data(id, data)
 
@@ -148,16 +147,14 @@ func minigame_end() -> void:
 		return
 	var id = currentEvent
 	var data = event.get_task()
+	print(data.isDone)
 	if data == null:
 		return
-	if data.isDone && (
-		data.action == QuestStep.Action.MINIGAME || data.action == QuestStep.Action.SCENE_CHANGE
-	):
+	if data.isDone && (data.action == QuestStep.Action.MINIGAME || data.action == QuestStep.Action.SCENE_CHANGE):
 		data = update_event(id)
 		if data == null:
+			questboard.update_task("", event)
 			return
-		# if data.emitType == QuestStep.EmitType.MINIGAME_END:
-		# 	_process_data(currentEvent, data)
 	if data.emitType == QuestStep.EmitType.MINIGAME_END:
 		_process_data(id, data)
 

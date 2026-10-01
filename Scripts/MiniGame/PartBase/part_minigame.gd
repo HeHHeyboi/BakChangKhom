@@ -67,6 +67,7 @@ func _set_phase(phase: int) -> void:
 
 func _advance_phase() -> void:
 	if current_phase == _last_phase():
+		print("last phase")
 		minigame_finished.emit(_mistakes)
 		return
 	_set_phase(current_phase + 1)

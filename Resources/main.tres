@@ -49,7 +49,7 @@ script = ExtResource("1_naor1")
 action = 1
 emitType = 3
 scene_path = "uid://bbcfansu05shj"
-quest_text_th = "ซ่อมแรมให้เสร็จ"
+quest_text_th = "ซ่อมแรม"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [resource]

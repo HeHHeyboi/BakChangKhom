@@ -193,31 +193,24 @@ static func refresh(phase: Control) -> void:
 	_auto_rail(phase)
 
 
-## ค่าตั้งต้นของทุก phase: false = rail เปิดแล้วฉากหดหนีให้ · true = rail วางทับภาพ ฉากกว้างเต็มเสมอ
-const RAIL_OVERLAY_DEFAULT := false
-
-
-## rail ของ phase นี้วางทับฉากไหม (ตั้งด้วย set_rail_overlay · ไม่ตั้ง = RAIL_OVERLAY_DEFAULT)
-static func is_rail_overlay(phase: Control) -> bool:
-	return bool(phase.get_meta("rail_overlay", RAIL_OVERLAY_DEFAULT))
-
-
-## เปลี่ยนโหมด rail ของ phase นี้ — เรียกก่อนหรือหลัง make_frame ก็ได้ · มีผลทันทีถ้า phase แสดงอยู่
-static func set_rail_overlay(phase: Control, on: bool) -> void:
-	phase.set_meta("rail_overlay", on)
-	_auto_rail(phase)
-
-
+## phase ตัดสินใจเองว่า rail เปิดไหม/หดฉากไหม (Phase2D.rail_mode + refresh_layout) — PhaseUI ไม่แตะ Stage
 static func _auto_rail(phase: Control) -> void:
 	if not phase.has_meta("rail") or not phase.visible:
 		return
-	var rail := phase.get_meta("rail") as Node
-	var open := _has_button(rail)
+	if phase.has_method("refresh_layout"):
+		phase.call("refresh_layout")
+	else:
+		apply_rail(phase, rail_wanted(phase))
+
+
+## ใน rail มีของให้กดอยู่ไหม (ใช้เป็นเกณฑ์ของโหมด AUTO)
+static func rail_wanted(phase: Control) -> bool:
+	return phase.has_meta("rail") and _has_button(phase.get_meta("rail") as Node)
+
+
+## ใช้ผลที่ตัดสินแล้วกับ widget: เปิด/ปิด rail · เด้งสมุด · อัปเดตเป้าหมาย
+static func apply_rail(phase: Control, open: bool) -> void:
 	set_rail_open(phase, open)
-	var st = phase.owner.get("stage") if phase.owner else null
-	if st is Stage2D:
-		var squeeze := open and not is_rail_overlay(phase) # วางทับ = ฉากไม่หด (rail ลอยอยู่บนภาพ)
-		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if squeeze else 0.0)
 	if phase.get_meta("unread", false):
 		ping_book(phase)
 	_refresh_goal(phase.get_meta("rail_box"))

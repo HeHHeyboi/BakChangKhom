@@ -21,7 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://b84tbxtnhrp8y" path="res://Assets/MiniGame/PartMainboard/mb_cpu.png" id="g12"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/cpu_cooler.tres" id="g13"]
 [ext_resource type="Texture2D" uid="uid://67isgu4ypllg" path="res://Assets/MiniGame/PartMainboard/mb_cooler.png" id="g14"]
-[ext_resource type="Resource" path="res://Resources/Parts/Ram/ram_stick.tres" id="g15"]
+[ext_resource type="Resource" uid="uid://b4ntdvsd2um4s" path="res://Resources/Parts/Ram/ram_stick.tres" id="g15"]
 [ext_resource type="Texture2D" uid="uid://dggbo116mnf" path="res://Assets/MiniGame/PartRam/ram_clean.png" id="g16"]
 [ext_resource type="Texture2D" uid="uid://dl06r2jawgx6q" path="res://Assets/MiniGame/Scene2D/ram_mini.png" id="g17"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/ssd_m2.tres" id="g18"]
@@ -99,6 +99,7 @@ target_view = &"Tray"
 label_text = "ชิ้นส่วน"
 
 [node name="Tray" type="Control" parent="Stage/Views" index="1" unique_id=248641645]
+visible = false
 clip_contents = true
 anchors_preset = 0
 offset_left = -67.76471
@@ -245,6 +246,7 @@ target_view = &"Build"
 label_text = "→ เคส"
 
 [node name="Build" type="Control" parent="Stage/Views" index="2" unique_id=22534374]
+visible = false
 clip_contents = true
 anchors_preset = 0
 offset_left = -67.76471
