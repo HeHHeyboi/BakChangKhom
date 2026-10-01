@@ -42,6 +42,11 @@ func reset_zoom() -> void:
 	stage().reset_zoom()
 
 
+## Info rail วางทับภาพ (true) หรือให้ฉากหดหนี (false) — ตั้งใน init() ของ phase ได้เลย
+func set_rail_overlay(on := true) -> void:
+	PhaseUI.set_rail_overlay(self, on)
+
+
 ## เลื่อนมุมปัจจุบันให้กึ่งกลางอยู่ที่ x (พิกัดในมุม) — ค้างจนเปลี่ยนมุมหรือ reset_camera()
 func pan(x: float, animate := true) -> void:
 	stage().pan_to(x, animate)

@@ -193,6 +193,21 @@ static func refresh(phase: Control) -> void:
 	_auto_rail(phase)
 
 
+## ค่าตั้งต้นของทุก phase: false = rail เปิดแล้วฉากหดหนีให้ · true = rail วางทับภาพ ฉากกว้างเต็มเสมอ
+const RAIL_OVERLAY_DEFAULT := false
+
+
+## rail ของ phase นี้วางทับฉากไหม (ตั้งด้วย set_rail_overlay · ไม่ตั้ง = RAIL_OVERLAY_DEFAULT)
+static func is_rail_overlay(phase: Control) -> bool:
+	return bool(phase.get_meta("rail_overlay", RAIL_OVERLAY_DEFAULT))
+
+
+## เปลี่ยนโหมด rail ของ phase นี้ — เรียกก่อนหรือหลัง make_frame ก็ได้ · มีผลทันทีถ้า phase แสดงอยู่
+static func set_rail_overlay(phase: Control, on: bool) -> void:
+	phase.set_meta("rail_overlay", on)
+	_auto_rail(phase)
+
+
 static func _auto_rail(phase: Control) -> void:
 	if not phase.has_meta("rail") or not phase.visible:
 		return
@@ -201,7 +216,8 @@ static func _auto_rail(phase: Control) -> void:
 	set_rail_open(phase, open)
 	var st = phase.owner.get("stage") if phase.owner else null
 	if st is Stage2D:
-		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if open else 0.0)
+		var squeeze := open and not is_rail_overlay(phase) # วางทับ = ฉากไม่หด (rail ลอยอยู่บนภาพ)
+		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if squeeze else 0.0)
 	if phase.get_meta("unread", false):
 		ping_book(phase)
 	_refresh_goal(phase.get_meta("rail_box"))
