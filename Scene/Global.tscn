@@ -18,6 +18,12 @@
 [ext_resource type="Texture2D" uid="uid://c55sqa22mn6p7" path="res://Assets/CharacterSprite/char_director.png" id="c14"]
 [ext_resource type="Texture2D" uid="uid://d1ieckuhyrbe4" path="res://Assets/CharacterSprite/char_kid.png" id="c15"]
 [ext_resource type="Texture2D" uid="uid://cyxckytx8mwdg" path="res://Assets/CharacterSprite/char_girl.png" id="c16"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_khom_surprised.png" id="c17"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_khom_tired.png" id="c18"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_grandma_smile.png" id="c19"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_grandma_worried.png" id="c20"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_min_serious.png" id="c21"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_amnuay_smile.png" id="c22"]
 
 [node name="Global" type="Node2D" unique_id=280335373]
 scale = Vector2(0.998061, 0.994891)
@@ -26,7 +32,11 @@ _CharacterMap = {
 "ขม": ExtResource("c0"),
 "ขม:happy": ExtResource("c1"),
 "ขม:worry": ExtResource("c2"),
+"ขม:surprised": ExtResource("c17"),
+"ขม:tired": ExtResource("c18"),
 "ยาย": ExtResource("c3"),
+"ยาย:happy": ExtResource("c19"),
+"ยาย:worry": ExtResource("c20"),
 "ปิ๊บ": ExtResource("c4"),
 "ปิ๊บ:happy": ExtResource("c5"),
 "ปิ๊บ:worry": ExtResource("c6"),
@@ -34,9 +44,11 @@ _CharacterMap = {
 "เพื่อนร่วมงาน": ExtResource("c8"),
 "มิ้น": ExtResource("c9"),
 "มิ้น:happy": ExtResource("c10"),
+"มิ้น:serious": ExtResource("c21"),
 "ผู้ใหญ่บ้าน": ExtResource("c11"),
 "ครู": ExtResource("c12"),
 "ลุงอำนวย": ExtResource("c13"),
+"ลุงอำนวย:happy": ExtResource("c22"),
 "ผอ.": ExtResource("c14"),
 "เด็ก": ExtResource("c15"),
 "เด็กคนหนึ่ง": ExtResource("c15"),
