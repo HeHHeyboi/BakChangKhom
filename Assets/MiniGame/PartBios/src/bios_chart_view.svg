@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="420" viewBox="0 0 1152 420">
+<rect width="1152" height="420" fill="#6b4a33"/>
+<path d="M0 24 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 76 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 128 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 180 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 232 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 284 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 336 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 388 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/>
+<rect x="150" y="0" width="852" height="420" rx="18" fill="#1b1c20" stroke="#2C1810" stroke-width="6"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="#f6f0dc"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="#f6f0dc"/><path d="M250 130 H880" stroke="#c9c2b0" stroke-width="2" stroke-dasharray="8 6"/><path d="M250 196 H880" stroke="#c9c2b0" stroke-width="2" stroke-dasharray="8 6"/><path d="M250 262 H880" stroke="#c9c2b0" stroke-width="2" stroke-dasharray="8 6"/><path d="M250 70 V330 H880" stroke="#2C1810" stroke-width="4" fill="none"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="none" stroke="#000" stroke-width="3" opacity=".5"/>
+</svg>

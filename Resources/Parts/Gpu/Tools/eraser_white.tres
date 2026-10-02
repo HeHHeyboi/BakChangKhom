@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CleanTool" format=3]
+
+[ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_eraser.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"eraser_white"
+display_name = "ยางลบสีขาว"
+icon = ExtResource("2_icon")
+hardness = 2
+leaves_residue = true
+fit_per_step = Dictionary[int, int]({
+0: 0,
+1: 0,
+2: 2
+})
+line_ideal = "ยางลบสีขาวขัดคราบบนขาทองได้ดี"
+line_forbidden = "ยางลบถูใบพัดหรือครีบไม่ได้ เศษยางจะติดค้างในซอก"

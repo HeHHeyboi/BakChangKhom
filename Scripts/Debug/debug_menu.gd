@@ -31,6 +31,18 @@ func _ready() -> void:
 			"label": "เล่น Part Mainboard + CPU (ทดสอบ)",
 			"minigame": "res://Scene/MiniGame/PartMainboard/part_mainboard.tscn",
 		},
+		{
+			"label": "เล่น Part GPU + จัดสาย (ทดสอบ)",
+			"minigame": "res://Scene/MiniGame/PartGpu/part_gpu.tscn",
+		},
+		{
+			"label": "เล่น Part Front Panel + Dual Channel (ทดสอบ)",
+			"minigame": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
+		},
+		{
+			"label": "เล่น Part BIOS + ลง Windows (ทดสอบ)",
+			"minigame": "res://Scene/MiniGame/PartBios/part_bios.tscn",
+		},
 	]
 	_build_ui()
 

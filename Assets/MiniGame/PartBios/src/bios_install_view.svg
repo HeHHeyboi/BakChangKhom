@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="420" viewBox="0 0 1152 420">
+<rect width="1152" height="420" fill="#6b4a33"/>
+<path d="M0 24 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 76 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 128 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 180 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 232 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 284 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 336 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/><path d="M0 388 H1152" stroke="#4e3524" stroke-width="2" opacity=".5"/>
+<rect x="150" y="0" width="852" height="420" rx="18" fill="#1b1c20" stroke="#2C1810" stroke-width="6"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="#3a2a7a"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="#3a2a7a"/><rect x="230" y="50" width="692" height="320" rx="8" fill="#f2f2f6" stroke="#2C1810" stroke-width="3"/><rect x="230" y="50" width="692" height="34" rx="8" fill="#5b4bc4"/><text x="250" y="73" font-family="DejaVu Sans" font-size="16" fill="#fff" font-weight="bold">Windows Setup</text><text x="256" y="114" font-family="DejaVu Sans" font-size="18" fill="#2b2b38">Where do you want to install Windows?</text><path d="M256 124 H896" stroke="#c9c9d6" stroke-width="2"/>
+<rect x="170" y="18" width="812" height="384" rx="6" fill="none" stroke="#000" stroke-width="3" opacity=".5"/>
+</svg>

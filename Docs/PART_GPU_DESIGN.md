@@ -4,7 +4,8 @@
 > ชุดเดียวกับ: `MINIGAME1_DESIGN.md` · `PART_MAINBOARD_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md` · `PART_BIOS_DESIGN.md`
 > อยู่ใน Scene S3 ของลูปงานซ่อม — `REPAIR_FLOW.md` · asset: `Assets/MiniGame/PartGpu/` (`gpu_*`)
 
-> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · ยังไม่มีซีนของ Part นี้ในรีโป
+> ✅ **2 ต.ค. 2569 — เล่นได้แล้วครบ 8 phase + หน้าสรุป** (ยังไม่ผูกเควสต์ · เปิดจากเมนู Debug F1 → "เล่น Part GPU + จัดสาย (ทดสอบ)")
+> ซีน `Scene/MiniGame/PartGpu/part_gpu.tscn` · โค้ด `Scripts/MiniGame/PartGpu/` · อุปกรณ์ `Resources/Parts/Gpu/Tools/` · ดูหัวข้อ 13
 
 ---
 
@@ -218,8 +219,20 @@ var fan_dirs := {"front": FanDir.INTAKE, "rear": FanDir.EXHAUST, "top": FanDir.E
 
 ---
 
+## 13. สิ่งที่ทำจริง (2 ต.ค. 2569)
+
+| | รายละเอียด |
+|---|---|
+| มุมกล้อง | Overview ภาพรวมร้าน · Monitor โต๊ะคอม (แสดงอุณหภูมิการ์ด) · **Rear** ท้ายเคส (HDMI · น็อตยึดการ์ด · ปลั๊กไฟ) · **Case** ในเคสมองด้านข้าง (การ์ด · สลัก · สายไฟ · สายรก · ลูกศรพัดลม 3 ตัว) · Mat แผ่น ESD (การ์ด 4 สภาพ) |
+| phase | INSPECT · BRIEFING · SAFETY · REMOVE · CLEAN · INSTALL · POWER · AIRFLOW (รวม VERIFY) · SUMMARY |
+| ต่างจากดีไซน์ | เลือกหัวสายจากปุ่มใน rail (มีรูปหัวสาย) แทนการลาก · ฝืนเสียบ CPU 8-pin ซ้ำ = การ์ดไหม้ → ใส่การ์ดใหม่แล้วเริ่มขั้น POWER ใหม่ (ไม่ต้องเริ่มทั้ง Part) · เพิ่มขั้น "ย้ายสาย HDMI ไปที่การ์ดจอ" ก่อนทดสอบ · ไม่คลิกหัวสาย → ทดสอบแล้วดับ → กลับขั้น POWER (คะแนน airflow คิดครั้งเดียว) |
+| อุณหภูมิ | 62°C + พัดลมผิด 6/ตัว + เก็บสายไม่ครบ 5 + ใช้ Molex 4 · ≤ 70 VERIFY_GOOD · ⭐⭐⭐ ต้อง ≥ 95 และ ≤ 65°C |
+| รูปใหม่ (`Assets/MiniGame/PartGpu/` · SVG ใน `src/`) | `gpu_case_view` · `gpu_rear_view` · `gpu_side` · `gpu_led_on/off` · `gpu_latch_locked/open` · `gpu_cable_loose/plugged` · `gpu_mess_1-3` · `gpu_head_pcie/cpu8/sata/molex` · `gpu_hdmi_cable` · `gpu_power_cord` · `gpu_card_dusty/fans/fins/clean` |
+| ทดสอบ | บอทเล่นอัตโนมัติ: ทำถูกหมด → 100/100 ⭐⭐⭐ 62°C · ทำผิดทุกจุด (แตะเคสก่อนตัดไฟ ดึงการ์ดก่อนกดสลัก เครื่องดูดฝุ่น ไม่ล็อกใบพัด SATA CPU 8-pin ×2 ไม่คลิกหัวสาย ไม่จัดสาย พัดลมผิดทิศ) → 24/100 · วนกลับขั้น POWER ได้ จบได้ทั้งคู่ ไม่มี error |
+
 ## 12. ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 22 ก.ย. 2569 | สร้างเอกสาร — ออกแบบมินิเกม Core Part: GPU + Cable Management 8 phase |
+| 2 ต.ค. 2569 | ทำซีน + โค้ดครบ 8 phase + หน้าสรุป · เปิดจากเมนู Debug · เพิ่มหัวข้อ 13 |

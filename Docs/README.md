@@ -45,9 +45,9 @@
 |---|---|---|---|
 | RAM | `MINIGAME1_DESIGN.md` | ช่างมือใหม่ | ขาทอง · ทำความสะอาดหน้าสัมผัส · เลือกอุปกรณ์ |
 | Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` | ช่างฝึกหัด | standoff · ทิศ CPU · ซิลิโคน · ขันไขว้ — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
-| GPU | `PART_GPU_DESIGN.md` | ช่างประจำหมู่บ้าน | PCIe · สลัก · สายไฟ PCIe vs CPU · airflow |
-| Front Panel | `PART_FRONTPANEL_DESIGN.md` | ช่างเชี่ยวชาญ | pin header · ขั้ว LED · dual channel |
-| BIOS + OS | `PART_BIOS_DESIGN.md` | ช่างระดับมือโปร | boot order · XMP · ลง OS · bottleneck |
+| GPU | `PART_GPU_DESIGN.md` | ช่างประจำหมู่บ้าน | PCIe · สลัก · สายไฟ PCIe vs CPU · airflow — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
+| Front Panel | `PART_FRONTPANEL_DESIGN.md` | ช่างเชี่ยวชาญ | pin header · ขั้ว LED · dual channel — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
+| BIOS + OS | `PART_BIOS_DESIGN.md` | ช่างระดับมือโปร | boot order · XMP · ลง OS · bottleneck — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
 
 **โครงร่วมของทุก Part:** 8 phase · ปิ๊บสอนผ่าน `PibHint` · ระบบเลือกอุปกรณ์/ตัวเลือกที่มีทั้ง ✅ 🟡 ❌ · ผิดครั้งแรกปิ๊บห้ามทันไม่เสียหาย · คะแนนเต็ม 100 ผ่าน ≥ 60 (⭐ 60 / ⭐⭐ 80 / ⭐⭐⭐ 95)
 
@@ -59,7 +59,7 @@
 4. ~~implement Core Part: RAM ให้ครบ 8 phase เป็นต้นแบบ~~ ✅ เล่นได้ครบแล้ว (2D) — เหลือภาพจริง เสียง และย้อน phase ตอน VERIFY ไม่ผ่าน
 4b. ต่อยอด Tutorial ประกอบคอม (SAFETY · CABLES · CLOSE · เช็กทิศ CPU/แรม) แล้วทำ Core Part ถัดไปจากโครง `part_ram.tscn`
 5. ทำ `RepairManager` + Scene S1/S2 ตาม `REPAIR_FLOW.md`
-6. ขยาย Core Part ที่เหลือทีละตัวด้วยโครงเดียวกัน
+6. ~~ขยาย Core Part ที่เหลือทีละตัวด้วยโครงเดียวกัน~~ ✅ ครบ 5 ตัวแล้ว (RAM · Mainboard · GPU · Front Panel · BIOS · 2 ต.ค. 2569) — เหลือผูกเข้าเควสต์/RepairManager
 
 
 ## ไฟล์บทของปิ๊บ (`Assets/Dialog/MiniGame/`)
@@ -69,8 +69,8 @@
 | `Ram_Pib.txt` | 57 | 32 | Core Part RAM |
 | `Mainboard_Pib.txt` | 40 | 27 | Core Part Mainboard + CPU |
 | `Gpu_Pib.txt` | 36 | 24 | Core Part GPU |
-| `FrontPanel_Pib.txt` | 28 | 20 | Core Part Front Panel |
-| `Bios_Pib.txt` | 34 | 21 | Core Part BIOS |
+| `FrontPanel_Pib.txt` | 44 | 33 | Core Part Front Panel |
+| `Bios_Pib.txt` | 59 | 42 | Core Part BIOS |
 | `Assembly_Pib.txt` | — | — | Tutorial ประกอบคอม (ใช้งานจริงแล้ว) |
 | `FindEraser.txt` | 4 | 4 | มินิเกมหายางลบ (แทน `dialog_arr` ในสคริปต์) |
 

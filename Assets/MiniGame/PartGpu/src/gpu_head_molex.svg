@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="160" viewBox="0 0 400 160">
+<path d="M0 60 C80 60 90 100 170 100" stroke="#2C1810" stroke-width="40" fill="none"/>
+<path d="M0 60 C80 60 90 100 170 100" stroke="#c0453b" stroke-width="28" fill="none"/>
+<path d="M0 60 C80 60 90 100 170 100" stroke="#111" stroke-width="2" stroke-dasharray="4 8" fill="none" opacity=".5"/>
+<path d="M180 40 h170 l20 20 v40 l-20 20 h-170 z" fill="#f2efe6" stroke="#2C1810" stroke-width="5" stroke-linejoin="round"/><circle cx="215" cy="80" r="11" fill="#c9a24a" stroke="#2C1810" stroke-width="3"/><circle cx="253" cy="80" r="11" fill="#c9a24a" stroke="#2C1810" stroke-width="3"/><circle cx="291" cy="80" r="11" fill="#c9a24a" stroke="#2C1810" stroke-width="3"/><circle cx="329" cy="80" r="11" fill="#c9a24a" stroke="#2C1810" stroke-width="3"/><text x="275" y="34" font-family="DejaVu Sans" font-size="20" font-weight="bold" fill="#f6e7c8" stroke="#2C1810" stroke-width="1" text-anchor="middle">MOLEX</text>
+<text x="285" y="150" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#2C1810" text-anchor="middle"></text>
+</svg>

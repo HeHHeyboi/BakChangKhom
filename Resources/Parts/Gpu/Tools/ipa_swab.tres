@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CleanTool" format=3]
+
+[ext_resource type="Script" uid="uid://cbqwa811lygd6" path="res://Scripts/Resources/clean_tool.gd" id="1_tool"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tool_ipa_swab.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"ipa_swab"
+display_name = "คอตตอนบัด + IPA 99%"
+icon = ExtResource("2_icon")
+hardness = 1
+has_moisture = true
+fit_per_step = Dictionary[int, int]({
+0: 1,
+1: 0,
+2: 2
+})
+line_ideal = "IPA ระเหยเร็ว เช็ดคราบที่ขาทองได้สะอาด"
+line_limited = "เช็ดทีละใบได้ แต่ช้ามาก"
+line_forbidden = "คอตตอนบัดเข้าซอกครีบไม่ได้ ขุยฝ้ายจะติดค้างในครีบ"

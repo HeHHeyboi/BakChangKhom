@@ -1,0 +1,1060 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_base.tscn" id="0_base"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="m1"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="m2"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="m3"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="m4"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_scr_bios.png" id="m5"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_scr_noboot.png" id="m6"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_scr_pxe.png" id="m7"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="m8"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tex_screen_desktop.png" id="m9"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_scr_install.png" id="m10"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/item_2d.gd" id="m11"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_on.png" id="m12"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="m13"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_rear_view.png" id="m14"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_usb_rear.png" id="m15"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_usb_installer_rear.png" id="m16"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_power_cord.png" id="m17"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/inside_bg.png" id="m18"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_cmos.png" id="m19"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_cmos_empty.png" id="m20"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_view.png" id="m21"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_boot_order_item.png" id="m22"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_xmp_toggle_off.png" id="m23"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_xmp_toggle_on.png" id="m24"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_btn_save.png" id="m25"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_btn_discard.png" id="m26"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_btn_default.png" id="m27"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_install_view.png" id="m28"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_drive_ssd.png" id="m29"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_drive_hdd.png" id="m30"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_drive_usb.png" id="m31"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_warning.png" id="m32"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_progress_bar.png" id="m33"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_chart_view.png" id="m34"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartBios/bios_bar.png" id="m35"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_inspect.gd" id="m36"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_briefing.gd" id="m37"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_check_hw.gd" id="m38"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_boot_order.gd" id="m39"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_xmp.gd" id="m40"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_save_exit.gd" id="m41"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_os_install.gd" id="m42"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_upgrade.gd" id="m43"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/phase_summary.gd" id="m44"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBios/part_bios.gd" id="m45"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="m46"]
+
+[node name="part_bios" instance=ExtResource("0_base")]
+script = ExtResource("m45")
+dialog_path = "res://Assets/Dialog/MiniGame/Bios_Pib.txt"
+
+[node name="Background" parent="." index="0"]
+texture = ExtResource("m46")
+
+[node name="Stage" parent="." index="2" instance=ExtResource("st2d")]
+unique_name_in_owner = true
+offset_bottom = 476.0
+preinstalled = Array[StringName]([&"mainboard"])
+
+[node name="Overview" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m1")
+label = "ภาพรวมร้าน"
+focus_x = 330.0
+bg_offset = Vector2(0, -150)
+
+[node name="ToCase" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 122.0
+offset_right = 356.0
+offset_bottom = 275.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Case"
+label_text = "ในเคส"
+always_show_label = true
+
+[node name="ToMonitor" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 158.0
+offset_right = 80.0
+offset_bottom = 305.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Monitor"
+label_text = "จอ/คอม"
+always_show_label = true
+
+[node name="ToRear" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 244.0
+offset_top = 362.0
+offset_right = 426.0
+offset_bottom = 408.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Rear"
+label_text = "ท้ายเคส"
+always_show_label = true
+
+[node name="Monitor" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m4")
+label = "โต๊ะคอม"
+focus_x = 560.0
+
+[node name="Monitor" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 452.0
+offset_top = 57.0
+offset_right = 768.0
+offset_bottom = 240.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(158.0, 91.5)
+mode = 0
+stretch = true
+state = "bios"
+looks = Dictionary[String, Texture2D]({"bios": ExtResource("m5"), "noboot": ExtResource("m6"), "pxe": ExtResource("m7"), "post": ExtResource("m8"), "desktop": ExtResource("m9"), "install": ExtResource("m10"), "off": null})
+
+[node name="ToBios" type="Control" parent="Stage/Views/Monitor"]
+layout_mode = 0
+offset_left = 470.0
+offset_top = 70.0
+offset_right = 750.0
+offset_bottom = 220.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Bios"
+label_text = "หน้าจอ BIOS"
+always_show_label = false
+
+[node name="PowerButton" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 319.0
+offset_top = 167.0
+offset_right = 351.0
+offset_bottom = 199.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(16.0, 16.0)
+mode = 3
+label_text = "ปุ่มเปิดเครื่อง"
+
+[node name="PowerLed" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 308.0
+offset_top = 127.0
+offset_right = 328.0
+offset_bottom = 147.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(10.0, 10.0)
+mode = 0
+state = "on"
+looks = Dictionary[String, Texture2D]({"on": ExtResource("m12"), "off": ExtResource("m13")})
+
+[node name="Rear" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m14")
+label = "ท้ายเคส"
+focus_x = 576.0
+
+[node name="UsbStick" type="Control" parent="Stage/Views/Rear"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 434.0
+offset_top = 31.0
+offset_right = 486.0
+offset_bottom = 71.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(26.0, 20.0)
+mode = 3
+texture = ExtResource("m15")
+looks = Dictionary[String, Texture2D]({"out": null})
+label_text = "แฟลชไดรฟ์ของลูกค้า"
+
+[node name="UsbInstaller" type="Control" parent="Stage/Views/Rear"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 386.0
+offset_top = 31.0
+offset_right = 438.0
+offset_bottom = 71.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(26.0, 20.0)
+mode = 3
+state = "out"
+texture = ExtResource("m16")
+looks = Dictionary[String, Texture2D]({"out": null})
+label_text = "USB ตัวติดตั้งของร้าน"
+
+[node name="PowerCord" type="Control" parent="Stage/Views/Rear"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 632.0
+offset_top = 300.0
+offset_right = 832.0
+offset_bottom = 420.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(100.0, 60.0)
+mode = 3
+texture = ExtResource("m17")
+looks = Dictionary[String, Texture2D]({"out": null})
+label_text = "ปลั๊กไฟ"
+hint_flip = true
+
+[node name="Case" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m18")
+label = "ในเคส"
+focus_x = 576.0
+
+[node name="CmosBattery" type="Control" parent="Stage/Views/Case"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 510.0
+offset_top = 262.0
+offset_right = 534.0
+offset_bottom = 286.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(12.0, 12.0)
+mode = 3
+texture = ExtResource("m19")
+looks = Dictionary[String, Texture2D]({"out": ExtResource("m20")})
+label_text = "ถ่าน CMOS"
+
+[node name="CaseFrame" type="Control" parent="Stage/Views/Case"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 386.0
+offset_top = 330.0
+offset_right = 768.0
+offset_bottom = 402.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(191.0, 36.0)
+mode = 3
+label_text = "โครงเคสโลหะ"
+
+[node name="Bios" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m21")
+label = "หน้าจอ BIOS"
+focus_x = 576.0
+
+[node name="MemPanel" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 190.0
+offset_top = 124.0
+offset_right = 562.0
+offset_bottom = 156.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(186.0, 16.0)
+mode = 3
+label_text = "แถบ Memory"
+
+[node name="StoragePanel" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 190.0
+offset_top = 156.0
+offset_right = 562.0
+offset_bottom = 220.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(186.0, 32.0)
+mode = 3
+label_text = "แถบ Storage"
+
+[node name="BootPanel" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 590.0
+offset_top = 92.0
+offset_right = 962.0
+offset_bottom = 328.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(186.0, 118.0)
+mode = 3
+label_text = "แถบ Boot Priority"
+
+[node name="CpuLabel" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 204.0
+offset_top = 96.0
+offset_right = 554.0
+offset_bottom = 124.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "CPU     : 3.60 GHz 6-Core"
+
+[node name="MemLabel" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 204.0
+offset_top = 126.0
+offset_right = 554.0
+offset_bottom = 154.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "Memory  : 16384 MB @ 2133 MHz"
+
+[node name="Sata1Label" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 204.0
+offset_top = 158.0
+offset_right = 554.0
+offset_bottom = 186.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "SATA 1  : WDC 1TB (Windows)"
+
+[node name="Sata2Label" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 204.0
+offset_top = 188.0
+offset_right = 554.0
+offset_bottom = 216.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "SATA 2  : SSD 240GB (empty)"
+
+[node name="TempLabel" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 204.0
+offset_top = 220.0
+offset_right = 554.0
+offset_bottom = 248.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.62, 0.72, 1, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "CPU Temp: 41°C   Fan: 1180 RPM"
+
+[node name="BootRow1" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 98.0
+offset_right = 952.0
+offset_bottom = 146.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(176.0, 24.0)
+mode = 3
+stretch = true
+texture = ExtResource("m22")
+label_text = "ลำดับที่ 1"
+
+[node name="BootLbl1" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 626.0
+offset_top = 98.0
+offset_right = 942.0
+offset_bottom = 146.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "-"
+
+[node name="BootRow2" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 152.0
+offset_right = 952.0
+offset_bottom = 200.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(176.0, 24.0)
+mode = 3
+stretch = true
+texture = ExtResource("m22")
+label_text = "ลำดับที่ 2"
+
+[node name="BootLbl2" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 626.0
+offset_top = 152.0
+offset_right = 942.0
+offset_bottom = 200.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "-"
+
+[node name="BootRow3" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 206.0
+offset_right = 952.0
+offset_bottom = 254.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(176.0, 24.0)
+mode = 3
+stretch = true
+texture = ExtResource("m22")
+label_text = "ลำดับที่ 3"
+
+[node name="BootLbl3" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 626.0
+offset_top = 206.0
+offset_right = 942.0
+offset_bottom = 254.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "-"
+
+[node name="BootRow4" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 260.0
+offset_right = 952.0
+offset_bottom = 308.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(176.0, 24.0)
+mode = 3
+stretch = true
+texture = ExtResource("m22")
+label_text = "ลำดับที่ 4"
+
+[node name="BootLbl4" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 626.0
+offset_top = 260.0
+offset_right = 942.0
+offset_bottom = 308.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "-"
+
+[node name="XmpToggle" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 200.0
+offset_top = 296.0
+offset_right = 272.0
+offset_bottom = 330.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(36.0, 17.0)
+mode = 3
+texture = ExtResource("m23")
+looks = Dictionary[String, Texture2D]({"on": ExtResource("m24")})
+label_text = "สวิตช์ XMP"
+
+[node name="XmpLabel" type="Label" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 282.0
+offset_top = 296.0
+offset_right = 562.0
+offset_bottom = 330.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "Disabled"
+
+[node name="BtnSave" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 216.0
+offset_top = 352.0
+offset_right = 456.0
+offset_bottom = 396.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(120.0, 22.0)
+mode = 3
+texture = ExtResource("m25")
+label_text = "บันทึกแล้วออก"
+
+[node name="BtnDiscard" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 472.0
+offset_top = 352.0
+offset_right = 712.0
+offset_bottom = 396.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(120.0, 22.0)
+mode = 3
+texture = ExtResource("m26")
+label_text = "ไม่บันทึกแล้วออก"
+
+[node name="BtnDefault" type="Control" parent="Stage/Views/Bios"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 728.0
+offset_top = 352.0
+offset_right = 968.0
+offset_bottom = 396.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(120.0, 22.0)
+mode = 3
+texture = ExtResource("m27")
+label_text = "โหลดค่าเริ่มต้นแล้วบันทึก"
+
+[node name="Install" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m28")
+label = "ติดตั้ง Windows"
+focus_x = 576.0
+
+[node name="DriveSsd" type="Control" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 262.0
+offset_top = 140.0
+offset_right = 458.0
+offset_bottom = 280.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(98.0, 70.0)
+mode = 3
+texture = ExtResource("m29")
+label_text = "SSD 240GB · ว่าง (ลูกค้าซื้อมาใหม่)"
+
+[node name="DriveSsdLbl" type="Label" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 252.0
+offset_top = 282.0
+offset_right = 468.0
+offset_bottom = 342.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.17, 0.22, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 0
+text = "SSD 240GB · ว่าง (ลูกค้าซื้อมาใหม่)"
+autowrap_mode = 3
+
+[node name="DriveHdd" type="Control" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 476.0
+offset_top = 140.0
+offset_right = 672.0
+offset_bottom = 280.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(98.0, 70.0)
+mode = 3
+texture = ExtResource("m30")
+label_text = "HDD 1TB · ข้อมูลลูกค้า"
+
+[node name="DriveHddLbl" type="Label" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 466.0
+offset_top = 282.0
+offset_right = 682.0
+offset_bottom = 342.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.17, 0.22, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 0
+text = "HDD 1TB · ข้อมูลลูกค้า"
+autowrap_mode = 3
+
+[node name="DriveUsb" type="Control" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 690.0
+offset_top = 140.0
+offset_right = 886.0
+offset_bottom = 280.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(98.0, 70.0)
+mode = 3
+texture = ExtResource("m31")
+label_text = "USB ตัวติดตั้ง"
+
+[node name="DriveUsbLbl" type="Label" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 680.0
+offset_top = 282.0
+offset_right = 896.0
+offset_bottom = 342.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.17, 0.22, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 0
+text = "USB ตัวติดตั้ง"
+autowrap_mode = 3
+
+[node name="Popup" type="Control" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 346.0
+offset_top = 100.0
+offset_right = 806.0
+offset_bottom = 320.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(230.0, 110.0)
+mode = 0
+state = "off"
+texture = ExtResource("m32")
+looks = Dictionary[String, Texture2D]({"off": null})
+
+[node name="PopupLabel" type="Label" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 440.0
+offset_top = 150.0
+offset_right = 790.0
+offset_bottom = 310.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 0
+vertical_alignment = 1
+text = ""
+autowrap_mode = 3
+
+[node name="ProgressBg" type="TextureRect" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 276.0
+offset_top = 300.0
+offset_right = 876.0
+offset_bottom = 344.0
+mouse_filter = 2
+texture = ExtResource("m33")
+expand_mode = 1
+
+[node name="ProgressFill" type="ColorRect" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 290.0
+offset_top = 312.0
+offset_right = 290.0
+offset_bottom = 332.0
+mouse_filter = 2
+color = Color(0.36, 0.29, 0.77, 1)
+
+[node name="ProgressLabel" type="Label" parent="Stage/Views/Install"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 276.0
+offset_top = 250.0
+offset_right = 876.0
+offset_bottom = 290.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.17, 0.22, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "Installing Windows... 0%"
+
+[node name="Chart" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m34")
+label = "กราฟสเปกเครื่อง"
+focus_x = 576.0
+
+[node name="ChartTitle" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 250.0
+offset_top = 26.0
+offset_right = 880.0
+offset_bottom = 62.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "คะแนนสเปกเทียบกับงานที่ลูกค้าใช้ (เกมออนไลน์ + ไลฟ์)"
+
+[node name="BarCpu" type="Control" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 290.0
+offset_top = 130.0
+offset_right = 380.0
+offset_bottom = 330.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(45.0, 100.0)
+mode = 0
+stretch = true
+texture = ExtResource("m35")
+
+[node name="BarCpuName" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 336.0
+offset_right = 400.0
+offset_bottom = 366.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "CPU"
+
+[node name="BarCpuVal" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 96.0
+offset_right = 400.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "0"
+
+[node name="BarGpu" type="Control" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 430.0
+offset_top = 130.0
+offset_right = 520.0
+offset_bottom = 330.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(45.0, 100.0)
+mode = 0
+stretch = true
+texture = ExtResource("m35")
+
+[node name="BarGpuName" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 410.0
+offset_top = 336.0
+offset_right = 540.0
+offset_bottom = 366.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "การ์ดจอ"
+
+[node name="BarGpuVal" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 410.0
+offset_top = 96.0
+offset_right = 540.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "0"
+
+[node name="BarRam" type="Control" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 570.0
+offset_top = 130.0
+offset_right = 660.0
+offset_bottom = 330.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(45.0, 100.0)
+mode = 0
+stretch = true
+texture = ExtResource("m35")
+
+[node name="BarRamName" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 550.0
+offset_top = 336.0
+offset_right = 680.0
+offset_bottom = 366.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "แรม"
+
+[node name="BarRamVal" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 550.0
+offset_top = 96.0
+offset_right = 680.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "0"
+
+[node name="BarStorage" type="Control" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 710.0
+offset_top = 130.0
+offset_right = 800.0
+offset_bottom = 330.0
+script = ExtResource("m11")
+mouse_filter = 2
+pivot_offset = Vector2(45.0, 100.0)
+mode = 0
+stretch = true
+texture = ExtResource("m35")
+
+[node name="BarStorageName" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 690.0
+offset_top = 336.0
+offset_right = 820.0
+offset_bottom = 366.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "ดิสก์"
+
+[node name="BarStorageVal" type="Label" parent="Stage/Views/Chart"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 690.0
+offset_top = 96.0
+offset_right = 820.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.17, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "0"
+
+[node name="PhaseInspect" type="Control" parent="."]
+visible = false
+script = ExtResource("m36")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseBriefing" type="Control" parent="."]
+visible = false
+script = ExtResource("m37")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseCheckHw" type="Control" parent="."]
+visible = false
+script = ExtResource("m38")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseBootOrder" type="Control" parent="."]
+visible = false
+script = ExtResource("m39")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseXmp" type="Control" parent="."]
+visible = false
+script = ExtResource("m40")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseSaveExit" type="Control" parent="."]
+visible = false
+script = ExtResource("m41")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseOsInstall" type="Control" parent="."]
+visible = false
+script = ExtResource("m42")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseUpgrade" type="Control" parent="."]
+visible = false
+script = ExtResource("m43")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseSummary" type="Control" parent="."]
+visible = false
+script = ExtResource("m44")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[editable path="Stage"]

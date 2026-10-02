@@ -230,8 +230,23 @@ func boot_result() -> bool:
 
 ---
 
+## 13.1 สิ่งที่ทำจริง (2 ต.ค. 2569)
+
+| | รายละเอียด |
+|---|---|
+| ไฟล์ | `Scene/MiniGame/PartBios/part_bios.tscn` · `Scripts/MiniGame/PartBios/` (class `PartBios` + phase 9 ไฟล์) · เปิดจาก Debug F1 "เล่น Part BIOS + ลง Windows (ทดสอบ)" · ยังไม่ผูกเควสต์ |
+| มุมกล้อง | Overview · Monitor (จอเล็ก: BIOS/POST/PXE/Reboot and Select/Setup/Desktop · ปุ่มเปิดเครื่อง) · Rear (แฟลชไดรฟ์ลูกค้า · USB ตัวติดตั้งสีแดงของร้าน · ปลั๊ก) · Case (ถ่าน CMOS) · **Bios** หน้าจอ BIOS เต็มมุม · **Install** เลือกไดรฟ์ · **Chart** กราฟคอขวด |
+| phase | INSPECT · BRIEFING · CHECK_HW · BOOT_ORDER · XMP · SAVE_EXIT · OS_INSTALL · UPGRADE · SUMMARY |
+| ต่างจากดีไซน์ | CHECK_HW เป็นคำถาม 3 ข้อจากค่าบนจอ (ผิด −5/ข้อ) · จัดลำดับบูตด้วยการคลิกสองแถวเพื่อสลับ · ผลจริงไปเห็นตอนกด Save แล้วรีบูต (USB อันดับ 1 = วนกลับ BIOS · Network = PXE · DVD = หาไม่เจอ → −10 แล้วกลับไปจัดใหม่) · ถอด USB แต่ไม่แก้ลำดับ = ผ่านแบบเตือน −8 · Load Defaults −5 (ค่าโรงงาน: ดิสก์อันดับ 1 · XMP ปิด) · XMP Profile 1 ล้มสุ่ม 20% (`force_xmp_fail` ใช้ทดสอบ) → ถอดปลั๊ก → แงะถ่าน CMOS → เสียบปลั๊ก → กลับขั้น XMP ใช้ Profile 2 · **OS_INSTALL ใส่เรื่องเพิ่ม: ลูกค้าซื้อ SSD มาด้วย ให้ลง Windows ใหม่ลง SSD** บูตผ่าน Boot Menu F11 ครั้งเดียว · เลือก HDD ครั้งแรกโดนเตือน −10 ยืนยันซ้ำ −10 และข้อมูลหาย (ดาวสูงสุด 1) · กราฟอัปเกรดคิดจากสิ่งที่ทำ (XMP · SSD) แท่งต่ำสุดคือ CPU |
+| คะแนน | อ่านหน้าจอ 20 · ลำดับบูต 30 · XMP 10 · Save/Exit 10 · เลือกไดรฟ์ 20 · อัปเกรด 10 · ⭐ 60/80/95 |
+| รูปใหม่ (`Assets/MiniGame/PartBios/` · SVG + `gen_art.py` ใน `src/`) | `bios_view` · `bios_install_view` · `bios_chart_view` · `bios_bar` · `bios_btn_save/discard/default` · `bios_drive_ssd/hdd/usb` · `bios_warning` · `bios_scr_bios/noboot/pxe/install` · `bios_usb_rear` · `bios_usb_installer_rear` · `bios_cmos` · `bios_cmos_empty` · ใช้ของเดิม: `bios_boot_order_item` `bios_xmp_toggle_on/off` `bios_progress_bar` · ตัวอักษรในภาพเป็นภาษาอังกฤษแบบหน้าจอจริง ค่าที่เปลี่ยนได้เป็น Label |
+| ทดสอบ | บอทเล่นอัตโนมัติ: ทำถูกหมด → 100/100 · ทำผิดทุกจุด (ตอบผิด · ถอด USB อย่างเดียว · ไม่เปิด XMP · Discard · Network อันดับ 1 · XMP ล้ม → เคลียร์ CMOS · เลือก USB/HDD ลงทับ · แนะนำการ์ดจอ) → 30/100 ข้อมูลลูกค้าหาย · ย้อนขั้นได้ครบ จบได้ไม่มี error |
+
+---
+
 ## 14. ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 22 ก.ย. 2569 | สร้างเอกสาร — ออกแบบมินิเกม Core Part: BIOS + OS + Upgrade 8 phase |
+| 2 ต.ค. 2569 | ทำซีน + โค้ดครบ 8 phase + หน้าสรุป · เปิดจากเมนู Debug · เพิ่มหัวข้อ 13.1 |

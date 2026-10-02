@@ -206,8 +206,23 @@ func is_dual_channel() -> bool:
 
 ---
 
+## 10.1 สิ่งที่ทำจริง (2 ต.ค. 2569)
+
+| | รายละเอียด |
+|---|---|
+| ไฟล์ | `Scene/MiniGame/PartFrontPanel/part_front_panel.tscn` · `Scripts/MiniGame/PartFrontPanel/` (class `PartFrontPanel` + phase 9 ไฟล์) · เปิดจาก Debug F1 "เล่น Part Front Panel + Dual Channel (ทดสอบ)" · ยังไม่ผูกเควสต์ |
+| มุมกล้อง | Overview · Monitor (ปุ่มหน้าเคส · ไฟ POWER/HDD · โน้ตลูกค้า · จอ BIOS + บรรทัด Memory) · Rear (ปลั๊ก) · Case (ไฟเมนบอร์ด · ทางไปแผงพิน/สล็อตแรม) · **Pins** แผง F_PANEL ซูม (ถาดหัวต่อซ้าย · ไฟฉาย) · **Slots** สล็อตแรม 4 ช่อง |
+| phase | INSPECT · BRIEFING · SAFETY (ถอดปลั๊ก → แตะเคส) · READ_MAP · CONNECT · TEST_BUTTON · DUAL_CHANNEL · VERIFY · SUMMARY |
+| ต่างจากดีไซน์ | เพิ่มขั้น SAFETY · คลิกหัวต่อแล้วคลิกคู่พินแทนการลาก · ปุ่ม "สลับขั้ว" กลับหัวซ้าย-ขวา (POWER LED มาแบบกลับหัว) · ไม่หักคะแนนตอนวาง แต่หัก −7 ทุกครั้งที่ทดสอบไม่ผ่าน แล้วถอดปลั๊กกลับขั้น CONNECT อัตโนมัติ (ไม่มีคืนครึ่ง) · อ่านผังแล้ววางผิดคู่ ปิ๊บทักทันที · แรม: คลิกแรม = ถอดมาถือ · คลิกสล็อตว่าง = วาง · คลิกอีกครั้ง = กดจนสลักล็อก · ยืนยันแบบ single ไม่ผ่าน (−8 ครั้งแรก) ต้องแก้เป็น dual · ลืมกดแรมลงสุด → BIOS เห็น 8GB Single → −5 กลับขั้นแรม |
+| คะแนน | ตรวจอาการ 10 · ความปลอดภัย 10 · อ่านผัง 10 · เสียบหัวต่อ 35 · Dual Channel 25 · กดแรมลงสุด/BIOS 10 · ⭐ 60/80/95 |
+| รูปใหม่ (`Assets/MiniGame/PartFrontPanel/` · SVG + `gen_art.py` ใน `src/`) | `fp_pins_view` · `fp_pin_labels` (ป้ายอังกฤษเหมือนบอร์ดจริง) · `fp_conn_power_sw/reset_sw/power_led/hdd_led` · `fp_bios_screen` · `fp_note` · `fp_beam` · ใช้ซ้ำ: `slots_zoom` `ram_slot` `clip_*` `inside_bg` `desk_pc` `gpu_rear_view` `gpu_power_cord` `tool_flashlight` |
+| ทดสอบ | บอทเล่นอัตโนมัติ: ทำถูกหมด → 100/100 Dual · ทำผิดทุกจุด (แตะเคสก่อนถอดปลั๊ก · ข้ามผัง · สลับ POWER/RESET · LED กลับขั้ว · ยืนยัน single · ไม่กดแรมลงสุด) → 58/100 · ย้อนกลับ CONNECT 2 รอบ และกลับขั้นแรม 1 รอบ จบได้ไม่มี error |
+
+---
+
 ## 11. ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 22 ก.ย. 2569 | สร้างเอกสาร — ออกแบบมินิเกม Core Part: Front Panel + Dual Channel 8 phase |
+| 2 ต.ค. 2569 | ทำซีน + โค้ดครบ 8 phase (+SAFETY) + หน้าสรุป · เปิดจากเมนู Debug · เพิ่มหัวข้อ 10.1 |

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="320" viewBox="0 0 512 320">
+<rect width="512" height="320" fill="#1d3f8f"/>
+<rect x="0" y="0" width="512" height="40" fill="#c9ccd2"/>
+<text x="256" y="28" font-family="DejaVu Sans Mono" font-size="20" fill="#1d3f8f" text-anchor="middle" font-weight="bold">BIOS SETUP UTILITY</text>
+<text x="30" y="80" font-family="DejaVu Sans Mono" font-size="18" fill="#e8f0ff">CPU     : 3.60 GHz  6-Core</text>
+<text x="30" y="112" font-family="DejaVu Sans Mono" font-size="18" fill="#e8f0ff">Storage : SSD 512GB</text>
+<rect x="20" y="150" width="472" height="44" fill="#16316f" stroke="#7fa4ff" stroke-width="2"/>
+<text x="30" y="290" font-family="DejaVu Sans Mono" font-size="15" fill="#9fb8ff">F10 Save &amp; Exit   ESC Back</text>
+</svg>

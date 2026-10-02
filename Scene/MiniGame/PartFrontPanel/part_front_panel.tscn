@@ -1,0 +1,835 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_base.tscn" id="0_base"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="m1"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="m2"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="m3"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="m4"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tex_screen_desktop.png" id="m5"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="m6"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_bios_screen.png" id="m7"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/scene2d/item_2d.gd" id="m8"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_on.png" id="m9"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="m10"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_note.png" id="m11"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_rear_view.png" id="m12"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_power_cord.png" id="m13"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/inside_bg.png" id="m14"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_pins_view.png" id="m15"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_beam.png" id="m16"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_pin_labels.png" id="m17"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_conn_power_sw.png" id="m18"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_conn_reset_sw.png" id="m19"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_conn_power_led.png" id="m20"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_conn_hdd_led.png" id="m21"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartCommon/tool_flashlight.png" id="m22"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/slots_zoom.png" id="m23"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/ram_slot.png" id="m24"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/clip_closed.png" id="m25"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/clip_open.png" id="m26"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_inspect.gd" id="m27"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_briefing.gd" id="m28"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_safety.gd" id="m29"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_read_map.gd" id="m30"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_connect.gd" id="m31"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_test.gd" id="m32"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_dual.gd" id="m33"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_verify.gd" id="m34"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/phase_summary.gd" id="m35"]
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartFrontPanel/part_front_panel.gd" id="m36"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="m37"]
+
+[node name="part_front_panel" instance=ExtResource("0_base")]
+script = ExtResource("m36")
+dialog_path = "res://Assets/Dialog/MiniGame/FrontPanel_Pib.txt"
+
+[node name="Background" parent="." index="0"]
+texture = ExtResource("m37")
+
+[node name="Stage" parent="." index="2" instance=ExtResource("st2d")]
+unique_name_in_owner = true
+offset_bottom = 476.0
+preinstalled = Array[StringName]([&"mainboard"])
+
+[node name="Overview" type="Control" parent="Stage/Views"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m1")
+label = "ภาพรวมร้าน"
+focus_x = 330.0
+bg_offset = Vector2(0, -150)
+
+[node name="ToCase" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 122.0
+offset_right = 356.0
+offset_bottom = 275.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Case"
+label_text = "ตรวจเคส"
+always_show_label = true
+
+[node name="ToMonitor" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 158.0
+offset_right = 80.0
+offset_bottom = 305.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Monitor"
+label_text = "จอ/คอม"
+always_show_label = true
+
+[node name="ToRear" type="Control" parent="Stage/Views/Overview"]
+layout_mode = 0
+offset_left = 244.0
+offset_top = 362.0
+offset_right = 426.0
+offset_bottom = 408.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Rear"
+label_text = "ท้ายเคส"
+always_show_label = true
+
+[node name="Monitor" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m4")
+label = "โต๊ะคอม"
+focus_x = 560.0
+
+[node name="Monitor" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 452.0
+offset_top = 57.0
+offset_right = 768.0
+offset_bottom = 240.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(158.0, 91.5)
+mode = 0
+stretch = true
+state = "off"
+looks = Dictionary[String, Texture2D]({"desktop": ExtResource("m5"), "boot": ExtResource("m6"), "bios": ExtResource("m7"), "off": null})
+
+[node name="MemLabel" type="Label" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 466.0
+offset_top = 143.0
+offset_right = 754.0
+offset_bottom = 168.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 15
+vertical_alignment = 1
+text = "Memory : 16GB"
+
+[node name="PowerButton" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 319.0
+offset_top = 167.0
+offset_right = 351.0
+offset_bottom = 199.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(16.0, 16.0)
+mode = 3
+label_text = "ปุ่มเปิดเครื่อง"
+
+[node name="PowerLed" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 308.0
+offset_top = 127.0
+offset_right = 328.0
+offset_bottom = 147.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(10.0, 10.0)
+mode = 0
+state = "off"
+looks = Dictionary[String, Texture2D]({"on": ExtResource("m9"), "off": ExtResource("m10")})
+
+[node name="HddLed" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 334.0
+offset_top = 127.0
+offset_right = 354.0
+offset_bottom = 147.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(10.0, 10.0)
+mode = 0
+state = "off"
+looks = Dictionary[String, Texture2D]({"on": ExtResource("m9"), "off": ExtResource("m10")})
+modulate = Color(1, 0.75, 0.35, 1)
+
+[node name="NoteCard" type="Control" parent="Stage/Views/Monitor"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 820.0
+offset_top = 250.0
+offset_right = 890.0
+offset_bottom = 320.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(35.0, 35.0)
+mode = 3
+texture = ExtResource("m11")
+label_text = "โน้ตจากลูกค้า"
+rotation = 0.12
+
+[node name="Rear" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m12")
+label = "ท้ายเคส"
+focus_x = 576.0
+
+[node name="PowerCord" type="Control" parent="Stage/Views/Rear"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 632.0
+offset_top = 300.0
+offset_right = 832.0
+offset_bottom = 420.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(100.0, 60.0)
+mode = 3
+texture = ExtResource("m13")
+looks = Dictionary[String, Texture2D]({"out": null})
+label_text = "ปลั๊กไฟ"
+hint_flip = true
+
+[node name="Case" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m14")
+label = "ในเคส"
+focus_x = 576.0
+
+[node name="MbLed" type="Control" parent="Stage/Views/Case"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 604.0
+offset_top = 284.0
+offset_right = 622.0
+offset_bottom = 302.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(9.0, 9.0)
+mode = 3
+label_text = "ไฟบนเมนบอร์ด"
+looks = Dictionary[String, Texture2D]({"off": ExtResource("m10")})
+texture = ExtResource("m9")
+
+[node name="ToPins" type="Control" parent="Stage/Views/Case"]
+layout_mode = 0
+offset_left = 548.0
+offset_top = 300.0
+offset_right = 628.0
+offset_bottom = 326.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Pins"
+label_text = "แผงพินหน้าเคส"
+always_show_label = false
+
+[node name="ToSlots" type="Control" parent="Stage/Views/Case"]
+layout_mode = 0
+offset_left = 594.0
+offset_top = 128.0
+offset_right = 630.0
+offset_bottom = 234.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Slots"
+label_text = "สล็อตแรม"
+always_show_label = false
+
+[node name="CaseFrame" type="Control" parent="Stage/Views/Case"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 386.0
+offset_top = 330.0
+offset_right = 768.0
+offset_bottom = 402.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(191.0, 36.0)
+mode = 3
+label_text = "โครงเคสโลหะ"
+
+[node name="Pins" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m15")
+label = "แผงพิน F_PANEL"
+focus_x = 470.0
+
+[node name="Beam" type="TextureRect" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 376.0
+offset_top = 0.0
+offset_right = 776.0
+offset_bottom = 400.0
+mouse_filter = 2
+texture = ExtResource("m16")
+expand_mode = 1
+
+[node name="PinLabels" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(576.0, 210.0)
+mode = 0
+stretch = true
+state = "off"
+texture = ExtResource("m17")
+looks = Dictionary[String, Texture2D]({"off": null})
+
+[node name="PairPled" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 426.0
+offset_top = 118.0
+offset_right = 546.0
+offset_bottom = 180.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 31.0)
+mode = 3
+label_text = "คู่พิน 1-2 แถวบน"
+
+[node name="PairPwr" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 546.0
+offset_top = 118.0
+offset_right = 666.0
+offset_bottom = 180.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 31.0)
+mode = 3
+label_text = "คู่พิน 3-4 แถวบน"
+
+[node name="PairHdd" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 426.0
+offset_top = 220.0
+offset_right = 546.0
+offset_bottom = 282.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 31.0)
+mode = 3
+label_text = "คู่พิน 1-2 แถวล่าง"
+
+[node name="PairRst" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 546.0
+offset_top = 220.0
+offset_right = 666.0
+offset_bottom = 282.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 31.0)
+mode = 3
+label_text = "คู่พิน 3-4 แถวล่าง"
+
+[node name="ConnPowerSw" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 70.0
+offset_right = 200.0
+offset_bottom = 170.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 50.0)
+mode = 3
+texture = ExtResource("m18")
+label_text = "หัว POWER SW"
+
+[node name="ConnResetSw" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 70.0
+offset_right = 200.0
+offset_bottom = 170.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 50.0)
+mode = 3
+texture = ExtResource("m19")
+label_text = "หัว RESET SW"
+
+[node name="ConnPowerLed" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 70.0
+offset_right = 200.0
+offset_bottom = 170.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 50.0)
+mode = 3
+texture = ExtResource("m20")
+label_text = "หัว POWER LED"
+
+[node name="ConnHddLed" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 70.0
+offset_right = 200.0
+offset_bottom = 170.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(60.0, 50.0)
+mode = 3
+texture = ExtResource("m21")
+label_text = "หัว HDD LED"
+
+[node name="Flashlight" type="Control" parent="Stage/Views/Pins"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 750.0
+offset_top = 300.0
+offset_right = 880.0
+offset_bottom = 374.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(65.0, 37.0)
+mode = 3
+texture = ExtResource("m22")
+label_text = "ไฟฉาย"
+hint_flip = true
+
+[node name="ToCaseP" type="Control" parent="Stage/Views/Pins"]
+layout_mode = 0
+offset_left = 1030.0
+offset_top = 350.0
+offset_right = 1140.0
+offset_bottom = 410.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Case"
+label_text = "← ในเคส"
+always_show_label = false
+
+[node name="Slots" type="Control" parent="Stage/Views"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 420.0
+script = ExtResource("m2")
+clip_contents = true
+mouse_filter = 2
+background = ExtResource("m23")
+label = "สล็อตแรม"
+focus_x = 576.0
+
+[node name="SlotA1" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 110.0
+offset_right = 912.0
+offset_bottom = 156.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(336.0, 23.0)
+mode = 3
+label_text = "สล็อต A1"
+
+[node name="SlotA2" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 175.0
+offset_right = 912.0
+offset_bottom = 221.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(336.0, 23.0)
+mode = 3
+label_text = "สล็อต A2"
+
+[node name="SlotB1" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 240.0
+offset_right = 912.0
+offset_bottom = 286.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(336.0, 23.0)
+mode = 3
+label_text = "สล็อต B1"
+
+[node name="SlotB2" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 305.0
+offset_right = 912.0
+offset_bottom = 351.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(336.0, 23.0)
+mode = 3
+label_text = "สล็อต B2"
+
+[node name="RamA1" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 252.0
+offset_top = 113.0
+offset_right = 900.0
+offset_bottom = 153.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(324.0, 20.0)
+mode = 3
+stretch = true
+texture = ExtResource("m24")
+looks = Dictionary[String, Texture2D]({"off": null})
+label_text = "แรม (A1)"
+
+[node name="ClipA1L" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 222.0
+offset_top = 105.0
+offset_right = 250.0
+offset_bottom = 155.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+
+[node name="ClipA1R" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 902.0
+offset_top = 105.0
+offset_right = 930.0
+offset_bottom = 155.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+mirror = true
+
+[node name="RamA2" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 252.0
+offset_top = 178.0
+offset_right = 900.0
+offset_bottom = 218.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(324.0, 20.0)
+mode = 3
+stretch = true
+texture = ExtResource("m24")
+looks = Dictionary[String, Texture2D]({"off": null})
+label_text = "แรม (A2)"
+
+[node name="ClipA2L" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 222.0
+offset_top = 170.0
+offset_right = 250.0
+offset_bottom = 220.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+
+[node name="ClipA2R" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 902.0
+offset_top = 170.0
+offset_right = 930.0
+offset_bottom = 220.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+mirror = true
+
+[node name="RamB1" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 252.0
+offset_top = 243.0
+offset_right = 900.0
+offset_bottom = 283.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(324.0, 20.0)
+mode = 3
+stretch = true
+texture = ExtResource("m24")
+looks = Dictionary[String, Texture2D]({"off": null})
+label_text = "แรม (B1)"
+
+[node name="ClipB1L" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 222.0
+offset_top = 235.0
+offset_right = 250.0
+offset_bottom = 285.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+
+[node name="ClipB1R" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 902.0
+offset_top = 235.0
+offset_right = 930.0
+offset_bottom = 285.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+mirror = true
+
+[node name="RamB2" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 252.0
+offset_top = 308.0
+offset_right = 900.0
+offset_bottom = 348.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(324.0, 20.0)
+mode = 3
+stretch = true
+texture = ExtResource("m24")
+looks = Dictionary[String, Texture2D]({"off": null})
+label_text = "แรม (B2)"
+
+[node name="ClipB2L" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 222.0
+offset_top = 300.0
+offset_right = 250.0
+offset_bottom = 350.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+
+[node name="ClipB2R" type="Control" parent="Stage/Views/Slots"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 902.0
+offset_top = 300.0
+offset_right = 930.0
+offset_bottom = 350.0
+script = ExtResource("m8")
+mouse_filter = 2
+pivot_offset = Vector2(14.0, 25.0)
+mode = 0
+texture = ExtResource("m25")
+looks = Dictionary[String, Texture2D]({"open": ExtResource("m26")})
+mirror = true
+
+[node name="ToCaseS" type="Control" parent="Stage/Views/Slots"]
+layout_mode = 0
+offset_left = 1030.0
+offset_top = 350.0
+offset_right = 1140.0
+offset_bottom = 410.0
+script = ExtResource("m3")
+mouse_filter = 2
+target_view = &"Case"
+label_text = "← ในเคส"
+always_show_label = false
+
+[node name="PhaseInspect" type="Control" parent="."]
+visible = false
+script = ExtResource("m27")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseBriefing" type="Control" parent="."]
+visible = false
+script = ExtResource("m28")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseSafety" type="Control" parent="."]
+visible = false
+script = ExtResource("m29")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseReadMap" type="Control" parent="."]
+visible = false
+script = ExtResource("m30")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseConnect" type="Control" parent="."]
+visible = false
+script = ExtResource("m31")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseTest" type="Control" parent="."]
+visible = false
+script = ExtResource("m32")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseDual" type="Control" parent="."]
+visible = false
+script = ExtResource("m33")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseVerify" type="Control" parent="."]
+visible = false
+script = ExtResource("m34")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PhaseSummary" type="Control" parent="."]
+visible = false
+script = ExtResource("m35")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[editable path="Stage"]
