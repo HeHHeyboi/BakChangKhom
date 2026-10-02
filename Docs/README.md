@@ -41,6 +41,8 @@
 
 ## มินิเกม Core Part 5 ตัว
 
+> **ตัดสินใจ 2 ต.ค. 2569:** ไม่มีทีมอาร์ตและทีมเสียง — ภาพที่ Claude วาด (SVG ต้นฉบับใน `src/` ของแต่ละ Part + PNG) **ใช้เป็นภาพจริง** ไม่ใช่ placeholder แล้ว · ภาพใหม่/แก้ภาพให้ Claude วาดต่อจาก SVG เดิม · เกมไม่มีเสียงไปก่อน
+
 | Part | ไฟล์ | ยศ | ความรู้หลัก |
 |---|---|---|---|
 | RAM | `MINIGAME1_DESIGN.md` | ช่างมือใหม่ | ขาทอง · ทำความสะอาดหน้าสัมผัส · เลือกอุปกรณ์ |
@@ -56,7 +58,7 @@
 1. แก้ที่เหลือใน `BUG_LIST.md` (ที่ยังเป็น ⬜)
 2. ตัดสินใจเรื่อง Player / MainGame.tscn (BUG-15) ก่อนเริ่ม scene ใหม่
 3. ทำ asset ชุด A + B ใน `ASSET_TODO.md`
-4. ~~implement Core Part: RAM ให้ครบ 8 phase เป็นต้นแบบ~~ ✅ เล่นได้ครบแล้ว (2D) — เหลือภาพจริง เสียง และย้อน phase ตอน VERIFY ไม่ผ่าน
+4. ~~implement Core Part: RAM ให้ครบ 8 phase เป็นต้นแบบ~~ ✅ เล่นได้ครบแล้ว (2D) — เหลือภาพที่ยังขาด (Claude วาดแทน) และย้อน phase ตอน VERIFY ไม่ผ่าน
 4b. ต่อยอด Tutorial ประกอบคอม (SAFETY · CABLES · CLOSE · เช็กทิศ CPU/แรม) แล้วทำ Core Part ถัดไปจากโครง `part_ram.tscn`
 5. ทำ `RepairManager` + Scene S1/S2 ตาม `REPAIR_FLOW.md`
 6. ~~ขยาย Core Part ที่เหลือทีละตัวด้วยโครงเดียวกัน~~ ✅ ครบ 5 ตัวแล้ว (RAM · Mainboard · GPU · Front Panel · BIOS · 2 ต.ค. 2569) — เหลือผูกเข้าเควสต์/RepairManager
