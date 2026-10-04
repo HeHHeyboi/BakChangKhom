@@ -35,6 +35,7 @@ const COL_INK := Color(0.28, 0.18, 0.1)
 @export var texture_on: Texture2D
 ## หน้าตาอื่น ๆ (ดูคำอธิบายด้านบน) · ค่า <empty> = ซ่อนรูป (เช่นฝากระจก "open")
 @export var looks: Dictionary[String, Texture2D] = { }
+			
 @export var state := "":
 	set(v):
 		state = v
@@ -64,6 +65,15 @@ var _blend := 0.0
 var _mat: ShaderMaterial
 var _plate: PanelContainer
 
+static var _blank: ImageTexture = ImageTexture.new()
+
+## key ไหนใน looks เป็น null → ใส่รูปโปร่งใสแทน · ทำเฉพาะตอนรันเกม (ใน Editor จะไปฝัง ImageTexture ลงไฟล์ .tscn)
+func _fill_null_looks() -> void:
+	if Engine.is_editor_hint():
+		return
+	for k in looks.keys():
+		if looks[k] == null:
+			looks[k] = _blank
 
 static func _masks() -> Dictionary:
 	if not Engine.has_meta("item2d_masks"):
@@ -72,7 +82,8 @@ static func _masks() -> Dictionary:
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE # Stage2D จัดการเมาส์เอง
+	_fill_null_looks()
+	mouse_filter = Control.MOUSE_FILTER_PASS # Stage2D จัดการเมาส์เอง
 	pivot_offset = size / 2.0
 	if mode == Mode.TOGGLE:
 		toggle_on = start_on

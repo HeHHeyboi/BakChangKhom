@@ -445,7 +445,7 @@ func _set_hover_item(b: Control) -> void:
 
 
 func press_part(b: Control) -> void:
-	if not (b is Item2D) or not _can_use(b):
+	if b is not Item2D or !_can_use(b):
 		return
 	var it := b as Item2D
 	match it.mode:
@@ -453,7 +453,6 @@ func press_part(b: Control) -> void:
 			it.set_toggle(not it.toggle_on)
 			part_toggled.emit(it, it.toggle_on)
 		Item2D.Mode.CLICK:
-			print("click")
 			it.clicked.emit()
 			part_clicked.emit(it)
 		Item2D.Mode.DRAGGABLE:

@@ -4,7 +4,14 @@ extends Phase2D
 ##   SSD ✅ · USB −5 (ลงทับตัวติดตั้งไม่ได้) · HDD ลูกค้า: ครั้งแรกปิ๊บหยุดมือ −10 · ยืนยันลงทับ −10 อีก = ข้อมูลลูกค้าหาย
 ## [Claude 2 ต.ค. 2569]
 
-enum Step { PLUG, RESTART, CHOOSE, CONFIRM, INSTALLING, DONE }
+enum Step {
+	PLUG,
+	RESTART,
+	CHOOSE,
+	CONFIRM,
+	INSTALLING,
+	DONE,
+}
 
 const FILL_W := 572.0
 
@@ -125,7 +132,10 @@ func _install(drive: String) -> void:
 	owner.show_progress(true)
 	var lbl := node("ProgressLabel") as Label
 	_set_progress(0.0)
-	say("OS_DATA_LOST" if owner.data_lost else "OS_SELECT_SSD", PibHint.Mood.WORRY if owner.data_lost else PibHint.Mood.HAPPY)
+	say(
+		"OS_DATA_LOST" if owner.data_lost else "OS_SELECT_SSD",
+		PibHint.Mood.WORRY if owner.data_lost else PibHint.Mood.HAPPY,
+	)
 	var tw := create_tween()
 	tw.tween_method(_set_progress, 0.0, 1.0, 5.0)
 	await tw.finished

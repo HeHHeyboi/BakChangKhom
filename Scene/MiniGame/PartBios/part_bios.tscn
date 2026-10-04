@@ -49,6 +49,8 @@
 [ext_resource type="Texture2D" uid="uid://ccixyjtudeyme" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="m46"]
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
 
+[sub_resource type="ImageTexture" id="ImageTexture_jwpx6"]
+
 [node name="part_bios" unique_id=1970021235 instance=ExtResource("0_base")]
 script = ExtResource("m45")
 start_phase = 0
@@ -228,7 +230,7 @@ mouse_filter = 2
 script = ExtResource("m11")
 texture = ExtResource("m16")
 looks = Dictionary[String, Texture2D]({
-"out": null
+"out": SubResource("ImageTexture_jwpx6")
 })
 state = "out"
 label_text = "USB ตัวติดตั้งของร้าน"

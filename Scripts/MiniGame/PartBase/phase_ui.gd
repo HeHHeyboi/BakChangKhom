@@ -157,7 +157,6 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	phase.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	phase.set_meta("title_text", title)
 	_make_card(phase, _parse_title(title))
-
 	var rail := panel(phase, RAIL, "InfoRail")
 	var show_button = button(phase, "<", DEFAULT_BUTTON_RECT, Callable())
 	show_button.set_anchors_and_offsets_preset(
