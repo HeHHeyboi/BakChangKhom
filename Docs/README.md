@@ -6,6 +6,8 @@
 
 | ไฟล์ | เนื้อหา |
 |---|---|
+| `REPAIR_SHOP_SYSTEM.md` | **ระบบร้านซ่อม** — ทางเลือก handle scene (แนะนำ SceneRouter + Overlay stack) · คิวงาน WorkOrder · ชั้นวางเครื่อง · สต็อกอะไหล่ · สั่งของจากร้านค้า (4 ต.ค. 2569) |
+| `CORE_PART_QTE.md` | **ข้อเสนอ QTE** ใน Core Part ทั้ง 5 — QTE 6 แบบ (จังหวะ · กดค้าง · วงหด · ลำดับ · มือนิ่ง · ถู) จุดใส่ราย phase · โครง `QteRunner` (4 ต.ค. 2569) |
 | `GAME_LOOP.md` | **ลูปเกมทั้งเกม** — 1 วัน (เช้า/เที่ยง/เย็น) → 7 วัน = 1 Chapter → 12 Chapter → ฉากจบ · เทียบกับโค้ดที่มีแล้ว + ลำดับทำให้เล่นจบลูป (2 ต.ค. 2569) |
 | `REPAIR_FLOW.md` | **เริ่มอ่านที่นี่** — ลูปงานซ่อม 5 scene (ShopCounter → Workbench → PartView → Reassemble → Handover), Part 13 ชิ้น, เครื่องมือ 21 ชิ้น, สเปก Resource/Manager/Scene |
 | `ASSET_RENAME.md` | ไฟล์ที่ชื่อยังไม่ตรงกฎ 38 ไฟล์ + ไฟล์ใหม่จากทีม · บอกชื่อใหม่และจุดที่โค้ดอ้างถึง |
