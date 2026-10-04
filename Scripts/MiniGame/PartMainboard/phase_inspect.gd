@@ -22,7 +22,7 @@ func init():
 		_checks["fins"] = PhaseUI.check_item(rail, "ครีบฮีตซิงก์")
 		_checks["paste"] = PhaseUI.check_item(rail, "ขอบ CPU ใต้ฮีตซิงก์")
 		_checks["standoff"] = PhaseUI.check_item(rail, "มุมใต้เมนบอร์ด")
-		_start_btn = rail_button(rail, "เริ่มซ่อม ►", _on_start)
+		_start_btn = PhaseUI.rail_button(rail, "เริ่มซ่อม ►", _on_start)
 	_seen.clear()
 	for k in _checks:
 		PhaseUI.set_check(_checks[k], false)

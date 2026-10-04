@@ -33,7 +33,7 @@ func init():
 		_type_box = VBoxContainer.new()
 		rail.add_child(_type_box)
 		for t in TYPES:
-			rail_button(_type_box, t[0], choose_type.bind(t[1]))
+			PhaseUI.rail_button(_type_box, t[0], choose_type.bind(t[1]))
 		_amount_box = VBoxContainer.new()
 		rail.add_child(_amount_box)
 		_amount_label = PhaseUI.label(_amount_box, "", 18, PhaseUI.COL_GOAL)
@@ -44,7 +44,7 @@ func init():
 		_slider.custom_minimum_size = Vector2(0, 32)
 		_slider.value_changed.connect(_on_amount)
 		_amount_box.add_child(_slider)
-		rail_button(_amount_box, "บีบลงกลาง CPU ►", squeeze)
+		PhaseUI.rail_button(_amount_box, "บีบลงกลาง CPU ►", squeeze)
 	_done = false
 	_wipe = false
 	for c in _chk:

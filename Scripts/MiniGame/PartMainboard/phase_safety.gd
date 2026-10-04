@@ -27,7 +27,7 @@ func init():
 		rail.add_child(_surface_box)
 		PhaseUI.label(_surface_box, "ชิ้นที่ถอดออกมาจะวางบน…", 16, PhaseUI.COL_OK)
 		for s in SURFACES:
-			rail_button(_surface_box, s[0], _on_surface.bind(s[1]))
+			PhaseUI.rail_button(_surface_box, s[0], _on_surface.bind(s[1]))
 	step = Step.SHUTDOWN
 	for c in _checks:
 		PhaseUI.set_check(c, false)

@@ -16,17 +16,17 @@ func init():
 	if not _built:
 		_built = true
 		var rail := PhaseUI.make_frame(self, "ซ่อมแรม — ขั้นที่ 6/8 · ใส่แรมกลับ")
-		set_rail_overlay(true)
+		PhaseUI.set_rail_overlay(self, true)
 		PhaseUI.label(rail, "ขั้นตอน", 20, PhaseUI.COL_OK)
 		for t in ["ลากแรมลงสล็อต (ร่องบากตรงสันเหลือง)", "คลิกแรม 2 ครั้งกดลงจนสลักล็อก"]:
 			_chk.append(PhaseUI.check_item(rail, t))
-		rail_button(
+		PhaseUI.rail_button(
 			rail,
 			"↻ หมุนแรมในมือ (R)",
 			func():
 				stage().rotate_held(),
 		)
-		_done_btn = rail_button(rail, "เสร็จแล้ว ►", _on_done)
+		_done_btn = PhaseUI.rail_button(rail, "เสร็จแล้ว ►", _on_done)
 	_presses = 0
 	_slot = null
 	for c in _chk:

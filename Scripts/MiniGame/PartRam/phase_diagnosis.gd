@@ -46,7 +46,7 @@ func _build() -> void:
 	rail.add_child(_choice_box)
 	PhaseUI.label(_choice_box, "สาเหตุน่าจะเป็น…", 18, PhaseUI.COL_OK)
 	for c in CHOICES:
-		rail_button(_choice_box, c[0], _on_choice.bind(c[1]))
+		PhaseUI.rail_button(_choice_box, c[0], _on_choice.bind(c[1]))
 
 
 func _on_clicked(p: Item2D) -> void:

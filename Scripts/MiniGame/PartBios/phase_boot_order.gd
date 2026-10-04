@@ -16,7 +16,7 @@ func init():
 		var rail := PhaseUI.make_frame(self, "ซ่อมเครื่องค้าง BIOS — ขั้นที่ 4/8 · ลำดับการบูต")
 		_chk = PhaseUI.check_item(rail, "ดิสก์ที่มี Windows อยู่อันดับ 1")
 		PhaseUI.label(rail, "คลิกสองแถวเพื่อสลับตำแหน่ง", 16, PhaseUI.COL_TEXT)
-		_done_btn = rail_button(rail, "ตั้งเสร็จแล้ว ►", _on_done)
+		_done_btn = PhaseUI.rail_button(rail, "ตั้งเสร็จแล้ว ►", _on_done)
 	_sel = -1
 	_done = false
 	_refresh()

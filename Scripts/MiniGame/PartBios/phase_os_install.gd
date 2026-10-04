@@ -21,8 +21,8 @@ func init():
 		var rail := PhaseUI.make_frame(self, "ซ่อมเครื่องค้าง BIOS — ขั้นที่ 7/8 · ลง Windows ลง SSD")
 		for t in ["เสียบ USB ตัวติดตั้ง (ท้ายเคส)", "รีสตาร์ตเข้าตัวติดตั้ง", "เลือกไดรฟ์ให้ถูก", "รอติดตั้งเสร็จ"]:
 			_chk.append(PhaseUI.check_item(rail, t))
-		_cancel_btn = rail_button(rail, "ยกเลิก กลับไปเลือกใหม่", _on_cancel)
-		_confirm_btn = rail_button(rail, "ยืนยันลงทับ HDD", _on_confirm)
+		_cancel_btn = PhaseUI.rail_button(rail, "ยกเลิก กลับไปเลือกใหม่", _on_cancel)
+		_confirm_btn = PhaseUI.rail_button(rail, "ยืนยันลงทับ HDD", _on_confirm)
 	step = Step.PLUG
 	for c in _chk:
 		PhaseUI.set_check(c, false)

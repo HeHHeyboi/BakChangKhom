@@ -24,8 +24,8 @@ func init():
 		PhaseUI.label(rail, "ขั้นตอน", 20, PhaseUI.COL_OK)
 		for t in ["เปิดคานล็อกซ็อกเก็ต", "หันสามเหลี่ยมให้ตรงแล้ววาง CPU", "ปิดคานล็อก"]:
 			_chk.append(PhaseUI.check_item(rail, t))
-		_rotate_btn = rail_button(rail, "↻ หมุน CPU 90°", rotate_cpu)
-		_force_btn = rail_button(rail, "ออกแรงกดให้ลง", _on_force)
+		_rotate_btn = PhaseUI.rail_button(rail, "↻ หมุน CPU 90°", rotate_cpu)
+		_force_btn = PhaseUI.rail_button(rail, "ออกแรงกดให้ลง", _on_force)
 	step = Step.OPEN
 	_tilted = false
 	_restart = false

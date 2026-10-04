@@ -22,7 +22,7 @@ func init():
 		_checks["boot"] = PhaseUI.check_item(rail, "Boot Priority (ลำดับบูต)")
 		_checks["mem"] = PhaseUI.check_item(rail, "Memory (แรม)")
 		_checks["disk"] = PhaseUI.check_item(rail, "Storage (ดิสก์)")
-		_start_btn = rail_button(rail, "เริ่มซ่อม ►", _on_start)
+		_start_btn = PhaseUI.rail_button(rail, "เริ่มซ่อม ►", _on_start)
 	_seen.clear()
 	for k in _checks:
 		PhaseUI.set_check(_checks[k], false)

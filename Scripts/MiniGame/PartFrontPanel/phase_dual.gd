@@ -21,7 +21,7 @@ func init():
 		for t in ["ปิดเครื่อง ถอดปลั๊ก", "ใส่แรม 2 แถวคนละแชนแนล (A + B)", "กดแรมลงจนสลักล็อก"]:
 			_chk.append(PhaseUI.check_item(rail, t))
 		_hand = PhaseUI.label(rail, "", 18, PhaseUI.COL_OK)
-		_ok_btn = rail_button(rail, "จัดเสร็จแล้ว ►", _on_ok)
+		_ok_btn = PhaseUI.rail_button(rail, "จัดเสร็จแล้ว ►", _on_ok)
 	_said_single = false
 	for c in _chk:
 		PhaseUI.set_check(c, false)

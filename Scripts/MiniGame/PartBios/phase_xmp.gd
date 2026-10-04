@@ -13,7 +13,7 @@ func init():
 		_built = true
 		var rail := PhaseUI.make_frame(self, "ซ่อมเครื่องค้าง BIOS — ขั้นที่ 5/8 · เปิด XMP")
 		_chk = PhaseUI.check_item(rail, "เปิดโปรไฟล์ XMP (คลิกสวิตช์)")
-		_next_btn = rail_button(rail, "ต่อไป ►", _on_next)
+		_next_btn = PhaseUI.rail_button(rail, "ต่อไป ►", _on_next)
 	_done = false
 	PhaseUI.set_check(_chk, owner.xmp > 0)
 	show()

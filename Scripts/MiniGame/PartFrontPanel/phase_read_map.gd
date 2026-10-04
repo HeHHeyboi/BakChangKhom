@@ -14,8 +14,8 @@ func init():
 		_built = true
 		var rail := PhaseUI.make_frame(self, "ซ่อมปุ่มหน้าเคส — ขั้นที่ 4/8 · อ่านผังพิน")
 		_chk = PhaseUI.check_item(rail, "ส่องไฟฉายอ่านตัวหนังสือข้างแผงพิน")
-		_next_btn = rail_button(rail, "ต่อไป ►", _on_next)
-		_skip_btn = rail_button(rail, "ข้าม (เดาเอา)", _on_skip)
+		_next_btn = PhaseUI.rail_button(rail, "ต่อไป ►", _on_next)
+		_skip_btn = PhaseUI.rail_button(rail, "ข้าม (เดาเอา)", _on_skip)
 	_done = false
 	PhaseUI.set_check(_chk, owner.map_revealed)
 	_next_btn.visible = owner.map_revealed

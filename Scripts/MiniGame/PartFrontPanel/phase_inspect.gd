@@ -22,7 +22,7 @@ func init():
 		_checks["led"] = PhaseUI.check_item(rail, "ไฟบนเมนบอร์ด (ในเคส)")
 		_checks["button"] = PhaseUI.check_item(rail, "ลองกดปุ่มหน้าเคส")
 		_checks["note"] = PhaseUI.check_item(rail, "โน้ตจากลูกค้า")
-		_start_btn = rail_button(rail, "เริ่มซ่อม ►", _on_start)
+		_start_btn = PhaseUI.rail_button(rail, "เริ่มซ่อม ►", _on_start)
 	_seen.clear()
 	for k in _checks:
 		PhaseUI.set_check(_checks[k], false)

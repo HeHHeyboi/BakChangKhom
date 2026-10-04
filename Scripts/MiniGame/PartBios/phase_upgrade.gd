@@ -19,7 +19,7 @@ func init():
 		var rail := PhaseUI.make_frame(self, "ซ่อมเครื่องค้าง BIOS — ขั้นที่ 8/8 · แนะนำการอัปเกรด")
 		PhaseUI.label(rail, "แนะนำลูกค้าว่า...", 18, PhaseUI.COL_OK)
 		for o in OPTIONS:
-			_btns.append(rail_button(rail, o[1], choose.bind(o[0])))
+			_btns.append(PhaseUI.rail_button(rail, o[1], choose.bind(o[0])))
 	_done = false
 	for b in _btns:
 		b.disabled = false

@@ -81,6 +81,7 @@ func _ready() -> void:
 		return
 	# ป้ายชื่อเป็น node ลูก (ไม่วาดในตัว) เพื่อไม่ให้โดน shader outline ตอนชี้ · วางไว้เหนือชิ้น กึ่งกลางแนวนอน
 	_plate = PanelContainer.new()
+	_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := StyleBoxFlat.new()
 	style.bg_color = COL_PLATE
 	style.border_color = COL_INK
@@ -91,6 +92,7 @@ func _ready() -> void:
 	_plate.z_index = 10
 	_plate.visible = Engine.is_editor_hint()
 	var label := Label.new()
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.text = label_text
 	label.add_theme_color_override("font_color", COL_INK)
 	_plate.add_child(label)

@@ -19,8 +19,8 @@ func init():
 		_lift_box = VBoxContainer.new()
 		rail.add_child(_lift_box)
 		PhaseUI.label(_lift_box, "จะยกยังไงดี", 16, PhaseUI.COL_OK)
-		rail_button(_lift_box, "หมุนซ้าย-ขวาเบา ๆ แล้วยก", _on_lift.bind(true))
-		rail_button(_lift_box, "ดึงขึ้นตรง ๆ", _on_lift.bind(false))
+		PhaseUI.rail_button(_lift_box, "หมุนซ้าย-ขวาเบา ๆ แล้วยก", _on_lift.bind(true))
+		PhaseUI.rail_button(_lift_box, "ดึงขึ้นตรง ๆ", _on_lift.bind(false))
 	_order.clear()
 	_done = false
 	for c in _chk:

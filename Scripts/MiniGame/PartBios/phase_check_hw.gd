@@ -21,6 +21,7 @@ func init():
 	if not _built:
 		_built = true
 		_rail = PhaseUI.make_frame(self, "ซ่อมเครื่องค้าง BIOS — ขั้นที่ 3/8 · ตรวจฮาร์ดแวร์")
+		PhaseUI.set_rail_overlay(self, true)
 		_box = VBoxContainer.new()
 		_box.add_theme_constant_override("separation", 6)
 		_rail.add_child(_box)
@@ -43,7 +44,7 @@ func _show_q() -> void:
 	var qd: Array = QUESTIONS[_q]
 	PhaseUI.label(_box, "ข้อ %d/%d  %s" % [_q + 1, QUESTIONS.size(), qd[0]], 18, PhaseUI.COL_OK)
 	for i in (qd[1] as Array).size():
-		rail_button(_box, qd[1][i], answer.bind(i))
+		PhaseUI.rail_button(_box, qd[1][i], answer.bind(i))
 	PhaseUI.refresh(self)
 
 

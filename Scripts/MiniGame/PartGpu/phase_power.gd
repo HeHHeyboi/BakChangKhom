@@ -42,8 +42,8 @@ func init():
 			b.add_theme_font_size_override("font_size", 15)
 			b.pressed.connect(choose.bind(h[0]))
 			_heads_box.add_child(b)
-		_click_btn = rail_button(rail, "ดันหัวสายจนคลิก", push_click)
-		_next_btn = rail_button(rail, "ต่อไป ►", _on_next)
+		_click_btn = PhaseUI.rail_button(rail, "ดันหัวสายจนคลิก", push_click)
+		_next_btn = PhaseUI.rail_button(rail, "ต่อไป ►", _on_next)
 	_plugged = false
 	_restart = false
 	_done = false

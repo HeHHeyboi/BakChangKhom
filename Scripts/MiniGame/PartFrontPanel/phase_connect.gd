@@ -18,8 +18,8 @@ func init():
 		var rail := PhaseUI.make_frame(self, "ซ่อมปุ่มหน้าเคส — ขั้นที่ 5/8 · เสียบหัวต่อ")
 		for c in PartFrontPanel.CONNS:
 			_chk[c] = PhaseUI.check_item(rail, "เสียบหัว " + PartFrontPanel.CONN_NAME[c])
-		_flip_btn = rail_button(rail, "สลับขั้วหัวที่เลือก ⇄", _on_flip)
-		_test_btn = rail_button(rail, "เสียบครบแล้ว ทดสอบ ►", _on_test)
+		_flip_btn = PhaseUI.rail_button(rail, "สลับขั้วหัวที่เลือก ⇄", _on_flip)
+		_test_btn = PhaseUI.rail_button(rail, "เสียบครบแล้ว ทดสอบ ►", _on_test)
 	_sel = ""
 	_done = false
 	_refresh()

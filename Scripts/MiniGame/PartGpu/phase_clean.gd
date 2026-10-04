@@ -77,7 +77,7 @@ func _build() -> void:
 	var rail := PhaseUI.make_frame(self, "ซ่อมการ์ดจอ — ขั้นที่ 5/8 · ทำความสะอาด")
 	for s in STEP_TEXT:
 		_chk.append(PhaseUI.check_item(rail, STEP_TEXT[s]))
-	_lock_btn = rail_button(rail, "", func(): set_fan_lock(not fan_locked))
+	_lock_btn = PhaseUI.rail_button(rail, "", func(): set_fan_lock(not fan_locked))
 	_bar = ProgressBar.new()
 	_bar.max_value = 100
 	_bar.custom_minimum_size = Vector2(0, 18)

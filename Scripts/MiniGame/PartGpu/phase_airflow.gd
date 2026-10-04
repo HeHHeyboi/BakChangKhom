@@ -26,7 +26,7 @@ func init():
 		var rail := PhaseUI.make_frame(self, "ซ่อมการ์ดจอ — ขั้นที่ 8/8 · จัดสาย + ทดสอบ")
 		for t in ["เก็บสายหลังถาดเมนบอร์ด 3 เส้น", "รัดเคเบิลไท", "ตั้งทิศพัดลม (หน้าเข้า · หลัง/บนออก)", "ย้ายสาย HDMI ไปที่การ์ดจอ", "เสียบปลั๊ก แล้วเปิดเครื่อง"]:
 			_chk.append(PhaseUI.check_item(rail, t))
-		_test_btn = rail_button(rail, "ทดสอบเปิดเครื่อง ►", start_test)
+		_test_btn = PhaseUI.rail_button(rail, "ทดสอบเปิดเครื่อง ►", start_test)
 	step = Step.ARRANGE
 	_tidied = 0
 	_tied = false

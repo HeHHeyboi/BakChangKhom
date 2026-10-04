@@ -124,6 +124,31 @@ static func _make_card(phase: Control, info: Dictionary) -> PanelContainer:
 	return card
 
 
+const DEFAULT_BUTTON_RECT = Rect2i(0, 0, 25, 50)
+
+
+## ธีมปุ่มพับ/กาง rail (< >) — โทนเดียวกับสมุดคู่มือ: ส้มขอบน้ำตาลตัวหนังสือสีกระดาษ · hover สว่างขึ้น · กดแล้วเข้มลง
+static func _style_toggle(b: Button) -> void:
+	b.add_theme_font_size_override("font_size", 16)
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(c, COL_PAPER)
+	b.add_theme_stylebox_override("normal", _toggle_box(COL_HEAD))
+	b.add_theme_stylebox_override("hover", _toggle_box(COL_HEAD.lightened(0.15)))
+	b.add_theme_stylebox_override("pressed", _toggle_box(COL_HEAD.darkened(0.2)))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	b.focus_mode = Control.FOCUS_NONE
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+
+
+static func _toggle_box(bg: Color) -> StyleBoxFlat:
+	var sb := _flat(bg, 8, COL_EDGE, 2)
+	sb.content_margin_left = 0
+	sb.content_margin_right = 0
+	sb.content_margin_top = 0
+	sb.content_margin_bottom = 0
+	return sb
+
+
 ## สร้างการ์ดความคืบหน้า + Info rail ให้ phase แล้วคืน VBoxContainer ใน rail ไว้ใส่ข้อความ
 static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	phase.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -134,7 +159,32 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	_make_card(phase, _parse_title(title))
 
 	var rail := panel(phase, RAIL, "InfoRail")
+	var show_button = button(phase, "<", DEFAULT_BUTTON_RECT, Callable())
+	show_button.set_anchors_and_offsets_preset(
+		Control.PRESET_CENTER_RIGHT,
+		Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE,
+	)
+	show_button.hide()
+	_style_toggle(show_button)
 	var box := VBoxContainer.new()
+	var hide_button = button(rail, ">", DEFAULT_BUTTON_RECT, Callable())
+	hide_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE)
+	hide_button.position = Vector2(0, -DEFAULT_BUTTON_RECT.size.y) # ขยับจริง (ไม่ใช่ offset_transform ที่ขยับแค่ภาพ)
+	hide_button.set_meta("rail_toggle", true)
+	_style_toggle(hide_button)
+
+	show_button.connect(
+		"pressed",
+		func():
+			rail.show()
+			show_button.hide(),
+	)
+	hide_button.connect(
+		"pressed",
+		func():
+			rail.hide()
+			show_button.show(),
+	)
 	box.name = "RailBox"
 	box.position = Vector2(16, 16)
 	box.size = RAIL.size - Vector2(32, 32)
@@ -193,14 +243,60 @@ static func refresh(phase: Control) -> void:
 	_auto_rail(phase)
 
 
-## phase ตัดสินใจเองว่า rail เปิดไหม/หดฉากไหม (Phase2D.rail_mode + refresh_layout) — PhaseUI ไม่แตะ Stage
 static func _auto_rail(phase: Control) -> void:
+	refresh_layout(phase)
+
+
+## โหมด Info rail ของ phase (ค่าเก็บที่ Phase2D.rail_mode ตั้งใน Inspector ได้ หรือเรียก set_rail_mode ใน init())
+##   AUTO = เปิดเมื่อมีปุ่มใน rail แล้วฉากหดหนี · SQUEEZE = เปิดเสมอ ฉากหด
+##   OVERLAY = เปิดเมื่อมีปุ่ม แต่วางทับภาพ ฉากกว้างเต็ม · HIDDEN = ซ่อน rail เสมอ
+enum RailMode {
+	AUTO,
+	SQUEEZE,
+	OVERLAY,
+	HIDDEN,
+}
+
+
+static func set_rail_mode(phase: Control, mode: RailMode) -> void:
+	phase.set("rail_mode", mode)
+	refresh_layout(phase)
+
+
+## ทางลัด: วางทับ (true) หรือกลับเป็น AUTO (false)
+static func set_rail_overlay(phase: Control, on := true) -> void:
+	set_rail_mode(phase, RailMode.OVERLAY if on else RailMode.AUTO)
+
+
+## ตัดสินใจ layout ของ phase ที่เดียว: rail เปิดไหม · Stage หดไหม — เรียกซ้ำได้เมื่อ UI เปลี่ยน
+static func refresh_layout(phase: Control) -> void:
 	if not phase.has_meta("rail") or not phase.visible:
 		return
-	if phase.has_method("refresh_layout"):
-		phase.call("refresh_layout")
-	else:
-		apply_rail(phase, rail_wanted(phase))
+	var mode: RailMode = phase.get("rail_mode") if phase.get("rail_mode") != null else RailMode.AUTO
+	var open: bool
+	match mode:
+		RailMode.HIDDEN:
+			open = false
+		RailMode.SQUEEZE:
+			open = true
+		_:
+			open = rail_wanted(phase)
+	apply_rail(phase, open)
+	var st = phase.owner.get("stage") if phase.owner else null
+	if st is Stage2D:
+		var squeeze := open and mode != RailMode.OVERLAY
+		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if squeeze else 0.0)
+
+
+## ปุ่มใน info rail (ใช้กับ VBox ที่ได้จาก make_frame)
+static func rail_button(box: Container, text: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.custom_minimum_size = Vector2(0, 40)
+	b.add_theme_font_size_override("font_size", 18)
+	b.pressed.connect(cb)
+	box.add_child(b)
+	return b
 
 
 ## ใน rail มีของให้กดอยู่ไหม (ใช้เป็นเกณฑ์ของโหมด AUTO)
@@ -220,7 +316,10 @@ static func _has_button(n: Node) -> bool:
 	for c in n.get_children():
 		if c is CanvasItem and not c.visible:
 			continue
-		if c is BaseButton or _has_button(c):
+		if c is BaseButton:
+			if not c.has_meta("rail_toggle"):
+				return true
+		elif _has_button(c):
 			return true
 	return false
 
@@ -316,7 +415,8 @@ static func button(parent: Node, text: String, rect: Rect2, cb: Callable) -> But
 	b.position = rect.position
 	b.size = rect.size
 	b.add_theme_font_size_override("font_size", 20)
-	b.pressed.connect(cb)
+	if !cb.is_null():
+		b.pressed.connect(cb)
 	parent.add_child(b)
 	return b
 
