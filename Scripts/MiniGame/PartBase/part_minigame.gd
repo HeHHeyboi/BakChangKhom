@@ -20,6 +20,10 @@ var _mistakes: Dictionary = { }
 var _phase_nodes: Dictionary = { }
 ## QTE กลางของมินิเกม — phase เรียก: var r = await owner.qte.run(SPEC, node("ชิ้นงาน"), owner.qte_zone_scale())
 var qte: QteRunner
+## มีปุ่ม "ข้ามบทฝึก" มุมขวาบน (กด 2 ครั้งยืนยัน) — ใช้กับ Tutorial / งานในเควสต์ · งานลูกค้า (meta work_order) ข้ามไม่ได้เสมอ
+@export var skippable := false
+var _skip_btn: Button
+var _skip_armed := false
 
 
 func _ready() -> void:
@@ -38,6 +42,8 @@ func _ready() -> void:
 		_phase_nodes[phase].mistake.connect(_on_mistake)
 
 	_build_qte()
+	if skippable and not has_meta("work_order"):
+		_build_skip()
 	_set_phase(_first_phase())
 	if OS.is_debug_build():
 		_debug_build_ui()
@@ -86,6 +92,46 @@ func _build_qte() -> void:
 	qte = QteRunner.new()
 	qte.name = "Qte"
 	layer.add_child(qte)
+
+
+func _build_skip() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "SkipLayer"
+	layer.layer = 35
+	add_child(layer)
+	_skip_btn = Button.new()
+	_skip_btn.text = "ข้ามบทฝึก ►"
+	_skip_btn.focus_mode = Control.FOCUS_NONE
+	_skip_btn.add_theme_font_size_override("font_size", 18)
+	_skip_btn.position = Vector2(1000, 12)
+	_skip_btn.pressed.connect(_on_skip_pressed)
+	layer.add_child(_skip_btn)
+
+
+## กดครั้งแรก = ถามยืนยัน (3 วิ) · กดซ้ำ = จบมินิเกมทันที (ไม่คิดคะแนน/เงิน) แล้วเควสต์เดินต่อ
+func _on_skip_pressed() -> void:
+	if not _skip_armed:
+		_skip_armed = true
+		_skip_btn.text = "แน่ใจ? กดอีกครั้ง"
+		_skip_btn.reset_size()
+		_skip_btn.position.x = 1152 - _skip_btn.size.x - 12
+		await get_tree().create_timer(3.0).timeout
+		if is_instance_valid(_skip_btn):
+			_skip_armed = false
+			_skip_btn.text = "ข้ามบทฝึก ►"
+		return
+	skip()
+
+
+## ข้ามมินิเกมทั้งตัว — phase ปัจจุบันถูก abort · ส่ง minigame_finished ให้ Part ปิดตัวเองตามปกติ
+func skip() -> void:
+	if qte:
+		qte.cancel()
+	if _phase_nodes.has(current_phase):
+		_phase_nodes[current_phase].abort()
+	if pib:
+		pib.hide()
+	minigame_finished.emit(_mistakes)
 
 
 func _exit_tree() -> void:

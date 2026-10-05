@@ -42,6 +42,7 @@ func _ready() -> void:
 	if dialog_path.is_empty():
 		dialog_path = RAM_PIB_PATH
 	minigame_finished.connect(_on_minigame_finished)
+	skippable = true # [Claude 5 ต.ค. 2569] ข้ามได้ตอนเป็น Tutorial/เควสต์ · งานลูกค้าข้ามไม่ได้ (PartMinigame เช็ก work_order)
 	_setup_dirt()
 	# _setup_slot_focus()
 	super._ready()

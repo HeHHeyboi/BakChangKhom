@@ -29,6 +29,7 @@ signal on_tutorial_end
 
 
 func _ready() -> void:
+	_build_skip()
 	self.visible = false
 	self.process_mode = Node.PROCESS_MODE_DISABLED
 	if test:
@@ -84,6 +85,26 @@ func _on_next_btn_pressed():
 
 	slide_show.texture = slide
 	pass
+
+
+## [Claude 5 ต.ค. 2569] ปุ่ม "ข้าม" มุมขวาบน — จบสไลด์ชุดนี้ทันที (เหมือนกด "เข้าใจแล้ว")
+func _build_skip() -> void:
+	var b := Button.new()
+	b.name = "Skip"
+	b.text = "ข้าม ►"
+	b.focus_mode = Control.FOCUS_NONE
+	b.add_theme_font_size_override("font_size", 18)
+	b.position = Vector2(1060, 12)
+	b.pressed.connect(skip)
+	$Control.add_child(b)
+
+
+func skip() -> void:
+	if not visible:
+		return
+	on_tutorial_end.emit()
+	self.visible = false
+	self.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func _on_prev_btn_pressed():

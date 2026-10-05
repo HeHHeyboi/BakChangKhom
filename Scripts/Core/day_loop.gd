@@ -20,6 +20,15 @@ extends CanvasLayer
 ## ข้ามเควสต์หลัก (Debug F1)
 @export var force_active := false
 
+@export_group("พักหลัง Tutorial")
+## บทพักหลังจบ Tutorial ก่อนลูกค้าคนแรก (เล่นครั้งเดียวต่อเกม) · ว่าง = ไม่มีพัก
+@export_file("*.txt") var break_dialog := "res://Assets/Dialog/Break/after_tutorial.txt"
+@export_file("*.png", "*.jpg") var break_bg := "res://Assets/Background/HomeBG.jpg"
+## หลังบทพัก เวลาในเกมเดินไปกี่นาที
+@export var break_minutes := 30
+## แอนิเมชันเวลาหมุนยาวกี่วินาที (เวลาจริง)
+@export var time_skip_seconds := 1.0
+
 const ENDING_TEXT := {
 	&"stay": "ฉากจบ: อยู่หมู่บ้าน ขยายร้าน\nร้านบักช่างขมกลายเป็นที่พึ่งของทั้งหมู่บ้าน",
 	&"city": "ฉากจบ: กลับเมือง\nมิ้นดูแลร้านแทน ส่วนขมกลับไปทำงานบริษัท",
@@ -40,6 +49,10 @@ var _pending_summary_week := 0
 var _game_over := false
 var _working := false          # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
 var _shop_time := 0.0
+var _break_done := false
+var _skip_overlay: ColorRect
+var _skip_clock: Label
+var _skip_caption: Label
 var _rng := RandomNumberGenerator.new()
 
 var _panel: PanelContainer
@@ -166,6 +179,50 @@ func start_repair() -> void:
 	Global.in_minigame = true
 
 
+## บทพักหลัง Tutorial → เวลาหมุน → แล้วลูกค้า forced ค่อยเข้ามา
+func _play_break() -> void:
+	_break_done = true
+	_working = true
+	_hide()
+	if not FileAccess.file_exists(break_dialog):
+		_after_break()
+		return
+	DialogScene.on_dialog_finish.connect(_after_break, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
+	var bg := break_bg if break_bg != "" and ResourceLoader.exists(break_bg) else ""
+	EventManager.play_story_dialog("พักก่อน", break_dialog, bg, GameState.speakers_in(break_dialog))
+
+
+func _after_break() -> void:
+	await time_skip(break_minutes, time_skip_seconds)
+	_shop_time = 0.0
+	_working = false
+
+
+## จอมืดลงครึ่งหนึ่ง + นาฬิกาหมุนจากตอนนี้ไปอีก minutes นาที ใน seconds วินาที (HUD หมุนตาม) แล้วสว่างกลับ
+## ใช้ซ้ำได้ทุกที่: await DayLoop.time_skip(30)
+func time_skip(minutes: int, seconds := 1.0) -> void:
+	var ts: TimeSystem = EventManager.time_system
+	var from := ts.current_minute
+	var to := from + minutes
+	_skip_caption.text = ("%d นาทีต่อมา…" % minutes) if minutes < 60 else ("%d ชั่วโมงต่อมา…" % (minutes / 60))
+	_skip_clock.text = TimeSystem.clock_text(from)
+	_skip_overlay.modulate.a = 0.0
+	_skip_overlay.visible = true
+	var tw := create_tween()
+	tw.tween_property(_skip_overlay, "modulate:a", 1.0, 0.2)
+	tw.tween_method(_skip_step, float(from), float(to), maxf(seconds, 0.05))
+	tw.tween_interval(0.15)
+	tw.tween_property(_skip_overlay, "modulate:a", 0.0, 0.2)
+	await tw.finished
+	ts.set_clock(to)
+	_skip_overlay.visible = false
+
+
+func _skip_step(v: float) -> void:
+	EventManager.time_system.set_clock(int(v))
+	_skip_clock.text = TimeSystem.clock_text(int(v))
+
+
 func close_shop() -> void:
 	EventManager.time_system.set_period(TimeSystem.TIME.EVENING)
 
@@ -194,6 +251,7 @@ func _reset_run() -> void:
 	arrived_today = false
 	last_result = {}
 	force_active = false
+	_break_done = false
 	GameState.reset()
 	week_start_money = GameState.money
 	EventManager.time_system.set_date(1, 1)
@@ -204,6 +262,10 @@ func _reset_run() -> void:
 
 func _process(delta: float) -> void:
 	var want := _decide_card()
+	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
+	if want == Card.JOB_FORCED and not arrived_today and not _break_done and break_dialog != "":
+		_play_break()
+		return
 	# ลูกค้า forced เดินเข้ามาเองเมื่ออยู่ในร้านครบ forced_delay วินาที
 	if want == Card.JOB_FORCED and not arrived_today:
 		_hide()
@@ -340,6 +402,32 @@ func _hide() -> void:
 	_card = Card.NONE
 
 
+func _build_time_skip() -> void:
+	_skip_overlay = ColorRect.new()
+	_skip_overlay.name = "TimeSkip"
+	_skip_overlay.color = Color(0.05, 0.04, 0.08, 0.6)
+	_skip_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_skip_overlay.size = Vector2(1152, 648)
+	_skip_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_skip_overlay.visible = false
+	add_child(_skip_overlay)
+	_skip_clock = Label.new()
+	_skip_clock.add_theme_font_size_override("font_size", 96)
+	_skip_clock.add_theme_color_override("font_color", Color(1.0, 0.9, 0.6))
+	_skip_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_skip_clock.position = Vector2(0, 220)
+	_skip_clock.size = Vector2(1152, 120)
+	_skip_overlay.add_child(_skip_clock)
+	_skip_caption = Label.new()
+	_skip_caption.add_theme_font_size_override("font_size", 28)
+	_skip_caption.add_theme_color_override("font_color", Color.WHITE)
+	_skip_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_skip_caption.position = Vector2(0, 340)
+	_skip_caption.size = Vector2(1152, 48)
+	_skip_overlay.add_child(_skip_caption)
+	_card = Card.NONE
+
+
 func _build_ui() -> void:
 	_panel = PanelContainer.new()
 	_panel.name = "DayCard"
@@ -379,3 +467,4 @@ func _build_ui() -> void:
 	_secondary.pressed.connect(_on_secondary)
 	row.add_child(_secondary)
 	_panel.visible = false
+	_build_time_skip()

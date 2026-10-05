@@ -22,6 +22,12 @@ signal all_weeks_ended
 var current_day := 1
 var current_week := 1
 var finished := false
+## นาฬิกาในเกม (นาทีนับจากเที่ยงคืน) · เปลี่ยนช่วงแล้วตั้งเป็นเวลาเริ่มช่วง · [Claude 5 ต.ค. 2569]
+var current_minute := 8 * 60
+## เวลาเริ่มของแต่ละช่วง (นาที) เช้า 08:00 · เที่ยง 12:00 · เย็น 17:00
+const PERIOD_START := { TIME.MORNING: 8 * 60, TIME.NOON: 12 * 60, TIME.EVENING: 17 * 60 }
+## นาฬิกาเปลี่ยน (ใช้ทำแอนิเมชันเวลาหมุน)
+signal clock_changed(minute: int)
 var _money_label: Label
 
 enum TIME {
@@ -42,6 +48,7 @@ func _exit_tree() -> void:
 
 
 func _ready() -> void:
+	dateText.add_theme_font_size_override("normal_font_size", 22)
 	updateTime()
 	_build_money_label()
 	_connect_money.call_deferred()
@@ -86,6 +93,7 @@ func change_period() -> void:
 		TIME.EVENING:
 			change_day()
 			return
+	current_minute = maxi(current_minute, PERIOD_START[cur_period])
 	updateTime()
 	period_changed.emit(cur_period)
 
@@ -95,6 +103,7 @@ func change_day() -> void:
 	if finished:
 		return
 	cur_period = TIME.MORNING
+	current_minute = PERIOD_START[TIME.MORNING]
 	if current_day >= DAYS_PER_WEEK:
 		var ended := current_week
 		if current_week >= TOTAL_WEEKS:
@@ -116,6 +125,7 @@ func change_day() -> void:
 
 func set_period(time: TIME) -> void:
 	cur_period = time
+	current_minute = maxi(current_minute, PERIOD_START[time]) if time != TIME.MORNING else PERIOD_START[time]
 	updateTime()
 	period_changed.emit(cur_period)
 
@@ -125,9 +135,33 @@ func set_date(week: int, day: int, period: TIME = TIME.MORNING) -> void:
 	current_week = clampi(week, 1, TOTAL_WEEKS)
 	current_day = clampi(day, 1, DAYS_PER_WEEK)
 	cur_period = period
+	current_minute = PERIOD_START[period]
 	finished = false
 	updateTime()
 	period_changed.emit(cur_period)
+
+
+## เดินนาฬิกาไปข้างหน้า m นาที (ช่วงเวลาเปลี่ยนเองถ้าข้ามเวลาเริ่มช่วงถัดไป · ไม่ข้ามวัน)
+func advance_minutes(m: int) -> void:
+	set_clock(current_minute + m)
+
+
+func set_clock(minute: int) -> void:
+	current_minute = clampi(minute, 0, 24 * 60 - 1)
+	var p: TIME = cur_period
+	if current_minute >= PERIOD_START[TIME.EVENING]:
+		p = TIME.EVENING
+	elif current_minute >= PERIOD_START[TIME.NOON]:
+		p = TIME.NOON
+	if p != cur_period and p > cur_period:
+		cur_period = p
+		period_changed.emit(cur_period)
+	updateTime()
+	clock_changed.emit(current_minute)
+
+
+static func clock_text(minute: int) -> String:
+	return "%02d:%02d" % [minute / 60, minute % 60]
 
 
 func is_last_day_of_week() -> bool:
@@ -150,4 +184,4 @@ func updateTime() -> void:
 			timeText.append_text("เย็น")
 	timeText.pop()
 	dateText.clear()
-	dateText.add_text("รอบ %d/%d · วันที่ %d/%d" % [current_week, TOTAL_WEEKS, current_day, DAYS_PER_WEEK])
+	dateText.add_text("เวลา %s\nรอบ %d/%d · วันที่ %d/%d" % [clock_text(current_minute), current_week, TOTAL_WEEKS, current_day, DAYS_PER_WEEK])

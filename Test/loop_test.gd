@@ -27,6 +27,30 @@ func _ready() -> void:
 	_check(GameState.money == money0, "งานในเควสต์ไม่คิดเงิน")
 	Global.in_minigame = false
 
+	# ปุ่มข้าม: Tutorial ประกอบคอม (กด 2 ครั้ง) · สไลด์
+	var ta: PartMinigame = load("res://Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn").instantiate()
+	add_child(ta)
+	await _frames(2)
+	_check(ta._skip_btn != null and ta._skip_btn.is_visible_in_tree(), "Tutorial ประกอบคอมมีปุ่มข้าม")
+	ta._on_skip_pressed()
+	_check(is_instance_valid(ta) and ta.is_inside_tree(), "กดข้ามครั้งแรก = ถามยืนยัน (ยังไม่ปิด)")
+	ta._on_skip_pressed()
+	await _frames(2)
+	_check(not is_instance_valid(ta) or not ta.is_inside_tree(), "กดข้ามครั้งที่สอง = ปิดมินิเกม")
+	var cust: PartMinigame = load("res://Scene/MiniGame/PartRam/part_ram.tscn").instantiate()
+	cust.set_meta("work_order", true)
+	add_child(cust)
+	await _frames(2)
+	_check(cust._skip_btn == null, "งานลูกค้าไม่มีปุ่มข้าม")
+	cust.queue_free()
+	await _frames(2)
+	EventManager.tutorial.show_tutorial(Tutorial.TutorialState.RAM_CLEANING)
+	await _frames(1)
+	EventManager.tutorial.skip()
+	_check(not EventManager.tutorial.visible, "สไลด์ Tutorial กดข้ามได้")
+	Global.in_minigame = false
+	EventManager.showUI()
+
 	DayLoop.force_active = true
 	get_tree().change_scene_to_file(Constant.ROOM_SCENE)
 	await _frames(5)
@@ -37,7 +61,17 @@ func _ready() -> void:
 		_check(c.problems().is_empty(), "day %d ข้อมูลลูกค้าครบ %s" % [d + 1, c.problems()])
 		_check(c != null and c.reason != "", "day %d ลูกค้ามีเหตุผล: %s — %s" % [d + 1, c.customer, c.reason])
 		if c.forced:
-			_check(DayLoop._decide_card() == DayLoop.Card.JOB_FORCED, "day %d event บังคับ" % (d + 1))
+			_check(DayLoop._break_done and not DayLoop.arrived_today, "day %d event บังคับ (เริ่มด้วยบทพัก ยังไม่ให้ลูกค้าเข้า)" % (d + 1))
+			# พักหลัง Tutorial → เวลาหมุน 30 นาทีใน 1 วิ
+			await _frames(2)
+			_check(DialogScene.visible and DialogScene.DialogDict.get("dialog", []).size() == 6, "day %d บทพักหลัง Tutorial" % (d + 1))
+			var before := ts.current_minute
+			DialogScene.dialog_end()
+			await _frames(3)
+			_check(DayLoop._skip_overlay.visible, "day %d จอเวลาหมุน" % (d + 1))
+			await get_tree().create_timer(DayLoop.time_skip_seconds + 0.6).timeout
+			_check(ts.current_minute == before + DayLoop.break_minutes and not DayLoop._skip_overlay.visible,
+				"day %d เวลา %s → %s" % [d + 1, TimeSystem.clock_text(before), TimeSystem.clock_text(ts.current_minute)])
 			await get_tree().create_timer(DayLoop.forced_delay + 0.3).timeout
 			_check(DialogScene.visible and DialogScene.DialogDict.get("dialog", []).size() > 0, "day %d บทลูกค้าเล่นเอง" % (d + 1))
 			DialogScene.dialog_end()
