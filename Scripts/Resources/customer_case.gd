@@ -61,21 +61,35 @@ func part() -> StringName:
 ## ช่องที่ขาด — DayLoop เตือนใน Output ตอนเริ่มเกม
 func problems() -> PackedStringArray:
 	var out := PackedStringArray()
+	if id == &"":
+		out.append("ไม่มี id")
+	if customer.strip_edges() == "":
+		out.append("ไม่มีชื่อลูกค้า (customer)")
+	elif not Engine.is_editor_hint():
+		var g := (Engine.get_main_loop() as SceneTree).root.get_node_or_null(^"Global") if Engine.get_main_loop() is SceneTree else null
+		if g and g.has_method("hasCharacter") and not g.hasCharacter(customer):
+			out.append("ชื่อ \"%s\" ไม่มีใน Global._CharacterMap (บทจะไม่ขึ้นรูป)" % customer)
 	if reason.strip_edges() == "":
 		out.append("ไม่มีเหตุผลที่ลูกค้ามา (reason)")
 	if symptom.strip_edges() == "":
 		out.append("ไม่มีอาการ (symptom)")
+	if job_title.strip_edges() == "":
+		out.append("ไม่มีชื่องาน (job_title)")
+	if fee < -1:
+		out.append("fee ติดลบ (ใช้ -1 = ค่าจาก economy)")
 	if scene_path() == "" or not ResourceLoader.exists(scene_path()):
 		out.append("ไม่พบมินิเกม %s" % scene_path())
-	if arrive_dialog != "" and not FileAccess.file_exists(arrive_dialog):
-		out.append("ไม่พบบท %s" % arrive_dialog)
-	elif arrive_dialog != "":
-		# DialogScene อ่าน ":" เป็นหัว branch ของ Choice — อารมณ์ให้เขียน "ขม (ยิ้ม),..." ไม่ใช่ "ขม:happy,..."
-		var f := FileAccess.open(arrive_dialog, FileAccess.READ)
-		var n := 0
-		while not f.eof_reached():
-			var line := f.get_line().strip_edges()
-			n += 1
-			if line != "" and not line.begins_with("#") and line.find(":") > -1 and not line.begins_with("Choice:"):
+	if arrive_dialog != "":
+		if not FileAccess.file_exists(arrive_dialog):
+			out.append("ไม่พบบท %s" % arrive_dialog)
+		elif not DialogUtil.has_lines(arrive_dialog):
+			out.append("บท %s ว่าง (ไม่มีบรรทัด ชื่อ,ข้อความ)" % arrive_dialog.get_file())
+		else:
+			# DialogScene อ่าน ":" เป็นหัว branch ของ Choice — อารมณ์ให้เขียน "ขม (ยิ้ม),..." ไม่ใช่ "ขม:happy,..."
+			for n in DialogUtil.colon_lines(arrive_dialog):
 				out.append("%s บรรทัด %d มี \":\" (อารมณ์ให้เขียน \"ชื่อ (ยิ้ม),\")" % [arrive_dialog.get_file(), n])
+	if bg != "" and not ResourceLoader.exists(bg):
+		out.append("ไม่พบฉากหลัง %s" % bg)
+	if thanks_text.strip_edges() == "" or complain_text.strip_edges() == "":
+		out.append("ไม่มีคำพูดตอนรับเครื่อง (thanks_text / complain_text)")
 	return out

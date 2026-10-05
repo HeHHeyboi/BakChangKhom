@@ -22,6 +22,9 @@ var _chk: Array[Label] = []
 func init():
 	if not _built:
 		_built = true
+		for spec: QteSpec in [ALIGN, PRESS]:
+			for msg in spec.problems():
+				push_warning("QteSpec %s: %s" % [spec.resource_path, msg])
 		var rail := PhaseUI.make_frame(self, "ซ่อมแรม — ขั้นที่ 6/8 · ใส่แรมกลับ")
 		PhaseUI.set_rail_overlay(self, true)
 		PhaseUI.label(rail, "ขั้นตอน", 20, PhaseUI.COL_OK)
@@ -69,11 +72,13 @@ func _on_installed(p: Item2D, s: Socket2D) -> void:
 	if s.accept_any:
 		cam(&"Mat")
 		return
+	if _slot != null:
+		return # กันวางซ้ำระหว่างกำลังเล่น QTE
 	_slot = s
 	PhaseUI.set_check(_chk[0], true)
 	cam(&"Slots")
 	await wait(0.25)
-	if not visible:
+	if not _alive():
 		return
 	p.position.y -= RAISED # วางแล้วแต่ยังไม่ลงสุด
 	p.mode = Item2D.Mode.STATIC # ระหว่าง QTE ลากไม่ได้
@@ -81,30 +86,52 @@ func _on_installed(p: Item2D, s: Socket2D) -> void:
 	if s != node("SlotA2"):
 		say_text(["ใส่ได้เหมือนกัน แต่ถ้ามีสองแถวต้องคู่ A2 กับ B2 นะ เรื่องนี้เดี๋ยวได้เรียนตอน Front Panel"])
 		await wait(1.2)
-	await _qte_align(p)
-	if not visible:
-		return
-	await _qte_press(p)
-	if not visible:
+	if _qte() == null:
+		push_warning("PhaseInstall: ไม่มี QteRunner — ใส่แรมให้เลย")
+	else:
+		await _qte_align(p)
+		if not _alive():
+			return
+		await _qte_press(p)
+	if not _alive():
 		return
 	for l in _slot.locks:
-		l.set_toggle(false) # คลิก! สลักดีดล็อก
+		if is_instance_valid(l):
+			l.set_toggle(false) # คลิก! สลักดีดล็อก
 	PhaseUI.set_check(_chk[2], true)
 	owner.ram_seated = true
 	await wait(0.5)
-	_complete()
+	if _alive():
+		_complete()
+
+
+## phase ยังเล่นอยู่ (ไม่ถูกข้าม/ปิดมินิเกมระหว่าง await)
+func _alive() -> bool:
+	return is_inside_tree() and visible and is_instance_valid(owner)
+
+
+func _qte() -> QteRunner:
+	if not is_instance_valid(owner):
+		return null
+	var q = owner.get("qte")
+	return q if is_instance_valid(q) and q.is_inside_tree() else null
 
 
 ## QTE A — ร่องบากต้องตรงสันในสล็อต
 func _qte_align(p: Item2D) -> void:
+	var q := _qte()
 	var base_x := p.position.x
-	var follow := func(v: float): p.position.x = base_x + (v - 0.5) * 2.0 * SWAY
-	owner.qte.value_changed.connect(follow)
+	var follow := func(v: float) -> void:
+		if is_instance_valid(p):
+			p.position.x = base_x + (v - 0.5) * 2.0 * SWAY
+	q.value_changed.connect(follow)
 	say(MinigameHeader.INSTALL_QTE_ALIGN)
 	for i in MAX_TRIES:
 		await _wait_pib()
-		var r: QteRunner.Result = await owner.qte.run(ALIGN, p, owner.qte_zone_scale())
-		if not visible:
+		if not _alive() or not is_instance_valid(q):
+			break
+		var r: QteRunner.Result = await q.run(ALIGN, p, owner.qte_zone_scale())
+		if not _alive():
 			break
 		if r != QteRunner.Result.MISS:
 			break
@@ -113,7 +140,10 @@ func _qte_align(p: Item2D) -> void:
 		else:
 			toast(MinigameHeader.INSTALL_QTE_ALIGN_MISS)
 			await wait(0.5)
-	owner.qte.value_changed.disconnect(follow)
+	if is_instance_valid(q) and q.value_changed.is_connected(follow):
+		q.value_changed.disconnect(follow)
+	if not _alive() or not is_instance_valid(p):
+		return
 	var tw := create_tween()
 	tw.tween_property(p, "position:x", base_x, 0.12)
 	await tw.finished
@@ -122,18 +152,26 @@ func _qte_align(p: Item2D) -> void:
 
 ## QTE B — กดค้างให้แรมลง ปล่อยตอนสลักดีด
 func _qte_press(p: Item2D) -> void:
+	var q := _qte()
+	if q == null:
+		return
 	var top_y := p.position.y
-	var follow := func(v: float): p.position.y = top_y + RAISED * minf(v / PRESS.zone.x, 1.0)
-	owner.qte.value_changed.connect(follow)
+	var zone_x := maxf(PRESS.zone.x, 0.01)
+	var follow := func(v: float) -> void:
+		if is_instance_valid(p):
+			p.position.y = top_y + RAISED * minf(v / zone_x, 1.0)
+	q.value_changed.connect(follow)
 	say(MinigameHeader.INSTALL_QTE_PRESS)
 	for i in MAX_TRIES:
 		await _wait_pib()
-		var r: QteRunner.Result = await owner.qte.run(PRESS, p, owner.qte_zone_scale())
-		if not visible:
+		if not _alive() or not is_instance_valid(q):
+			break
+		var r: QteRunner.Result = await q.run(PRESS, p, owner.qte_zone_scale())
+		if not _alive():
 			break
 		if r != QteRunner.Result.MISS:
 			break
-		var over: bool = owner.qte.last_value > PRESS.zone.y
+		var over: bool = q.last_value > maxf(PRESS.zone.x, PRESS.zone.y)
 		if over:
 			_penalize(&"press_over")
 		if i == MAX_TRIES - 1:
@@ -142,21 +180,34 @@ func _qte_press(p: Item2D) -> void:
 			toast(MinigameHeader.INSTALL_QTE_PRESS_OVER if over else MinigameHeader.INSTALL_QTE_PRESS_EARLY)
 			p.position.y = top_y # แรมเด้งกลับขึ้นมา
 			await wait(0.5)
-	owner.qte.value_changed.disconnect(follow)
-	p.position.y = top_y + RAISED
+	if is_instance_valid(q) and q.value_changed.is_connected(follow):
+		q.value_changed.disconnect(follow)
+	if is_instance_valid(p):
+		p.position.y = top_y + RAISED
 
 
 ## รอให้ผู้เล่นกดปิดกล่องคำพูดปิ๊บก่อน — ไม่งั้นคลิกปิดกล่องจะนับเป็นการกด QTE
+## เช็กทุก 0.1 วิ (ไม่ await สัญญาณตรง ๆ กันค้างถ้าปิ๊บถูกซ่อนแบบอื่น) · รอได้นานสุด PIB_WAIT_MAX วิ
+const PIB_WAIT_MAX := 60.0
 func _wait_pib() -> void:
+	if not _alive():
+		return
 	await get_tree().process_frame
-	var pib: PibHint = owner.pib
-	while visible and pib and pib.visible and pib.dialog_panel.visible and not pib._closing:
-		await pib.all_lines_finished
-	await wait(0.2)
+	var t := 0.0
+	while _alive() and t < PIB_WAIT_MAX:
+		var pib = owner.get("pib")
+		if not is_instance_valid(pib) or not pib.visible or not pib.dialog_panel.visible or pib._closing:
+			break
+		await wait(0.1)
+		t += 0.1
+	if _alive():
+		await wait(0.2)
 
 
 ## พลาด 3 ครั้ง → ปิ๊บช่วยทำให้ (หักคะแนน)
 func _help(key: StringName) -> void:
+	if not _alive():
+		return
 	_penalize(StringName("help_" + key))
 	say(MinigameHeader.INSTALL_QTE_HELP, PibHint.Mood.HAPPY)
 
@@ -169,5 +220,7 @@ func _penalize(key: StringName) -> void:
 
 
 func _complete() -> void:
-	(node("RamA2") as Item2D).mode = Item2D.Mode.DRAGGABLE
+	var ram := node("RamA2") as Item2D
+	if ram:
+		ram.mode = Item2D.Mode.DRAGGABLE
 	finish()

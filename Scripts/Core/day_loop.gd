@@ -50,6 +50,12 @@ var _game_over := false
 var _working := false          # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
 var _shop_time := 0.0
 var _break_done := false
+var _skipping := false          # กำลังเล่นแอนิเมชันเวลาหมุน
+var _pending_cb := Callable()   # callback ที่รอ DialogScene.on_dialog_finish อยู่ (ถอดได้ถ้าบทไม่ขึ้น)
+var _minigame: Node             # มินิเกมงานลูกค้าที่เปิดอยู่
+var _stuck_time := 0.0          # watchdog: _working ค้างโดยไม่มีบท/มินิเกม
+var _connect_tries := 0
+const STUCK_LIMIT := 3.0
 var _skip_overlay: ColorRect
 var _skip_clock: Label
 var _skip_caption: Label
@@ -72,24 +78,51 @@ func _ready() -> void:
 
 
 func _connect() -> void:
-	var ts: TimeSystem = EventManager.time_system
-	ts.day_started.connect(_on_day_started)
-	ts.week_ended.connect(_on_week_ended)
-	ts.all_weeks_ended.connect(_on_all_weeks_ended)
-	GameState.repair_recorded.connect(_on_repair_recorded)
+	var ts := _ts()
+	if ts == null or not has_node(^"/root/GameState"):
+		_connect_tries += 1
+		if _connect_tries > 30:
+			push_error("DayLoop: ไม่พบ EventManager.time_system / GameState — ลูปร้านไม่ทำงาน")
+			return
+		await get_tree().process_frame
+		_connect()
+		return
+	if not ts.day_started.is_connected(_on_day_started):
+		ts.day_started.connect(_on_day_started)
+	if not ts.week_ended.is_connected(_on_week_ended):
+		ts.week_ended.connect(_on_week_ended)
+	if not ts.all_weeks_ended.is_connected(_on_all_weeks_ended):
+		ts.all_weeks_ended.connect(_on_all_weeks_ended)
+	if not GameState.repair_recorded.is_connected(_on_repair_recorded):
+		GameState.repair_recorded.connect(_on_repair_recorded)
 	week_start_money = GameState.money
 	today_case = case_for(ts.current_week, ts.current_day)
 
 
 ## เตือนใน Output ถ้าลูกค้าคนไหนกรอกไม่ครบ (เช่น ไม่มีเหตุผลที่มาร้าน)
 func _validate() -> void:
-	var all: Array[CustomerCase] = random_pool.duplicate()
+	var all: Array[CustomerCase] = []
+	for c in random_pool:
+		if c:
+			all.append(c)
+	var weeks_seen := {}
 	for plan in week_plans:
-		if plan:
-			for c in plan.days:
-				if c:
-					all.append(c)
+		if plan == null:
+			push_warning("DayLoop.week_plans มีช่องว่าง")
+			continue
+		if weeks_seen.has(plan.week):
+			push_warning("DayLoop.week_plans มีรอบ %d ซ้ำ — ใช้อันแรก (%s)" % [plan.week, plan.resource_path])
+		weeks_seen[plan.week] = true
+		if plan.days.size() > TimeSystem.DAYS_PER_WEEK:
+			push_warning("WeekPlan %s มี %d วัน (เกิน %d) — วันที่เกินไม่ถูกใช้" % [plan.resource_path, plan.days.size(), TimeSystem.DAYS_PER_WEEK])
+		for c in plan.days:
+			if c:
+				all.append(c)
+	var ids := {}
 	for c in all:
+		if c.id != &"" and ids.has(c.id) and ids[c.id] != c:
+			push_warning("CustomerCase id ซ้ำ: %s" % c.id)
+		ids[c.id] = c
 		for p in c.problems():
 			push_warning("CustomerCase %s: %s" % [c.resource_path, p])
 	for c in random_pool:
@@ -113,7 +146,7 @@ func case_for(week: int, day: int) -> CustomerCase:
 		var c := plan.case_for_day(day)
 		if c:
 			return c
-	var pool := random_pool.filter(func(c): return c != null)
+	var pool := random_pool.filter(func(c: CustomerCase) -> bool: return c != null and not c.forced)
 	if pool.is_empty():
 		return null
 	return pool[_rng.randi_range(0, pool.size() - 1)]
@@ -128,6 +161,9 @@ func _on_day_started(week: int, day: int) -> void:
 
 
 func _on_repair_recorded(result: Dictionary) -> void:
+	if job_done_today:
+		push_warning("DayLoop: ได้ผลงานซ่อมซ้ำในวันเดียว — ใช้อันล่าสุด")
+		week_results.pop_back()
 	job_done_today = true
 	last_result = result
 	week_results.append(result)
@@ -150,33 +186,56 @@ func play_arrival(then_repair: bool) -> void:
 	_hide()
 	arrived_today = true
 	var path := today_case.arrive_dialog
-	if path == "" or not FileAccess.file_exists(path):
+	var done := func() -> void:
+		_pending_cb = Callable()
 		_working = false
 		if then_repair:
 			start_repair()
-		return
-	var done := func():
-		_working = false
-		if then_repair:
-			start_repair()
-	DialogScene.on_dialog_finish.connect(done, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
-	var bg := today_case.bg if today_case.bg != "" and ResourceLoader.exists(today_case.bg) else ""
-	EventManager.play_story_dialog("ลูกค้า: " + today_case.customer, path, bg, GameState.speakers_in(path))
+	var bg := today_case.bg
+	if path != "" and EventManager.play_story_dialog("ลูกค้า: " + today_case.customer, path, bg, DialogUtil.speakers_in(path)):
+		_wait_dialog(done)
+	else:
+		done.call()   # ไม่มีบท/เปิดบทไม่ได้ → ข้ามไปขั้นต่อไปเลย ไม่ให้ค้าง
 
 
 ## เปิดมินิเกมของงานวันนี้ · meta "work_order" = งานลูกค้า (PartMinigame ส่งคะแนนเข้า GameState เฉพาะงานที่มี meta นี้)
 func start_repair() -> void:
 	var cs := get_tree().current_scene
-	if today_case == null or cs == null or not ResourceLoader.exists(today_case.scene_path()):
-		push_warning("DayLoop: เปิดมินิเกมไม่ได้ %s" % (today_case.scene_path() if today_case else "<ไม่มีลูกค้า>"))
+	if today_case == null or cs == null:
+		push_warning("DayLoop: เปิดมินิเกมไม่ได้ (ไม่มีลูกค้า หรือไม่มีซีนปัจจุบัน)")
 		return
+	if is_instance_valid(_minigame) and _minigame.is_inside_tree():
+		push_warning("DayLoop: มีมินิเกมเปิดอยู่แล้ว")
+		return
+	var path := today_case.scene_path()
+	var ps := load(path) as PackedScene if path != "" and ResourceLoader.exists(path) else null
+	if ps == null:
+		push_error("DayLoop: โหลดมินิเกมไม่ได้ %s (%s)" % [path, today_case.resource_path])
+		return
+	var m := ps.instantiate()
+	if not m is PartMinigame:
+		push_warning("DayLoop: %s ไม่ใช่ PartMinigame — จะไม่ได้คะแนน/เงิน" % path)
 	_working = true
 	_hide()
-	var m := (load(today_case.scene_path()) as PackedScene).instantiate()
 	m.set_meta("work_order", today_case)
-	m.tree_exited.connect(func(): _working = false)
+	m.tree_exited.connect(_on_minigame_closed)
+	_minigame = m
 	cs.add_child(m)
 	Global.in_minigame = true
+
+
+func _on_minigame_closed() -> void:
+	_minigame = null
+	_working = false
+	Global.in_minigame = false   # กันมินิเกมปิดแบบผิดปกติแล้วค่านี้ค้าง true (การ์ดจะไม่ขึ้นอีกเลย)
+
+
+## รอบทจบแล้วค่อยเรียก cb · จำไว้ใน _pending_cb เพื่อถอดได้ถ้าบทไม่ขึ้นจริง (watchdog)
+func _wait_dialog(cb: Callable) -> void:
+	if _pending_cb.is_valid() and DialogScene.on_dialog_finish.is_connected(_pending_cb):
+		DialogScene.on_dialog_finish.disconnect(_pending_cb)
+	_pending_cb = cb
+	DialogScene.on_dialog_finish.connect(cb, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
 
 
 ## บทพักหลัง Tutorial → เวลาหมุน → แล้วลูกค้า forced ค่อยเข้ามา
@@ -184,15 +243,14 @@ func _play_break() -> void:
 	_break_done = true
 	_working = true
 	_hide()
-	if not FileAccess.file_exists(break_dialog):
+	if EventManager.play_story_dialog("พักก่อน", break_dialog, break_bg, DialogUtil.speakers_in(break_dialog)):
+		_wait_dialog(_after_break)
+	else:
 		_after_break()
-		return
-	DialogScene.on_dialog_finish.connect(_after_break, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
-	var bg := break_bg if break_bg != "" and ResourceLoader.exists(break_bg) else ""
-	EventManager.play_story_dialog("พักก่อน", break_dialog, bg, GameState.speakers_in(break_dialog))
 
 
 func _after_break() -> void:
+	_pending_cb = Callable()
 	await time_skip(break_minutes, time_skip_seconds)
 	_shop_time = 0.0
 	_working = false
@@ -201,10 +259,13 @@ func _after_break() -> void:
 ## จอมืดลงครึ่งหนึ่ง + นาฬิกาหมุนจากตอนนี้ไปอีก minutes นาที ใน seconds วินาที (HUD หมุนตาม) แล้วสว่างกลับ
 ## ใช้ซ้ำได้ทุกที่: await DayLoop.time_skip(30)
 func time_skip(minutes: int, seconds := 1.0) -> void:
-	var ts: TimeSystem = EventManager.time_system
+	var ts := _ts()
+	if ts == null or minutes <= 0 or _skipping:
+		return
+	_skipping = true
 	var from := ts.current_minute
-	var to := from + minutes
-	_skip_caption.text = ("%d นาทีต่อมา…" % minutes) if minutes < 60 else ("%d ชั่วโมงต่อมา…" % (minutes / 60))
+	var to := mini(from + minutes, 24 * 60 - 1)
+	_skip_caption.text = ("%d นาทีต่อมา…" % minutes) if minutes < 60 else ("%d ชั่วโมงต่อมา…" % floori(minutes / 60.0))
 	_skip_clock.text = TimeSystem.clock_text(from)
 	_skip_overlay.modulate.a = 0.0
 	_skip_overlay.visible = true
@@ -214,17 +275,31 @@ func time_skip(minutes: int, seconds := 1.0) -> void:
 	tw.tween_interval(0.15)
 	tw.tween_property(_skip_overlay, "modulate:a", 0.0, 0.2)
 	await tw.finished
-	ts.set_clock(to)
+	if is_instance_valid(ts):
+		ts.set_clock(to)
 	_skip_overlay.visible = false
+	_skipping = false
 
 
 func _skip_step(v: float) -> void:
-	EventManager.time_system.set_clock(int(v))
+	var ts := _ts()
+	if ts:
+		ts.set_clock(int(v))
 	_skip_clock.text = TimeSystem.clock_text(int(v))
 
 
+func _ts() -> TimeSystem:
+	var em := get_node_or_null(^"/root/EventManager")
+	if em == null:
+		return null
+	var ts = em.get("time_system")
+	return ts as TimeSystem if is_instance_valid(ts) else null
+
+
 func close_shop() -> void:
-	EventManager.time_system.set_period(TimeSystem.TIME.EVENING)
+	var ts := _ts()
+	if ts:
+		ts.set_period(TimeSystem.TIME.EVENING)
 
 
 func sleep() -> void:
@@ -254,13 +329,18 @@ func _reset_run() -> void:
 	_break_done = false
 	GameState.reset()
 	week_start_money = GameState.money
-	EventManager.time_system.set_date(1, 1)
+	var ts := _ts()
+	if ts:
+		ts.set_date(1, 1)
 	today_case = case_for(1, 1)
 
 
 # ---------------------------------------------------------------- UI
 
 func _process(delta: float) -> void:
+	if _ts() == null:
+		return
+	_watchdog(delta)
 	var want := _decide_card()
 	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
 	if want == Card.JOB_FORCED and not arrived_today and not _break_done and break_dialog != "":
@@ -281,6 +361,23 @@ func _process(delta: float) -> void:
 		_show_card(want)
 
 
+## _working ค้างนานโดยไม่มีบท/มินิเกม/เวลาหมุน (เช่นบทเปิดไม่ขึ้น) → ปลดล็อกให้การ์ดกลับมา
+func _watchdog(delta: float) -> void:
+	var busy := DialogScene.visible or _skipping or (is_instance_valid(_minigame) and _minigame.is_inside_tree())
+	if not _working or busy:
+		_stuck_time = 0.0
+		return
+	_stuck_time += delta
+	if _stuck_time < STUCK_LIMIT:
+		return
+	push_warning("DayLoop: ค้างรอบท/มินิเกมเกิน %.0f วิ — ปลดล็อก" % STUCK_LIMIT)
+	if _pending_cb.is_valid() and DialogScene.on_dialog_finish.is_connected(_pending_cb):
+		DialogScene.on_dialog_finish.disconnect(_pending_cb)
+	_pending_cb = Callable()
+	_working = false
+	_stuck_time = 0.0
+
+
 func _decide_card() -> Card:
 	if _working or Global.in_minigame or DialogScene.visible:
 		return Card.NONE
@@ -290,7 +387,7 @@ func _decide_card() -> Card:
 		return Card.ENDING if GameState.ending != &"" else Card.NONE
 	if not _loop_active() or not _in_shop():
 		return Card.NONE
-	var ts: TimeSystem = EventManager.time_system
+	var ts := _ts()
 	if job_done_today:
 		return Card.EVENING if ts.cur_period == TimeSystem.TIME.EVENING else Card.RESULT
 	if today_case and today_case.forced:
@@ -313,17 +410,25 @@ func _in_shop() -> bool:
 
 
 func _fee(c: CustomerCase) -> int:
+	if c == null:
+		return 0
 	if c.fee >= 0:
 		return c.fee
-	return GameState.economy.repair_fee.get(c.part(), GameState.economy.default_fee)
+	var e: EconomyConfig = GameState.economy
+	if e == null:
+		return 0
+	return e.repair_fee.get(c.part(), e.default_fee)
 
 
 func _show_card(card: Card) -> void:
 	_card = card
 	_panel.visible = true
 	_secondary.visible = false
-	var ts: TimeSystem = EventManager.time_system
+	var ts := _ts()
 	var c := today_case
+	if c == null and (card == Card.JOB or card == Card.JOB_FORCED):
+		card = Card.EVENING   # ไม่มีลูกค้าวันนี้
+		_card = card
 	match card:
 		Card.JOB:
 			_title.text = "ลูกค้ามาที่ร้าน · วันที่ %d" % ts.current_day
@@ -343,13 +448,17 @@ func _show_card(card: Card) -> void:
 				_body.text = "ซ่อมเสร็จแล้ว"
 			else:
 				var r := last_result
-				var money_txt := ("+฿%d" % r["money"]) if r["money"] >= 0 else ("−฿%d" % -r["money"])
+				var money: int = r.get("money", 0)
+				var grade: int = clampi(int(r.get("grade", GameState.Grade.PASS)), 0, GRADE_TEXT.size() - 1)
+				var money_txt := ("+฿%d" % money) if money >= 0 else ("−฿%d" % -money)
 				var quote := ""
 				if c:
-					quote = "\n\n%s: \"%s\"" % [c.customer, c.complain_text if r["grade"] == GameState.Grade.FAIL else c.thanks_text]
+					var line := c.complain_text if grade == GameState.Grade.FAIL else c.thanks_text
+					if line.strip_edges() != "":
+						quote = "\n\n%s: \"%s\"" % [c.customer, line]
 				_body.text = "%s\nคะแนน %d/100%s\nเงิน %s · ความพอใจ %d · XP +%d%s" % [
-					GRADE_TEXT[r["grade"]], r["score"], "  (ทำของเสีย!)" if r["damaged"] else "",
-					money_txt, r["satisfaction"], r["xp"], quote]
+					GRADE_TEXT[grade], int(r.get("score", 0)), "  (ทำของเสีย!)" if r.get("damaged", false) else "",
+					money_txt, int(r.get("satisfaction", 0)), int(r.get("xp", 0)), quote]
 			_primary.text = "ปิดร้าน → ช่วงเย็น"
 		Card.EVENING:
 			_title.text = "ช่วงเย็น · วันที่ %d/%d" % [ts.current_day, TimeSystem.DAYS_PER_WEEK]
@@ -359,8 +468,9 @@ func _show_card(card: Card) -> void:
 			var earned := GameState.money - week_start_money
 			var sat := 0.0
 			for r in week_results:
-				sat += r["satisfaction"]
+				sat += float(r.get("satisfaction", 0))
 			sat = sat / week_results.size() if not week_results.is_empty() else 0.0
+			sat = sat if is_finite(sat) else 0.0
 			_title.text = "สรุปรอบ %d" % _pending_summary_week
 			_body.text = "งานที่ซ่อม %d งาน\nรายได้รอบนี้ %s฿%d\nความพอใจเฉลี่ย %d · ทั้งเกม %d\nXP รวม %d" % [
 				week_results.size(), "+" if earned >= 0 else "−", absi(earned), roundi(sat),
@@ -387,7 +497,9 @@ func _on_primary() -> void:
 			_continue_after_summary()
 		Card.ENDING:
 			_reset_run()
-			get_tree().change_scene_to_file("res://Scene/Start_Scene.tscn")
+			var err := get_tree().change_scene_to_file("res://Scene/Start_Scene.tscn")
+			if err != OK:
+				push_error("DayLoop: กลับหน้าแรกไม่ได้ (error %d)" % err)
 	_card = Card.NONE
 
 

@@ -24,6 +24,8 @@ var qte: QteRunner
 @export var skippable := false
 var _skip_btn: Button
 var _skip_armed := false
+## จบมินิเกมไปแล้ว (กันส่ง minigame_finished ซ้ำ → เควสต์เดิน 2 ขั้น / เงินเข้า 2 ครั้ง)
+var _finished := false
 
 
 func _ready() -> void:
@@ -77,14 +79,31 @@ func _set_phase(phase: int) -> void:
 
 
 func _advance_phase() -> void:
+	if _finished:
+		return
 	if current_phase == _last_phase():
-		_report_repair()
-		minigame_finished.emit(_mistakes)
+		_finish(true)
+		return
+	if not _phase_nodes.has(current_phase + 1):
+		push_warning("%s: ไม่มี phase %d ต่อจาก %d — จบมินิเกม" % [name, current_phase + 1, current_phase])
+		_finish(true)
 		return
 	_set_phase(current_phase + 1)
 
 
+## จบมินิเกมครั้งเดียวเท่านั้น · report = ส่งผลงานให้ GameState (งานลูกค้า)
+func _finish(report: bool) -> void:
+	if _finished:
+		return
+	_finished = true
+	if report:
+		_report_repair()
+	minigame_finished.emit(_mistakes)
+
+
 func _build_qte() -> void:
+	if qte:
+		return
 	var layer := CanvasLayer.new()
 	layer.name = "QteLayer"
 	layer.layer = 30
@@ -110,13 +129,15 @@ func _build_skip() -> void:
 
 ## กดครั้งแรก = ถามยืนยัน (3 วิ) · กดซ้ำ = จบมินิเกมทันที (ไม่คิดคะแนน/เงิน) แล้วเควสต์เดินต่อ
 func _on_skip_pressed() -> void:
+	if _finished or not is_inside_tree():
+		return
 	if not _skip_armed:
 		_skip_armed = true
 		_skip_btn.text = "แน่ใจ? กดอีกครั้ง"
 		_skip_btn.reset_size()
 		_skip_btn.position.x = 1152 - _skip_btn.size.x - 12
 		await get_tree().create_timer(3.0).timeout
-		if is_instance_valid(_skip_btn):
+		if is_instance_valid(_skip_btn) and not _finished:
 			_skip_armed = false
 			_skip_btn.text = "ข้ามบทฝึก ►"
 		return
@@ -125,13 +146,20 @@ func _on_skip_pressed() -> void:
 
 ## ข้ามมินิเกมทั้งตัว — phase ปัจจุบันถูก abort · ส่ง minigame_finished ให้ Part ปิดตัวเองตามปกติ
 func skip() -> void:
+	if _finished:
+		return
+	if has_meta("work_order"):
+		push_warning("%s: งานลูกค้าข้ามไม่ได้" % name)
+		return
 	if qte:
 		qte.cancel()
-	if _phase_nodes.has(current_phase):
+	if _phase_nodes.has(current_phase) and is_instance_valid(_phase_nodes[current_phase]):
 		_phase_nodes[current_phase].abort()
-	if pib:
+	if is_instance_valid(pib):
 		pib.hide()
-	minigame_finished.emit(_mistakes)
+	if is_instance_valid(_skip_btn):
+		_skip_btn.disabled = true
+	_finish(false)
 
 
 func _exit_tree() -> void:
@@ -161,14 +189,16 @@ func _report_repair() -> void:
 	var order = get_meta("work_order")
 	if order is CustomerCase:
 		fee = order.fee
+		if order.part_id != String(id):
+			push_warning("%s: งานลูกค้า %s เป็น %s แต่มินิเกมนี้คือ %s" % [name, order.id, order.part_id, id])
 	gs.record_repair(id, final_score(), repair_damaged(), fee)
 
 
 ## คะแนน 0–100 จาก phase สุดท้าย (SUMMARY มี var total) · ไม่มี = คิดจาก _mistakes
 func final_score() -> int:
 	var last = _phase_nodes.get(_last_phase())
-	if last != null and "total" in last:
-		return int(last.total)
+	if is_instance_valid(last) and "total" in last:
+		return clampi(int(last.total), 0, 100)
 	var lost := 0
 	for k in _mistakes:
 		lost += int(_mistakes[k])

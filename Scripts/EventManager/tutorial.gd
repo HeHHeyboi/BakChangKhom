@@ -54,7 +54,7 @@ func show_tutorial(tutor_index: TutorialState) -> void:
 	slide_show.texture = cur_slide.get_cur_slide()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if cur_slide == null:
 		return
 
@@ -96,7 +96,12 @@ func _build_skip() -> void:
 	b.add_theme_font_size_override("font_size", 18)
 	b.position = Vector2(1060, 12)
 	b.pressed.connect(skip)
-	$Control.add_child(b)
+	var root := get_node_or_null(^"Control")
+	if root == null:
+		push_warning("Tutorial: ไม่พบโหนด Control — ไม่มีปุ่มข้าม")
+		b.free()
+		return
+	root.add_child(b)
 
 
 func skip() -> void:

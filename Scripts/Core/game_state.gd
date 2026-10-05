@@ -78,6 +78,9 @@ func can_afford(cost: int) -> bool:
 ## เรียกจาก PartMinigame ตอนจบงานลูกค้า · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย · fee −1 = ใช้ค่าจาก economy
 func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1) -> Dictionary:
 	var e := economy
+	if e == null:
+		e = EconomyConfig.new()
+	score = clampi(score, 0, 100)
 	var grade: Grade
 	if damaged or score < e.pass_score:
 		grade = Grade.FAIL
@@ -122,7 +125,7 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 ## งานซ่อม 1 งานกินเวลา 1 ช่วง (เช้า → เที่ยง → เย็น) · ไม่ข้ามวันเอง — จบวันต้องนอน
 func _advance_after_repair() -> void:
 	var ts: TimeSystem = EventManager.time_system
-	if ts and ts.cur_period != TimeSystem.TIME.EVENING:
+	if ts and not ts.finished and ts.cur_period != TimeSystem.TIME.EVENING:
 		EventManager.next_period.emit()
 
 
@@ -142,9 +145,10 @@ func has_cleared(part_id: StringName) -> bool:
 # ---------------------------------------------------------------- ลูปรอบ / ฉากจบ
 
 ## ครบรอบ week → เปิดบทของรอบถัดไป · DayLoop เรียกหลังการ์ดสรุปรอบ
-func play_week_chapter(week: int) -> void:
-	if week < CHAPTERS.size():
-		_play_story(CHAPTERS[week])
+func play_week_chapter(week: int) -> bool:
+	if week < 1 or week >= CHAPTERS.size():
+		return false
+	return _play_story(CHAPTERS[week])
 
 
 ## ครบ 12 รอบ → ตัดสินฉากจบ + Epilogue · DayLoop เรียกหลังการ์ดสรุปรอบ 12
@@ -166,30 +170,17 @@ func decide_ending() -> StringName:
 	return &"stay" if average_satisfaction() >= 70.0 else &"failure"
 
 
-func _play_story(ch: Dictionary) -> void:
-	if not FileAccess.file_exists(ch["file"]):
-		push_warning("ไม่พบไฟล์บท %s" % ch["file"])
-		return
-	var bg: String = ch["bg"]
+func _play_story(ch: Dictionary) -> bool:
+	var file: String = ch.get("file", "")
+	var bg: String = ch.get("bg", "")
+	if not DialogUtil.has_lines(file):
+		push_warning("ไม่พบไฟล์บท หรือบทว่าง %s" % file)
+		return false
 	if bg != "" and not ResourceLoader.exists(bg):
 		bg = ""
-	EventManager.play_story_dialog(ch["title"], ch["file"], bg, speakers_in(ch["file"]))
+	return EventManager.play_story_dialog(ch.get("title", ""), file, bg, DialogUtil.speakers_in(file))
 
 
-## ดึงชื่อคนพูดทุกคนจากไฟล์บท (ช่องแรกก่อน ",") — DialogScene ข้ามชื่อที่ไม่มีใน _CharacterMap ให้เอง
-static func speakers_in(path: String) -> Array[String]:
-	var out: Array[String] = []
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f == null:
-		return out
-	while not f.eof_reached():
-		var line := f.get_line().strip_edges()
-		if line == "" or line.begins_with("#") or line.begins_with("Choice:") or line.ends_with(":"):
-			continue
-		var comma := line.find(",")
-		if comma <= 0:
-			continue
-		var who := line.substr(0, comma).split("(")[0].split(":")[0].strip_edges()  # "ขม (ยิ้ม)" → "ขม"
-		if who != "" and not out.has(who):
-			out.append(who)
-	return out
+## (เก่า) ใช้ DialogUtil.speakers_in แทน — เก็บไว้ให้โค้ดเดิมเรียกได้
+func speakers_in(path: String) -> Array[String]:
+	return DialogUtil.speakers_in(path)

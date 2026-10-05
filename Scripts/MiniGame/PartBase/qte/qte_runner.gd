@@ -62,22 +62,28 @@ func _ready() -> void:
 
 ## เล่น QTE เหนือ target (Control ใด ๆ เช่น Item2D) · zone_scale > 1 = ง่ายขึ้น (ครั้งแรกที่เจอ Part ใช้ 1.5)
 func run(spec: QteSpec, target: Control = null, zone_scale := 1.0) -> Result:
+	if not is_inside_tree():
+		push_warning("QteRunner.run: runner ไม่อยู่ใน scene tree")
+		return Result.MISS
 	if running:
 		push_warning("QteRunner: เรียก run ซ้อนกัน")
+		await get_tree().process_frame
 		return Result.MISS
 	if auto_result >= 0:
 		await get_tree().process_frame
 		last_value = 0.5
-		return auto_result as Result
+		return clampi(auto_result, Result.PERFECT, Result.MISS) as Result
 	if spec == null or spec.kind > QteSpec.Kind.HOLD:
 		push_warning("QteRunner: ยังไม่รองรับ QTE แบบนี้ — ให้ผ่านเป็น GOOD")
 		await get_tree().process_frame
 		return Result.GOOD
 	_spec = spec
-	var s := zone_scale * (1.5 if assist else 1.0)
-	_zone = spec.scaled_zone(spec.zone, s)
-	_perfect = spec.scaled_zone(spec.perfect, s)
-	_duration = spec.duration * (2.0 if assist else 1.0)
+	var s := clampf(zone_scale, 0.25, 4.0) * (1.5 if assist else 1.0)
+	_zone = spec.scaled_zone(_ordered(spec.zone), s)
+	_perfect = spec.scaled_zone(_ordered(spec.perfect), s)
+	# PERFECT ต้องอยู่ในโซน GOOD เสมอ
+	_perfect = Vector2(clampf(_perfect.x, _zone.x, _zone.y), clampf(_perfect.y, _zone.x, _zone.y))
+	_duration = maxf(spec.duration, 0.1) * (2.0 if assist else 1.0)
 	_t = 0.0
 	_value = 0.0
 	_holding = false
@@ -92,6 +98,11 @@ func run(spec: QteSpec, target: Control = null, zone_scale := 1.0) -> Result:
 	queue_redraw()
 	var r: Result = await finished
 	return r
+
+
+## ค่าที่กรอกกลับด้าน (x > y) ใน Inspector → สลับให้
+static func _ordered(v: Vector2) -> Vector2:
+	return Vector2(minf(v.x, v.y), maxf(v.x, v.y))
 
 
 ## ยกเลิกกลางคัน (phase ถูกข้าม) = MISS
@@ -113,7 +124,7 @@ func _anchor_for(target: Control) -> Vector2:
 
 
 func _process(delta: float) -> void:
-	if not running:
+	if not running or _spec == null:
 		return
 	_t += delta
 	match _spec.kind:
@@ -140,7 +151,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not running:
+	if not running or _spec == null or not is_visible_in_tree():
 		return
 	var pressed := false
 	var released := false
@@ -187,6 +198,8 @@ func _end(r: Result, show_flash := true) -> void:
 
 
 func _show_flash(r: Result) -> void:
+	if not is_inside_tree():
+		return
 	_flash.text = ["PERFECT!", "GOOD", "MISS"][r]
 	_flash.add_theme_color_override("font_color", [COL_PERFECT, COL_ZONE, COL_OVER][r])
 	_flash.visible = true

@@ -65,11 +65,11 @@ func _ready() -> void:
 		while ram.current_phase == 6 and waited < 15.0:
 			await get_tree().create_timer(0.1).timeout
 			waited += 0.1
-		var name := "PERFECT" if mode == QteRunner.Result.PERFECT else "MISS ทุกครั้ง"
-		_check(ram.current_phase == 7, "RAM INSTALL บอท %s → ไป VERIFY (%.1f วิ)" % [name, waited])
-		_check(ram.ram_seated, "RAM INSTALL บอท %s → แรมลงสุด" % name)
+		var label := "PERFECT" if mode == QteRunner.Result.PERFECT else "MISS ทุกครั้ง"
+		_check(ram.current_phase == 7, "RAM INSTALL บอท %s → ไป VERIFY (%.1f วิ)" % [label, waited])
+		_check(ram.ram_seated, "RAM INSTALL บอท %s → แรมลงสุด" % label)
 		var lost: int = ram._mistakes.get(&"handling", 0)
-		_check(lost == (0 if mode == QteRunner.Result.PERFECT else 10), "RAM INSTALL บอท %s → หัก handling %d" % [name, lost])
+		_check(lost == (0 if mode == QteRunner.Result.PERFECT else 10), "RAM INSTALL บอท %s → หัก handling %d" % [label, lost])
 		ram.queue_free()
 		await _frames(2)
 	QteRunner.auto_result = -1

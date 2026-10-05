@@ -103,11 +103,22 @@ func trigger_step(id: EventID, event: Event) -> void:
 
 
 ## เปิดบทพูดนอกเควสต์ (บท Chapter ประจำรอบ · Epilogue) — เรียกจาก GameState ตอนครบ 7 วัน
-func play_story_dialog(title: String, file_path: String, bg_name: String, chars: Array = []) -> void:
+## คืน false ถ้าเปิดไม่ได้ (ไฟล์หาย/บทว่าง/มีบทอื่นเปิดอยู่) — ผู้เรียกต้องไปต่อเอง ไม่งั้นรอ on_dialog_finish ค้าง
+func play_story_dialog(title: String, file_path: String, bg_name: String, chars: Array = []) -> bool:
+	if not DialogUtil.has_lines(file_path):
+		push_warning("play_story_dialog: ไม่พบบท หรือบทว่าง %s" % file_path)
+		return false
+	if DialogScene.visible:
+		push_warning("play_story_dialog: มีบทอื่นเปิดอยู่ ข้าม %s" % file_path)
+		return false
+	if bg_name != "" and not ResourceLoader.exists(bg_name):
+		push_warning("play_story_dialog: ไม่พบฉากหลัง %s" % bg_name)
+		bg_name = ""
 	_story_dialog = true
 	hideUI()
 	DialogScene.show_dialog(file_path, bg_name, chars)
 	DialogScene.set_title(title)
+	return true
 
 
 ## จบช่วงเวลาปัจจุบัน (เช้า → เที่ยง → เย็น → วันใหม่)

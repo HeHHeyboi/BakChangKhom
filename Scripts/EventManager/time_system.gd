@@ -38,17 +38,22 @@ enum TIME {
 
 
 func _enter_tree() -> void:
-	EventManager.next_period.connect(change_period)
-	EventManager.next_day.connect(change_day)
+	if not EventManager.next_period.is_connected(change_period):
+		EventManager.next_period.connect(change_period)
+	if not EventManager.next_day.is_connected(change_day):
+		EventManager.next_day.connect(change_day)
 
 
 func _exit_tree() -> void:
-	EventManager.next_period.disconnect(change_period)
-	EventManager.next_day.disconnect(change_day)
+	if EventManager.next_period.is_connected(change_period):
+		EventManager.next_period.disconnect(change_period)
+	if EventManager.next_day.is_connected(change_day):
+		EventManager.next_day.disconnect(change_day)
 
 
 func _ready() -> void:
-	dateText.add_theme_font_size_override("normal_font_size", 22)
+	if dateText:
+		dateText.add_theme_font_size_override("normal_font_size", 22)
 	updateTime()
 	_build_money_label()
 	_connect_money.call_deferred()
@@ -56,7 +61,10 @@ func _ready() -> void:
 
 ## เงินของร้านแสดงต่อท้ายวันที่ (GameState เป็น autoload ที่โหลดหลัง EventManager จึงผูกแบบ deferred)
 func _build_money_label() -> void:
-	var box := $PanelContainer/HBoxContainer as HBoxContainer
+	var box := get_node_or_null(^"PanelContainer/HBoxContainer") as HBoxContainer
+	if box == null:
+		push_warning("TimeSystem: ไม่พบ PanelContainer/HBoxContainer — ไม่แสดงเงิน")
+		return
 	_money_label = Label.new()
 	_money_label.name = "Money"
 	_money_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -73,11 +81,14 @@ func _connect_money() -> void:
 	if not has_node("/root/GameState"):
 		return
 	var gs := get_node("/root/GameState")
-	gs.money_changed.connect(_on_money_changed)
+	if not gs.money_changed.is_connected(_on_money_changed):
+		gs.money_changed.connect(_on_money_changed)
 	_on_money_changed(gs.money, 0)
 
 
 func _on_money_changed(money: int, _delta: int) -> void:
+	if _money_label == null:
+		return
 	_money_label.text = "฿ %d" % money
 
 
@@ -124,6 +135,9 @@ func change_day() -> void:
 
 
 func set_period(time: TIME) -> void:
+	if not PERIOD_START.has(time):
+		push_warning("TimeSystem.set_period: ช่วงเวลาไม่ถูกต้อง %s" % time)
+		return
 	cur_period = time
 	current_minute = maxi(current_minute, PERIOD_START[time]) if time != TIME.MORNING else PERIOD_START[time]
 	updateTime()
@@ -132,6 +146,8 @@ func set_period(time: TIME) -> void:
 
 ## ใช้ตอนโหลดเซฟ / debug
 func set_date(week: int, day: int, period: TIME = TIME.MORNING) -> void:
+	if not PERIOD_START.has(period):
+		period = TIME.MORNING
 	current_week = clampi(week, 1, TOTAL_WEEKS)
 	current_day = clampi(day, 1, DAYS_PER_WEEK)
 	cur_period = period
@@ -147,6 +163,8 @@ func advance_minutes(m: int) -> void:
 
 
 func set_clock(minute: int) -> void:
+	if finished:
+		return
 	current_minute = clampi(minute, 0, 24 * 60 - 1)
 	var p: TIME = cur_period
 	if current_minute >= PERIOD_START[TIME.EVENING]:
@@ -161,7 +179,8 @@ func set_clock(minute: int) -> void:
 
 
 static func clock_text(minute: int) -> String:
-	return "%02d:%02d" % [minute / 60, minute % 60]
+	minute = clampi(minute, 0, 24 * 60 - 1)
+	return "%02d:%02d" % [floori(minute / 60.0), minute % 60]
 
 
 func is_last_day_of_week() -> bool:
@@ -169,7 +188,7 @@ func is_last_day_of_week() -> bool:
 
 
 func updateTime() -> void:
-	if timeText == null:
+	if timeText == null or dateText == null:
 		return
 	timeText.clear()
 	match cur_period:
