@@ -165,6 +165,11 @@ func _debug_prepare(phase: int) -> void:
 	ram.mode = Item2D.Mode.DRAGGABLE
 
 
+## ของเสียระหว่างซ่อม → GameState หักเงิน
+func repair_damaged() -> bool:
+	return ram_damaged
+
+
 func _on_minigame_finished(_score: Dictionary) -> void:
 	Global.in_minigame = false
 	Global.cur_pib = null

@@ -16,6 +16,8 @@ enum EventID {
 @onready var tutorial = $"Tutorial" as Tutorial
 var currentEvent: EventID
 var pendingTask: int = -1
+## true ระหว่างเล่นบทที่ไม่ใช่ขั้นของเควสต์ (บท Chapter ท้ายรอบ · Epilogue) — จบแล้วไม่ไปเดินเควสต์หลัก
+var _story_dialog := false
 
 signal on_tutorial_finish
 signal on_minigame_end
@@ -100,8 +102,29 @@ func trigger_step(id: EventID, event: Event) -> void:
 		_process_data(id, data)
 
 
+## เปิดบทพูดนอกเควสต์ (บท Chapter ประจำรอบ · Epilogue) — เรียกจาก GameState ตอนครบ 7 วัน
+func play_story_dialog(title: String, file_path: String, bg_name: String, chars: Array = []) -> void:
+	_story_dialog = true
+	hideUI()
+	DialogScene.show_dialog(file_path, bg_name, chars)
+	DialogScene.set_title(title)
+
+
+## จบช่วงเวลาปัจจุบัน (เช้า → เที่ยง → เย็น → วันใหม่)
+func advance_period() -> void:
+	next_period.emit()
+
+
+## นอน → วันถัดไป (ครบ 7 วัน TimeSystem จะยิง week_ended)
+func end_day() -> void:
+	next_day.emit()
+
+
 func _on_dialog_finish() -> void:
 	showUI()
+	if _story_dialog:
+		_story_dialog = false
+		return
 	on_dialog_end.emit()
 	var event = eventMap[currentEvent]
 	if event == null:

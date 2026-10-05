@@ -11,6 +11,8 @@ signal minigame_finished(score: Dictionary)
 @export var pib: PibHint
 ## ไฟล์บทปิ๊บแบบ @SECTION ของ Part นี้ (เช่น res://Assets/Dialog/MiniGame/Ram_Pib.txt)
 @export_file("*.txt") var dialog_path: String
+## ใช้คิดค่าซ่อมใน GameState (EconomyConfig.repair_fee) · ว่าง = ชื่อไฟล์ซีน เช่น part_gpu
+@export var part_id: StringName
 
 var current_phase: int = -1
 var dialog_dict: Dictionary
@@ -67,9 +69,37 @@ func _set_phase(phase: int) -> void:
 
 func _advance_phase() -> void:
 	if current_phase == _last_phase():
+		_report_repair()
 		minigame_finished.emit(_mistakes)
 		return
 	_set_phase(current_phase + 1)
+
+
+## ส่งผลงานซ่อมให้ GameState (เงิน · ความพอใจ · XP) — ลูปเกม Docs/GAME_LOOP.md §3
+func _report_repair() -> void:
+	var gs := get_node_or_null(^"/root/GameState")
+	if gs == null:
+		return
+	var id := part_id
+	if id == &"":
+		id = StringName(scene_file_path.get_file().get_basename())
+	gs.record_repair(id, final_score(), repair_damaged())
+
+
+## คะแนน 0–100 จาก phase สุดท้าย (SUMMARY มี var total) · ไม่มี = คิดจาก _mistakes
+func final_score() -> int:
+	var last = _phase_nodes.get(_last_phase())
+	if last != null and "total" in last:
+		return int(last.total)
+	var lost := 0
+	for k in _mistakes:
+		lost += int(_mistakes[k])
+	return clampi(100 - lost, 0, 100)
+
+
+## override: ทำของลูกค้าเสียระหว่างซ่อม (การ์ดไหม้ · ขาซ็อกเก็ตงอ ฯลฯ) → หักเงิน
+func repair_damaged() -> bool:
+	return false
 
 
 ## สะสมคะแนนที่ถูกหักแยกตามหมวด — Phase SUMMARY อ่านจาก _mistakes

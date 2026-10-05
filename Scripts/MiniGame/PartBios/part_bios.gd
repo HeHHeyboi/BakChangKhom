@@ -194,6 +194,11 @@ func _debug_prepare(phase: int) -> void:
 	refresh_bios()
 
 
+## ของเสียระหว่างซ่อม → GameState หักเงิน
+func repair_damaged() -> bool:
+	return data_lost
+
+
 func _on_minigame_finished(_score: Dictionary) -> void:
 	Global.in_minigame = false
 	Global.cur_pib = null

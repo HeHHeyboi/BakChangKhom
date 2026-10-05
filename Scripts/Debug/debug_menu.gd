@@ -43,6 +43,23 @@ func _ready() -> void:
 			"label": "เล่น Part BIOS + ลง Windows (ทดสอบ)",
 			"minigame": "res://Scene/MiniGame/PartBios/part_bios.tscn",
 		},
+		# [Claude 5 ต.ค. 2569] ทดสอบลูปเวลา 7 วัน/รอบ · 12 รอบ (Docs/GAME_LOOP.md)
+		{
+			"label": "เวลา: ไปช่วงถัดไป (เย็น → วันใหม่)",
+			"call": EventManager.advance_period,
+		},
+		{
+			"label": "เวลา: นอน → วันถัดไป",
+			"call": EventManager.end_day,
+		},
+		{
+			"label": "เวลา: ไปเย็นวันที่ 7 ของรอบนี้ (นอนต่อ = จบรอบ)",
+			"call": func(): EventManager.time_system.set_date(EventManager.time_system.current_week, TimeSystem.DAYS_PER_WEEK, TimeSystem.TIME.EVENING),
+		},
+		{
+			"label": "เวลา: ไปเย็นวันที่ 7 รอบ 12 (นอนต่อ = ฉากจบ)",
+			"call": func(): EventManager.time_system.set_date(TimeSystem.TOTAL_WEEKS, TimeSystem.DAYS_PER_WEEK, TimeSystem.TIME.EVENING),
+		},
 	]
 	_build_ui()
 
@@ -82,6 +99,10 @@ func _refresh_buttons() -> void:
 
 
 func _on_jump_point_pressed(point: Dictionary) -> void:
+	if point.has("call"):
+		(point["call"] as Callable).call()
+		visible = false
+		return
 	if point.has("minigame"):
 		_open_minigame(point["minigame"])
 		visible = false

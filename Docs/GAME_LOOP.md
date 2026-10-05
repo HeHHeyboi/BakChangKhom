@@ -56,7 +56,7 @@ flowchart TD
 | เที่ยง | ซ่อม: ถอด → Core Part / Normal Part → ประกอบ → bench test | ซ่อมตามที่ขอ · ตรวจว่าถูกทุกอย่าง | S2–S4 + มินิเกม Core Part 5 ตัว | 🟡 มินิเกมครบ 5 ตัว · S2/S4 ยังไม่มี |
 | เที่ยง (จบงาน) | ส่งเครื่อง รับเงิน หรือโดนหัก | ได้เงิน / ความพอใจลด + หักเงิน | S5 Handover · เงิน · ความพอใจ | ⬜ |
 | เย็น | ออกไปหมู่บ้านผ่านแผนที่ · ช่วย NPC · จัดกิจกรรม · เหตุการณ์สุ่ม | จัดกิจกรรม/ช่วย NPC · เหตุการณ์สุ่ม · เนื้อเรื่องเดิน | `map.tscn` · Market · `EventManager` · Dialog | 🟡 แผนที่ไปได้ บ้าน/ตลาด · ไม่มีระบบเหตุการณ์สุ่ม |
-| จบวัน | เข้านอน → วันถัดไป · autosave | ครบ 7 วัน? | `TimeSystem.change_day()` · SaveManager | 🟡 เปลี่ยนวันได้ · ไม่มี save |
+| จบวัน | เข้านอน → วันถัดไป · autosave | ครบ 7 วัน? | `EventManager.end_day()` → `TimeSystem.change_day()` · SaveManager | 🟡 7 วัน/รอบ · 12 รอบ ✅ · ยังไม่มีเตียง/ปุ่มนอนในเกม (ใช้ Debug F1) · ไม่มี save |
 
 ### ผลของการซ่อม (กล่อง "Check if everything is correct")
 
@@ -68,7 +68,7 @@ flowchart TD
 | ผ่านแบบมีจุดพลาด | 60–79 | ค่าซ่อมเต็ม | 0 | ×0.6 |
 | ผิด | < 60 หรือทำของเสีย (การ์ดไหม้ · ข้อมูลลูกค้าหาย) | **หักเงิน** (ค่าของที่เสีย) | −10 | ×0.4 |
 
-ตัวเลขเงินยังไม่กำหนด เพราะยังไม่มีระบบเงิน — ให้ตั้งในไฟล์ resource เดียว (`Resources/Balance/economy.tres`) จะได้ปรับทีหลังได้
+✅ ทำแล้ว (5 ต.ค.) — `GameState.record_repair()` ถูกเรียกเองตอนจบมินิเกม Core Part ทุกตัว (`PartMinigame._report_repair` อ่าน `total` จากหน้า SUMMARY + `repair_damaged()` ของแต่ละ Part) · ตัวเลขทั้งหมดอยู่ใน `Resources/Balance/economy.tres` (`EconomyConfig`) — **ค่าตอนนี้เป็นค่าทดลอง ทีมต้องปรับ** · ซ่อมเสร็จ 1 งาน = เวลาเดิน 1 ช่วง (ไม่เกินเย็น)
 
 ---
 
@@ -78,7 +78,7 @@ flowchart TD
 |---|---|---|
 | ลูกค้าเคสใหม่ตามระดับความยากของรอบ (ดูข้อ 5) | ทุกเช้า | ⬜ (มีดีไซน์เคส C01–C06 ใน `REPAIR_FLOW.md` 3.5) |
 | เหตุการณ์ประจำบท (NPC มาขอให้ช่วย · ไฟดับ · งานโรงเรียน ฯลฯ) | กลางรอบ วันที่ 3–5 ช่วงเย็น | ⬜ |
-| บท Chapter ของรอบ (`Assets/Dialog/ChapterN*.txt`) | ท้ายวันที่ 7 | 🟡 มีบทครบ 12 บท + Epilogue · เควสต์ใช้จริงแค่ Chapter 1 |
+| บท Chapter ของรอบ (`Assets/Dialog/ChapterN*.txt`) | นอนคืนวันที่ 7 → เปิดบทของรอบถัดไป (รอบ 1 = Chapter 1 ในเควสต์) | ✅ `GameState._on_week_ended` · เล่นผ่าน `EventManager.play_story_dialog` (ไม่ไปเดินเควสต์หลัก) |
 | สรุปรอบ: เงิน · ความพอใจเฉลี่ย · ยศ | หลังบท Chapter | ⬜ |
 
 ### บทของแต่ละรอบ (มีไฟล์ครบแล้ว)
@@ -135,12 +135,12 @@ flowchart TD
 
 | ข้อมูล | ใช้ที่ | มีแล้วไหม |
 |---|---|---|
-| `week` (1–12) · `day` (1–7) · `period` | ลูปเวลา | 🟡 `TimeSystem` มี day/month/period แต่นับ 30 วันต่อเดือน และไม่ได้ save |
-| `money` | รายได้ · หักเงิน · ซื้อของ | ⬜ |
-| `satisfaction_history` (คะแนนงานซ่อมทุกงาน) | ความพอใจเฉลี่ย · ฉากจบ | ⬜ |
-| `xp` · `rank` · `part_clears` | ยศช่าง · ปลดล็อก Part | ⬜ |
+| `week` (1–12) · `day` (1–7) · `period` | ลูปเวลา | 🟡 `TimeSystem.current_week/current_day/cur_period` + `set_date()` · ยังไม่ได้ save |
+| `money` | รายได้ · หักเงิน · ซื้อของ | 🟡 `GameState.money` · ยังไม่ได้ save |
+| `satisfaction_history` (คะแนนงานซ่อมทุกงาน) | ความพอใจเฉลี่ย · ฉากจบ | 🟡 `GameState` · ยังไม่ได้ save |
+| `xp` · `rank` · `part_clears` | ยศช่าง · ปลดล็อก Part | 🟡 `xp` · `part_clears` มีแล้ว · `rank` ยังไม่มี |
 | `event_step` ของเควสต์หลัก | `EventManager` | 🟡 อยู่ในหน่วยความจำ ไม่ได้ save |
-| `story_flags` (ทางเลือก Chapter 11 · NPC ที่ช่วยแล้ว) | ฉากจบ · เหตุการณ์ | ⬜ |
+| `story_flags` (ทางเลือก Chapter 11 · NPC ที่ช่วยแล้ว) | ฉากจบ · เหตุการณ์ | 🟡 `GameState.story_flags` มีที่เก็บ · บทพูดยังตั้งธงไม่ได้ (`ch11_choice`) |
 
 ---
 
@@ -148,25 +148,26 @@ flowchart TD
 
 | ระบบ | ไฟล์ | ใช้ในลูปตรงไหน | สถานะ |
 |---|---|---|---|
-| เควสต์ทีละขั้น (Dialog / Minigame / Tutorial / Scene) | `EventManager` · `QuestStep` · `Resources/main.tres` | ขับเนื้อเรื่องและเปิดมินิเกม | ✅ ใช้ได้ · เควสต์ตอนนี้จบที่ Part RAM |
+| เควสต์ทีละขั้น (Dialog / Minigame / Tutorial / Scene) | `EventManager` · `QuestStep` · `Resources/main.tres` | ขับเนื้อเรื่องและเปิดมินิเกม | ✅ ใช้ได้ · เควสต์ต่อครบ 5 Part (RAM → Mainboard → GPU → Front Panel → BIOS · กด ! ที่คอมในห้อง) |
 | บทพูด + ตัวเลือก | `DialogScene` · `Assets/Dialog/*.txt` | บท Chapter · คุยลูกค้า · NPC | ✅ |
 | ตัวละคร + สีหน้า | `Scene/Global.tscn` `_CharacterMap` | บทพูด | ✅ 12 ตัว · สีหน้าเรียกด้วย `"ชื่อ:อารมณ์"` เช่น `"ขม:surprised"` |
-| เวลา เช้า/เที่ยง/เย็น + วัน | `time_system.gd` | ลูปวัน | 🟡 ต้องเปลี่ยนเป็น 7 วัน/รอบ · 12 รอบ |
+| เวลา เช้า/เที่ยง/เย็น + วัน | `time_system.gd` | ลูปวัน | ✅ 7 วัน/รอบ · 12 รอบ · สัญญาณ `period_changed` `day_started` `week_ended` `all_weeks_ended` · HUD แสดง "รอบ x/12 · วันที่ y/7" + เงิน |
 | แผนที่ | `map.tscn` | ช่วงเย็นออกไปหมู่บ้าน | 🟡 ไปได้ บ้าน · ตลาด |
 | ตลาด | `Market.tscn` (มีตัวผู้เล่นเดินได้) | ซื้ออะไหล่/ของ | 🟡 เดินได้ ยังไม่มีร้านค้า |
-| มินิเกม Core Part 5 ตัว | `Scene/MiniGame/Part*/` | ช่วงซ่อม | ✅ เล่นได้ครบ · ต่อเควสต์แค่ RAM |
+| มินิเกม Core Part 5 ตัว | `Scene/MiniGame/Part*/` | ช่วงซ่อม | ✅ เล่นได้ครบ · ต่อเควสต์ครบ 5 ตัว · ส่งคะแนนเข้า `GameState` |
 | Tutorial ประกอบคอม | `tutorial_assembly.tscn` | ก่อนรอบ 1 | ✅ อยู่ในเควสต์แล้ว |
 | สไลด์สอน | `Tutorial.tscn` | สอนเล่นครั้งแรก | ✅ BASIC_START · RAM_CLEANING |
 | งานซ่อม 5 Scene · RepairManager | — | ช่วงเช้า–เที่ยง | ⬜ |
-| เงิน · ความพอใจ · ยศ · Save · เสียง · ฉากจบ | — | ทั้งลูป | ⬜ (เสียงตัดออก — ไม่มีทีมเสียง) |
+| เงิน · ความพอใจ · XP · ฉากจบ (ตัดสิน) | `Scripts/Core/game_state.gd` (autoload `GameState`) · `EconomyConfig` | ทั้งลูป | 🟡 เงิน/ความพอใจ/XP ✅ · `decide_ending()` + Epilogue ✅ · ยังไม่มีหน้าฉากจบแยก 4 แบบ/เครดิต |
+| ยศ · Save · เสียง | — | ทั้งลูป | ⬜ (เสียงตัดออก — ไม่มีทีมเสียง) |
 
 ---
 
 ## 9. ลำดับทำให้เล่นจบลูปได้เร็วที่สุด
 
-1. **เชื่อม 4 Core Part เข้าเควสต์** ต่อจาก Part RAM ใน `main.tres` — เล่นเนื้อเรื่องจบทั้ง 5 Part ได้ทันที (ไม่ต้องรอระบบอื่น)
-2. **TimeSystem: 7 วัน/รอบ · 12 รอบ** + สัญญาณ `week_ended` → เปิดบท Chapter ของรอบ
-3. **เงิน + ความพอใจ** (autoload เล็ก ๆ เก็บค่าจาก `phase_summary.total`) + แสดงใน HUD
+1. ✅ (5 ต.ค.) **เชื่อม 4 Core Part เข้าเควสต์** ต่อจาก Part RAM ใน `main.tres` — เล่นเนื้อเรื่องจบทั้ง 5 Part ได้ทันที (ไม่ต้องรอระบบอื่น)
+2. ✅ (5 ต.ค.) **TimeSystem: 7 วัน/รอบ · 12 รอบ** + สัญญาณ `week_ended` → เปิดบท Chapter ของรอบ
+3. ✅ (5 ต.ค.) **เงิน + ความพอใจ** (autoload เล็ก ๆ เก็บค่าจาก `phase_summary.total`) + แสดงใน HUD
 4. **SaveManager** (ข้อ 7)
 5. **S1 ShopCounter แบบง่าย** (เลือกลูกค้า → เลือก Core Part ตามอาการ) แทน S1–S5 เต็มรูปแบบ — ใช้ Core Part เป็น S3 ตรง ๆ
 6. ช่วงเย็น: เหตุการณ์ประจำบทผ่าน `QuestStep` (ใช้ระบบเควสต์ที่มีอยู่)
@@ -179,3 +180,4 @@ flowchart TD
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 2 ต.ค. 2569 | สร้างเอกสาร — ลูปเกมทั้งเกมตาม flowchart ของทีม เทียบกับโค้ดจริง |
+| 5 ต.ค. 2569 | ทำข้อ 9.1–9.3 บน `Test/Beta_version1`: TimeSystem 7 วัน/รอบ · 12 รอบ · `GameState` (เงิน · ความพอใจ · XP · ฉากจบ) + `economy.tres` · เควสต์ต่อครบ 5 Part · Debug F1 มีปุ่มเดินเวลา · ทดสอบ `Test/loop_test.tscn` (Godot 4.7.2 headless ผ่าน) |

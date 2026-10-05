@@ -133,6 +133,11 @@ func _debug_prepare(phase: int) -> void:
 		(%Cooler as Item2D).set_state("")
 
 
+## ของเสียระหว่างซ่อม → GameState หักเงิน
+func repair_damaged() -> bool:
+	return pins_bent
+
+
 func _on_minigame_finished(_score: Dictionary) -> void:
 	Global.in_minigame = false
 	Global.cur_pib = null

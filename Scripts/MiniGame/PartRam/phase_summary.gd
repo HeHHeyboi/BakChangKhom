@@ -23,12 +23,13 @@ var _stars: Label
 var _total: Label
 var _rows: VBoxContainer
 var _back: Button
+var total := 0
 
 
 func init():
 	if not _built:
 		_build()
-	var total := 0
+	total = 0
 	for c in _rows.get_children():
 		c.queue_free()
 	for k in FULL:

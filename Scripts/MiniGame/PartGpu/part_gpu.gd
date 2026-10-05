@@ -157,6 +157,11 @@ func _debug_prepare(phase: int) -> void:
 	(%GpuCard as Item2D).set_state(("clean" if phase == PhaseState.INSTALL else "dusty") if on_mat else "off")
 
 
+## ของเสียระหว่างซ่อม → GameState หักเงิน
+func repair_damaged() -> bool:
+	return card_burnt or slot_damaged
+
+
 func _on_minigame_finished(_score: Dictionary) -> void:
 	Global.in_minigame = false
 	Global.cur_pib = null
