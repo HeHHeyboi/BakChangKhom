@@ -52,36 +52,8 @@ scene_path = "uid://bbcfansu05shj"
 quest_text_th = "ซ่อมแรม"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
-[sub_resource type="Resource" id="Resource_mb001"]
-script = ExtResource("1_naor1")
-action = 1
-scene_path = "res://Scene/MiniGame/PartMainboard/part_mainboard.tscn"
-quest_text_th = "ลูกค้าเอาคอมมาซ่อม: เปลี่ยนซิลิโคน CPU (กด ! ที่คอมในห้อง)"
-metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
-
-[sub_resource type="Resource" id="Resource_gpu01"]
-script = ExtResource("1_naor1")
-action = 1
-scene_path = "res://Scene/MiniGame/PartGpu/part_gpu.tscn"
-quest_text_th = "ลูกค้าเอาคอมมาซ่อม: การ์ดจอ + จัดสาย (กด ! ที่คอมในห้อง)"
-metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
-
-[sub_resource type="Resource" id="Resource_fp001"]
-script = ExtResource("1_naor1")
-action = 1
-scene_path = "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn"
-quest_text_th = "ลูกค้าเอาคอมมาซ่อม: สายหน้าเคส + แรม Dual Channel (กด ! ที่คอมในห้อง)"
-metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
-
-[sub_resource type="Resource" id="Resource_bios1"]
-script = ExtResource("1_naor1")
-action = 1
-scene_path = "res://Scene/MiniGame/PartBios/part_bios.tscn"
-quest_text_th = "ลูกค้าเอาคอมมาซ่อม: ตั้ง BIOS + ลง Windows (กด ! ที่คอมในห้อง)"
-metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
-
 [resource]
 script = ExtResource("1_vbkmp")
 name = "main"
-Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_naor1"), SubResource("Resource_42x1i"), SubResource("Resource_ur0up"), SubResource("Resource_asm01"), SubResource("Resource_xrra5"), SubResource("Resource_rvjks"), SubResource("Resource_mb001"), SubResource("Resource_gpu01"), SubResource("Resource_fp001"), SubResource("Resource_bios1")])
+Tasks = Array[ExtResource("1_naor1")]([SubResource("Resource_naor1"), SubResource("Resource_42x1i"), SubResource("Resource_ur0up"), SubResource("Resource_asm01"), SubResource("Resource_xrra5"), SubResource("Resource_rvjks")])
 metadata/_custom_type_script = "uid://db0chdbe7jurd"

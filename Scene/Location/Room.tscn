@@ -31,7 +31,7 @@ offset_top = 371.99997
 offset_right = 241.99998
 offset_bottom = 446.99997
 trackEvents = Dictionary[Variant, PackedByteArray]({
-1: PackedByteArray(1, 3, 6, 7, 8, 9)
+1: PackedByteArray(1, 3)
 })
 
 [node name="Door" type="TextureButton" parent="." unique_id=2032888040]

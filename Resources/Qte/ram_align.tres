@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="QteSpec" format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/qte/qte_spec.gd" id="1_qte"]
+
+[resource]
+script = ExtResource("1_qte")
+duration = 1.4
+zone = Vector2(0.38, 0.62)
+perfect = Vector2(0.46, 0.54)
+max_sweeps = 8
+hint = "กดตอนร่องบากตรงสันในสล็อต (โซนเขียว)"
+sfx_cue = "แรมลงร่อง"

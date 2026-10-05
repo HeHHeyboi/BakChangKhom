@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d3_kid_gpu"
+customer = "เด็ก"
+reason = "ร้านในเมืองคิวยาวสองอาทิตย์ แต่นัดเพื่อนเล่นเกมเสาร์นี้"
+device = "คอมเล่นเกมของน้อง"
+symptom = "เล่นเกมไปสักพักภาพกระตุก แล้วจอดับ"
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d3_kid_gpu.txt"
+thanks_text = "ลื่นมากพี่! เสาร์นี้ชนะแน่"
+complain_text = "ภาพยังกระตุกอยู่เลยพี่…"

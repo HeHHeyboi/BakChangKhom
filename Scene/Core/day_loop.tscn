@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/day_loop.gd" id="1_loop"]
+[ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="2_week"]
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="3_case"]
+[ext_resource type="Resource" path="res://Resources/Week/week1.tres" id="w1"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d2_headman_mainboard.tres" id="p1"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d3_kid_gpu.tres" id="p2"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d4_teacher_frontpanel.tres" id="p3"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d5_director_bios.tres" id="p4"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d6_girl_ram.tres" id="p5"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d7_amnuay_mainboard.tres" id="p6"]
+
+[node name="DayLoop" type="CanvasLayer"]
+layer = 90
+script = ExtResource("1_loop")
+week_plans = Array[ExtResource("2_week")]([ExtResource("w1")])
+random_pool = Array[ExtResource("3_case")]([ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6")])

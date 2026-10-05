@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d7_amnuay_mainboard"
+customer = "ลุงอำนวย"
+reason = "เครื่องที่ขมซ่อมใช้ดี เลยเอาคอมของลูกชายมาให้ดูอีกเครื่อง"
+device = "คอมของลูกชายลุงอำนวย"
+symptom = "ร้อนจนพัดลมดังลั่น แล้วก็ดับเอง"
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d7_amnuay_mainboard.txt"
+thanks_text = "ฝีมือขมนี่ไว้ใจได้จริง ๆ"
+complain_text = "ยังดับอยู่เลยขม ไม่เป็นไรนะ ค่อย ๆ ไป"

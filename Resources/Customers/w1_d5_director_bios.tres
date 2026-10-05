@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d5_director_bios"
+customer = "ผอ."
+reason = "ครูเล่าว่าขมช่วยเรื่องคอมห้องพักครูไว้"
+device = "คอมบริจาคเครื่องใหม่ของโรงเรียน"
+symptom = "เปิดแล้วขึ้นว่าหาไดรฟ์บูตไม่เจอ"
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d5_director_bios.txt"
+thanks_text = "เรียบร้อยดีมาก วันจันทร์เด็ก ๆ ได้เรียนแน่นอน"
+complain_text = "ยังเข้า Windows ไม่ได้เลย… คงต้องเลื่อนคาบเรียนไปก่อน"

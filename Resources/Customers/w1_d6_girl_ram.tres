@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d6_girl_ram"
+customer = "เด็กหญิง"
+reason = "เห็นป้ายร้านตอนเดินกลับจากโรงเรียน"
+device = "คอมทำบัญชีร้านขายของชำของแม่ วางข้างกระสอบข้าวมาหลายปี"
+symptom = "เปิดแล้วจอดำ มีเสียงปี๊บ"
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d6_girl_ram.txt"
+thanks_text = "แม่ต้องดีใจมากแน่เลยค่ะ!"
+complain_text = "ยังเปิดไม่ติดเลยค่ะพี่…"

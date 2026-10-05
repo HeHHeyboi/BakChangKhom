@@ -1,6 +1,6 @@
 extends Node
 ## GameState (autoload) — state ของลูปเกมที่ต้องอยู่ข้ามซีน: เงิน · ความพอใจ · XP · Part ที่ผ่านแล้ว · ธงเนื้อเรื่อง
-## + กาวของลูปรอบ: ครบ 7 วัน → เปิดบท Chapter ของรอบถัดไป · ครบ 12 รอบ → Epilogue + ฉากจบ
+## + บท Chapter ประจำรอบ / Epilogue / ตัดสินฉากจบ (DayLoop เป็นคนเรียกตอนครบรอบ)
 ## ดู Docs/GAME_LOOP.md §3 §4 §6 §7 · [Claude 5 ต.ค. 2569]
 
 signal money_changed(money: int, delta: int)
@@ -48,17 +48,6 @@ func _ready() -> void:
 		push_warning("ไม่พบ %s ใช้ค่าเริ่มต้น" % ECONOMY_PATH)
 		economy = EconomyConfig.new()
 	reset()
-	# EventManager เป็น autoload ก่อนหน้า · รอให้ทุก autoload พร้อมก่อนค่อยผูกสัญญาณ
-	_connect_time.call_deferred()
-
-
-func _connect_time() -> void:
-	var ts: TimeSystem = EventManager.time_system
-	if ts == null:
-		push_error("GameState: ไม่พบ EventManager.time_system")
-		return
-	ts.week_ended.connect(_on_week_ended)
-	ts.all_weeks_ended.connect(_on_all_weeks_ended)
 
 
 func reset() -> void:
@@ -86,8 +75,8 @@ func can_afford(cost: int) -> bool:
 
 # ---------------------------------------------------------------- ผลงานซ่อม
 
-## เรียกจาก PartMinigame ตอนจบมินิเกม · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย
-func record_repair(part_id: StringName, score: int, damaged := false) -> Dictionary:
+## เรียกจาก PartMinigame ตอนจบงานลูกค้า · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย · fee −1 = ใช้ค่าจาก economy
+func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1) -> Dictionary:
 	var e := economy
 	var grade: Grade
 	if damaged or score < e.pass_score:
@@ -97,7 +86,7 @@ func record_repair(part_id: StringName, score: int, damaged := false) -> Diction
 	else:
 		grade = Grade.GOOD
 
-	var fee: int = e.repair_fee.get(part_id, e.default_fee)
+	var fee: int = fee_override if fee_override >= 0 else e.repair_fee.get(part_id, e.default_fee)
 	var delta := 0
 	var sat := 0
 	var gained := 0
@@ -152,13 +141,14 @@ func has_cleared(part_id: StringName) -> bool:
 
 # ---------------------------------------------------------------- ลูปรอบ / ฉากจบ
 
-func _on_week_ended(week: int) -> void:
-	# ครบรอบ week → เปิดบทของรอบถัดไป (รอบ 12 จบไปต่อที่ _on_all_weeks_ended)
+## ครบรอบ week → เปิดบทของรอบถัดไป · DayLoop เรียกหลังการ์ดสรุปรอบ
+func play_week_chapter(week: int) -> void:
 	if week < CHAPTERS.size():
 		_play_story(CHAPTERS[week])
 
 
-func _on_all_weeks_ended() -> void:
+## ครบ 12 รอบ → ตัดสินฉากจบ + Epilogue · DayLoop เรียกหลังการ์ดสรุปรอบ 12
+func finish_game() -> void:
 	ending = decide_ending()
 	_play_story(EPILOGUE)
 	game_finished.emit(ending)
@@ -199,7 +189,7 @@ static func speakers_in(path: String) -> Array[String]:
 		var comma := line.find(",")
 		if comma <= 0:
 			continue
-		var who := line.substr(0, comma).strip_edges().split(":")[0]
+		var who := line.substr(0, comma).split("(")[0].split(":")[0].strip_edges()  # "ขม (ยิ้ม)" → "ขม"
 		if who != "" and not out.has(who):
 			out.append(who)
 	return out

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d2_headman_mainboard"
+customer = "ผู้ใหญ่บ้าน"
+reason = "ลุงอำนวยเล่าทั้งหมู่บ้านว่าขมซ่อมคอมเก่ง"
+device = "คอมที่ทำการหมู่บ้าน ใช้พิมพ์ประกาศ"
+symptom = "เปิดได้สิบนาทีก็ดับเอง ตัวเครื่องร้อนจัด"
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d2_headman_mainboard.txt"
+thanks_text = "เครื่องเย็นลงเยอะเลย พรุ่งนี้พิมพ์ประกาศงานวัดทันแน่"
+complain_text = "ยังร้อนอยู่นะขม เดี๋ยวคงต้องหาที่ซ่อมในเมืองแล้ว"

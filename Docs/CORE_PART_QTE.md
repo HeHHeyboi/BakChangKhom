@@ -1,6 +1,6 @@
 # CORE_PART_QTE.md — ใส่ QTE ในมินิเกม Core Part ทั้ง 5
 
-> [Claude 4 ต.ค. 2569] · ข้อเสนอ ยังไม่ได้เขียนโค้ด · อ้างอิง phase ที่มีอยู่จริงในโค้ด (commit `09f7491`) และดีไซน์ `MINIGAME1_DESIGN.md` · `PART_*_DESIGN.md`
+> [Claude 4 ต.ค. 2569] · ข้อเสนอ · **[5 ต.ค.] ทำแล้ว: ระบบกลาง + แบบ A/B + RAM INSTALL (ดูข้อ 9)** · อ้างอิง phase ที่มีอยู่จริงในโค้ด (commit `09f7491`) และดีไซน์ `MINIGAME1_DESIGN.md` · `PART_*_DESIGN.md`
 > QTE = Quick Time Event — จังหวะสั้น ๆ ที่ผู้เล่นต้องกด/ค้าง/ปล่อยให้ถูกเวลา
 
 ---
@@ -181,8 +181,32 @@ func _install_stick(slot: Item2D) -> void:
 5. **D ลำดับ** · **F ถู** → ที่เหลือ
 6. โหมดช่วยในหน้าตั้งค่า + บอททดสอบแบบ MISS ทุกครั้ง
 
+## 9. สถานะโค้ด (5 ต.ค. 2569)
+
+| ชิ้น | ไฟล์ | สถานะ |
+|---|---|---|
+| `QteSpec` (ค่าแต่ละจุด แก้ใน Inspector) | `Scripts/MiniGame/PartBase/qte/qte_spec.gd` · `Resources/Qte/*.tres` | ✅ |
+| `QteRunner` (ตัวเล่นกลาง · เมาส์ซ้าย/Space · บังคลิกฉากระหว่างเล่น · ป้าย PERFECT/GOOD/MISS) | `Scripts/MiniGame/PartBase/qte/qte_runner.gd` | ✅ A จังหวะ · B กดค้าง · ⬜ C–F (เรียกแล้วได้ GOOD + warning) |
+| สร้าง runner ให้ทุก Part อัตโนมัติ | `PartMinigame._build_qte()` → `owner.qte` (CanvasLayer 30) | ✅ |
+| ครั้งแรกโซนกว้าง 1.5 เท่า | `PartMinigame.qte_zone_scale()` อ่าน `GameState.has_cleared()` | ✅ |
+| โหมดช่วย · บอททดสอบ | `QteRunner.assist` · `QteRunner.auto_result` | ✅ ตัวแปรมีแล้ว · ⬜ ยังไม่มีหน้าตั้งค่า |
+| **RAM INSTALL** A + B | `Scripts/MiniGame/PartRam/phase_install.gd` · `ram_align.tres` · `ram_press.tres` · บทปิ๊บ `@INSTALL_QTE_*` ใน `Ram_Pib.txt` | ✅ แทนคลิก 2 ครั้งเดิม · รอผู้เล่นปิดกล่องปิ๊บก่อนเริ่ม QTE (กันคลิกปิดกล่องนับเป็นการกด) |
+| Part อื่น · RAM REMOVE/CLEAN | — | ⬜ |
+| กราฟิก QTE (ข้อ 7) | ตอนนี้วาดด้วย `_draw()` | ⬜ |
+
+**กติกา RAM INSTALL ที่ทำจริง**
+
+| จังหวะ | ผ่าน | พลาด |
+|---|---|---|
+| A วางให้ตรงร่อง (แรมเลื่อนซ้าย-ขวาตามตัวชี้) | ไป B | ปิ๊บเตือน ลองใหม่ ไม่หักคะแนน |
+| B กดค้าง (แรมลงตามเกจ) ปล่อยในโซนเขียว | สลักดีด → VERIFY | ปล่อยเร็ว = ลองใหม่ · ค้างจนสุดเกจ = แรงเกิน −5 `handling` (ครั้งเดียว) |
+| พลาดจุดเดียวกัน 3 ครั้ง | — | ปิ๊บช่วยทำให้ −5 `handling` (ครั้งเดียวต่อจุด) · ไม่มีวันติด |
+
+ทดสอบ: `Test/qte_test.tscn` (จำลองคลิกจริง + บอท PERFECT / MISS ทุกครั้งใน RAM INSTALL) → `T DONE fails=0`
+
 ## ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
 | 4 ต.ค. 2569 | สร้างเอกสาร — ข้อเสนอ QTE 6 แบบ + จุดใส่ใน Core Part ทั้ง 5 |
+| 5 ต.ค. 2569 | ทำข้อ 8.1–8.2: `QteSpec` · `QteRunner` (A · B) · RAM INSTALL ใช้ QTE · เพิ่มข้อ 9 สถานะโค้ด |

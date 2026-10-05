@@ -45,6 +45,10 @@ func _ready() -> void:
 		},
 		# [Claude 5 ต.ค. 2569] ทดสอบลูปเวลา 7 วัน/รอบ · 12 รอบ (Docs/GAME_LOOP.md)
 		{
+			"label": "ลูปร้าน: ข้ามเควสต์ เริ่มรับลูกค้า (ไปห้องขม)",
+			"call": _start_shop_loop,
+		},
+		{
 			"label": "เวลา: ไปช่วงถัดไป (เย็น → วันใหม่)",
 			"call": EventManager.advance_period,
 		},
@@ -96,6 +100,11 @@ func _refresh_buttons() -> void:
 		button.text = point["label"]
 		button.pressed.connect(_on_jump_point_pressed.bind(point))
 		_button_list.add_child(button)
+
+
+func _start_shop_loop() -> void:
+	DayLoop.force_active = true
+	get_tree().change_scene_to_file(Constant.ROOM_SCENE)
 
 
 func _on_jump_point_pressed(point: Dictionary) -> void:

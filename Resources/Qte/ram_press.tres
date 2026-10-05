@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="QteSpec" format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/qte/qte_spec.gd" id="1_qte"]
+
+[resource]
+script = ExtResource("1_qte")
+kind = 1
+duration = 1.6
+zone = Vector2(0.68, 0.9)
+perfect = Vector2(0.76, 0.84)
+max_sweeps = 5
+hint = "กดค้าง แล้วปล่อยตอนสลักดีด (โซนเขียว)"
+sfx_cue = "คลิก! สลักดีด"

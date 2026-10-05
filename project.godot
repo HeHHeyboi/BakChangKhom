@@ -28,6 +28,7 @@ Market="*res://Scene/Location/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 DebugMenu="*res://Scripts/Debug/debug_menu.gd"
 GameState="*res://Scripts/Core/game_state.gd"
+DayLoop="*res://Scene/Core/day_loop.tscn"
 
 [display]
 

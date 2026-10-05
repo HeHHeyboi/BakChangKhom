@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d1_amnuay_ram"
+customer = "ลุงอำนวย"
+reason = "ยายเล่าให้ลุงฟังว่าขมกลับมาเปิดร้านซ่อมคอม — ลูกค้าคนแรกของร้าน"
+device = "คอมตั้งโต๊ะของลุง ใช้มา 6 ปี ไม่เคยเปิดฝาทำความสะอาด"
+symptom = "กดเปิดแล้วจอไม่ขึ้น มีเสียงปี๊บดังซ้ำ ๆ"
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d1_amnuay_ram.txt"
+thanks_text = "เปิดติดแล้ว! ขอบใจมากนะขม เดี๋ยวลุงบอกต่อทั้งหมู่บ้านเลย"
+complain_text = "ยังเปิดไม่ค่อยติดเลยขม… ไม่เป็นไร ลุงรอได้"
+forced = true

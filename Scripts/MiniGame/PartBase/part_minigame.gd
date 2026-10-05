@@ -18,6 +18,8 @@ var current_phase: int = -1
 var dialog_dict: Dictionary
 var _mistakes: Dictionary = { }
 var _phase_nodes: Dictionary = { }
+## QTE กลางของมินิเกม — phase เรียก: var r = await owner.qte.run(SPEC, node("ชิ้นงาน"), owner.qte_zone_scale())
+var qte: QteRunner
 
 
 func _ready() -> void:
@@ -35,6 +37,7 @@ func _ready() -> void:
 		_phase_nodes[phase].pib_toggle.connect(self.pib_toggle)
 		_phase_nodes[phase].mistake.connect(_on_mistake)
 
+	_build_qte()
 	_set_phase(_first_phase())
 	if OS.is_debug_build():
 		_debug_build_ui()
@@ -75,15 +78,44 @@ func _advance_phase() -> void:
 	_set_phase(current_phase + 1)
 
 
+func _build_qte() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "QteLayer"
+	layer.layer = 30
+	add_child(layer)
+	qte = QteRunner.new()
+	qte.name = "Qte"
+	layer.add_child(qte)
+
+
+func _exit_tree() -> void:
+	if qte:
+		qte.cancel()
+
+
+## ครั้งแรกที่ซ่อม Part นี้ผ่าน (ยังไม่เคยผ่าน) โซน QTE กว้าง 1.5 เท่า · Docs/CORE_PART_QTE.md ข้อ 1
+func qte_zone_scale() -> float:
+	var gs := get_node_or_null(^"/root/GameState")
+	var id := part_id if part_id != &"" else StringName(scene_file_path.get_file().get_basename())
+	if gs and gs.has_cleared(id):
+		return 1.0
+	return 1.5
+
+
 ## ส่งผลงานซ่อมให้ GameState (เงิน · ความพอใจ · XP) — ลูปเกม Docs/GAME_LOOP.md §3
+## เฉพาะงานลูกค้าที่ DayLoop เปิด (meta "work_order" = CustomerCase) · งานในเควสต์/Debug ไม่คิดเงิน
 func _report_repair() -> void:
 	var gs := get_node_or_null(^"/root/GameState")
-	if gs == null:
+	if gs == null or not has_meta("work_order"):
 		return
 	var id := part_id
 	if id == &"":
 		id = StringName(scene_file_path.get_file().get_basename())
-	gs.record_repair(id, final_score(), repair_damaged())
+	var fee := -1
+	var order = get_meta("work_order")
+	if order is CustomerCase:
+		fee = order.fee
+	gs.record_repair(id, final_score(), repair_damaged(), fee)
 
 
 ## คะแนน 0–100 จาก phase สุดท้าย (SUMMARY มี var total) · ไม่มี = คิดจาก _mistakes
