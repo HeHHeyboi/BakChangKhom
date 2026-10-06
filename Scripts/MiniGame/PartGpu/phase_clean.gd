@@ -1,13 +1,12 @@
 extends Phase2D
 ## Phase 5 · CLEAN — 3 ขั้นบนแผ่น ESD: S1 ใบพัด · S2 ครีบระบายความร้อน · S3 ขาทอง PCIe (เลือกอุปกรณ์ 7 ชิ้น)
-## กติกาเหมือน Part RAM (✅ +50% · 🟡 +25% −3 · ❌ −8 ปิ๊บห้ามทันครั้งแรก)
+## กติกาเหมือน Part RAM: ตัดสินจาก ToolDef.action (✅ +50% · 🟡 +25% · อุปกรณ์ที่ไม่ตรงกับขั้นนั้นไม่ทำอะไร)
+##   S1/S2 ปัด·เป่า = ✅ · S3 ขัด = ✅ / ปัด·เป่า = 🟡
 ## กติกาพิเศษ: เป่า/ปัดใบพัดหรือครีบโดยไม่ล็อกใบพัดก่อน = −5 (ครั้งเดียว) · ปุ่ม "ใช้นิ้วล็อกใบพัด" ใน rail
-## อุปกรณ์: Resources/Parts/Gpu/Tools/*.tres · [Claude 2 ต.ค. 2569]
+## อุปกรณ์: Constant.TOOL_DIR/*.tres (ToolDef) · [Claude 2 ต.ค. 2569]
 
 enum CleanStep { FAN_BLADES, HEATSINK_FINS, GOLD_CONTACTS }
 
-const TOOL_DIR := "res://Resources/Parts/Gpu/Tools/"
-const TOOL_IDS := ["brush", "blower", "eraser_white", "ipa_swab", "cloth", "hairdryer", "vacuum"]
 const STEP_TEXT := {
 	CleanStep.FAN_BLADES: "S1 · ฝุ่นบนใบพัดลม",
 	CleanStep.HEATSINK_FINS: "S2 · ฝุ่นในครีบระบายความร้อน",
@@ -25,7 +24,6 @@ const STEP_POINT := {
 	CleanStep.HEATSINK_FINS: Vector2(0.75, 0.55),
 	CleanStep.GOLD_CONTACTS: Vector2(0.52, 0.85),
 }
-const BLOW_TOOLS := ["brush", "blower"]
 const TOOL_LINES := {
 	"blower:1": "CLEAN_FINS_BLOWER",
 	"eraser_white:2": "CLEAN_CONTACTS_ERASER",
@@ -33,11 +31,10 @@ const TOOL_LINES := {
 }
 const GAIN := { CleanTool.Fit.IDEAL: 50.0, CleanTool.Fit.LIMITED: 25.0 }
 
-var _tools: Array[CleanTool] = []
+var _tools: Array[ToolDef] = []
 var _step := CleanStep.FAN_BLADES
 var _progress := 0.0
-var _blocked_once := {}
-var _limited_charged := {}
+var _bar_tween: Tween
 var _busy := false
 var _finishing := false
 var fan_locked := false
@@ -51,15 +48,13 @@ var _lock_btn: Button
 
 
 func init():
-	if _tools.is_empty():
-		for id in TOOL_IDS:
-			var t := load(TOOL_DIR + id + ".tres") as CleanTool
+	if _tools.is_empty(): # init() ถูกเรียกทุกครั้งที่เข้า phase — โหลดครั้งเดียวพอ ไม่งั้นอุปกรณ์ซ้ำ
+		for p in DirAccess.get_files_at(Constant.TOOL_DIR):
+			var t := load(Constant.TOOL_DIR + p) as ToolDef
 			if t:
 				_tools.append(t)
 	if not _built:
 		_build()
-	_blocked_once.clear()
-	_limited_charged.clear()
 	_busy = false
 	_finishing = false
 	_no_lock_charged = false
@@ -75,6 +70,7 @@ func init():
 func _build() -> void:
 	_built = true
 	var rail := PhaseUI.make_frame(self, "ซ่อมการ์ดจอ — ขั้นที่ 5/8 · ทำความสะอาด")
+	PhaseUI.force_rail_open(self, true)
 	for s in STEP_TEXT:
 		_chk.append(PhaseUI.check_item(rail, STEP_TEXT[s]))
 	_lock_btn = PhaseUI.rail_button(rail, "", func(): set_fan_lock(not fan_locked))
@@ -103,11 +99,13 @@ func set_fan_lock(on: bool) -> void:
 func _set_step(step: CleanStep) -> void:
 	_step = step
 	_progress = 0.0
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill() # tween ของขั้นก่อนยังวิ่งอยู่ จะทับค่า 0 ถ้าไม่ฆ่า
 	_bar.value = 0
+	_apply_visual(0.0) # รีเซ็ตภาพของขั้นใหม่ให้ตรงกับ progress 0
 	for i in _chk.size():
 		PhaseUI.set_check(_chk[i], i < int(step))
 	_lock_btn.visible = step != CleanStep.GOLD_CONTACTS
-	(node("GpuCard") as Item2D).set_state(STEP_LOOK[step][0])
 	_fill_tray()
 	PhaseUI.refresh(self)
 
@@ -115,9 +113,7 @@ func _set_step(step: CleanStep) -> void:
 func _fill_tray() -> void:
 	for c in _tray.get_children():
 		c.queue_free()
-	var list := _tools.duplicate()
-	list.shuffle()
-	for t: CleanTool in list:
+	for t: ToolDef in _tools:
 		var b := TextureButton.new()
 		b.name = String(t.id)
 		b.texture_normal = t.icon
@@ -125,55 +121,59 @@ func _fill_tray() -> void:
 		b.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		b.custom_minimum_size = Vector2(60, 56)
 		b.tooltip_text = t.display_name
-		b.mouse_entered.connect(func(): _card.text = t.display_name)
+		b.mouse_entered.connect(_show_card.bind(t))
 		b.pressed.connect(func(): use_tool(t))
 		_tray.add_child(b)
 
 
-func tool_by_id(id: String) -> CleanTool:
+func _show_card(t: ToolDef) -> void:
+	_card.text = "%s\nการใช้งาน %s\nจำนวนครั้ง %s · เวลา %d นาที" % [
+		t.display_name,
+		_action_names(t.action),
+		"ไม่จำกัด" if t.uses < 0 else str(t.uses),
+		t.time_minutes,
+	]
+
+
+## ชื่อ Action ทุกบิตที่ติดอยู่ใน flags (action เป็นบิตแฟล็ก ใช้ keys() ตรง ๆ ไม่ได้)
+func _action_names(flags: int) -> String:
+	var names: PackedStringArray = []
+	for key in ToolDef.Action:
+		if flags & ToolDef.Action[key]:
+			names.append(key.capitalize())
+	return " / ".join(names)
+
+
+func tool_by_id(id: String) -> ToolDef:
 	for t in _tools:
 		if String(t.id) == id:
 			return t
 	return null
 
 
-func fit_of(t: CleanTool) -> int:
-	return int(t.fit_per_step.get(int(_step), CleanTool.Fit.FORBIDDEN))
-
-
-func use_tool(tool: CleanTool) -> void:
+func use_tool(tool: ToolDef) -> void:
 	if not visible or _finishing or _busy:
 		return
-	var fit := fit_of(tool)
-	_busy = true
-	await _animate_tool(tool, fit != CleanTool.Fit.FORBIDDEN)
-	_busy = false
-	var no_lock: bool = fit != CleanTool.Fit.FORBIDDEN and BLOW_TOOLS.has(String(tool.id)) \
-			and _step != CleanStep.GOLD_CONTACTS and not fan_locked
-	match fit:
-		CleanTool.Fit.IDEAL:
-			if no_lock:
-				_warn_no_lock()
-			else:
-				_say_tool(tool, tool.line_ideal, PibHint.Mood.HAPPY)
-			_progress_by(GAIN[CleanTool.Fit.IDEAL])
-		CleanTool.Fit.LIMITED:
-			var key := "%s:%d" % [tool.id, _step]
-			if not _limited_charged.has(key):
-				_limited_charged[key] = true
-				mistake.emit(&"clean", 3)
-				if no_lock:
-					_warn_no_lock()
-				else:
-					_say_tool(tool, tool.line_limited, PibHint.Mood.NORMAL)
-			_progress_by(GAIN[CleanTool.Fit.LIMITED])
+	var gain: float = 0.0
+	var brush_blow := tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW)
+	match _step:
+		CleanStep.GOLD_CONTACTS:
+			if tool.action & ToolDef.Action.SCRUB:
+				gain = GAIN[CleanTool.Fit.IDEAL]
+			if brush_blow:
+				gain = GAIN[CleanTool.Fit.LIMITED]
 		_:
-			mistake.emit(&"clean", 8)
-			if _blocked_once.has(tool.id):
-				say_text(["ไม่ทันแล้วขม... " + tool.line_forbidden], PibHint.Mood.WORRY)
-			else:
-				_blocked_once[tool.id] = true
-				_say_tool(tool, "เดี๋ยวก่อน! " + tool.line_forbidden, PibHint.Mood.WORRY)
+			if brush_blow:
+				gain = GAIN[CleanTool.Fit.IDEAL]
+	if gain < 0.0:
+		return
+	_animate_tool(tool, true)
+	# เป่า/ปัดใบพัดหรือครีบโดยไม่ล็อกใบพัด → ปิ๊บเตือน −5 (ครั้งเดียว)
+	if _step != CleanStep.GOLD_CONTACTS and not fan_locked:
+		_warn_no_lock()
+	else:
+		_say_tool(tool, PibHint.Mood.HAPPY)
+	_progress_by(gain)
 
 
 func _warn_no_lock() -> void:
@@ -184,15 +184,13 @@ func _warn_no_lock() -> void:
 	say("CLEAN_NO_LOCK", PibHint.Mood.WORRY)
 
 
-func _say_tool(tool: CleanTool, fallback: String, mood: PibHint.Mood) -> void:
+func _say_tool(tool: ToolDef, mood: PibHint.Mood) -> void:
 	var h: String = TOOL_LINES.get("%s:%d" % [tool.id, _step], TOOL_LINES.get("%s:-1" % tool.id, ""))
 	if h != "" and owner.dialog_dict.has(h):
 		say(h, mood)
-	elif fallback != "":
-		say_text([fallback], mood)
 
 
-func _animate_tool(tool: CleanTool, reach: bool) -> void:
+func _animate_tool(tool: ToolDef, reach: bool) -> void:
 	var spr := node("ToolSprite") as TextureRect
 	var top := spr.get_parent() as Control
 	var r := (node("GpuCard") as Control).get_global_rect()
@@ -218,9 +216,11 @@ func _animate_tool(tool: CleanTool, reach: bool) -> void:
 
 func _progress_by(amount: float) -> void:
 	_progress = minf(_progress + amount, 100.0)
-	create_tween().tween_property(_bar, "value", _progress, 0.25)
-	var looks: Array = STEP_LOOK[_step]
-	(node("GpuCard") as Item2D).set_state_blend(looks[0], looks[1], _progress / 100.0)
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_tween = create_tween()
+	_bar_tween.tween_property(_bar, "value", _progress, 0.25)
+	_apply_visual(_progress / 100.0)
 	if _progress < 100.0:
 		return
 	if _step < CleanStep.GOLD_CONTACTS:
@@ -230,6 +230,12 @@ func _progress_by(amount: float) -> void:
 		_finishing = true
 		PhaseUI.set_check(_chk[2], true)
 		say("CLEAN_DONE", PibHint.Mood.HAPPY)
+
+
+## ผลที่เห็นในฉาก: การ์ดเปลี่ยนหน้าตาก่อน → หลังของขั้นปัจจุบันตาม progress
+func _apply_visual(t: float) -> void:
+	var looks: Array = STEP_LOOK[_step]
+	(node("GpuCard") as Item2D).set_state_blend(looks[0], looks[1], t)
 
 
 func _on_pib_done() -> void:

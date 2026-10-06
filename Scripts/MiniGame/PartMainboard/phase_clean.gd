@@ -1,18 +1,17 @@
 extends Phase2D
 ## Phase 5 · CLEAN — เลือกอุปกรณ์เช็ดซิลิโคนเก่า 2 ขั้น: S1 ผิว CPU (มุมซ็อกเก็ต) · S2 ฐานฮีตซิงก์ (แผ่น ESD)
-## กติกาเหมือน Part RAM: ✅ +50% · 🟡 +25% และ −3 ครั้งแรก · ❌ −8 ปิ๊บห้ามทันครั้งแรก
-## อุปกรณ์: Resources/Parts/Mainboard/Tools/*.tres (CleanTool ตัวเดิม) · [Claude 2 ต.ค. 2569]
+## กติกาเหมือน Part RAM: ตัดสินจาก ToolDef.action (✅ +50% · 🟡 +25% · อุปกรณ์ที่ไม่ตรงกับขั้นนั้นไม่ทำอะไร)
+##   ทั้ง 2 ขั้น: เช็ด (WIPE) = ✅ · ขัด (SCRUB) = 🟡
+## อุปกรณ์: Constant.TOOL_DIR/*.tres (ToolDef) · [Claude 2 ต.ค. 2569]
 
 enum CleanStep { CPU_SURFACE, HEATSINK_BASE }
 
-const TOOL_DIR := "res://Resources/Parts/Mainboard/Tools/"
-const TOOL_IDS := ["ipa_swab", "cloth", "tissue", "wet_cloth", "thinner", "sandpaper", "wire_brush"]
 const STEP_TEXT := {
 	CleanStep.CPU_SURFACE: "S1 · เช็ดผิว CPU",
 	CleanStep.HEATSINK_BASE: "S2 · เช็ดฐานฮีตซิงก์",
 }
 const STEP_VIEW := { CleanStep.CPU_SURFACE: &"Socket", CleanStep.HEATSINK_BASE: &"Mat" }
-## บทปิ๊บเฉพาะใน Mainboard_Pib.txt (ไม่มี = ใช้ line_* ของ CleanTool)
+## บทปิ๊บเฉพาะอุปกรณ์ใน Mainboard_Pib.txt (ไม่มีในนี้ = ปิ๊บไม่พูด)
 const TOOL_LINES := {
 	"ipa_swab": "CLEAN_IPA",
 	"tissue": "CLEAN_TISSUE",
@@ -22,11 +21,10 @@ const TOOL_LINES := {
 }
 const GAIN := { CleanTool.Fit.IDEAL: 50.0, CleanTool.Fit.LIMITED: 25.0 }
 
-var _tools: Array[CleanTool] = []
+var _tools: Array[ToolDef] = []
 var _step := CleanStep.CPU_SURFACE
 var _progress := 0.0
-var _blocked_once := {}
-var _limited_charged := {}
+var _bar_tween: Tween
 var _busy := false
 var _finishing := false
 var _built := false
@@ -37,15 +35,13 @@ var _card: Label
 
 
 func init():
-	if _tools.is_empty():
-		for id in TOOL_IDS:
-			var t := load(TOOL_DIR + id + ".tres") as CleanTool
+	if _tools.is_empty(): # init() ถูกเรียกทุกครั้งที่เข้า phase — โหลดครั้งเดียวพอ ไม่งั้นอุปกรณ์ซ้ำ
+		for p in DirAccess.get_files_at(Constant.TOOL_DIR):
+			var t := load(Constant.TOOL_DIR + p) as ToolDef
 			if t:
 				_tools.append(t)
 	if not _built:
 		_build()
-	_blocked_once.clear()
-	_limited_charged.clear()
 	_busy = false
 	_finishing = false
 	show()
@@ -80,7 +76,10 @@ func _build() -> void:
 func _set_step(step: CleanStep) -> void:
 	_step = step
 	_progress = 0.0
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill() # tween ของขั้นก่อนยังวิ่งอยู่ จะทับค่า 0 ถ้าไม่ฆ่า
 	_bar.value = 0
+	_apply_visual(0.0) # รีเซ็ตภาพของขั้นใหม่ให้ตรงกับ progress 0
 	for i in _chk.size():
 		PhaseUI.set_check(_chk[i], i < int(step))
 	cam(STEP_VIEW[step])
@@ -90,9 +89,7 @@ func _set_step(step: CleanStep) -> void:
 func _fill_tray() -> void:
 	for c in _tray.get_children():
 		c.queue_free()
-	var list := _tools.duplicate()
-	list.shuffle()
-	for t: CleanTool in list:
+	for t: ToolDef in _tools:
 		var b := TextureButton.new()
 		b.name = String(t.id)
 		b.texture_normal = t.icon
@@ -105,55 +102,51 @@ func _fill_tray() -> void:
 		_tray.add_child(b)
 
 
-func _show_card(t: CleanTool) -> void:
-	_card.text = "%s\nชื้น %s · ทิ้งเศษ %s · แข็ง %d/5" % [
-		t.display_name, "มี" if t.has_moisture else "ไม่มี", "มี" if t.leaves_residue else "ไม่มี", t.hardness]
+func _show_card(t: ToolDef) -> void:
+	_card.text = "%s\nการใช้งาน %s\nจำนวนครั้ง %s · เวลา %d นาที" % [
+		t.display_name,
+		_action_names(t.action),
+		"ไม่จำกัด" if t.uses < 0 else str(t.uses),
+		t.time_minutes,
+	]
 
 
-func fit_of(t: CleanTool) -> int:
-	return int(t.fit_per_step.get(int(_step), CleanTool.Fit.FORBIDDEN))
+## ชื่อ Action ทุกบิตที่ติดอยู่ใน flags (action เป็นบิตแฟล็ก ใช้ keys() ตรง ๆ ไม่ได้)
+func _action_names(flags: int) -> String:
+	var names: PackedStringArray = []
+	for key in ToolDef.Action:
+		if flags & ToolDef.Action[key]:
+			names.append(key.capitalize())
+	return " / ".join(names)
 
 
-func tool_by_id(id: String) -> CleanTool:
+func tool_by_id(id: String) -> ToolDef:
 	for t in _tools:
 		if String(t.id) == id:
 			return t
 	return null
 
 
-func use_tool(tool: CleanTool) -> void:
+## เช็ด (WIPE) = ✅ · ขัด (SCRUB) = 🟡 · อย่างอื่นไม่ทำอะไร (เหมือน Part RAM)
+func use_tool(tool: ToolDef) -> void:
 	if not visible or _finishing or _busy:
 		return
-	var fit := fit_of(tool)
-	_busy = true
-	await _animate_tool(tool, fit != CleanTool.Fit.FORBIDDEN)
-	_busy = false
-	match fit:
-		CleanTool.Fit.IDEAL:
-			_say_tool(tool, tool.line_ideal, PibHint.Mood.HAPPY)
-			_progress_by(GAIN[CleanTool.Fit.IDEAL])
-		CleanTool.Fit.LIMITED:
-			var key := "%s:%d" % [tool.id, _step]
-			if not _limited_charged.has(key):
-				_limited_charged[key] = true
-				mistake.emit(&"tools", 3)
-				_say_tool(tool, tool.line_limited, PibHint.Mood.NORMAL)
-			_progress_by(GAIN[CleanTool.Fit.LIMITED])
-		_:
-			mistake.emit(&"tools", 8)
-			if _blocked_once.has(tool.id):
-				say_text(["ไม่ทันแล้วขม... " + tool.line_forbidden], PibHint.Mood.WORRY)
-			else:
-				_blocked_once[tool.id] = true
-				_say_tool(tool, "เดี๋ยวก่อน! " + tool.line_forbidden, PibHint.Mood.WORRY)
+	var gain: float
+	if tool.action & ToolDef.Action.WIPE:
+		gain = GAIN[CleanTool.Fit.IDEAL]
+	elif tool.action & ToolDef.Action.SCRUB:
+		gain = GAIN[CleanTool.Fit.LIMITED]
+	else:
+		return
+	_animate_tool(tool, true)
+	_say_tool(tool, PibHint.Mood.HAPPY)
+	_progress_by(gain)
 
 
-func _say_tool(tool: CleanTool, fallback: String, mood: PibHint.Mood) -> void:
+func _say_tool(tool: ToolDef, mood: PibHint.Mood) -> void:
 	var h: String = TOOL_LINES.get(String(tool.id), "")
 	if h != "" and owner.dialog_dict.has(h):
 		say(h, mood)
-	elif fallback != "":
-		say_text([fallback], mood)
 
 
 func _target() -> Control:
@@ -161,7 +154,7 @@ func _target() -> Control:
 
 
 ## อุปกรณ์ลอยมาถูไปมาที่เป้าหมาย · ห้ามใช้ = ปิ๊บคว้าไว้ก่อนถึง
-func _animate_tool(tool: CleanTool, reach: bool) -> void:
+func _animate_tool(tool: ToolDef, reach: bool) -> void:
 	var spr := node("ToolSprite") as TextureRect
 	var top := spr.get_parent() as Control
 	var tgt := top.get_global_transform_with_canvas().affine_inverse() * _target().get_global_rect().get_center() - spr.size / 2.0
@@ -185,12 +178,11 @@ func _animate_tool(tool: CleanTool, reach: bool) -> void:
 
 func _progress_by(amount: float) -> void:
 	_progress = minf(_progress + amount, 100.0)
-	create_tween().tween_property(_bar, "value", _progress, 0.25)
-	var t := _progress / 100.0
-	if _step == CleanStep.CPU_SURFACE:
-		(node("Cpu") as Item2D).set_state_blend("old", "clean", t)
-	else:
-		(node("HeatsinkBase") as Item2D).set_state_blend("dirty", "clean", t)
+	if _bar_tween and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_tween = create_tween()
+	_bar_tween.tween_property(_bar, "value", _progress, 0.25)
+	_apply_visual(_progress / 100.0)
 	if _progress < 100.0:
 		return
 	if _step == CleanStep.CPU_SURFACE:
@@ -202,6 +194,14 @@ func _progress_by(amount: float) -> void:
 		_finishing = true
 		PhaseUI.set_check(_chk[1], true)
 		say("CLEAN_DONE", PibHint.Mood.HAPPY)
+
+
+## ผลที่เห็นในฉาก: ซิลิโคนเก่าบนผิว CPU / ฐานฮีตซิงก์ค่อย ๆ สะอาดตาม progress
+func _apply_visual(t: float) -> void:
+	if _step == CleanStep.CPU_SURFACE:
+		(node("Cpu") as Item2D).set_state_blend("old", "clean", t)
+	else:
+		(node("HeatsinkBase") as Item2D).set_state_blend("dirty", "clean", t)
 
 
 func _on_pib_done() -> void:
