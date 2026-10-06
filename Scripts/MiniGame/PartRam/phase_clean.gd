@@ -8,42 +8,12 @@ enum CleanStep {
 	DUST_BOARD,
 	SCRUB_CONTACTS,
 	CLEAN_SLOT,
-} # S1 S2 S3
-
-
-class StepTool:
-	var ideal: Array[CleanTool]
-	var limited: Array[CleanTool]
-	var forbidden: Array[CleanTool]
-	var tools: Array[CleanTool]
-
-
-	func add(tool: CleanTool, index: int):
-		match tool.fit_per_step[index]:
-			CleanTool.Fit.IDEAL:
-				ideal.append(tool)
-			CleanTool.Fit.LIMITED:
-				limited.append(tool)
-			CleanTool.Fit.FORBIDDEN:
-				forbidden.append(tool)
-
+}
 
 signal step_completed(step: CleanStep)
 signal clean_finished(penalty: int)
 
 const TRAY_SIZE := 6
-const TOOL_PATHS := [
-	"res://Resources/Parts/Ram/Tools/eraser_white.tres",
-	"res://Resources/Parts/Ram/Tools/brush.tres",
-	"res://Resources/Parts/Ram/Tools/blower.tres",
-	"res://Resources/Parts/Ram/Tools/cloth.tres",
-	"res://Resources/Parts/Ram/Tools/ipa_swab.tres",
-	"res://Resources/Parts/Ram/Tools/eraser_red.tres",
-	"res://Resources/Parts/Ram/Tools/sandpaper.tres",
-	"res://Resources/Parts/Ram/Tools/wet_cloth.tres",
-	"res://Resources/Parts/Ram/Tools/hairdryer.tres",
-	"res://Resources/Parts/Ram/Tools/vacuum.tres",
-]
 const STEP_TEXT := {
 	CleanStep.DUST_BOARD: "S1 · ปัดฝุ่นบนแผงแรม",
 	CleanStep.SCRUB_CONTACTS: "S2 · ขัดคราบที่ขาทอง",
@@ -72,31 +42,28 @@ const GAIN := { CleanTool.Fit.IDEAL: 50.0, CleanTool.Fit.LIMITED: 25.0 } # ✅ 2
 var _blocked_once: Dictionary = { } # tool_id -> true (เลือก ❌ ไปแล้วรอบหนึ่ง)
 var _limited_charged: Dictionary = { }
 var _step: CleanStep = CleanStep.DUST_BOARD
-var _step_list: Array[StepTool] = [StepTool.new(), StepTool.new(), StepTool.new()]
+# var _step_list: Array[StepTool] = [StepTool.new(), StepTool.new(), StepTool.new()]
 var _progress := 0.0
 var _bar_tween: Tween
 var _penalty := 0
 var _busy := false
 var _finishing := false
-
+var _tools: Array[ToolDef] = []
 var _built := false
 var _step_label: Label
 var _bar: ProgressBar
-var _tray: GridContainer
+var _tray: HBoxContainer
 var _card: Label
 var _chk: Array[Label] = []
 
 
 func init():
-	# if _tools.is_empty():
-	for p in TOOL_PATHS:
-		var t := load(p) as CleanTool
-		if t:
-			_step_list[0].add(t, 0)
-			_step_list[1].add(t, 1)
-			_step_list[2].add(t, 2)
-			# _tools.append(t)
+	if _tools.is_empty(): # init() ถูกเรียกทุกครั้งที่เข้า phase — โหลดครั้งเดียวพอ ไม่งั้นอุปกรณ์ซ้ำ
+		for p in DirAccess.get_files_at(Constant.TOOL_DIR):
+			var t := load(Constant.TOOL_DIR + p) as ToolDef
+			_tools.append(t)
 	if not _built:
+		print("build")
 		_build()
 	_blocked_once.clear()
 	_limited_charged.clear()
@@ -113,6 +80,7 @@ func init():
 func _build() -> void:
 	_built = true
 	var rail := PhaseUI.make_frame(self, "ซ่อมแรม — ขั้นที่ 5/8 · ทำความสะอาด")
+	PhaseUI.set_rail_overlay(self)
 	for s in STEP_TEXT:
 		_chk.append(PhaseUI.check_item(rail, STEP_TEXT[s]))
 	_step_label = PhaseUI.label(rail, "", 18, PhaseUI.COL_OK)
@@ -120,11 +88,11 @@ func _build() -> void:
 	_bar.max_value = 100
 	_bar.custom_minimum_size = Vector2(0, 18)
 	rail.add_child(_bar)
-	_tray = GridContainer.new()
-	_tray.columns = 3
+	_tray = HBoxContainer.new()
 	_tray.add_theme_constant_override("h_separation", 6)
-	_tray.add_theme_constant_override("v_separation", 6)
-	rail.add_child(_tray)
+	_tray.set_anchors_preset(PRESET_BOTTOM_WIDE)
+	self.add_child(_tray)
+	_fill_tray(_tools)
 	_card = PhaseUI.label(rail, "ชี้ที่อุปกรณ์เพื่อดูคุณสมบัติ", 14)
 
 
@@ -139,27 +107,27 @@ func _set_step(step: CleanStep) -> void:
 	for i in _chk.size():
 		PhaseUI.set_check(_chk[i], i < int(step))
 	cam(STEP_VIEW[step])
-	_fill_tray(_build_tray(step))
 
 
 func _build_tray(step: CleanStep) -> Array[CleanTool]:
 	# การันตี ✅ ≥ 1 และ ❌ ≥ 2 แล้วสุ่มที่เหลือให้ครบ TRAY_SIZE
-	var cur_step = _step_list[step]
-	var ideal: CleanTool = cur_step.ideal[randi_range(0, len(cur_step.ideal) - 1)]
-	var limited: CleanTool = cur_step.limited[randi_range(0, len(cur_step.limited) - 1)]
-	var bad: Array[CleanTool] = cur_step.forbidden
-	bad.shuffle()
-	var tray: Array[CleanTool] = []
-	tray.append(ideal)
-	tray.append(limited)
-	tray.append_array(bad.slice(0, -1))
-	while tray.size() > 6:
-		tray.pop_back()
-	tray.shuffle()
-	return tray
+	# var cur_step = _step_list[step]
+	# var ideal: CleanTool = cur_step.ideal[randi_range(0, len(cur_step.ideal) - 1)]
+	# var limited: CleanTool = cur_step.limited[randi_range(0, len(cur_step.limited) - 1)]
+	# var bad: Array[CleanTool] = cur_step.forbidden
+	# bad.shuffle()
+	# var tray: Array[CleanTool] = []
+	# tray.append(ideal)
+	# tray.append(limited)
+	# tray.append_array(bad.slice(0, -1))
+	# while tray.size() > 6:
+	# 	tray.pop_back()
+	# tray.shuffle()
+	# return tray
+	return []
 
 
-func _fill_tray(tray: Array[CleanTool]) -> void:
+func _fill_tray(tray: Array[ToolDef]) -> void:
 	for c in _tray.get_children():
 		c.queue_free()
 	for t in tray:
@@ -172,7 +140,7 @@ func _fill_tray(tray: Array[CleanTool]) -> void:
 		b.mouse_entered.connect(_show_card.bind(t))
 		b.pressed.connect(
 			func():
-				_on_tool_used(t, _step),
+				self._on_tool_used(t, _step),
 		)
 		_tray.add_child(b)
 
@@ -193,38 +161,33 @@ func _fit(t: CleanTool, step: int) -> int:
 	return int(t.fit_per_step.get(step, CleanTool.Fit.FORBIDDEN))
 
 
-func _on_tool_used(tool: CleanTool, step: CleanStep) -> void:
+func _on_tool_used(tool: ToolDef, step: CleanStep) -> void:
 	if not visible or _finishing or _busy:
 		return
-	var fit := _fit(tool, step)
-	_busy = true
-	await _animate_tool(tool, fit != CleanTool.Fit.FORBIDDEN)
-	_busy = false
-	match fit:
-		CleanTool.Fit.IDEAL:
-			_say_for(tool, step, tool.line_ideal, PibHint.Mood.HAPPY)
-			_progress_by(GAIN[CleanTool.Fit.IDEAL])
-		CleanTool.Fit.LIMITED:
-			var key := "%s:%d" % [tool.id, step]
-			if not _limited_charged.has(key):
-				_limited_charged[key] = true
-				_penalty += 3
-				mistake.emit(&"tools", 3)
-				_say_for(tool, step, tool.line_limited, PibHint.Mood.NORMAL)
-			_progress_by(GAIN[CleanTool.Fit.LIMITED])
-		CleanTool.Fit.FORBIDDEN:
-			_penalty += 8
-			mistake.emit(&"tools", 8)
-			if _blocked_once.has(tool.id):
-				owner.ram_damaged = true # ❌ ชิ้นเดิมครั้งที่ 2 = เสียหายจริง → VERIFY บูตไม่ผ่าน
-				_say_for(tool, step, "ไม่ทันแล้วขม... " + tool.line_forbidden, PibHint.Mood.WORRY)
-			else:
-				_blocked_once[tool.id] = true # ครั้งแรก ปิ๊บคว้ามือไว้ทัน
-				_say_for(tool, step, "เดี๋ยวก่อน! " + tool.line_forbidden, PibHint.Mood.WORRY)
+	# var fit := _fit(tool, step)
+	# _busy = true
+	# await _animate_tool(tool, fit != CleanTool.Fit.FORBIDDEN)
+	# _busy = false
+	match step:
+		CleanStep.DUST_BOARD:
+			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
+				# _say_for(tool, step, tool.line_ideal, PibHint.Mood.HAPPY)
+				_progress_by(GAIN[CleanTool.Fit.IDEAL])
+		CleanStep.SCRUB_CONTACTS:
+			# var key := "%s:%d" % [tool.id, step]
+			if tool.action & (ToolDef.Action.SCRUB):
+				_progress_by(GAIN[CleanTool.Fit.IDEAL])
+			elif tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
+				_progress_by(GAIN[CleanTool.Fit.LIMITED])
+		CleanStep.CLEAN_SLOT:
+			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
+				_progress_by(GAIN[CleanTool.Fit.IDEAL])
+			elif tool.action & (ToolDef.Action.SCRUB):
+				_progress_by(GAIN[CleanTool.Fit.LIMITED])
 
 
 ## อุปกรณ์ลอยมาถูไปมาที่เป้าหมาย (รูป 2D ในชั้นบนของฉาก) · ห้ามใช้ = ปิ๊บคว้าไว้ก่อนถึง
-func _animate_tool(tool: CleanTool, reach: bool) -> void:
+func _animate_tool(tool: ToolDef, reach: bool) -> void:
 	var spr := node("ToolSprite") as TextureRect
 	spr.texture = tool.icon
 	var half := spr.size / 2.0

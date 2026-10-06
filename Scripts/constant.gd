@@ -17,3 +17,4 @@ const MAIN_DIALOG_1 = DIALOG_DIR + "MainQuest/GoToRoom.txt"
 
 const MINIGAME1_SCENE = "res://Scene/MiniGame/PartRam/part_ram.tscn"
 const FIND_ERASER_MINIGAME_SCENE = "res://Scene/MiniGame/find_item_minigame.tscn"
+const TOOL_DIR = "res://Resources/Tool/"

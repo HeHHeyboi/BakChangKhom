@@ -3,21 +3,15 @@ class_name TimeSystem extends CanvasLayer
 ## 1 วัน = 3 ช่วง (เช้า · เที่ยง · เย็น) · 1 รอบ = 7 วัน = 1 Chapter · ทั้งเกม = 12 รอบ
 ## [Claude 5 ต.ค. 2569] เปลี่ยนจาก 30 วัน/เดือน เป็น 7 วัน/รอบ · 12 รอบ + สัญญาณ week_ended
 
-const DAYS_PER_WEEK := 7
-const TOTAL_WEEKS := 12
-
 ## ช่วงเวลาเปลี่ยน (รวมตอนขึ้นวันใหม่ที่กลับเป็นเช้า)
 signal period_changed(period: TIME)
 ## เริ่มวันใหม่ (หลังนอน) — week 1–12 · day 1–7
 signal day_started(week: int, day: int)
-## ครบ 7 วันของรอบ week · ยิงก่อน day_started ของรอบถัดไป
-signal week_ended(week: int)
-## ครบ 12 รอบ → ฉากจบ
-signal all_weeks_ended
 
 @onready var timeText = $PanelContainer/HBoxContainer/Time as RichTextLabel
 @onready var dateText = $PanelContainer/HBoxContainer/Date as RichTextLabel
 @export var cur_period = TIME.MORNING
+@export var money_label: Label
 
 var current_day := 1
 var current_week := 1
@@ -28,7 +22,6 @@ var current_minute := 8 * 60
 const PERIOD_START := { TIME.MORNING: 8 * 60, TIME.NOON: 12 * 60, TIME.EVENING: 17 * 60 }
 ## นาฬิกาเปลี่ยน (ใช้ทำแอนิเมชันเวลาหมุน)
 signal clock_changed(minute: int)
-var _money_label: Label
 
 enum TIME {
 	MORNING,
@@ -52,44 +45,23 @@ func _exit_tree() -> void:
 
 
 func _ready() -> void:
-	if dateText:
-		dateText.add_theme_font_size_override("normal_font_size", 22)
-	updateTime()
-	_build_money_label()
-	_connect_money.call_deferred()
-
-
-## เงินของร้านแสดงต่อท้ายวันที่ (GameState เป็น autoload ที่โหลดหลัง EventManager จึงผูกแบบ deferred)
-func _build_money_label() -> void:
-	var box := get_node_or_null(^"PanelContainer/HBoxContainer") as HBoxContainer
-	if box == null:
-		push_warning("TimeSystem: ไม่พบ PanelContainer/HBoxContainer — ไม่แสดงเงิน")
+	set_date(1,TIME.MORNING)
+	var gs := GameState
+	if gs == null:
 		return
-	_money_label = Label.new()
-	_money_label.name = "Money"
-	_money_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_money_label.size_flags_stretch_ratio = 1.6
-	_money_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_money_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_money_label.add_theme_font_size_override("font_size", 28)
-	_money_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.35))
-	box.add_child(_money_label)
-	($PanelContainer as Control).offset_right = 640
-
-
-func _connect_money() -> void:
-	if not has_node("/root/GameState"):
-		return
-	var gs := get_node("/root/GameState")
 	if not gs.money_changed.is_connected(_on_money_changed):
 		gs.money_changed.connect(_on_money_changed)
 	_on_money_changed(gs.money, 0)
 
 
 func _on_money_changed(money: int, _delta: int) -> void:
-	if _money_label == null:
+	var value: String = str(money)
+	if money >= 1000:
+		value = str(money / 1000.0) + "k"
+
+	if money_label == null:
 		return
-	_money_label.text = "฿ %d" % money
+	money_label.text = "฿ %s" % value
 
 
 ## เช้า → เที่ยง → เย็น · เย็นแล้วกดอีกที = จบวัน (นอน)
@@ -115,21 +87,8 @@ func change_day() -> void:
 		return
 	cur_period = TIME.MORNING
 	current_minute = PERIOD_START[TIME.MORNING]
-	if current_day >= DAYS_PER_WEEK:
-		var ended := current_week
-		if current_week >= TOTAL_WEEKS:
-			finished = true
-			updateTime()
-			week_ended.emit(ended)
-			all_weeks_ended.emit()
-			return
-		current_day = 1
-		current_week += 1
-		updateTime()
-		week_ended.emit(ended)
-	else:
-		current_day += 1
-		updateTime()
+	current_day += 1
+	updateTime()
 	period_changed.emit(cur_period)
 	day_started.emit(current_week, current_day)
 
@@ -145,11 +104,11 @@ func set_period(time: TIME) -> void:
 
 
 ## ใช้ตอนโหลดเซฟ / debug
-func set_date(week: int, day: int, period: TIME = TIME.MORNING) -> void:
+func set_date(day: int, period: TIME = TIME.MORNING) -> void:
 	if not PERIOD_START.has(period):
 		period = TIME.MORNING
-	current_week = clampi(week, 1, TOTAL_WEEKS)
-	current_day = clampi(day, 1, DAYS_PER_WEEK)
+	# current_week = clampi(week, 1, TOTAL_WEEKS)
+	current_day = day
 	cur_period = period
 	current_minute = PERIOD_START[period]
 	finished = false
@@ -183,10 +142,6 @@ static func clock_text(minute: int) -> String:
 	return "%02d:%02d" % [floori(minute / 60.0), minute % 60]
 
 
-func is_last_day_of_week() -> bool:
-	return current_day == DAYS_PER_WEEK
-
-
 func updateTime() -> void:
 	if timeText == null or dateText == null:
 		return
@@ -201,6 +156,6 @@ func updateTime() -> void:
 		TIME.EVENING:
 			timeText.push_color(Color.NAVY_BLUE)
 			timeText.append_text("เย็น")
-	timeText.pop()
+	#timeText.pop()
 	dateText.clear()
-	dateText.add_text("เวลา %s\nรอบ %d/%d · วันที่ %d/%d" % [clock_text(current_minute), current_week, TOTAL_WEEKS, current_day, DAYS_PER_WEEK])
+	dateText.append_text("วันที่ %d" % current_day)

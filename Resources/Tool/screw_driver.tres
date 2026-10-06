@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ToolDef" format=3 uid="uid://b11hpohso4oam"]
+
+[ext_resource type="Texture2D" uid="uid://cjhwhi33wmufy" path="res://Assets/MiniGame/PartMainboard/mb_screwdriver.png" id="1_fs7pb"]
+[ext_resource type="Script" uid="uid://xssv75b66tn2" path="res://Scripts/Resources/tool_def.gd" id="1_koth1"]
+
+[resource]
+script = ExtResource("1_koth1")
+id = &"screw_driver"
+display_name = "ไขขวง"
+icon = ExtResource("1_fs7pb")

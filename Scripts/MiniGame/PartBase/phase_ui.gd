@@ -171,7 +171,6 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 	hide_button.position = Vector2(0, -DEFAULT_BUTTON_RECT.size.y) # ขยับจริง (ไม่ใช่ offset_transform ที่ขยับแค่ภาพ)
 	hide_button.set_meta("rail_toggle", true)
 	_style_toggle(hide_button)
-
 	show_button.connect(
 		"pressed",
 		func():
@@ -265,6 +264,12 @@ static func set_rail_mode(phase: Control, mode: RailMode) -> void:
 ## ทางลัด: วางทับ (true) หรือกลับเป็น AUTO (false)
 static func set_rail_overlay(phase: Control, on := true) -> void:
 	set_rail_mode(phase, RailMode.OVERLAY if on else RailMode.AUTO)
+
+
+## บังคับเปิด rail แม้ไม่มีปุ่มใน rail (AUTO จะซ่อนเอง) · overlay = true วางทับภาพ ฉากกว้างเต็ม · false = ฉากหดหนี
+## เรียกหลัง show() ใน init() — ค่าโหมดค้างไว้ที่ phase จนกว่าจะเรียก set_rail_mode ใหม่
+static func force_rail_open(phase: Control, overlay: bool) -> void:
+	set_rail_mode(phase, RailMode.OVERLAY if overlay else RailMode.SQUEEZE)
 
 
 ## ตัดสินใจ layout ของ phase ที่เดียว: rail เปิดไหม · Stage หดไหม — เรียกซ้ำได้เมื่อ UI เปลี่ยน

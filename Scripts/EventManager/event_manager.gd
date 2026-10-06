@@ -102,35 +102,6 @@ func trigger_step(id: EventID, event: Event) -> void:
 		_process_data(id, data)
 
 
-## เปิดบทพูดนอกเควสต์ (บท Chapter ประจำรอบ · Epilogue) — เรียกจาก GameState ตอนครบ 7 วัน
-## คืน false ถ้าเปิดไม่ได้ (ไฟล์หาย/บทว่าง/มีบทอื่นเปิดอยู่) — ผู้เรียกต้องไปต่อเอง ไม่งั้นรอ on_dialog_finish ค้าง
-func play_story_dialog(title: String, file_path: String, bg_name: String, chars: Array = []) -> bool:
-	if not DialogUtil.has_lines(file_path):
-		push_warning("play_story_dialog: ไม่พบบท หรือบทว่าง %s" % file_path)
-		return false
-	if DialogScene.visible:
-		push_warning("play_story_dialog: มีบทอื่นเปิดอยู่ ข้าม %s" % file_path)
-		return false
-	if bg_name != "" and not ResourceLoader.exists(bg_name):
-		push_warning("play_story_dialog: ไม่พบฉากหลัง %s" % bg_name)
-		bg_name = ""
-	_story_dialog = true
-	hideUI()
-	DialogScene.show_dialog(file_path, bg_name, chars)
-	DialogScene.set_title(title)
-	return true
-
-
-## จบช่วงเวลาปัจจุบัน (เช้า → เที่ยง → เย็น → วันใหม่)
-func advance_period() -> void:
-	next_period.emit()
-
-
-## นอน → วันถัดไป (ครบ 7 วัน TimeSystem จะยิง week_ended)
-func end_day() -> void:
-	next_day.emit()
-
-
 func _on_dialog_finish() -> void:
 	showUI()
 	if _story_dialog:
@@ -212,6 +183,35 @@ func _process_data(id: EventID, data: QuestStep):
 			tutorial.show_tutorial(data.tutorial)
 			if !on_tutorial_finish.is_connected(data.set_done):
 				on_tutorial_finish.connect(data.set_done, CONNECT_ONE_SHOT)
+
+
+## เปิดบทพูดนอกเควสต์ (บท Chapter ประจำรอบ · Epilogue) — เรียกจาก GameState ตอนครบ 7 วัน
+## คืน false ถ้าเปิดไม่ได้ (ไฟล์หาย/บทว่าง/มีบทอื่นเปิดอยู่) — ผู้เรียกต้องไปต่อเอง ไม่งั้นรอ on_dialog_finish ค้าง
+func play_story_dialog(title: String, file_path: String, bg_name: String, chars: Array = []) -> bool:
+	if not DialogUtil.has_lines(file_path):
+		push_warning("play_story_dialog: ไม่พบบท หรือบทว่าง %s" % file_path)
+		return false
+	if DialogScene.visible:
+		push_warning("play_story_dialog: มีบทอื่นเปิดอยู่ ข้าม %s" % file_path)
+		return false
+	if bg_name != "" and not ResourceLoader.exists(bg_name):
+		push_warning("play_story_dialog: ไม่พบฉากหลัง %s" % bg_name)
+		bg_name = ""
+	_story_dialog = true
+	hideUI()
+	DialogScene.show_dialog(file_path, bg_name, chars)
+	DialogScene.set_title(title)
+	return true
+
+
+## จบช่วงเวลาปัจจุบัน (เช้า → เที่ยง → เย็น → วันใหม่)
+func advance_period() -> void:
+	next_period.emit()
+
+
+## นอน → วันถัดไป (ครบ 7 วัน TimeSystem จะยิง week_ended)
+func end_day() -> void:
+	next_day.emit()
 
 
 func _hud_state(state: bool):

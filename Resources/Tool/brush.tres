@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ToolDef" format=3 uid="uid://dy1fadmi1slet"]
+
+[ext_resource type="Texture2D" uid="uid://cbnbaqwy4r6y0" path="res://Assets/MiniGame/PartRam/ram_tool_brush.png" id="1_46qft"]
+[ext_resource type="Script" uid="uid://xssv75b66tn2" path="res://Scripts/Resources/tool_def.gd" id="1_b0ij0"]
+
+[resource]
+script = ExtResource("1_b0ij0")
+id = &"brush"
+display_name = "แปรงปัดฝุ่น"
+icon = ExtResource("1_46qft")
+action = 8

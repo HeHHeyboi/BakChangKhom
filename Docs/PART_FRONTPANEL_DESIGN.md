@@ -4,7 +4,7 @@
 > ชุดเดียวกับ: `MINIGAME1_DESIGN.md` · `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_BIOS_DESIGN.md`
 > อยู่ใน Scene S3 ของลูปงานซ่อม — `REPAIR_FLOW.md` · asset: `Assets/MiniGame/PartFrontPanel/` (`fp_*`)
 
-> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · ยังไม่มีซีนของ Part นี้ในรีโป
+> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · **ซีนมีแล้ว** `Scene/MiniGame/PartFrontPanel/part_front_panel.tscn` เล่นได้ครบ 8 phase (2 ต.ค.) เปิดจาก Debug F1 และเป็นงานรายวันใน `DayLoop` (ดู §10.1)
 
 ---
 

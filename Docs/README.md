@@ -1,11 +1,13 @@
 # Docs — สารบัญเอกสารออกแบบ BakChangKhom
 
-อัปเดต 30 ก.ย. 2569 · อ้างอิงโค้ดที่ commit `65bddbf` (ฉากมินิเกมเป็น 2D ทั้งหมดแล้ว — ดู `SCENE_2D.md`)
+อัปเดต 6 ต.ค. 2569 (แก้ banner/ตัวเลขสถานะที่ค้าง — asset ✅ 57 · 🔴 85) · ฉากมินิเกมเป็น 2D ทั้งหมดตั้งแต่ 30 ก.ย. — ดู `SCENE_2D.md` · ทิศทางเกมใหม่ดู `GAME_REDESIGN.md` (ร่าง)
 
 ## ภาพรวมระบบ
 
 | ไฟล์ | เนื้อหา |
 |---|---|
+| `GAME_REDESIGN.md` | **ร่างรูปแบบเกมใหม่ v2 (6 ต.ค.)** — กระดานงาน · ความยาก 3 ระดับ · เครื่องมือใช้ได้จริง · บทลงโทษ/ชื่อเสียง · hints · โหมด · upgrade · BIOS window · ส่วนที่ขัดกับ `GAME_LOOP` / `REPAIR_FLOW` / `REPAIR_SHOP_SYSTEM` ให้ถือเอกสารนี้ · **รอทีมตัดสินใจข้อ 15** |
+| `WEEK1_CUSTOMERS.md` | ลูกค้า Week 1 (7 คน) + วิธีแก้ `CustomerCase` / `WeekPlan` ใน Inspector + วิธีเทสต์ลูป |
 | `REPAIR_SHOP_SYSTEM.md` | **ระบบร้านซ่อม** — ทางเลือก handle scene (แนะนำ SceneRouter + Overlay stack) · คิวงาน WorkOrder · ชั้นวางเครื่อง · สต็อกอะไหล่ · สั่งของจากร้านค้า (4 ต.ค. 2569) |
 | `CORE_PART_QTE.md` | **ข้อเสนอ QTE** ใน Core Part ทั้ง 5 — QTE 6 แบบ (จังหวะ · กดค้าง · วงหด · ลำดับ · มือนิ่ง · ถู) จุดใส่ราย phase · โครง `QteRunner` (4 ต.ค. 2569) |
 | `GAME_LOOP.md` | **ลูปเกมทั้งเกม** — 1 วัน (เช้า/เที่ยง/เย็น) → 7 วัน = 1 Chapter → 12 Chapter → ฉากจบ · เทียบกับโค้ดที่มีแล้ว + ลำดับทำให้เล่นจบลูป (2 ต.ค. 2569) |
@@ -49,10 +51,10 @@
 | Part | ไฟล์ | ยศ | ความรู้หลัก |
 |---|---|---|---|
 | RAM | `MINIGAME1_DESIGN.md` | ช่างมือใหม่ | ขาทอง · ทำความสะอาดหน้าสัมผัส · เลือกอุปกรณ์ |
-| Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` | ช่างฝึกหัด | standoff · ทิศ CPU · ซิลิโคน · ขันไขว้ — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
-| GPU | `PART_GPU_DESIGN.md` | ช่างประจำหมู่บ้าน | PCIe · สลัก · สายไฟ PCIe vs CPU · airflow — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
-| Front Panel | `PART_FRONTPANEL_DESIGN.md` | ช่างเชี่ยวชาญ | pin header · ขั้ว LED · dual channel — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
-| BIOS + OS | `PART_BIOS_DESIGN.md` | ช่างระดับมือโปร | boot order · XMP · ลง OS · bottleneck — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · ยังไม่ผูกเควสต์** |
+| Mainboard + CPU | `PART_MAINBOARD_DESIGN.md` | ช่างฝึกหัด | standoff · ทิศ CPU · ซิลิโคน · ขันไขว้ — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · เป็นงานลูกค้ารายวันใน `DayLoop` (ไม่อยู่ในเควสต์หลัก)** |
+| GPU | `PART_GPU_DESIGN.md` | ช่างประจำหมู่บ้าน | PCIe · สลัก · สายไฟ PCIe vs CPU · airflow — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · เป็นงานลูกค้ารายวันใน `DayLoop`** |
+| Front Panel | `PART_FRONTPANEL_DESIGN.md` | ช่างเชี่ยวชาญ | pin header · ขั้ว LED · dual channel — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · เป็นงานลูกค้ารายวันใน `DayLoop`** |
+| BIOS + OS | `PART_BIOS_DESIGN.md` | ช่างระดับมือโปร | boot order · XMP · ลง OS · bottleneck — **เล่นได้แล้ว (2 ต.ค.) เปิดจาก Debug F1 · เป็นงานลูกค้ารายวันใน `DayLoop`** |
 
 **โครงร่วมของทุก Part:** 8 phase · ปิ๊บสอนผ่าน `PibHint` · ระบบเลือกอุปกรณ์/ตัวเลือกที่มีทั้ง ✅ 🟡 ❌ · ผิดครั้งแรกปิ๊บห้ามทันไม่เสียหาย · คะแนนเต็ม 100 ผ่าน ≥ 60 (⭐ 60 / ⭐⭐ 80 / ⭐⭐⭐ 95)
 
@@ -98,5 +100,5 @@
 
 ### ⚠️ ต้องทำก่อนใช้ไฟล์เหล่านี้
 
-- [ ] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` (sprite มีแล้ว 5 อารมณ์ที่ `Assets/CharacterSprite/char_pib_*.png`)
-- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/PartBase/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/PartBase/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริง `Ram_Pib.txt` ผ่าน `part_ram.gd` และ `Assembly_Pib.txt` ผ่าน `tutorial_assembly.gd`; อีก 4 ไฟล์แก้ format ให้ใช้กับ parser ได้แล้วแต่ยังไม่มีสคริปต์มินิเกมเรียกใช้)
+- [x] เพิ่ม `"ปิ๊บ"` เข้า `_CharacterMap` ใน `Scene/Global.tscn` — ทำแล้ว (ปิ๊บ · ปิ๊บ:happy · ปิ๊บ:worry · ตรวจ 6 ต.ค.)
+- [x] เขียนคอมโพเนนต์ `PibHint` (`Scripts/MiniGame/PartBase/pib_hint.gd`) + parser `PhaseDialogParser` (`Scripts/MiniGame/PartBase/phase_dialog_parser.gd`) ที่อ่านไฟล์แล้วแยกตาม `@SECTION` — `DialogScene` เดิมอ่านทั้งไฟล์รวดเดียว ใช้กับ section ไม่ได้ (ตอนนี้ผูกใช้งานจริงครบทุกไฟล์ผ่าน `dialog_path` / `PIB_PATH` ของแต่ละ Part: `Ram_Pib` · `Mainboard_Pib` · `Gpu_Pib` · `FrontPanel_Pib` · `Bios_Pib` · `Assembly_Pib` — ตรวจ 6 ต.ค.)

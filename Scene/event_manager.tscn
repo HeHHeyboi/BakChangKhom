@@ -14,6 +14,7 @@ eventMap = Dictionary[int, ExtResource("2_1ssq2")]({
 })
 
 [node name="TimeSystem" parent="." unique_id=1106151211 instance=ExtResource("4_brmao")]
+cur_period = null
 
 [node name="QuestBoard" parent="." unique_id=858189005 instance=ExtResource("5_ookmy")]
 

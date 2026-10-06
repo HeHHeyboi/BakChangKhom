@@ -21,15 +21,24 @@ func _ready() -> void:
 	f.close()
 	_check(not EventManager.play_story_dialog("x", empty, ""), "บทว่าง → คืน false (ไม่เปิด DialogScene)")
 	_check(not DialogScene.visible, "DialogScene ไม่ถูกเปิด")
-	_check(EventManager.play_story_dialog("x", "res://Assets/Dialog/Break/after_tutorial.txt", "res://ไม่มีรูป.jpg"), "ฉากหลังหาย → ยังเปิดบทได้")
-	_check(not EventManager.play_story_dialog("y", "res://Assets/Dialog/Break/after_tutorial.txt", ""), "เปิดบทซ้อน → คืน false")
+	_check(
+		EventManager.play_story_dialog("x", "res://Assets/Dialog/Break/after_tutorial.txt", "res://ไม่มีรูป.jpg"),
+		"ฉากหลังหาย → ยังเปิดบทได้",
+	)
+	_check(
+		not EventManager.play_story_dialog("y", "res://Assets/Dialog/Break/after_tutorial.txt", ""),
+		"เปิดบทซ้อน → คืน false",
+	)
 	DialogScene.dialog_end()
 	await _frames(2)
 
 	# --- เวลา
-	ts.call("set_period", 99)   # ค่าที่ไม่มีใน enum
+	ts.call("set_period", 99) # ค่าที่ไม่มีใน enum
 	_check(ts.cur_period != 99, "set_period ค่าผิด → ไม่เปลี่ยน")
-	_check(TimeSystem.clock_text(-50) == "00:00" and TimeSystem.clock_text(99999) == "23:59", "clock_text ค่าเกิน → clamp")
+	_check(
+		TimeSystem.clock_text(-50) == "00:00" and TimeSystem.clock_text(99999) == "23:59",
+		"clock_text ค่าเกิน → clamp",
+	)
 	ts.set_clock(-10)
 	_check(ts.current_minute == 0, "set_clock ติดลบ → 00:00")
 	ts.set_date(1, 1)
@@ -37,14 +46,21 @@ func _ready() -> void:
 	await DayLoop.time_skip(0)
 	_check(ts.current_minute == m0, "time_skip 0 นาที → ไม่ทำอะไร")
 	DayLoop.time_skip(30, 0.3)
-	DayLoop.time_skip(30, 0.3)   # ซ้อน → ต้องถูกข้าม
+	DayLoop.time_skip(30, 0.3) # ซ้อน → ต้องถูกข้าม
 	await get_tree().create_timer(1.0).timeout
-	_check(ts.current_minute == m0 + 30, "time_skip ซ้อนกัน → เดินแค่ครั้งเดียว (%s)" % TimeSystem.clock_text(ts.current_minute))
+	_check(
+		ts.current_minute == m0 + 30,
+		"time_skip ซ้อนกัน → เดินแค่ครั้งเดียว (%s)" % TimeSystem.clock_text(ts.current_minute),
+	)
 
 	# --- เงิน
 	var money0 := GameState.money
 	var r := GameState.record_repair(&"part_ไม่มีจริง", 150)
-	_check(r["score"] == 100 and GameState.money == money0 + GameState.economy.default_fee + GameState.economy.tip_three_star, "คะแนนเกิน 100 → clamp · Part ไม่รู้จัก → ค่าซ่อม default")
+	_check(
+		r["score"] == 100
+		and GameState.money == money0 + GameState.economy.default_fee + GameState.economy.tip_three_star,
+		"คะแนนเกิน 100 → clamp · Part ไม่รู้จัก → ค่าซ่อม default",
+	)
 	DayLoop.job_done_today = false
 
 	# --- ลูกค้ากรอกไม่ครบ
@@ -60,7 +76,10 @@ func _ready() -> void:
 	ram.set_meta("work_order", load("res://Resources/Customers/w1_d6_girl_ram.tres"))
 	add_child(ram)
 	await _frames(2)
-	ram.minigame_finished.connect(func(_s: Dictionary) -> void: _finished_count += 1)
+	ram.minigame_finished.connect(
+		func(_s: Dictionary) -> void:
+			_finished_count += 1,
+	)
 	ram.skip()
 	_check(_finished_count == 0, "งานลูกค้าเรียก skip() → ไม่ยอม")
 	var jobs1 := GameState.satisfaction_history.size()
@@ -69,7 +88,10 @@ func _ready() -> void:
 	ram._advance_phase()
 	await _frames(2)
 	_check(_finished_count == 1, "minigame_finished ส่งครั้งเดียว (ได้ %d)" % _finished_count)
-	_check(GameState.satisfaction_history.size() == jobs1 + 1, "บันทึกผลงานครั้งเดียว (ได้ %d)" % (GameState.satisfaction_history.size() - jobs1))
+	_check(
+		GameState.satisfaction_history.size() == jobs1 + 1,
+		"บันทึกผลงานครั้งเดียว (ได้ %d)" % (GameState.satisfaction_history.size() - jobs1),
+	)
 	_check(not Global.in_minigame, "มินิเกมปิดแล้ว in_minigame = false")
 	DayLoop.job_done_today = false
 
@@ -93,13 +115,16 @@ func _ready() -> void:
 	var rs := QteSpec.new()
 	rs.kind = QteSpec.Kind.RING
 	_check(await q.run(rs) == QteRunner.Result.GOOD, "QTE แบบที่ยังไม่ทำ → GOOD ไม่ค้าง")
-	var task := {"done": false}
+	var task := { "done": false }
 	var go := func() -> void:
 		await q.run(weird)
 		task["done"] = true
 	go.call()
 	await _frames(2)
-	_check(q._zone.x <= q._zone.y and q._perfect.x >= q._zone.x and q._perfect.y <= q._zone.y, "โซนกลับด้าน → runner สลับ + บีบ PERFECT เข้าโซน")
+	_check(
+		q._zone.x <= q._zone.y and q._perfect.x >= q._zone.x and q._perfect.y <= q._zone.y,
+		"โซนกลับด้าน → runner สลับ + บีบ PERFECT เข้าโซน",
+	)
 	q.cancel()
 	await _frames(1)
 	_check(task["done"] and not q.running, "cancel() → run จบ ไม่ค้าง")

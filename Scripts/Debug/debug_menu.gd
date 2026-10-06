@@ -31,39 +31,16 @@ func _ready() -> void:
 			"label": "เล่น Part Mainboard + CPU (ทดสอบ)",
 			"minigame": "res://Scene/MiniGame/PartMainboard/part_mainboard.tscn",
 		},
-		{
-			"label": "เล่น Part GPU + จัดสาย (ทดสอบ)",
-			"minigame": "res://Scene/MiniGame/PartGpu/part_gpu.tscn",
-		},
+		{ "label": "เล่น Part GPU + จัดสาย (ทดสอบ)", "minigame": "res://Scene/MiniGame/PartGpu/part_gpu.tscn" },
 		{
 			"label": "เล่น Part Front Panel + Dual Channel (ทดสอบ)",
 			"minigame": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
 		},
-		{
-			"label": "เล่น Part BIOS + ลง Windows (ทดสอบ)",
-			"minigame": "res://Scene/MiniGame/PartBios/part_bios.tscn",
-		},
+		{ "label": "เล่น Part BIOS + ลง Windows (ทดสอบ)", "minigame": "res://Scene/MiniGame/PartBios/part_bios.tscn" },
 		# [Claude 5 ต.ค. 2569] ทดสอบลูปเวลา 7 วัน/รอบ · 12 รอบ (Docs/GAME_LOOP.md)
-		{
-			"label": "ลูปร้าน: ข้ามเควสต์ เริ่มรับลูกค้า (ไปห้องขม)",
-			"call": _start_shop_loop,
-		},
-		{
-			"label": "เวลา: ไปช่วงถัดไป (เย็น → วันใหม่)",
-			"call": EventManager.advance_period,
-		},
-		{
-			"label": "เวลา: นอน → วันถัดไป",
-			"call": EventManager.end_day,
-		},
-		{
-			"label": "เวลา: ไปเย็นวันที่ 7 ของรอบนี้ (นอนต่อ = จบรอบ)",
-			"call": func(): EventManager.time_system.set_date(EventManager.time_system.current_week, TimeSystem.DAYS_PER_WEEK, TimeSystem.TIME.EVENING),
-		},
-		{
-			"label": "เวลา: ไปเย็นวันที่ 7 รอบ 12 (นอนต่อ = ฉากจบ)",
-			"call": func(): EventManager.time_system.set_date(TimeSystem.TOTAL_WEEKS, TimeSystem.DAYS_PER_WEEK, TimeSystem.TIME.EVENING),
-		},
+		{ "label": "ลูปร้าน: ข้ามเควสต์ เริ่มรับลูกค้า (ไปห้องขม)", "call": _start_shop_loop },
+		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → วันใหม่)", "call": EventManager.advance_period },
+		{ "label": "เวลา: นอน → วันถัดไป", "call": EventManager.end_day },
 	]
 	_build_ui()
 

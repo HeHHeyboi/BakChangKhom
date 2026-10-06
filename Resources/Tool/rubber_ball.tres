@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ToolDef" format=3 uid="uid://b5hkhbu0ri46d"]
+
+[ext_resource type="Texture2D" uid="uid://cye704cldn4lc" path="res://Assets/MiniGame/PartRam/ram_tool_blower.png" id="1_h1ome"]
+[ext_resource type="Script" uid="uid://xssv75b66tn2" path="res://Scripts/Resources/tool_def.gd" id="1_u6lhs"]
+
+[resource]
+script = ExtResource("1_u6lhs")
+id = &"rubber_ball"
+display_name = "ลูกยาง"
+icon = ExtResource("1_h1ome")
+action = 4

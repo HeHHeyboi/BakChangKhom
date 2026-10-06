@@ -4,7 +4,7 @@
 > ชุดเดียวกับ: `MINIGAME1_DESIGN.md` · `PART_MAINBOARD_DESIGN.md` · `PART_GPU_DESIGN.md` · `PART_FRONTPANEL_DESIGN.md`
 > อยู่ใน Scene S3 ของลูปงานซ่อม (ทำ **หลังประกอบเครื่องเสร็จ**) — `REPAIR_FLOW.md` · asset: `Assets/MiniGame/PartBios/` (`bios_*`)
 
-> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · ยังไม่มีซีนของ Part นี้ในรีโป
+> ⚠️ **30 ก.ย. 2569:** ชื่อคลาสและโครงในเอกสารนี้เป็นร่างตอนออกแบบ — โค้ดจริงใช้ `PartMinigame` (`enum PhaseState`) + phase ที่ extends `Phase2D` บนฉาก 2D (`Stage2D`) ดู `MINIGAME_PREFAB.md` · `SCENE_2D.md` · กติกา/คะแนน/บทปิ๊บยังใช้ได้ · **ซีนมีแล้ว** `Scene/MiniGame/PartBios/part_bios.tscn` เล่นได้ครบ 8 phase (2 ต.ค.) เปิดจาก Debug F1 และเป็นงานรายวันใน `DayLoop` (ดู §13.1) · หน้าจอ BIOS ยังเป็นภาพนิ่ง — `GAME_REDESIGN.md` §11.3 เสนอเปลี่ยนเป็นหน้าต่างใช้คีย์บอร์ดได้
 
 ---
 

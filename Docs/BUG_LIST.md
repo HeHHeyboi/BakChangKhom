@@ -10,10 +10,12 @@
 
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
-| 🔴 Critical | 11 | 0 | 3 | 14 |
-| 🟡 High | 10 | 0 | 2 | 12 |
-| 🟢 Low | 4 | 0 | 6 | 10 |
-| **รวม** | **25** | **0** | **11** | **36** |
+| 🔴 Critical | 12 | 0 | 2 | 14 |
+| 🟡 High | 9 | 0 | 2 | 11 |
+| 🟢 Low | 5 | 0 | 5 | 10 |
+| **รวม** | **26** | **0** | **9** | **35** |
+
+> นับใหม่ 6 ต.ค. 2569 จากหัวข้อ BUG-xx ในไฟล์นี้ (เดิม 25 / 11 / 36) — ไม่มี BUG-27 ในไฟล์ (เลขไม่เคยถูกใช้) จึงรวม 35 · BUG-32 และ BUG-34 ปิดแล้วตามหัวข้อ "อัปเดต 30 ก.ย." · **ยังเปิด 9:** BUG-14 · 15 · 16 · 17 · 21 · 22 · 23 · 25 · 35 (`output.txt` ยังอยู่ใน git)
 
 ---
 
@@ -56,7 +58,7 @@
 
 รอบนี้ทีมเขียนของใหม่มาเยอะมาก — `PibHint` · `PhaseDialogParser` · `part_ram.gd` state machine ครบ 8 phase · `phase_diagnosis.gd` ที่เล่นได้จริง · `CleanTool` resource · แปลงไฟล์บทปิ๊บทั้ง 5 ไฟล์เป็นฟอร์แมต `@SECTION` โครงถูกทางหมด ที่เจอด้านล่างเป็นงานที่ยังต่อไม่ครบ ไม่ใช่ออกแบบผิด
 
-### BUG-32 🔴 จบ Phase 0 แล้วจอว่าง — ลงทะเบียน phase node ไว้แค่ตัวเดียว
+### BUG-32 🔴 → ✅ จบ Phase 0 แล้วจอว่าง — ลงทะเบียน phase node ไว้แค่ตัวเดียว
 
 | | |
 |---|---|
@@ -77,7 +79,7 @@
 | สาเหตุ | `var lines = dialog_dict[data.header]` เข้าถึงคีย์ตรง ๆ Godot จะ push error ทันทีที่คีย์ไม่มี ก่อนจะไปถึงบรรทัด `if lines != null` ที่ตั้งใจดักไว้ |
 | แก้ | `if not dialog_dict.has(data.header): push_error(...); return` ก่อน หรือใช้ `dialog_dict.get(data.header)` |
 
-### BUG-34 🟢 ข้อความเควสต์ใน `main.tres` กลับไปเป็นภาษาอังกฤษ (ย้อนกลับของ BUG-13)
+### BUG-34 🟢 → ✅ ข้อความเควสต์ใน `main.tres` กลับไปเป็นภาษาอังกฤษ (ย้อนกลับของ BUG-13)
 
 `quest_text_th` ทั้ง 4 ขั้นเป็น `"Talk to gradma"` · `"go in to your room and inspect computer"` · `"find eraser"` · `"clean a ram"` — ตัวแรกสะกดผิดด้วย (`gradma`) เคยแก้เป็นไทยไปแล้วรอบหนึ่ง แล้วถูกเขียนทับตอน rebuild resource · ชื่อฟิลด์ลงท้าย `_th` แต่เนื้อหาเป็นอังกฤษ
 
@@ -330,6 +332,7 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 6 ต.ค. 2569 | นับตารางสรุปใหม่ (26 แก้แล้ว · 9 เปิด · รวม 35) · ติด ✅ ให้ BUG-32 และ BUG-34 ที่ปิดไปแล้วเมื่อ 30 ก.ย. |
 | 23 ก.ย. 2569 (ตรวจซ้ำ 2) | ปิด BUG-18 (`parse_text()` guard `body.size() < 2` ก่อน `push_error`+`return null`) และ BUG-24 (`QuesetBoard` → `QuestBoard` ทั้ง `quest_board.gd` และ `event_manager.gd`) จาก working-tree changes ที่ยังไม่ commit — ดู `git diff` ตอนตรวจ |
 | 23 ก.ย. 2569 (ตรวจซ้ำ) | Audit เต็มไฟล์เทียบกับโค้ดจริงที่ HEAD `cd053b4` (ไม่มี commit โค้ดใหม่ตั้งแต่ `7c291e5`) — ปิด BUG-09 (`.import` ครบ 69 คู่ ไม่มีไฟล์กำพร้าแล้ว) และ BUG-19 (`Constant.MINIGAME1_SCENE` ชี้ `part_ram.tscn` แล้วจริง) เป็น ✅ ทั้งคู่ · อัปเดตเลขบรรทัด/จุดอ้างอิงโค้ดของ BUG-16 (ย้ายจาก `trigger_step()` case 3 ไปที่ `_on_tutorial_end()` + `minigame1.gd::_input()`) และ BUG-18 (เลขบรรทัดขยับ) ให้ตรงโค้ดปัจจุบัน · พบจุดน่าสงสัยใหม่ใน `main.tres` (emitType ของ task หายางลบ) แต่ยังไม่ฟันธงเป็นบั๊ก |
 | 23 ก.ย. 2569 | commit `7c291e5` — ปิด BUG-28 ถึง BUG-31 (load/instantiate, QuestStep→String, main.tres 5 task, minigame_end/dialog_finish logic) ด้วยระบบ `isDone`/`EmitType` ต่อสัญญาณ `on_dialog_end`/`on_minigame_end`/`on_tutorial_finish` แบบ one-shot · ปิด BUG-20 (data-driven เต็มรูปแบบ) และ BUG-26 (`Event.reset()` + เรียกจาก `_ready()`) ไปด้วย |

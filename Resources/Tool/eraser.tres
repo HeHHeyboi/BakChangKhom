@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ToolDef" format=3 uid="uid://d02vsfihc5tt"]
+
+[ext_resource type="Script" uid="uid://xssv75b66tn2" path="res://Scripts/Resources/tool_def.gd" id="1_a1oic"]
+[ext_resource type="Texture2D" uid="uid://bkbffkwbjfgw8" path="res://Assets/MiniGame/PartRam/ram_eraser.png" id="1_ikbhb"]
+
+[resource]
+script = ExtResource("1_a1oic")
+id = &"eraser"
+display_name = "ยางลบ"
+icon = ExtResource("1_ikbhb")
+action = 16

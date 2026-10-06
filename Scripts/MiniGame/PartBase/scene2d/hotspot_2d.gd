@@ -13,6 +13,10 @@ const COL_GLOW := Color(1, 0.86, 0.35)
 @export var always_show_label := true
 ## ใช้เป็นประตูตอนถือชิ้นส่วน (ลากมาค้างไว้แป๊บเดียว = ไปมุมนั้น)
 @export var portal := true
+@export var accepts: Array[ToolDef.Action]
+@export var harmfull: Dictionary[ToolDef.Action, StringName]
+
+signal tool_used(tool: ToolDef, result: int)
 
 var hovered := false
 var _t := 0.0

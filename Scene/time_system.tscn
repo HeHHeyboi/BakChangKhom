@@ -9,14 +9,17 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
-[node name="TimeSystem" type="CanvasLayer" unique_id=1106151211]
+[node name="TimeSystem" type="CanvasLayer" unique_id=1106151211 node_paths=PackedStringArray("money_label")]
 process_mode = 3
 layer = 100
 script = ExtResource("1_nyd0s")
+money_label = NodePath("PanelContainer/HBoxContainer/MoneyLabel")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=549087680]
-offset_right = 467.0
+offset_right = 492.0
 offset_bottom = 91.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer" unique_id=28475656]
@@ -44,8 +47,17 @@ clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
-theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/normal_font_size = 22
 bbcode_enabled = true
 scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MoneyLabel" type="Label" parent="PanelContainer/HBoxContainer" unique_id=2063910084]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+theme_override_colors/font_color = Color(1, 0.9309246, 0.62782896, 1)
+theme_override_font_sizes/font_size = 28
+text = "Money"
+horizontal_alignment = 1

@@ -37,23 +37,31 @@ const ENDING_TEXT := {
 }
 const GRADE_TEXT := ["ซ่อมถูกทุกอย่าง", "ผ่าน แต่มีจุดพลาด", "ซ่อมไม่ผ่าน"]
 
-enum Card { NONE, JOB, JOB_FORCED, RESULT, EVENING, WEEK_SUMMARY, ENDING }
+enum Card {
+	NONE,
+	JOB,
+	JOB_FORCED,
+	RESULT,
+	EVENING,
+	WEEK_SUMMARY,
+	ENDING,
+}
 
 var today_case: CustomerCase
 var job_done_today := false
-var arrived_today := false     # บทลูกค้าเข้าร้านเล่นไปแล้ว
-var last_result: Dictionary = {}
+var arrived_today := false # บทลูกค้าเข้าร้านเล่นไปแล้ว
+var last_result: Dictionary = { }
 var week_results: Array[Dictionary] = []
 var week_start_money := 0
 var _pending_summary_week := 0
 var _game_over := false
-var _working := false          # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
+var _working := false # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
 var _shop_time := 0.0
 var _break_done := false
-var _skipping := false          # กำลังเล่นแอนิเมชันเวลาหมุน
-var _pending_cb := Callable()   # callback ที่รอ DialogScene.on_dialog_finish อยู่ (ถอดได้ถ้าบทไม่ขึ้น)
-var _minigame: Node             # มินิเกมงานลูกค้าที่เปิดอยู่
-var _stuck_time := 0.0          # watchdog: _working ค้างโดยไม่มีบท/มินิเกม
+var _skipping := false # กำลังเล่นแอนิเมชันเวลาหมุน
+var _pending_cb := Callable() # callback ที่รอ DialogScene.on_dialog_finish อยู่ (ถอดได้ถ้าบทไม่ขึ้น)
+var _minigame: Node # มินิเกมงานลูกค้าที่เปิดอยู่
+var _stuck_time := 0.0 # watchdog: _working ค้างโดยไม่มีบท/มินิเกม
 var _connect_tries := 0
 const STUCK_LIMIT := 3.0
 var _skip_overlay: ColorRect
@@ -89,10 +97,6 @@ func _connect() -> void:
 		return
 	if not ts.day_started.is_connected(_on_day_started):
 		ts.day_started.connect(_on_day_started)
-	if not ts.week_ended.is_connected(_on_week_ended):
-		ts.week_ended.connect(_on_week_ended)
-	if not ts.all_weeks_ended.is_connected(_on_all_weeks_ended):
-		ts.all_weeks_ended.connect(_on_all_weeks_ended)
 	if not GameState.repair_recorded.is_connected(_on_repair_recorded):
 		GameState.repair_recorded.connect(_on_repair_recorded)
 	week_start_money = GameState.money
@@ -105,7 +109,7 @@ func _validate() -> void:
 	for c in random_pool:
 		if c:
 			all.append(c)
-	var weeks_seen := {}
+	var weeks_seen := { }
 	for plan in week_plans:
 		if plan == null:
 			push_warning("DayLoop.week_plans มีช่องว่าง")
@@ -113,12 +117,15 @@ func _validate() -> void:
 		if weeks_seen.has(plan.week):
 			push_warning("DayLoop.week_plans มีรอบ %d ซ้ำ — ใช้อันแรก (%s)" % [plan.week, plan.resource_path])
 		weeks_seen[plan.week] = true
-		if plan.days.size() > TimeSystem.DAYS_PER_WEEK:
-			push_warning("WeekPlan %s มี %d วัน (เกิน %d) — วันที่เกินไม่ถูกใช้" % [plan.resource_path, plan.days.size(), TimeSystem.DAYS_PER_WEEK])
+		# if plan.days.size() > TimeSystem.DAYS_PER_WEEK:
+		# 	push_warning(
+		# 		"WeekPlan %s มี %d วัน (เกิน %d) — วันที่เกินไม่ถูกใช้"
+		# 		% [plan.resource_path, plan.days.size(), TimeSystem.DAYS_PER_WEEK]
+		# 	)
 		for c in plan.days:
 			if c:
 				all.append(c)
-	var ids := {}
+	var ids := { }
 	for c in all:
 		if c.id != &"" and ids.has(c.id) and ids[c.id] != c:
 			push_warning("CustomerCase id ซ้ำ: %s" % c.id)
@@ -129,8 +136,8 @@ func _validate() -> void:
 		if c and c.forced:
 			push_warning("random_pool ไม่ควรมีลูกค้า forced: %s" % c.resource_path)
 
-
 # ---------------------------------------------------------------- ลูป
+
 
 func plan_for(week: int) -> WeekPlan:
 	for p in week_plans:
@@ -146,7 +153,10 @@ func case_for(week: int, day: int) -> CustomerCase:
 		var c := plan.case_for_day(day)
 		if c:
 			return c
-	var pool := random_pool.filter(func(c: CustomerCase) -> bool: return c != null and not c.forced)
+	var pool := random_pool.filter(
+		func(c: CustomerCase) -> bool:
+			return c != null and not c.forced,
+	)
 	if pool.is_empty():
 		return null
 	return pool[_rng.randi_range(0, pool.size() - 1)]
@@ -155,7 +165,7 @@ func case_for(week: int, day: int) -> CustomerCase:
 func _on_day_started(week: int, day: int) -> void:
 	job_done_today = false
 	arrived_today = false
-	last_result = {}
+	last_result = { }
 	_shop_time = 0.0
 	today_case = case_for(week, day)
 
@@ -192,10 +202,13 @@ func play_arrival(then_repair: bool) -> void:
 		if then_repair:
 			start_repair()
 	var bg := today_case.bg
-	if path != "" and EventManager.play_story_dialog("ลูกค้า: " + today_case.customer, path, bg, DialogUtil.speakers_in(path)):
+	if (
+		path != ""
+		and EventManager.play_story_dialog("ลูกค้า: " + today_case.customer, path, bg, DialogUtil.speakers_in(path))
+	):
 		_wait_dialog(done)
 	else:
-		done.call()   # ไม่มีบท/เปิดบทไม่ได้ → ข้ามไปขั้นต่อไปเลย ไม่ให้ค้าง
+		done.call() # ไม่มีบท/เปิดบทไม่ได้ → ข้ามไปขั้นต่อไปเลย ไม่ให้ค้าง
 
 
 ## เปิดมินิเกมของงานวันนี้ · meta "work_order" = งานลูกค้า (PartMinigame ส่งคะแนนเข้า GameState เฉพาะงานที่มี meta นี้)
@@ -227,7 +240,7 @@ func start_repair() -> void:
 func _on_minigame_closed() -> void:
 	_minigame = null
 	_working = false
-	Global.in_minigame = false   # กันมินิเกมปิดแบบผิดปกติแล้วค่านี้ค้าง true (การ์ดจะไม่ขึ้นอีกเลย)
+	Global.in_minigame = false # กันมินิเกมปิดแบบผิดปกติแล้วค่านี้ค้าง true (การ์ดจะไม่ขึ้นอีกเลย)
 
 
 ## รอบทจบแล้วค่อยเรียก cb · จำไว้ใน _pending_cb เพื่อถอดได้ถ้าบทไม่ขึ้นจริง (watchdog)
@@ -324,18 +337,18 @@ func _reset_run() -> void:
 	week_results.clear()
 	job_done_today = false
 	arrived_today = false
-	last_result = {}
+	last_result = { }
 	force_active = false
 	_break_done = false
 	GameState.reset()
 	week_start_money = GameState.money
 	var ts := _ts()
 	if ts:
-		ts.set_date(1, 1)
+		ts.set_date(1, TimeSystem.TIME.MORNING)
 	today_case = case_for(1, 1)
 
-
 # ---------------------------------------------------------------- UI
+
 
 func _process(delta: float) -> void:
 	if _ts() == null:
@@ -391,7 +404,7 @@ func _decide_card() -> Card:
 	if job_done_today:
 		return Card.EVENING if ts.cur_period == TimeSystem.TIME.EVENING else Card.RESULT
 	if today_case and today_case.forced:
-		return Card.JOB_FORCED          # ปิดร้านหนีไม่ได้ ต้องซ่อมก่อน
+		return Card.JOB_FORCED # ปิดร้านหนีไม่ได้ ต้องซ่อมก่อน
 	if ts.cur_period == TimeSystem.TIME.EVENING or today_case == null:
 		return Card.EVENING
 	return Card.JOB
@@ -427,20 +440,31 @@ func _show_card(card: Card) -> void:
 	var ts := _ts()
 	var c := today_case
 	if c == null and (card == Card.JOB or card == Card.JOB_FORCED):
-		card = Card.EVENING   # ไม่มีลูกค้าวันนี้
+		card = Card.EVENING # ไม่มีลูกค้าวันนี้
 		_card = card
 	match card:
 		Card.JOB:
 			_title.text = "ลูกค้ามาที่ร้าน · วันที่ %d" % ts.current_day
 			_body.text = "%s\nมาเพราะ: %s\nเครื่อง: %s\nอาการ: %s\nงาน: %s · ค่าซ่อม ฿%d" % [
-				c.customer, c.reason, c.device, c.symptom, c.job_title, _fee(c)]
+				c.customer,
+				c.reason,
+				c.device,
+				c.symptom,
+				c.job_title,
+				_fee(c),
+			]
 			_primary.text = "รับงาน"
 			_secondary.text = "ปิดร้านวันนี้"
 			_secondary.visible = true
 		Card.JOB_FORCED:
 			_title.text = "งานด่วน! · วันที่ %d" % ts.current_day
 			_body.text = "%s รอเครื่องอยู่\nเครื่อง: %s\nอาการ: %s\nงาน: %s · ค่าซ่อม ฿%d" % [
-				c.customer, c.device, c.symptom, c.job_title, _fee(c)]
+				c.customer,
+				c.device,
+				c.symptom,
+				c.job_title,
+				_fee(c),
+			]
 			_primary.text = "เริ่มซ่อม"
 		Card.RESULT:
 			_title.text = "ส่งเครื่องคืนลูกค้า"
@@ -457,11 +481,17 @@ func _show_card(card: Card) -> void:
 					if line.strip_edges() != "":
 						quote = "\n\n%s: \"%s\"" % [c.customer, line]
 				_body.text = "%s\nคะแนน %d/100%s\nเงิน %s · ความพอใจ %d · XP +%d%s" % [
-					GRADE_TEXT[grade], int(r.get("score", 0)), "  (ทำของเสีย!)" if r.get("damaged", false) else "",
-					money_txt, int(r.get("satisfaction", 0)), int(r.get("xp", 0)), quote]
+					GRADE_TEXT[grade],
+					int(r.get("score", 0)),
+					"  (ทำของเสีย!)" if r.get("damaged", false) else "",
+					money_txt,
+					int(r.get("satisfaction", 0)),
+					int(r.get("xp", 0)),
+					quote,
+				]
 			_primary.text = "ปิดร้าน → ช่วงเย็น"
 		Card.EVENING:
-			_title.text = "ช่วงเย็น · วันที่ %d/%d" % [ts.current_day, TimeSystem.DAYS_PER_WEEK]
+			_title.text = "ช่วงเย็น · วันที่ %d" % [ts.current_day]
 			_body.text = "ออกไปหมู่บ้านได้ทางแผนที่\nเงินในร้าน ฿%d" % GameState.money
 			_primary.text = "เข้านอน (จบรอบ)" if ts.is_last_day_of_week() else "เข้านอน → วันถัดไป"
 		Card.WEEK_SUMMARY:
@@ -473,13 +503,21 @@ func _show_card(card: Card) -> void:
 			sat = sat if is_finite(sat) else 0.0
 			_title.text = "สรุปรอบ %d" % _pending_summary_week
 			_body.text = "งานที่ซ่อม %d งาน\nรายได้รอบนี้ %s฿%d\nความพอใจเฉลี่ย %d · ทั้งเกม %d\nXP รวม %d" % [
-				week_results.size(), "+" if earned >= 0 else "−", absi(earned), roundi(sat),
-				roundi(GameState.average_satisfaction()), GameState.xp]
+				week_results.size(),
+				"+" if earned >= 0 else "−",
+				absi(earned),
+				roundi(sat),
+				roundi(GameState.average_satisfaction()),
+				GameState.xp,
+			]
 			_primary.text = "ดูฉากจบ" if _game_over else "ไปต่อ (บทของรอบ %d)" % (_pending_summary_week + 1)
 		Card.ENDING:
 			_title.text = "จบเกม"
 			_body.text = "%s\n\nเงิน ฿%d · ความพอใจเฉลี่ย %d" % [
-				ENDING_TEXT.get(GameState.ending, ""), GameState.money, roundi(GameState.average_satisfaction())]
+				ENDING_TEXT.get(GameState.ending, ""),
+				GameState.money,
+				roundi(GameState.average_satisfaction()),
+			]
 			_primary.text = "กลับหน้าแรก"
 
 

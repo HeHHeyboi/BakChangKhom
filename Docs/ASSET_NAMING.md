@@ -15,17 +15,17 @@
 ## `Assets/Tutorial/BasicStart/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
 |---|---|---|---|
-| `tut_start_01.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนเล่นพื้นฐาน |
-| `tut_start_02.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนเล่นพื้นฐาน |
-| `tut_start_03.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนเล่นพื้นฐาน |
+| `tut_start_01.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนเล่นพื้นฐาน |
+| `tut_start_02.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนเล่นพื้นฐาน |
+| `tut_start_03.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนเล่นพื้นฐาน |
 
 ## `Assets/Tutorial/RamCleaning/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
 |---|---|---|---|
-| `tut_ram_01.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนขัดแรม |
-| `tut_ram_02.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนขัดแรม |
-| `tut_ram_03.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนขัดแรม |
-| `tut_ram_04.png` | 1152×648 | 🔴 ยังไม่มี | สไลด์สอนขัดแรม |
+| `tut_ram_01.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนขัดแรม |
+| `tut_ram_02.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนขัดแรม |
+| `tut_ram_03.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนขัดแรม |
+| `tut_ram_04.png` | 1152×648 | ✅ มีแล้วใช้ได้ | สไลด์สอนขัดแรม |
 
 ## `Assets/MiniGame/PartRam/`
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
@@ -117,7 +117,7 @@
 |---|---|---|---|
 | `gpu_cable_cpu8.png` | = gpu_cable_pcie.png | 🔴 ยังไม่มี | Part GPU |
 | `gpu_connector_zoom.png` | 500×300 | 🔴 ยังไม่มี | Part GPU |
-| `gpu_card_dusty.png` | = gpu_card.png | 🔴 ยังไม่มี | Part GPU |
+| `gpu_card_dusty.png` | = gpu_card.png | ✅ มีแล้วใช้ได้ | Part GPU |
 | `gpu_burn.png` | = gpu_card.png | 🔴 ยังไม่มี | Part GPU |
 
 ## `Assets/MiniGame/PartFrontPanel/`
@@ -131,12 +131,12 @@
 | ไฟล์ | canvas | สถานะ | ใช้ที่ |
 |---|---|---|---|
 | `bios_bottleneck_chart.png` | 600×400 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_hdd.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_ssd.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_drive_usb.png` | 200×160 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_save.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_discard.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
-| `bios_btn_default.png` | 300×80 | 🔴 ยังไม่มี | Part BIOS |
+| `bios_drive_hdd.png` | 180×140 | ✅ มีแล้วใช้ได้ | Part BIOS |
+| `bios_drive_ssd.png` | 180×140 | ✅ มีแล้วใช้ได้ | Part BIOS |
+| `bios_drive_usb.png` | 180×140 | ✅ มีแล้วใช้ได้ | Part BIOS |
+| `bios_btn_save.png` | 240×44 | ✅ มีแล้วใช้ได้ | Part BIOS |
+| `bios_btn_discard.png` | 240×44 | ✅ มีแล้วใช้ได้ | Part BIOS |
+| `bios_btn_default.png` | 240×44 | ✅ มีแล้วใช้ได้ | Part BIOS |
 | `bios_windows_desktop.png` | 1152×648 | 🔴 ยังไม่มี | Part BIOS |
 
 ## `Assets/UI/`
@@ -207,16 +207,18 @@
 | `CharacterSprite/char_khom_happy.png` · `char_khom_worry.png` · `char_min_happy.png` | เก็บ — เป็นอารมณ์เพิ่มของตัวละครที่มีอยู่แล้ว ใส่ใน `_CharacterMap` ตอนผูกตัวละคร |
 | `MiniGame/PartBios/bios_xmp_toggle_on.png` · `bios_xmp_toggle_off.png` | เก็บ — ใช้ใน Part BIOS Phase 4 (ชื่อถูกกฎแล้ว) |
 | `SpriteSheets/Frames/char_khom_walk_01..04.png` | เก็บ — เฟรมที่ตัดจาก `char_khom_walk_sheet.png` แล้ว |
-| `Tutorial/BasicStart/Tutorial สอนเล่น.png` · `Tutorial/RamCleaning/Tutorial ขัดแรม.png` | **ลบ** — ชื่อภาษาไทย ผิดกฎ · แทนด้วยชุด `tut_start_01..03` / `tut_ram_01..04` ตามตารางด้านบน |
+| `Tutorial/BasicStart/Tutorial สอนเล่น.png` · `Tutorial/RamCleaning/Tutorial ขัดแรม.png` | **ลบได้แล้ว** — ชื่อภาษาไทย ผิดกฎ · `tutorial1.tres` / `ram_cleaning.tres` ชี้ไปชุด `tut_start_01..03` / `tut_ram_01..04` แล้ว (6 ต.ค. ไม่มีที่ไหนอ้างไฟล์เก่า) แต่ไฟล์ยังค้างอยู่ในโฟลเดอร์ |
 
 ## สรุป
 
 | | จำนวน |
 |---|---|
-| ✅ มีแล้วใช้ได้ | 36 |
-| 🟠 มีไฟล์แต่ต้องทำใหม่ | 7 |
-| 🔴 ยังไม่มี | 99 |
+| ✅ มีแล้วใช้ได้ | 57 |
+| 🟠 มีไฟล์แต่ต้องทำใหม่ | 0 |
+| 🔴 ยังไม่มี | 85 |
 | **รวมในเอกสารนี้** | **142** |
+
+> นับใหม่ 6 ต.ค. 2569 จากไฟล์จริง (เดิม 36 / 7 / 99) — เพิ่ม ✅ 14 ไฟล์: สไลด์ tutorial 7 · `gpu_card_dusty` · BIOS `bios_drive_*` 3 + `bios_btn_*` 3 · ขนาด BIOS 6 ไฟล์ใช้ตามไฟล์จริง (180×140 · 240×44) ไม่ใช่ 200×160 / 300×80 ในสเปกเดิม · ที่ยังขาด 85: UI 33 · PartRam 19 · PartCommon 12 · Mainboard 8 · Front Panel 3 · GPU 3 · ฉากจบ 3 · BIOS 2 · พื้นหลัง 2
 
 > ไฟล์เสียง 19 ไฟล์ไม่ได้อยู่ในตารางนี้ เพราะต้องมี `AudioManager` autoload ก่อน ดูรายชื่อใน `ASSET_TODO.md` ชุด I
 
@@ -226,4 +228,5 @@
 |---|---|
 | 28 ก.ย. 2569 | สร้างเอกสาร — รวมชื่อไฟล์จากทุก MD ให้เป็นรายการเดียว ตรวจกับไฟล์จริง และแยกขนาด canvas ออกจากขนาดตอนวางในฉาก |
 | 28 ก.ย. 2569 | เปลี่ยน asset ตัวใหม่ 23 ไฟล์ที่ crop ใหม่จาก sheet ต้นฉบับ (PartCommon 11 · PartRam 12) ทุกไฟล์ที่เคยเป็น 🟠 กลายเป็น ✅ แล้ว |
+| 6 ต.ค. 2569 | นับสถานะใหม่จากไฟล์จริง: ✅ 57 · 🔴 85 (เดิม 36 / 99 + 🟠 7) · เปลี่ยนไฟล์ 14 ไฟล์เป็น ✅ · ปรับขนาด BIOS 6 ไฟล์ตามไฟล์จริง |
 | 28 ก.ย. 2569 (ครั้งที่ 2) | ปรับขนาด 10 ไฟล์ของ Part BIOS / Front Panel / Mainboard ให้ตรงกับเอกสารดีไซน์ของแต่ละ Part (เดิมผมกรอกเดาไว้) · เพิ่มรายการไฟล์ที่มีอยู่แต่ยังไม่อยู่ในเอกสาร 11 ไฟล์ |
