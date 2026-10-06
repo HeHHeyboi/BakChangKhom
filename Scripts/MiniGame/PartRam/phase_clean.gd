@@ -80,7 +80,7 @@ func init():
 func _build() -> void:
 	_built = true
 	var rail := PhaseUI.make_frame(self, "ซ่อมแรม — ขั้นที่ 5/8 · ทำความสะอาด")
-	PhaseUI.set_rail_overlay(self)
+	PhaseUI.force_rail_open(self, true)
 	for s in STEP_TEXT:
 		_chk.append(PhaseUI.check_item(rail, STEP_TEXT[s]))
 	_step_label = PhaseUI.label(rail, "", 18, PhaseUI.COL_OK)
@@ -89,9 +89,15 @@ func _build() -> void:
 	_bar.custom_minimum_size = Vector2(0, 18)
 	rail.add_child(_bar)
 	_tray = HBoxContainer.new()
-	_tray.add_theme_constant_override("h_separation", 6)
-	_tray.set_anchors_preset(PRESET_BOTTOM_WIDE)
-	self.add_child(_tray)
+	var panel = PanelContainer.new()
+	panel.add_child(_tray)
+	self.add_child(panel)
+	panel.set_anchors_preset(PRESET_CENTER_BOTTOM, true)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH # ขยายออกสองข้างจากกึ่งกลาง ไม่เอียงขวา
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN # ขยายขึ้นด้านบน ไม่ล้นขอบล่าง
+	panel.offset_bottom = -175
+	_tray.add_theme_constant_override("separation", 6)
+	_tray.alignment = BoxContainer.ALIGNMENT_CENTER
 	_fill_tray(_tools)
 	_card = PhaseUI.label(rail, "ชี้ที่อุปกรณ์เพื่อดูคุณสมบัติ", 14)
 
@@ -107,24 +113,6 @@ func _set_step(step: CleanStep) -> void:
 	for i in _chk.size():
 		PhaseUI.set_check(_chk[i], i < int(step))
 	cam(STEP_VIEW[step])
-
-
-func _build_tray(step: CleanStep) -> Array[CleanTool]:
-	# การันตี ✅ ≥ 1 และ ❌ ≥ 2 แล้วสุ่มที่เหลือให้ครบ TRAY_SIZE
-	# var cur_step = _step_list[step]
-	# var ideal: CleanTool = cur_step.ideal[randi_range(0, len(cur_step.ideal) - 1)]
-	# var limited: CleanTool = cur_step.limited[randi_range(0, len(cur_step.limited) - 1)]
-	# var bad: Array[CleanTool] = cur_step.forbidden
-	# bad.shuffle()
-	# var tray: Array[CleanTool] = []
-	# tray.append(ideal)
-	# tray.append(limited)
-	# tray.append_array(bad.slice(0, -1))
-	# while tray.size() > 6:
-	# 	tray.pop_back()
-	# tray.shuffle()
-	# return tray
-	return []
 
 
 func _fill_tray(tray: Array[ToolDef]) -> void:
@@ -145,42 +133,44 @@ func _fill_tray(tray: Array[ToolDef]) -> void:
 		_tray.add_child(b)
 
 
-func _show_card(t: CleanTool) -> void:
-	var pips := "▮".repeat(t.hardness) + "▯".repeat(5 - t.hardness)
-	_card.text = "%s\nแข็ง %s · ชื้น %s\nไฟฟ้าสถิต %s · เศษ %s · เข้าซอก %s" % [
+func _show_card(t: ToolDef) -> void:
+	_card.text = "%s\nการใช้งาน %s\nจำนวนครั้ง %s · เวลา %d นาที" % [
 		t.display_name,
-		pips,
-		"มี" if t.has_moisture else "ไม่มี",
-		"เสี่ยง" if t.esd_risk else "ปลอดภัย",
-		"มี" if t.leaves_residue else "ไม่มี",
-		"ได้" if t.reaches_narrow else "ไม่ได้",
+		_action_names(t.action),
+		"ไม่จำกัด" if t.uses < 0 else str(t.uses),
+		t.time_minutes,
 	]
 
 
-func _fit(t: CleanTool, step: int) -> int:
-	return int(t.fit_per_step.get(step, CleanTool.Fit.FORBIDDEN))
+## ชื่อ Action ทุกบิตที่ติดอยู่ใน flags (action เป็นบิตแฟล็ก ใช้ keys() ตรง ๆ ไม่ได้)
+func _action_names(flags: int) -> String:
+	var names: PackedStringArray = []
+	for key in ToolDef.Action:
+		if flags & ToolDef.Action[key]:
+			names.append(key.capitalize())
+	return " / ".join(names)
 
 
 func _on_tool_used(tool: ToolDef, step: CleanStep) -> void:
 	if not visible or _finishing or _busy:
 		return
-	# var fit := _fit(tool, step)
-	# _busy = true
-	# await _animate_tool(tool, fit != CleanTool.Fit.FORBIDDEN)
-	# _busy = false
 	match step:
 		CleanStep.DUST_BOARD:
 			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
 				# _say_for(tool, step, tool.line_ideal, PibHint.Mood.HAPPY)
+				_animate_tool(tool, true)
 				_progress_by(GAIN[CleanTool.Fit.IDEAL])
 		CleanStep.SCRUB_CONTACTS:
 			# var key := "%s:%d" % [tool.id, step]
 			if tool.action & (ToolDef.Action.SCRUB):
+				_animate_tool(tool, true)
 				_progress_by(GAIN[CleanTool.Fit.IDEAL])
 			elif tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
+				_animate_tool(tool, true)
 				_progress_by(GAIN[CleanTool.Fit.LIMITED])
 		CleanStep.CLEAN_SLOT:
 			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
+				_animate_tool(tool, true)
 				_progress_by(GAIN[CleanTool.Fit.IDEAL])
 			elif tool.action & (ToolDef.Action.SCRUB):
 				_progress_by(GAIN[CleanTool.Fit.LIMITED])

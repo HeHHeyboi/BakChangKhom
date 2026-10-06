@@ -493,7 +493,7 @@ func _show_card(card: Card) -> void:
 		Card.EVENING:
 			_title.text = "ช่วงเย็น · วันที่ %d" % [ts.current_day]
 			_body.text = "ออกไปหมู่บ้านได้ทางแผนที่\nเงินในร้าน ฿%d" % GameState.money
-			_primary.text = "เข้านอน (จบรอบ)" if ts.is_last_day_of_week() else "เข้านอน → วันถัดไป"
+			_primary.text = "เข้านอน → วันถัดไป" # TimeSystem ไม่นับรอบ/สัปดาห์แล้ว (ไม่มี is_last_day_of_week)
 		Card.WEEK_SUMMARY:
 			var earned := GameState.money - week_start_money
 			var sat := 0.0

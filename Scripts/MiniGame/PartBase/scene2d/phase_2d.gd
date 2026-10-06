@@ -42,8 +42,11 @@ func reset_zoom() -> void:
 	stage().reset_zoom()
 
 
-## โหมด Info rail ของ phase นี้ (ตั้งใน Inspector) — logic ทั้งหมดอยู่ที่ PhaseUI.set_rail_mode / set_rail_overlay / refresh_layout
-@export var rail_mode: PhaseUI.RailMode = PhaseUI.RailMode.AUTO
+## Info rail ของ phase นี้ (ตั้งใน Inspector) — logic ทั้งหมดอยู่ที่ PhaseUI.set_rail / set_rail_visibility / set_rail_overlay / force_rail_open / refresh_layout
+## rail_visibility: AUTO = เปิดเมื่อ rail มีปุ่ม · ALWAYS = เปิดเสมอ · NEVER = ซ่อนเสมอ
+@export var rail_visibility: PhaseUI.RailVisibility = PhaseUI.RailVisibility.AUTO
+## rail_overlay: false = ฉากหดหนี rail · true = rail วางทับภาพ ฉากกว้างเต็ม
+@export var rail_overlay := false
 
 
 ## เลื่อนมุมปัจจุบันให้กึ่งกลางอยู่ที่ x (พิกัดในมุม) — ค้างจนเปลี่ยนมุมหรือ reset_camera()

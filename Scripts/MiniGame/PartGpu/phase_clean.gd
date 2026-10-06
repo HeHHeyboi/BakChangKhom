@@ -45,7 +45,7 @@ var _no_lock_charged := false
 var _built := false
 var _chk: Array[Label] = []
 var _bar: ProgressBar
-var _tray: GridContainer
+var _tray: HBoxContainer
 var _card: Label
 var _lock_btn: Button
 
@@ -82,11 +82,16 @@ func _build() -> void:
 	_bar.max_value = 100
 	_bar.custom_minimum_size = Vector2(0, 18)
 	rail.add_child(_bar)
-	_tray = GridContainer.new()
-	_tray.columns = 4
-	_tray.add_theme_constant_override("h_separation", 4)
-	_tray.add_theme_constant_override("v_separation", 4)
-	rail.add_child(_tray)
+	_tray = HBoxContainer.new()
+	var panel := PanelContainer.new()
+	panel.add_child(_tray)
+	add_child(panel)
+	panel.set_anchors_preset(PRESET_CENTER_BOTTOM, true)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH # ขยายออกสองข้างจากกึ่งกลาง
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN # ขยายขึ้นด้านบน ไม่ล้นขอบล่าง
+	panel.offset_bottom = -175
+	_tray.add_theme_constant_override("separation", 6)
+	_tray.alignment = BoxContainer.ALIGNMENT_CENTER
 	_card = PhaseUI.label(rail, "ชี้ที่อุปกรณ์เพื่อดูคุณสมบัติ", 14)
 
 

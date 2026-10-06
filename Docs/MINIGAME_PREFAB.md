@@ -114,7 +114,7 @@ Core Part ทั้ง 5 จะเปลี่ยนเป็น 2.5D — **เ�
 | `Item2D` (@tool) | `STATIC` / `DRAGGABLE` / `TOGGLE` / `CLICK` · `size_override` / `color_override` / `texture_override` (ใช้ .tres เดียวหลายขนาด) · `add_overlay()` ชั้นฝุ่น · `set_texture()` |
 | `Socket2D` (@tool) | จุดติดตั้ง · Locks · Start Occupant |
 | `View2D` (@tool) | มุมกล้องสำเร็จรูป (ตำแหน่ง = จุดโฟกัส · yaw · pitch · distance) — วางใต้ `World/Views` |
-| `Phase2D` | ฐานของ phase ในฉาก 3D: `listen()` (ถอดสัญญาณเองตอนจบ) · `cam()` · `allow()` · `allow_sockets()` · `say()` · `toast()` · `finish()` (UI ทั้งหมด เช่น `PhaseUI.rail_button()` · `PhaseUI.set_rail_mode()` · `PhaseUI.set_rail_overlay()` · `PhaseUI.refresh_layout()` อยู่ที่ `PhaseUI`) |
+| `Phase2D` | ฐานของ phase ในฉาก 3D: `listen()` (ถอดสัญญาณเองตอนจบ) · `cam()` · `allow()` · `allow_sockets()` · `say()` · `toast()` · `finish()` (UI ทั้งหมด เช่น `PhaseUI.rail_button()` · `PhaseUI.set_rail()` · `PhaseUI.set_rail_visibility()` · `PhaseUI.set_rail_overlay()` · `PhaseUI.force_rail_open()` · `PhaseUI.refresh_layout()` อยู่ที่ `PhaseUI` · ตั้งใน Inspector ด้วย `rail_visibility` (AUTO/ALWAYS/NEVER) + `rail_overlay`) |
 
 **สัญญาณ `Stage2D`:** `part_picked` · `part_installed` · `part_removed` · `part_returned` · `drop_rejected` · `part_toggled` · `part_clicked` · `view_changed`
 

@@ -245,50 +245,61 @@ static func _auto_rail(phase: Control) -> void:
 	refresh_layout(phase)
 
 
-## โหมด Info rail ของ phase (ค่าเก็บที่ Phase2D.rail_mode ตั้งใน Inspector ได้ หรือเรียก set_rail_mode ใน init())
-##   AUTO = เปิดเมื่อมีปุ่มใน rail แล้วฉากหดหนี · SQUEEZE = เปิดเสมอ ฉากหด
-##   OVERLAY = เปิดเมื่อมีปุ่ม แต่วางทับภาพ ฉากกว้างเต็ม · HIDDEN = ซ่อน rail เสมอ
-enum RailMode {
+## Info rail ของ phase ตั้งได้ 2 อย่างแยกกัน (ค่าเก็บที่ Phase2D.rail_visibility / rail_overlay · ตั้งใน Inspector หรือเรียกใน init())
+##   rail_visibility: AUTO = เปิดเมื่อ rail มีปุ่ม · ALWAYS = เปิดเสมอ · NEVER = ซ่อนเสมอ
+##   rail_overlay: false = ฉากหดหนี rail · true = rail วางทับภาพ ฉากกว้างเต็ม
+enum RailVisibility {
 	AUTO,
-	SQUEEZE,
-	OVERLAY,
-	HIDDEN,
+	ALWAYS,
+	NEVER,
 }
 
 
-static func set_rail_mode(phase: Control, mode: RailMode) -> void:
-	phase.set("rail_mode", mode)
+## ตั้งทั้งสองอย่างพร้อมกัน แล้วคำนวณ layout ใหม่ (ค่าค้างที่ phase จนกว่าจะตั้งใหม่)
+static func set_rail(phase: Control, visibility: RailVisibility, overlay := false) -> void:
+	phase.set("rail_visibility", visibility)
+	phase.set("rail_overlay", overlay)
 	refresh_layout(phase)
 
 
-## ทางลัด: วางทับ (true) หรือกลับเป็น AUTO (false)
+## เปลี่ยนแค่เปิด/ปิด (AUTO · ALWAYS · NEVER) — overlay คงเดิม
+static func set_rail_visibility(phase: Control, visibility: RailVisibility) -> void:
+	phase.set("rail_visibility", visibility)
+	refresh_layout(phase)
+
+
+## เปลี่ยนแค่วางทับ (true) หรือให้ฉากหด (false) — เปิด/ปิดคงเดิม
 static func set_rail_overlay(phase: Control, on := true) -> void:
-	set_rail_mode(phase, RailMode.OVERLAY if on else RailMode.AUTO)
+	phase.set("rail_overlay", on)
+	refresh_layout(phase)
 
 
 ## บังคับเปิด rail แม้ไม่มีปุ่มใน rail (AUTO จะซ่อนเอง) · overlay = true วางทับภาพ ฉากกว้างเต็ม · false = ฉากหดหนี
-## เรียกหลัง show() ใน init() — ค่าโหมดค้างไว้ที่ phase จนกว่าจะเรียก set_rail_mode ใหม่
+## เรียกหลัง show() ใน init()
 static func force_rail_open(phase: Control, overlay: bool) -> void:
-	set_rail_mode(phase, RailMode.OVERLAY if overlay else RailMode.SQUEEZE)
+	set_rail(phase, RailVisibility.ALWAYS, overlay)
 
 
 ## ตัดสินใจ layout ของ phase ที่เดียว: rail เปิดไหม · Stage หดไหม — เรียกซ้ำได้เมื่อ UI เปลี่ยน
 static func refresh_layout(phase: Control) -> void:
 	if not phase.has_meta("rail") or not phase.visible:
 		return
-	var mode: RailMode = phase.get("rail_mode") if phase.get("rail_mode") != null else RailMode.AUTO
+	var vis = phase.get("rail_visibility")
+	if vis == null:
+		vis = RailVisibility.AUTO
+	var overlay: bool = phase.get("rail_overlay") == true
 	var open: bool
-	match mode:
-		RailMode.HIDDEN:
+	match vis:
+		RailVisibility.NEVER:
 			open = false
-		RailMode.SQUEEZE:
+		RailVisibility.ALWAYS:
 			open = true
 		_:
 			open = rail_wanted(phase)
 	apply_rail(phase, open)
 	var st = phase.owner.get("stage") if phase.owner else null
 	if st is Stage2D:
-		var squeeze := open and mode != RailMode.OVERLAY
+		var squeeze := open and not overlay
 		(st as Stage2D).set_inset(maxf((st as Stage2D).size.x - RAIL.position.x, 0.0) if squeeze else 0.0)
 
 
