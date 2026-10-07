@@ -226,7 +226,6 @@ func pib_toggle(data: PibHint.Data):
 		data.Act.TOAST:
 			pib.toast(dialog_dict[data.header][0], data.seconds)
 
-
 # ---------------------------------------------------------------- Debug: กระโดดข้าม phase (เฉพาะ debug build · F2 เปิด/ปิด)
 
 const DEBUG_TOGGLE_KEY := KEY_F2
@@ -273,14 +272,18 @@ func _debug_build_ui() -> void:
 		var b := Button.new()
 		b.text = "%d · %s" % [ph, _debug_phase_name(ph)]
 		b.focus_mode = Control.FOCUS_NONE
-		b.pressed.connect(func():
-			debug_jump(ph)
-			_debug_layer.visible = false
+		b.pressed.connect(
+			func():
+				debug_jump(ph)
+				_debug_layer.visible = false,
 		)
 		box.add_child(b)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _debug_layer and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == DEBUG_TOGGLE_KEY:
+	if (
+		_debug_layer and event is InputEventKey and event.pressed
+		and not event.echo and event.physical_keycode == DEBUG_TOGGLE_KEY
+	):
 		_debug_layer.visible = not _debug_layer.visible
 		get_viewport().set_input_as_handled()

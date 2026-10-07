@@ -52,7 +52,7 @@ func _ready() -> void:
 	EventManager.showUI()
 
 	DayLoop.force_active = true
-	get_tree().change_scene_to_file(Constant.ROOM_SCENE)
+	SceneRouter.go(SceneRouter.ROOM)
 	await _frames(5)
 	print("T start money=", GameState.money, " ", ts.dateText.get_parsed_text())
 	for d in 7:
@@ -86,7 +86,7 @@ func _ready() -> void:
 			DialogScene.dialog_end()   # เหมือนกดข้ามบทจนจบ
 		await _frames(3)
 		var mg: Node = null
-		for n in get_tree().current_scene.get_children():
+		for n in SceneRouter.overlay_stack.get_children():
 			if n is PartMinigame:
 				mg = n
 		_check(mg != null and mg.get_meta("work_order", null) == c, "day %d เปิดมินิเกม %s" % [d + 1, c.part_id])

@@ -8,10 +8,16 @@ var showTutorial = false
 func _ready() -> void:
 	EventManager.hideUI()
 	EventManager.on_tutorial_finish.connect(tutorial_end)
+	EventManager.on_dialog_end.connect(dialog_end)
 
+func dialog_end():
+	SceneRouter.go(SceneRouter.HOME)
+	Fade.set_opacity(1)
+	EventManager.on_dialog_end.disconnect(dialog_end)
 
+	
 func tutorial_end():
-	get_tree().change_scene_to_file(Constant.HOME_SCENE)
+
 	EventManager.show_dialog("ออฟฟิส", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
 	Global.on_start = false
 	showTutorial = false

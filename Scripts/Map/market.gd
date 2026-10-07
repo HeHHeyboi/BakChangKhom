@@ -9,21 +9,23 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if Market.visible:
-		self.disabled = true
-	else:
-		self.disabled = false
+	pass
+	#if Market.visible:
+		#self.disabled = true
+	#else:
+		#self.disabled = false
 
 
 func _on_market_pressed() -> void:
-	Market.move_to_front()
+	#Market.move_to_front()
 	MapPanel.showmap(MapPanel.Location.MARKET)
 
 
 func _on_map_show_map(m: MapPanel.Location) -> void:
-	if m == MapPanel.Location.MARKET:
-		Market.show()
-		Market.process_mode = Node.PROCESS_MODE_INHERIT
-	else:
-		Market.hide()
-		Market.process_mode = Node.PROCESS_MODE_DISABLED
+	pass
+	#if m == MapPanel.Location.MARKET:
+		#Market.show()
+		#Market.process_mode = Node.PROCESS_MODE_INHERIT
+	#else:
+		#Market.hide()
+		#Market.process_mode = Node.PROCESS_MODE_DISABLED

@@ -39,16 +39,20 @@ GameRoot (Node · main scene ถาวรหลังกด Start)
 ├── LocationSlot      ← สถานที่เดียวที่เปิดอยู่ (Home / Room / Workshop / Workbench / Market / Village)
 ├── OverlayStack      ← CanvasLayer layer 10 · หน้าที่เปิดทับ ซ้อนกันได้ (push / pop)
 │                        มินิเกม Core Part · ชั้นวางเครื่อง · สั่งอะไหล่ · การ์ดสรุป · สมุดจด
-├── HUD               ← CanvasLayer layer 20 · เวลา · เงิน · กระดานภารกิจ (ย้ายมาจาก EventManager)
 └── Fade              ← CanvasLayer layer 30 · จอดำตอนเปลี่ยนสถานที่
-autoload: Global · EventManager · DialogScene · SceneRouter · GameState · (WorkshopManager · Inventory · SupplyOrders ส่วนที่ 2)
+autoload: Global · EventManager (มี TimeSystem · QuestBoard · Tutorial เป็นลูก · layer 100 = HUD) · DialogScene · SceneRouter · GameState · (WorkshopManager · Inventory · SupplyOrders ส่วนที่ 2)
 ```
+
+**ไม่มี HUD ใน GameRoot — HUD คือลูกของ `EventManager` อยู่แล้ว** (`TimeSystem` + `QuestBoard` เป็น `CanvasLayer` layer 100 ใน `Scene/event_manager.tscn`) จึงอยู่เหนือ Overlay (10) และ Fade (30) ตลอด · เหตุผลที่ไม่ย้ายออกไปเป็นโหนดแยกใน GameRoot:
+- `EventManager` เรียก `time_system` / `questboard` / `tutorial` ตรง ๆ ผ่าน `@onready $"…"` (ความสัมพันธ์ พ่อ→ลูก ชัดเจน) · ถ้าแยกออกไปต้องเปลี่ยนเป็น signal หรือหาโหนดผ่าน `SceneRouter.root` ซึ่งเพิ่มความซับซ้อนโดยไม่จำเป็น และ `GameRoot` ยังไม่มีตอน `EventManager._ready`
+- `EventManager` ไม่ได้มีแค่ UI (event map · เดินเควสต์ · เปิด dialog · ส่งมินิเกม) จึง**ไม่เปลี่ยนชื่อเป็น `HUD`** (แตะ ~71 จุดและชื่อบอกไม่ครบ) · ถ้าอยากรวมการโชว์/ซ่อน HUD ไว้จุดเดียวค่อยเพิ่มเมธอดบน `EventManager` (ตั้ง `visible` ของ `TimeSystem` + `QuestBoard`) ตาม `QuestStep.showHUD`
+- ถ้าอนาคตอยากแยก HUD ที่แสดงอย่างเดียว (เวลา · เงิน · เควสต์) ออกจาก logic ให้ทำหลัง Router เสร็จ ไม่ใช่ส่วนของงานนี้
 
 | ชั้น | อะไรอยู่ | เปิดยังไง | ปิดยังไง |
 |---|---|---|---|
 | Location | ที่ที่ผู้เล่นยืนอยู่ ณ ตอนนั้น 1 ที่ | `SceneRouter.go(&"workshop")` — ลบที่เก่า โหลดที่ใหม่ เฟดดำ | เปลี่ยนที่ |
 | Overlay | หน้าที่ทำเสร็จแล้วต้องกลับมาที่เดิม | `SceneRouter.push(scene, ctx)` | `SceneRouter.pop(result)` หรือปุ่มกลับ |
-| HUD / Dialog / PibHint | อยู่ตลอด | ซ่อน/โชว์ตาม `QuestStep.showHUD` | — |
+| HUD (`EventManager`) / Dialog / PibHint | อยู่ตลอด (autoload · layer 100) | ซ่อน/โชว์ตาม `QuestStep.showHUD` | — |
 
 กติกา:
 - **state ของเกมอยู่ใน autoload เท่านั้น** (`GameState` · `WorkshopManager` ฯลฯ) ซีนแค่ "แสดง" state — เปลี่ยนซีนแล้วไม่มีอะไรหาย และ Save ง่ายเพราะ save แค่ autoload
@@ -339,5 +343,6 @@ class_name SupplyItem extends Resource
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 7 ต.ค. 2569 | 1.3: เอา `HUD` ออกจาก `GameRoot` — HUD คือลูกของ `EventManager` (autoload) อยู่แล้ว เรียกกันตรง ๆ ไม่ต้องใช้ signal · ไม่เปลี่ยนชื่อ `EventManager` · แก้เลข layer เป็นค่าจริง (100) |
 | 4 ต.ค. 2569 | เปลี่ยนชื่อจาก `SHOP_SYSTEMS.md` → `REPAIR_SHOP_SYSTEM.md` · แยกคำว่าร้านซ่อม (Workshop) กับร้านค้า (Supply/Market) |
 | 4 ต.ค. 2569 | สร้างเอกสาร — ทางเลือกจัดการ scene (แนะนำ Router + Overlay stack) + ระบบคิวงาน/ชั้นวาง/สต็อก/สั่งของ |

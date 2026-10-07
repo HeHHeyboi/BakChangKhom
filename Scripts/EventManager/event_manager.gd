@@ -145,6 +145,7 @@ func _on_tutorial_end():
 
 func minigame_end() -> void:
 	showUI()
+	SceneRouter.pop()
 	on_minigame_end.emit()
 	var event = eventMap[currentEvent]
 	if event == null:
@@ -174,8 +175,7 @@ func _process_data(id: EventID, data: QuestStep):
 			if !on_dialog_end.is_connected(data.set_done):
 				on_dialog_end.connect(data.set_done, CONNECT_ONE_SHOT)
 		QuestStep.Action.MINIGAME, QuestStep.Action.SCENE_CHANGE:
-			var scene = load(data.scene_path) as PackedScene
-			get_tree().current_scene.add_child(scene.instantiate())
+			SceneRouter.push(data.scene_path)
 			Global.in_minigame = true
 			if !on_minigame_end.is_connected(data.set_done):
 				on_minigame_end.connect(data.set_done, CONNECT_ONE_SHOT)

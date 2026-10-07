@@ -18,13 +18,13 @@ func _ready() -> void:
 			"label": "Go to Your Room and Clean the Ram",
 			"event_id": EventManager.EventID.MAIN,
 			"task_index": 1,
-			"scene": Constant.HOME_SCENE,
+			"location": SceneRouter.HOME,
 		},
 		{
 			"label": "ข้ามไป Tutorial ประกอบคอม (กด ! ในห้อง)",
 			"event_id": EventManager.EventID.MAIN,
 			"task_index": 3,
-			"scene": Constant.ROOM_SCENE,
+			"location": SceneRouter.ROOM,
 		},
 		{
 			# [Claude 2 ต.ค. 2569] เปิดมินิเกมตรง ๆ ไม่แตะเควสต์หลัก (Part ที่ยังไม่มีเควสต์)
@@ -81,7 +81,7 @@ func _refresh_buttons() -> void:
 
 func _start_shop_loop() -> void:
 	DayLoop.force_active = true
-	get_tree().change_scene_to_file(Constant.ROOM_SCENE)
+	SceneRouter.go(SceneRouter.ROOM)
 
 
 func _on_jump_point_pressed(point: Dictionary) -> void:
@@ -94,8 +94,8 @@ func _on_jump_point_pressed(point: Dictionary) -> void:
 		visible = false
 		return
 	EventManager.jump_event(point["event_id"], point["task_index"])
-	if point.get("scene", "") != "":
-		get_tree().change_scene_to_file(point["scene"])
+	if point.has("location"):
+		SceneRouter.go(point["location"])
 	visible = false
 
 
@@ -105,13 +105,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-## เปิดมินิเกมเป็นลูกของฉากปัจจุบัน แบบไม่ผูกเควสต์ (มินิเกมเห็น meta "standalone" แล้วจะไม่เรียก EventManager.minigame_end)
+## เปิดมินิเกมเป็น overlay ของ SceneRouter แบบไม่ผูกเควสต์ (มินิเกมเห็น meta "standalone" แล้วจะไม่เรียก EventManager.minigame_end)
 func _open_minigame(path: String) -> void:
-	var cs := get_tree().current_scene
-	for c in cs.get_children():
-		if c is PartMinigame:
-			return
+	if Global.isInMinigame():
+		return
 	var m := (load(path) as PackedScene).instantiate()
 	m.set_meta("standalone", true)
-	cs.add_child(m)
+	SceneRouter.push_node(m)
 	Global.in_minigame = true

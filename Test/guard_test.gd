@@ -135,7 +135,7 @@ func _ready() -> void:
 	_check(not DayLoop._working, "watchdog ปลด _working ที่ค้าง")
 
 	# --- ลูกค้าไม่มีบท → ไปมินิเกมเลย ไม่ค้าง
-	get_tree().change_scene_to_file(Constant.ROOM_SCENE)
+	SceneRouter.go(SceneRouter.ROOM)
 	await _frames(5)
 	var nodlg: CustomerCase = load("res://Resources/Customers/w1_d2_headman_mainboard.tres").duplicate()
 	nodlg.arrive_dialog = ""
@@ -143,7 +143,7 @@ func _ready() -> void:
 	DayLoop.play_arrival(true)
 	await _frames(3)
 	var opened := false
-	for n in get_tree().current_scene.get_children():
+	for n in SceneRouter.overlay_stack.get_children():
 		if n is PartMinigame:
 			opened = true
 			n.queue_free()

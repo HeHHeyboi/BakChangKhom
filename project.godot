@@ -24,11 +24,12 @@ config/icon="res://icon.svg"
 Global="*res://Scene/Global.tscn"
 EventManager="*uid://cjpenoqg41ftl"
 DialogScene="*res://Scene/Dialog_Scene.tscn"
-Market="*res://Scene/Location/Market.tscn"
 MapPanel="*res://Scene/map.tscn"
 DebugMenu="*res://Scripts/Debug/debug_menu.gd"
 GameState="*res://Scripts/Core/game_state.gd"
 DayLoop="*res://Scene/Core/day_loop.tscn"
+SceneRouter="*uid://bsmp1pfk2iobb"
+Fade="*uid://b02nmvfjtu017"
 
 [display]
 

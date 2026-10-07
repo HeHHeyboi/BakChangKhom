@@ -13,8 +13,8 @@ extends CanvasLayer
 @export var week_plans: Array[WeekPlan] = []
 ## ลูกค้าที่ใช้สุ่มเมื่อไม่มีแผน (ห้ามใส่ลูกค้า forced)
 @export var random_pool: Array[CustomerCase] = []
-## ซีนที่ถือว่าเป็น "ร้าน" (การ์ดขึ้นเฉพาะที่นี่)
-@export var shop_scenes: PackedStringArray = ["res://Scene/Location/Home.tscn", "res://Scene/Location/Room.tscn"]
+## สถานที่ที่ถือว่าเป็น "ร้าน" (การ์ดขึ้นเฉพาะที่นี่)
+@export var shop_locations: Array[SceneRouter.LocationID] = [SceneRouter.HOME, SceneRouter.ROOM]
 ## รอให้อยู่ในร้านกี่วินาทีก่อนลูกค้า forced เดินเข้ามา
 @export var forced_delay := 0.8
 ## ข้ามเควสต์หลัก (Debug F1)
@@ -213,9 +213,8 @@ func play_arrival(then_repair: bool) -> void:
 
 ## เปิดมินิเกมของงานวันนี้ · meta "work_order" = งานลูกค้า (PartMinigame ส่งคะแนนเข้า GameState เฉพาะงานที่มี meta นี้)
 func start_repair() -> void:
-	var cs := get_tree().current_scene
-	if today_case == null or cs == null:
-		push_warning("DayLoop: เปิดมินิเกมไม่ได้ (ไม่มีลูกค้า หรือไม่มีซีนปัจจุบัน)")
+	if today_case == null:
+		push_warning("DayLoop: เปิดมินิเกมไม่ได้ (ไม่มีลูกค้า)")
 		return
 	if is_instance_valid(_minigame) and _minigame.is_inside_tree():
 		push_warning("DayLoop: มีมินิเกมเปิดอยู่แล้ว")
@@ -233,7 +232,7 @@ func start_repair() -> void:
 	m.set_meta("work_order", today_case)
 	m.tree_exited.connect(_on_minigame_closed)
 	_minigame = m
-	cs.add_child(m)
+	SceneRouter.push_node(m)
 	Global.in_minigame = true
 
 
@@ -418,8 +417,7 @@ func _loop_active() -> bool:
 
 
 func _in_shop() -> bool:
-	var cs := get_tree().current_scene
-	return cs != null and cs.scene_file_path in shop_scenes
+	return SceneRouter.current_id in shop_locations
 
 
 func _fee(c: CustomerCase) -> int:
@@ -535,6 +533,7 @@ func _on_primary() -> void:
 			_continue_after_summary()
 		Card.ENDING:
 			_reset_run()
+			SceneRouter.clear()
 			var err := get_tree().change_scene_to_file("res://Scene/Start_Scene.tscn")
 			if err != OK:
 				push_error("DayLoop: กลับหน้าแรกไม่ได้ (error %d)" % err)

@@ -9,26 +9,74 @@ signal repair_recorded(result: Dictionary)
 ## ending: &"stay" · &"city" · &"coworking" · &"failure"
 signal game_finished(ending: StringName)
 
-enum Grade { GOOD, PASS, FAIL }
+enum Grade {
+	GOOD,
+	PASS,
+	FAIL,
+}
 
 const ECONOMY_PATH := "res://Resources/Balance/economy.tres"
 
 ## บทของแต่ละรอบ (index 0 = รอบ 1) · รอบ 1 เล่นผ่านเควสต์หลักแล้ว (main.tres) จึงไม่เปิดซ้ำ
 const CHAPTERS := [
 	{ "title": "กลับบ้าน", "file": "res://Assets/Dialog/Chapter1ReturnHome.txt", "bg": "" },
-	{ "title": "คอมเก่าของขม", "file": "res://Assets/Dialog/Chapter2Rest.txt", "bg": "res://Assets/Background/Chapter2_bg.jpg" },
-	{ "title": "จัดบ้านเป็นร้าน", "file": "res://Assets/Dialog/Chapter3DecorateHouse.txt", "bg": "res://Assets/Background/bg_shop_empty.jpg" },
-	{ "title": "เปิดร้านวันแรก", "file": "res://Assets/Dialog/Chapter4Start.txt", "bg": "res://Assets/Background/bg_shop_open.jpg" },
-	{ "title": "ร้านเงียบ", "file": "res://Assets/Dialog/Chapter5Quiet.txt", "bg": "res://Assets/Background/bg_shop_quiet.jpg" },
-	{ "title": "ร้านเริ่มคึกคัก", "file": "res://Assets/Dialog/Chapter6Happy.txt", "bg": "res://Assets/Background/bg_shop_busy.jpg" },
-	{ "title": "สอนคอมพื้นฐาน", "file": "res://Assets/Dialog/Chapter7Teaching.txt", "bg": "res://Assets/Background/bg_shop_open.jpg" },
+	{
+		"title": "คอมเก่าของขม",
+		"file": "res://Assets/Dialog/Chapter2Rest.txt",
+		"bg": "res://Assets/Background/Chapter2_bg.jpg",
+	},
+	{
+		"title": "จัดบ้านเป็นร้าน",
+		"file": "res://Assets/Dialog/Chapter3DecorateHouse.txt",
+		"bg": "res://Assets/Background/bg_shop_empty.jpg",
+	},
+	{
+		"title": "เปิดร้านวันแรก",
+		"file": "res://Assets/Dialog/Chapter4Start.txt",
+		"bg": "res://Assets/Background/bg_shop_open.jpg",
+	},
+	{
+		"title": "ร้านเงียบ",
+		"file": "res://Assets/Dialog/Chapter5Quiet.txt",
+		"bg": "res://Assets/Background/bg_shop_quiet.jpg",
+	},
+	{
+		"title": "ร้านเริ่มคึกคัก",
+		"file": "res://Assets/Dialog/Chapter6Happy.txt",
+		"bg": "res://Assets/Background/bg_shop_busy.jpg",
+	},
+	{
+		"title": "สอนคอมพื้นฐาน",
+		"file": "res://Assets/Dialog/Chapter7Teaching.txt",
+		"bg": "res://Assets/Background/bg_shop_open.jpg",
+	},
 	{ "title": "ไฟดับ", "file": "res://Assets/Dialog/Chapter8Problem.txt", "bg": "res://Assets/Background/HomeBG.jpg" },
-	{ "title": "สอนที่โรงเรียน", "file": "res://Assets/Dialog/Chapter9School.txt", "bg": "res://Assets/Background/bg_school_room.jpg" },
-	{ "title": "งานหมู่บ้าน", "file": "res://Assets/Dialog/Chapter10Village.txt", "bg": "res://Assets/Background/bg_village_day.jpg" },
-	{ "title": "ทางแยก", "file": "res://Assets/Dialog/Chapter11Path.txt", "bg": "res://Assets/Background/bg_path_sunset.jpg" },
-	{ "title": "ครบหนึ่งปี", "file": "res://Assets/Dialog/Chapter12Year.txt", "bg": "res://Assets/Background/bg_year_after.jpg" },
+	{
+		"title": "สอนที่โรงเรียน",
+		"file": "res://Assets/Dialog/Chapter9School.txt",
+		"bg": "res://Assets/Background/bg_school_room.jpg",
+	},
+	{
+		"title": "งานหมู่บ้าน",
+		"file": "res://Assets/Dialog/Chapter10Village.txt",
+		"bg": "res://Assets/Background/bg_village_day.jpg",
+	},
+	{
+		"title": "ทางแยก",
+		"file": "res://Assets/Dialog/Chapter11Path.txt",
+		"bg": "res://Assets/Background/bg_path_sunset.jpg",
+	},
+	{
+		"title": "ครบหนึ่งปี",
+		"file": "res://Assets/Dialog/Chapter12Year.txt",
+		"bg": "res://Assets/Background/bg_year_after.jpg",
+	},
 ]
-const EPILOGUE := { "title": "บทส่งท้าย", "file": "res://Assets/Dialog/Epilogue.txt", "bg": "res://Assets/Background/bg_year_after.jpg" }
+const EPILOGUE := {
+	"title": "บทส่งท้าย",
+	"file": "res://Assets/Dialog/Epilogue.txt",
+	"bg": "res://Assets/Background/bg_year_after.jpg",
+}
 
 var economy: EconomyConfig
 var money := 0
@@ -36,9 +84,9 @@ var money := 0
 var satisfaction_history: Array[int] = []
 var xp := 0
 ## part_id → จำนวนครั้งที่ซ่อมผ่าน (ใช้ปลดล็อก / ข้ามบทสอนครั้งถัดไป)
-var part_clears: Dictionary[StringName, int] = {}
+var part_clears: Dictionary[StringName, int] = { }
 ## ธงเนื้อเรื่อง เช่น &"ch11_choice": &"stay" | &"city" | &"coworking"
-var story_flags: Dictionary = {}
+var story_flags: Dictionary = { }
 var ending: StringName = &""
 
 
@@ -59,8 +107,8 @@ func reset() -> void:
 	ending = &""
 	money_changed.emit(money, 0)
 
-
 # ---------------------------------------------------------------- เงิน
+
 
 func add_money(delta: int) -> void:
 	if delta == 0:
@@ -72,8 +120,8 @@ func add_money(delta: int) -> void:
 func can_afford(cost: int) -> bool:
 	return money >= cost
 
-
 # ---------------------------------------------------------------- ผลงานซ่อม
+
 
 ## เรียกจาก PartMinigame ตอนจบงานลูกค้า · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย · fee −1 = ใช้ค่าจาก economy
 func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1) -> Dictionary:
@@ -114,8 +162,13 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 		part_clears[part_id] = part_clears.get(part_id, 0) + 1
 
 	var result := {
-		"part_id": part_id, "score": score, "grade": grade, "money": delta,
-		"satisfaction": sat, "xp": gained, "damaged": damaged,
+		"part_id": part_id,
+		"score": score,
+		"grade": grade,
+		"money": delta,
+		"satisfaction": sat,
+		"xp": gained,
+		"damaged": damaged,
 	}
 	repair_recorded.emit(result)
 	_advance_after_repair()
@@ -141,8 +194,8 @@ func average_satisfaction() -> float:
 func has_cleared(part_id: StringName) -> bool:
 	return part_clears.get(part_id, 0) > 0
 
-
 # ---------------------------------------------------------------- ลูปรอบ / ฉากจบ
+
 
 ## ครบรอบ week → เปิดบทของรอบถัดไป · DayLoop เรียกหลังการ์ดสรุปรอบ
 func play_week_chapter(week: int) -> bool:
