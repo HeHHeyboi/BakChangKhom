@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://desjp04mfica7" path="res://Scripts/Map/map.gd" id="1_ex5br"]
 [ext_resource type="Script" uid="uid://b34em8142t571" path="res://Scripts/Map/close.gd" id="2_5mejs"]
 [ext_resource type="Script" uid="uid://bgnh8eyn41s7s" path="res://Scripts/Map/market.gd" id="3_5mejs"]
-[ext_resource type="Script" uid="uid://hbyavto7k12b" path="res://Scripts/Map/Home.gd" id="4_5mejs"]
+[ext_resource type="Script" uid="uid://hbyavto7k12b" path="res://Scripts/Map/home.gd" id="4_5mejs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rgag"]
 bg_color = Color(1, 1, 1, 1)
@@ -76,8 +76,6 @@ theme_override_font_sizes/font_size = 32
 disabled = true
 text = "เมือง"
 
-[connection signal="show_map" from="." to="Panel/market" method="_on_map_show_map"]
-[connection signal="show_map" from="." to="Panel/บ้าน" method="_on_map_show_map"]
 [connection signal="pressed" from="Panel/Close" to="Panel/Close" method="_on_pressed"]
 [connection signal="pressed" from="Panel/market" to="Panel/market" method="_on_market_pressed"]
 [connection signal="pressed" from="Panel/บ้าน" to="Panel/บ้าน" method="_on_pressed"]
