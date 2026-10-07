@@ -72,19 +72,16 @@ func clear() -> void:
 func push(path: String, ctx: Variant = null) -> Node:
 	if !ResourceLoader.exists(path):
 		return null
+	await Fade.fade_out()
 	var n: Node = load(path).instantiate()
 	n.set_meta("ctx", ctx)
-	return push_node(n)
-
-
-## วางโหนดที่สร้างเองเป็น overlay · ตั้ง meta ให้เสร็จก่อนเรียก (_ready ของโหนดอ่านได้)
-func push_node(n: Node) -> Node:
 	if _stack.is_empty():
 		_set_location_paused(true)
 	else:
 		_stack.back().process_mode = Node.PROCESS_MODE_DISABLED
 	_stack.append(n)
 	overlay_stack.add_child(n)
+	await Fade.fade_in()
 	return n
 
 
