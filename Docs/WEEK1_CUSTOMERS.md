@@ -1,3 +1,5 @@
+> ⚠️ **9 ต.ค. 2569:** ลูปเปลี่ยนเป็น **กะ/สัปดาห์ + กระดานงาน** (`LEVEL_DESIGN.md` ข้อ 8.5) — "วันที่ 1–7" ด้านล่างเป็นของเดิม · ตอนนี้ `week1.tres` มีแค่งานบังคับกะ 1 (ลุงอำนวย) + `level_weights` · ลูกค้าคนอื่นสุ่มขึ้นกระดานจาก `random_pool` ใน `Scene/Core/day_loop.tscn` ตามระดับ (`level`) · ช่องใหม่ใน CustomerCase: `level` · `est_slots` · `due_shifts`
+
 # WEEK1_CUSTOMERS.md — ลูกค้า Week 1 + วิธีแก้ใน Inspector
 
 > [Claude 5 ต.ค. 2569] · ใช้คู่กับ `GAME_LOOP.md` (ลูปวัน/รอบ) · โค้ด: `Scripts/Core/day_loop.gd` · `Scripts/Resources/customer_case.gd` · `Scripts/Resources/week_plan.gd`

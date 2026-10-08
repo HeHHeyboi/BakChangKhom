@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Desktop/task_free_space_homework.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv1_min_space"
+customer = "มิ้น"
+reason = "ต้องส่งรายงานกลุ่มพรุ่งนี้ แต่เครื่องเต็ม"
+device = "โน้ตบุ๊กของมิ้น"
+symptom = "เซฟงานไม่ได้ เครื่องบอกพื้นที่ไม่พอ"
+level = 1
+est_slots = 1
+due_shifts = 1
+part_id = "part_desktop"
+job_title = "ลบไฟล์ซ้ำ ทำที่ว่าง"
+desktop_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv1_min_space.txt"
+thanks_text = "เซฟได้แล้ว! รอดตายไปอีกวัน ขอบคุณนะขม"
+complain_text = "รายงานกลุ่มหายไปไหน! เพื่อนต้องโกรธมิ้นแน่ ๆ"

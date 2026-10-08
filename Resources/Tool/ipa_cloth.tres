@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ToolDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/tool_def.gd" id="1_tool"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartRam/ram_tool_ipa_swab.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_tool")
+id = &"ipa_cloth"
+display_name = "IPA + ผ้าไม่เป็นขุย"
+icon = ExtResource("2_icon")
+action = 32
+uses = 3
+time_minutes = 8

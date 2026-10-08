@@ -37,10 +37,17 @@ func _ready() -> void:
 			"minigame": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
 		},
 		{ "label": "เล่น Part BIOS + ลง Windows (ทดสอบ)", "minigame": "res://Scene/MiniGame/PartBios/part_bios.tscn" },
-		# [Claude 5 ต.ค. 2569] ทดสอบลูปเวลา 7 วัน/รอบ · 12 รอบ (Docs/GAME_LOOP.md)
+		# [Claude 9 ต.ค. 2569] ขมOS งานบนจอ Lv1 (Resources/Desktop/*.tres)
+		{ "label": "ขมOS 1-1 ลงโปรแกรม (ทดสอบ)", "call": _open_desktop.bind("task_install_chat") },
+		{ "label": "ขมOS 1-2 ลบไฟล์ซ้ำ (ทดสอบ)", "call": _open_desktop.bind("task_free_space_photos") },
+		{ "label": "ขมOS 1-3 ถอนโปรแกรมโฆษณา (ทดสอบ)", "call": _open_desktop.bind("task_uninstall_ads_kid") },
+		# [Claude 9 ต.ค. 2569] ทดสอบลูปกะ/สัปดาห์/เดือน (Docs/LEVEL_DESIGN.md ข้อ 4)
 		{ "label": "ลูปร้าน: ข้ามเควสต์ เริ่มรับลูกค้า (ไปห้องขม)", "call": _start_shop_loop },
-		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → วันใหม่)", "call": EventManager.advance_period },
-		{ "label": "เวลา: นอน → วันถัดไป", "call": EventManager.end_day },
+		{ "label": "เวลา: ทำงาน +1 ชม.", "call": func() -> void: EventManager.time_system.advance_minutes(60) },
+		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → 18:30)", "call": EventManager.advance_period },
+		{ "label": "เวลา: ปิดร้าน → กะถัดไป", "call": DayLoop.end_shift },
+		{ "label": "เวลา: ไป 18:30 กะสุดท้ายของสัปดาห์", "call": _jump_week_end },
+		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ⭐⭐ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()
 
@@ -79,6 +86,18 @@ func _refresh_buttons() -> void:
 		_button_list.add_child(button)
 
 
+func _jump_week_end() -> void:
+	var ts: TimeSystem = EventManager.time_system
+	var last := (ts.week() - 1) * TimeSystem.SHIFTS_PER_WEEK + TimeSystem.SHIFTS_PER_WEEK
+	ts.set_shift(last, TimeSystem.CLOSE)
+
+
+func _unlock_levels() -> void:
+	for lv in range(2, 5):
+		GameState.level_stars[lv] = maxi(GameState.level_stars.get(lv, 0), 2)
+	DayLoop.add_jobs(3)
+
+
 func _start_shop_loop() -> void:
 	DayLoop.force_active = true
 	SceneRouter.go(SceneRouter.ROOM)
@@ -106,6 +125,17 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## เปิดมินิเกมเป็น overlay ของ SceneRouter แบบไม่ผูกเควสต์ (มินิเกมเห็น meta "standalone" แล้วจะไม่เรียก EventManager.minigame_end)
+## เปิดขมOS ด้วยงาน Resources/Desktop/<task_name>.tres (ไม่คิดเงิน)
+func _open_desktop(task_name: String) -> void:
+	if Global.isInMinigame():
+		return
+	var m := (load("res://Scene/MiniGame/Desktop/desktop_window.tscn") as PackedScene).instantiate()
+	m.set("task", load("res://Resources/Desktop/%s.tres" % task_name))
+	m.set_meta("standalone", true)
+	SceneRouter.push_node(m)
+	Global.in_minigame = true
+
+
 func _open_minigame(path: String) -> void:
 	if Global.isInMinigame():
 		return

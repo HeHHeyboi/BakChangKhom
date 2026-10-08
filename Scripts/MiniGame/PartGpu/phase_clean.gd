@@ -165,7 +165,9 @@ func use_tool(tool: ToolDef) -> void:
 		_:
 			if brush_blow:
 				gain = GAIN[CleanTool.Fit.IDEAL]
-	if gain < 0.0:
+	if gain <= 0.0:
+		# [Claude 9 ต.ค. 2569] LEVEL_DESIGN 0.2 #3 — เครื่องมือผิดขั้น: ไม่ถู ไม่หักคะแนน ปิ๊บบอกเหมือน Part RAM
+		say_text(["%s ไม่เหมาะกับขั้นนี้นะ ลองเลือกเครื่องมืออื่นดู" % tool.display_name], PibHint.Mood.WORRY)
 		return
 	_animate_tool(tool, true)
 	# เป่า/ปัดใบพัดหรือครีบโดยไม่ล็อกใบพัด → ปิ๊บเตือน −5 (ครั้งเดียว)

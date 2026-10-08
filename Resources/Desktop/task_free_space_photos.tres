@@ -1,0 +1,77 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 2
+title = "ทำที่ว่างให้เครื่องลุงอำนวย"
+pc_name = "คอมของลุงอำนวย"
+request = "เครื่องเต็ม เซฟรูปงานบวชหลานไม่ได้"
+files = Array[Dictionary]([{
+"name": "รูปงานบวช",
+"size_mb": 1200,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "รูปงานบวชหลานชาย 412 รูป (ตัวจริง)"
+}, {
+"name": "รูปงานบวช - สำเนา",
+"size_mb": 1200,
+"folder": "รูปภาพ",
+"kind": "dup",
+"dup_of": "รูปงานบวช"
+}, {
+"name": "รูปงานบวช - สำเนา (2)",
+"size_mb": 1200,
+"folder": "รูปภาพ",
+"kind": "dup",
+"dup_of": "รูปงานบวช"
+}, {
+"name": "รูปงานบวช.zip",
+"size_mb": 1100,
+"folder": "ดาวน์โหลด",
+"kind": "dup",
+"dup_of": "รูปงานบวช",
+"note": "ไฟล์บีบอัดของรูปงานบวช ข้างในเหมือนตัวจริงทุกรูป"
+}, {
+"name": "รูปหลานใส่ชุดนาค.jpg",
+"size_mb": 5,
+"folder": "เดสก์ท็อป",
+"kind": "user",
+"note": "รูปที่ลุงชอบที่สุด"
+}, {
+"name": "บัญชีสวนยาง.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "บัญชีรายรับสวนยางทั้งปี"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_total_mb = 64000
+disk_free_mb = 300
+free_space_target_mb = 2000
+traps = Array[StringName]([&"delete_system", &"delete_user", &"click_ad", &"fake_download"])
+ask_options = PackedStringArray("ลุงเก็บรูปไว้ที่ไหนบ้างครับ แล้วอันไหนห้ามหาย", "ลุงซื้อเครื่องนี้มากี่บาทครับ", "ลบทุกอย่างให้เกลี้ยงเลยได้ไหมครับ")
+ask_best = 0
+ask_answer = "รูปงานบวชอยู่ในรูปภาพ ลุงก๊อปไว้หลายรอบกลัวหาย ตัวซ้ำลบได้ แต่ตัวจริงกับบัญชีสวนยางห้ามหายนะ"
+explain_options = PackedStringArray("ไฟล์ที่ชื่อมีคำว่าสำเนาคือตัวที่ก๊อปซ้ำ ลบแล้วต้องล้างถังขยะด้วยพื้นที่ถึงจะคืน", "เครื่องเต็มเพราะเครื่องเก่าแล้ว ต้องซื้อเครื่องใหม่", "ถ้าเต็มอีกก็ลบโฟลเดอร์ใหญ่ ๆ ทิ้งได้เลย")
+explain_best = 0
+pib_intro = PackedStringArray("เครื่องเต็ม ต้องหาไฟล์ที่ซ้ำกันแล้วลบออก", "ไฟล์ที่ชื่อมีคำว่าสำเนา ลองเปิดดูก่อนว่าซ้ำจริงไหม ของลูกค้าห้ามลบเด็ดขาด", "ลบแล้วไฟล์ยังอยู่ในถังขยะนะ ต้องล้างถังขยะพื้นที่ถึงจะคืน")
+pib_lesson = PackedStringArray("ลบไฟล์ให้ถามเจ้าของก่อนทุกครั้ง ไฟล์ระบบห้ามแตะ", "และจำไว้ว่าลบแล้วต้องล้างถังขยะ พื้นที่ถึงจะกลับมาจริง")

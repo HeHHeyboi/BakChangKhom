@@ -9,3 +9,4 @@ id = &"brush"
 display_name = "แปรงปัดฝุ่น"
 icon = ExtResource("1_46qft")
 action = 8
+time_minutes = 5

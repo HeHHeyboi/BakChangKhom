@@ -3,15 +3,10 @@
 [ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="1_week"]
 [ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="2_case"]
 [ext_resource type="Resource" path="res://Resources/Customers/w1_d1_amnuay_ram.tres" id="c1"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d2_headman_mainboard.tres" id="c2"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d3_kid_gpu.tres" id="c3"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d4_teacher_frontpanel.tres" id="c4"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d5_director_bios.tres" id="c5"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d6_girl_ram.tres" id="c6"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d7_amnuay_mainboard.tres" id="c7"]
 
 [resource]
 script = ExtResource("1_week")
 week = 1
-days = Array[ExtResource("2_case")]([ExtResource("c1"), ExtResource("c2"), ExtResource("c3"), ExtResource("c4"), ExtResource("c5"), ExtResource("c6"), ExtResource("c7")])
-note = "รอบ 1: วันละ Part ใหม่ RAM → Mainboard → GPU → Front Panel → BIOS · วัน 6–7 ทวนซ้ำ · วันที่ 1 เป็น event บังคับหลัง Tutorial"
+shifts = Array[ExtResource("2_case")]([ExtResource("c1")])
+level_weights = PackedFloat32Array(70, 30, 0, 0, 0)
+note = "สัปดาห์ 1 (LEVEL_DESIGN ข้อ 6 ทาง B): กะ 1 ลุงอำนวยเป็น event บังคับหลัง Tutorial · ที่เหลือสุ่มจากกระดาน Lv1 70% / Lv2 30% · ยังไม่มีงาน Lv1 (ขมOS) → ระบบย้ายไป Lv2 · Lv3+ ขึ้นเมื่อได้ ⭐⭐ ใน Lv2 ครบ 2 งาน"

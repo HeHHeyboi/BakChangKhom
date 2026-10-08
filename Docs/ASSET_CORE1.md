@@ -82,12 +82,12 @@
 | ปัญหา | รายละเอียด | ต้องตัดสินใจ |
 |---|---|---|
 | ขมใช้รูปเก่า | `_CharacterMap` ใน `Scene/Global.tscn` ใช้ `Idle.png` (ลายเส้นเก่า เดินด้านข้าง) ส่วนชุดใหม่ `char_khom_normal/happy/worry/idle.png` ยังไม่ได้ใช้ | ทีมเลือกว่าจะใช้ชุดใหม่ไหม |
-| ยายมี 2 แบบ | `GrandmaNormal.png` (ใช้อยู่ในฉากบ้าน) กับ `char_grandma_normal.png` (ชุดใหม่ ยังไม่ได้ใช้) | ทีมเลือกให้เหมือนกันทั้งเกม |
+| ยายมี 2 แบบ | ✅ 9 ต.ค. ฉากบ้านใช้ชุดใหม่แล้ว (`Assets/Home/grandma_idle.png` · `grandma_hover.png` ทำจาก `char_grandma_normal/smile`) · `GrandmaNormal.png` เหลือใช้ใน `SimpleNPC.tscn` | ที่เหลือคือ `SimpleNPC` |
 | ตัวละครใน Prologue ไม่มีรูปตอนคุย | Prologue เรียก Dialog โดยไม่ส่งตัวละคร จึงเห็นแต่ชื่อ · มีรูป `char_boss.png` และ `char_coworker.png` แล้วแต่ยังไม่ได้ผูก | 🤖 ผูกให้ได้ และทำให้รูปคนพูดขึ้นเองตามชื่อในสคริปต์ |
 
 ### 5. งานเล็กที่ไม่ต้องวาด
 
-- `HomeBG.jpg`, `RoomBG.jpg` ขนาด 1920×1080 ใหญ่กว่าจอ ยังใช้ได้ แต่ถ้าย่อเป็น 1152×648 ต้องขยับตำแหน่งประตู/ยาย/คอมในซีนตามด้วย
+- ~~`HomeBG.jpg`, `RoomBG.jpg` ใหญ่กว่าจอ~~ ✅ 9 ต.ค. ฉากบ้าน/ร้านเปลี่ยนเป็น `bg_village_day.jpg` · `bg_shop_open.jpg` แล้ว · `RoomBG.jpg` เหลือใช้ใน find-item minigame · `HomeBG.jpg` เหลือเป็นฉากหลังบทใน `day_loop.gd` / `game_state.gd`
 - `speaker.png` (1024×1024) ไม่มีไฟล์ไหนใช้แล้ว เพราะลำโพงใน Part RAM เป็นจุดคลิกล่องหน **ลบได้**
 - `mb_case_open.png` ไม่มีไฟล์ไหนใช้แล้ว (รวมเข้า `Scene2D/inside_bg.png` ไปแล้ว)
 
@@ -96,11 +96,19 @@
 | ส่วน | ไฟล์ |
 |---|---|
 | หน้าเริ่ม | `stargBG2.jpg` · `tutorial.jpg` · `settingBG.jpg` · สไตล์ปุ่ม `StartMenu/*` |
-| ฉากบ้าน/ห้อง | `HomeBG.jpg` · `RoomBG.jpg` · `door(Highlight).png` · `pc_up/pc_down.png` · `GrandmaNormal/GradmaHighlight.png` · `caution*.png` |
+| ฉากบ้าน/ร้าน (9 ต.ค.) | `bg_village_day.jpg` · `bg_shop_open.jpg` · `Home/grandma_idle/hover.png` · `Home/sign_shop(_hover).png` · `caution*.png` · (เลิกใช้ในฉาก: `door*` · `pc_up/down` · `GradmaHighlight`) |
 | หายางลบ | `box.png` · `box_on_hover.png` · `ram_eraser.png` |
-| Tutorial ประกอบคอม | `esd_mat_view.png` · `build_bg.png` · `desk_pc.png` · ชิ้นส่วน 7 ชิ้น (`gpu_psu` · `mb_mainboard` · `mb_cpu` · `mb_cooler` · `ram_clean` · `ssd_m2` · `gpu_card`) |
+| Tutorial ประกอบคอม (9 ต.ค. ชุดใหม่) | `Assets/MiniGame/TutorialAssembly/` — แผ่นรอง · เคส · 7 ชิ้น + มุมมองตอนเสียบ (`asm_*`) · ภาพประกอบแล้ว `asm_layer_*` · สร้างจาก `src/gen_asm.py` · `desk_pc.png` ยังใช้ในมุมจอ |
 | Part RAM | รูปใน `Scene2D/` ทั้งชุด (ดู `SCENE_2D.md`) · `ram_dirty/better/clean` · `ram_tex_screen_*` · `ram_tex_beep` · เครื่องมือทำความสะอาด 10 ชิ้น |
 | ปิ๊บ | `char_pib_*.png` 5 ท่า |
 | UI | ปุ่ม 4 state · กล่องบทพูด · ป้ายชื่อ · กรอบภารกิจ · แถบเวลา |
 
 > รายการใน `ASSET_STATUS.md` กลุ่ม "Phase 0 วินิจฉัย" และ "Phase 2-3 ตัดไฟและถอด" (`ram_pc_front`, `ram_screen_*`, `ram_plug_*`, `ram_clip_*`, `ram_slot_empty` ฯลฯ) **ไม่ต้องทำแล้ว** เพราะรูปชุด `Scene2D/` ใช้แทนไปแล้ว
+
+## อัปเดต 9 ต.ค. 2569 — asset ที่ Claude สร้างเพิ่ม (วาดด้วยโค้ด ไม่ใช้โลโก้/ชื่อของจริง)
+
+| โฟลเดอร์ | ไฟล์ | ใช้ที่ |
+|---|---|---|
+| `Assets/MiniGame/Desktop/` | `os_wallpaper.jpg` · `os_start.png` · `os_sticky_note.png` · ไอคอน `os_icon_*` 14 ไฟล์ | ขมOS (`desktop_window.tscn`) |
+| `Assets/Home/` | `grandma_idle.png` · `grandma_hover.png` · `sign_shop.png` · `sign_shop_hover.png` | ฉากบ้านยาย `Home.tscn` |
+| `Assets/MiniGame/TutorialAssembly/` | `asm_tray_bg` · `asm_case_bg` · `asm_mainboard/cpu/cooler/ram/ram_edge/ssd/gpu/gpu_edge/psu/psu_side` · `asm_layer_*` 8 ไฟล์ · `src/gen_asm.py` | บทฝึกประกอบคอม |

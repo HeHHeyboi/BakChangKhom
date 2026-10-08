@@ -11,6 +11,7 @@ const PART_SCENES := {
 	"part_gpu": "res://Scene/MiniGame/PartGpu/part_gpu.tscn",
 	"part_front_panel": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
 	"part_bios": "res://Scene/MiniGame/PartBios/part_bios.tscn",
+	"part_desktop": "res://Scene/MiniGame/Desktop/desktop_window.tscn", # ขมOS งานบนจอ Lv1 → ใส่ desktop_task ด้วย
 }
 
 @export_group("ลูกค้า")
@@ -25,10 +26,20 @@ const PART_SCENES := {
 ## อาการที่ลูกค้าเล่า
 @export_multiline var symptom: String
 
+@export_group("ระดับงาน (LEVEL_DESIGN ข้อ 2 · 7.2)")
+## 1 ง่าย · 2 ปกติ · 3 ปานกลาง · 4 ยาก · 5 ชำนาญ — ค่าจ้าง/XP จาก economy.tres
+@export_range(1, 5) var level := 2
+## เวลาที่ประเมินบนการ์ด (ช่อง 30 นาที) · 0 = ใช้ค่าเฉลี่ยของระดับ
+@export_range(0, 14) var est_slots := 0
+## ต้องรับภายในกี่กะ · 0 = ภายในกะนี้ · หมดเขต = ลูกค้าเดินออก
+@export_range(0, 10) var due_shifts := 1
+
 @export_group("งานซ่อม")
 ## Core Part ที่ต้องซ่อม → เปิดมินิเกมตัวนั้น
-@export_enum("part_ram", "part_mainboard", "part_gpu", "part_front_panel", "part_bios") var part_id: String = "part_ram"
-## ชื่องานบนการ์ด เช่น "ทำความสะอาดแรม"
+@export_enum("part_ram", "part_mainboard", "part_gpu", "part_front_panel", "part_bios", "part_desktop") var part_id: String = "part_ram"
+## งานบนจอ (part_desktop) — ข้อมูลเครื่อง/ไฟล์/กับดักในขมOS (Resources/Desktop/*.tres) · [Claude 9 ต.ค. 2569]
+@export var desktop_task: DesktopTask
+## ชื่องานบนการ์ดผลงาน เช่น "ทำความสะอาดแรม" (การ์ดบนกระดานไม่โชว์ — ผู้เล่นต้องวินิจฉัยเอง)
 @export var job_title: String
 ## ค่าซ่อม (บาท) · −1 = ใช้ค่าจาก Resources/Balance/economy.tres
 @export var fee := -1
@@ -58,6 +69,22 @@ func part() -> StringName:
 	return StringName(part_id)
 
 
+const LEVEL_NAMES := ["ง่าย", "ปกติ", "ปานกลาง", "ยาก", "ชำนาญ"]
+
+
+func level_name() -> String:
+	return "Lv%d %s" % [level, LEVEL_NAMES[clampi(level, 1, 5) - 1]]
+
+
+## เวลาที่ใช้ (ช่อง) · est_slots หรือค่าเฉลี่ยของระดับ
+func slots(econ: EconomyConfig = null) -> int:
+	if est_slots > 0:
+		return est_slots
+	if econ:
+		return ceili(econ.avg_slots_for_level(level))
+	return [2, 3, 5, 7, 10][clampi(level, 1, 5) - 1]
+
+
 ## ช่องที่ขาด — DayLoop เตือนใน Output ตอนเริ่มเกม
 func problems() -> PackedStringArray:
 	var out := PackedStringArray()
@@ -77,6 +104,11 @@ func problems() -> PackedStringArray:
 		out.append("ไม่มีชื่องาน (job_title)")
 	if fee < -1:
 		out.append("fee ติดลบ (ใช้ -1 = ค่าจาก economy)")
+	if part_id == "part_desktop" and scene_override == "":
+		if desktop_task == null:
+			out.append("งานบนจอ (part_desktop) ต้องใส่ desktop_task")
+		else:
+			out.append_array(desktop_task.problems())
 	if scene_path() == "" or not ResourceLoader.exists(scene_path()):
 		out.append("ไม่พบมินิเกม %s" % scene_path())
 	if arrive_dialog != "":

@@ -186,12 +186,14 @@ func _report_repair() -> void:
 	if id == &"":
 		id = StringName(scene_file_path.get_file().get_basename())
 	var fee := -1
+	var level := 0
 	var order = get_meta("work_order")
 	if order is CustomerCase:
 		fee = order.fee
+		level = order.level
 		if order.part_id != String(id):
 			push_warning("%s: งานลูกค้า %s เป็น %s แต่มินิเกมนี้คือ %s" % [name, order.id, order.part_id, id])
-	gs.record_repair(id, final_score(), repair_damaged(), fee)
+	gs.record_repair(id, final_score(), repair_damaged(), fee, level)
 
 
 ## คะแนน 0–100 จาก phase สุดท้าย (SUMMARY มี var total) · ไม่มี = คิดจาก _mistakes

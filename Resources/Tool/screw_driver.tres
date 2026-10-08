@@ -6,5 +6,6 @@
 [resource]
 script = ExtResource("1_koth1")
 id = &"screw_driver"
-display_name = "ไขขวง"
+display_name = "ไขควง"
 icon = ExtResource("1_fs7pb")
+time_minutes = 5

@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 0
+title = "ลงแอปพูดคุยที่ศาลาหมู่บ้าน"
+pc_name = "คอมศาลาหมู่บ้าน"
+request = "อยากลงโปรแกรมพูดคุย ไว้ประกาศข่าวในกลุ่มหมู่บ้าน"
+files = Array[Dictionary]([{
+"name": "ประกาศงานวัด.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ประกาศงานวัดประจำปี"
+}, {
+"name": "รายชื่อลูกบ้าน.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "รายชื่อกับเบอร์โทรลูกบ้าน 120 หลัง"
+}, {
+"name": "DOWNLOAD_NOW_ฟรี.exe",
+"size_mb": 3,
+"folder": "ดาวน์โหลด",
+"kind": "fake_installer",
+"note": ""
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_free_mb = 12000
+traps = Array[StringName]([&"fake_download", &"bundle", &"delete_system", &"delete_user", &"click_ad"])
+ask_options = PackedStringArray("ผู้ใหญ่เคยลองลงเองแล้วหรือยังครับ", "เครื่องนี้มีคนใช้กี่คนครับ", "อยากได้จอใหญ่กว่านี้ไหมครับ")
+ask_best = 0
+ask_answer = "เคยกดโหลดจากปุ่มใหญ่ ๆ แล้วไม่กล้าเปิด ไฟล์มันค้างอยู่ในดาวน์โหลดนั่นแหละ ส่วนของจริงหลานว่าต้องโหลดจากเว็บพูดคุยเอง"
+explain_options = PackedStringArray("ครั้งหน้าจะลงโปรแกรม ให้โหลดจากเว็บของเจ้าของโปรแกรมเท่านั้น อย่ากดปุ่มโฆษณานะ", "ปุ่มดาวน์โหลดอันใหญ่ ๆ สีส้ม ๆ กดได้เลย เร็วดี", "ลงโปรแกรมไว้เยอะ ๆ ก่อน เผื่อได้ใช้")
+explain_best = 0
+pib_intro = PackedStringArray("ลงโปรแกรมต้องโหลดจากเว็บทางการของผู้พัฒนาเท่านั้นนะขม", "เปิดเบราว์เซอร์ที่แถบล่างดูสิ ระวังปุ่มที่เป็นโฆษณาด้วย")
+pib_lesson = PackedStringArray("ดูที่อยู่เว็บก่อนโหลดเสมอ แล้วอ่านทุกหน้าของตัวติดตั้ง", "ช่องติ๊กที่แอบแถมโปรแกรมอื่นมา ต้องเอาออกทุกครั้ง")

@@ -13,7 +13,7 @@
 | **Inside** ในเคส (ชื่อเก่า Speaker) | **2.5D แนว Lil' Guardsman** — มองจากบน โต๊ะไม้มีไฟส่อง | `Scene2D/inside_bg.png` (โต๊ะ + `mb_case_open.png` + `mb_mainboard.png`) |
 | **Slots** สล็อตแรม (ชื่อเก่า SlotClose) | 2.5D ซูม | `Scene2D/slots_zoom.png` |
 | **Mat** แผ่น ESD (ชื่อเก่า MatGold) | 2D มองจากบน | `Scene2D/esd_mat_view.png` |
-| Tutorial: **Tray** ชิ้นส่วน · **Build** ประกอบในเคส | 2D / 2.5D | `esd_mat_view.png` · `Scene2D/build_bg.png` |
+| Tutorial: **Tray** ชิ้นส่วน · **Build** ประกอบในเคส | 2D มองจากบน (เวกเตอร์) | `TutorialAssembly/asm_tray_bg.png` · `asm_case_bg.png` + ภาพประกอบแล้ว `asm_layer_*.png` (9 ต.ค. แทน `esd_mat_view` · `build_bg` — ดู `TUTORIAL_ASSEMBLY_DESIGN.md`) |
 
 - สลับมุม = ภาพ crossfade + ซูมเข้า/ออกเล็กน้อย (`Stage2D.transition_time`)
 - เปลี่ยนสถานะ = เปลี่ยนรูป crossfade (`Item2D.set_state`) เช่นจอ `glitch → desktop → off → boot_ok` · ปลั๊ก `"" ↔ out` · ฝากระจก `"" → open` · แรม `dirty → dusted → clean` · สลักเปิด/ปิด

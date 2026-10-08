@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 1
+title = "ถอนโปรแกรมโฆษณาเครื่องเด็ก"
+pc_name = "คอมของเด็กข้างบ้าน"
+request = "มีโฆษณาเด้งตลอดเวลา เล่นเกมไม่ได้เลย"
+files = Array[Dictionary]([{
+"name": "สูตรโกงเกม.exe",
+"size_mb": 3,
+"folder": "เดสก์ท็อป",
+"kind": "junk",
+"note": "ไฟล์นี้แหละที่แอบลงโปรแกรมโฆษณามาด้วย",
+"reply": "อันนั้นโหลดมาจากเว็บแปลก ๆ ลบได้เลย"
+}, {
+"name": "งานศิลปะ.png",
+"size_mb": 6,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "รูปวาดส่งครูศิลปะ"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ลดราคาเด้งไว",
+"publisher": "Super Deal Co.",
+"size_mb": 120,
+"adware": true,
+"desktop_icon": true
+}, {
+"name": "เกมฟาร์มผัก",
+"publisher": "Farm Studio",
+"size_mb": 800,
+"desktop_icon": true
+}, {
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_free_mb = 20000
+traps = Array[StringName]([&"icon_only", &"delete_system", &"click_ad", &"fake_download", &"delete_user"])
+ask_options = PackedStringArray("เริ่มเด้งตั้งแต่ลงอะไรไปครับ", "เล่นเกมวันละกี่ชั่วโมงครับ", "ใครเป็นคนซื้อคอมให้ครับ")
+ask_best = 0
+ask_answer = "ตั้งแต่โหลดสูตรโกงเกมมาเปิด แล้วมีไอคอนป้ายราคาโผล่มาบนจอ"
+explain_options = PackedStringArray("โปรแกรมโฆษณาต้องถอนในหน้าตั้งค่า ลบแค่ไอคอนไม่หาย และอย่าโหลดสูตรโกงจากเว็บแปลก ๆ อีกนะ", "ปิดหน้าต่างโฆษณาไปเรื่อย ๆ ก็พอ", "ลงโปรแกรมลดราคาอีกตัวมาแก้ทางกัน")
+explain_best = 0
+pib_intro = PackedStringArray("โฆษณาเด้งแบบนี้ เพราะมีโปรแกรมโฆษณาแอบติดอยู่ในเครื่อง", "ลบแค่ไอคอนไม่พอนะ ต้องถอนการติดตั้งในหน้าตั้งค่า แล้วหน้าต่างโฆษณาให้กดกากบาทปิด อย่ากดข้างใน")
+pib_lesson = PackedStringArray("ถอนโปรแกรมต้องทำผ่านหน้าตั้งค่า ไอคอนเป็นแค่ทางลัดเท่านั้น", "ของระบบอย่าถอน ถอนเฉพาะตัวที่รู้แน่ว่าเป็นโฆษณา")

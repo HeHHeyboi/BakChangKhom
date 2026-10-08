@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_coworker_ram"
+customer = "เพื่อนร่วมงาน"
+reason = "เพื่อนร่วมงานเก่าในเมืองส่งพัสดุมา บอกว่าร้านในเมืองคิดแพง"
+device = "โน้ตบุ๊กเครื่องเก่าที่ใช้ทำงานที่บ้าน"
+symptom = "เปิดแล้วไฟติดแต่จอดำ มีเสียงปี๊บ ๆ"
+level = 2
+est_slots = 3
+due_shifts = 3
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_coworker_ram.txt"
+thanks_text = "ส่งกลับไปถึงแล้วใช้ได้เลย ขอบใจมาก ไว้จะบอกเพื่อนในเมืองให้"
+complain_text = "ยังไม่ติดเลยว่ะ… ไม่เป็นไรนะ ค่อย ๆ ไป"

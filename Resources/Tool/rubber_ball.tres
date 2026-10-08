@@ -9,3 +9,4 @@ id = &"rubber_ball"
 display_name = "ลูกยาง"
 icon = ExtResource("1_h1ome")
 action = 4
+time_minutes = 3

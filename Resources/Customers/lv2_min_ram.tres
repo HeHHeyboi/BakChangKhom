@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_min_ram"
+customer = "มิ้น"
+reason = "มิ้นแวะมาเยี่ยมยาย เลยถือคอมที่บ้านมาให้ดูด้วย"
+device = "คอมตั้งโต๊ะที่บ้านมิ้น เพิ่งย้ายบ้านมา"
+symptom = "ย้ายบ้านแล้วเปิดไม่ติด มีเสียงปี๊บยาว ๆ"
+level = 2
+est_slots = 3
+due_shifts = 2
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_min_ram.txt"
+thanks_text = "เปิดติดแล้ว! ฝีมือขมยังไม่ตกเลยนะ"
+complain_text = "ยังไม่ติดเลยขม… ไว้มิ้นยกไปร้านในเมืองก็ได้"

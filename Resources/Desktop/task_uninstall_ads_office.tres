@@ -1,0 +1,79 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 1
+title = "ถอนโปรแกรมโฆษณาห้องธุรการ"
+pc_name = "คอมห้องธุรการโรงเรียน"
+request = "ประชุมออนไลน์ทีไร โฆษณาเด้งขึ้นจอให้อายครู"
+files = Array[Dictionary]([{
+"name": "ตารางสอน.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ตารางสอนเทอมนี้"
+}, {
+"name": "หนังสือราชการ",
+"size_mb": 350,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "หนังสือเข้า-ออกทั้งปี"
+}, {
+"name": "ตัวแปลงไฟล์ฟรี.exe",
+"size_mb": 5,
+"folder": "ดาวน์โหลด",
+"kind": "junk",
+"note": "ตัวติดตั้งที่แถมโปรแกรมค้นหามาด้วย",
+"reply": "ครูธุรการโหลดมาแปลงไฟล์ ลบได้"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ค้นหาเร็วพลัส",
+"publisher": "Fast Search Ltd.",
+"size_mb": 90,
+"adware": true,
+"desktop_icon": true
+}, {
+"name": "ลดราคาเด้งไว",
+"publisher": "Super Deal Co.",
+"size_mb": 120,
+"adware": true,
+"desktop_icon": false
+}, {
+"name": "โปรแกรมพิมพ์งาน",
+"publisher": "Office Thai",
+"size_mb": 1500,
+"desktop_icon": true
+}, {
+"name": "ตัวป้องกันเครื่อง",
+"publisher": "ขมOS",
+"size_mb": 200,
+"system": true
+}, {
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_free_mb = 30000
+traps = Array[StringName]([&"icon_only", &"delete_system", &"click_ad", &"fake_download", &"delete_user"])
+ask_options = PackedStringArray("โฆษณาเริ่มเด้งหลังลงโปรแกรมอะไรครับ", "ประชุมออนไลน์บ่อยแค่ไหนครับ", "ห้องนี้เปิดแอร์ทั้งวันไหมครับ")
+ask_best = 0
+ask_answer = "ครูธุรการลงตัวแปลงไฟล์ฟรีมา หลังจากนั้นก็มีหน้าค้นหาแปลก ๆ กับโฆษณาลดราคาขึ้นมาเลย"
+explain_options = PackedStringArray("ตัวติดตั้งฟรีบางตัวแถมโปรแกรมโฆษณามา ถอนในหน้าตั้งค่าให้ครบทุกตัว และติดตั้งอะไรให้อ่านทุกหน้าก่อน", "ปิดเครื่องแล้วเปิดใหม่ก็หายเอง", "ซื้อโปรแกรมกันไวรัสแพง ๆ มาลง")
+explain_best = 0
+pib_intro = PackedStringArray("โฆษณาเด้งแบบนี้ เพราะมีโปรแกรมโฆษณาแอบติดอยู่ในเครื่อง", "ลบแค่ไอคอนไม่พอนะ ต้องถอนการติดตั้งในหน้าตั้งค่า แล้วหน้าต่างโฆษณาให้กดกากบาทปิด อย่ากดข้างใน", "เครื่องนี้อาจมีมากกว่าหนึ่งตัวนะ ดูในรายการแอปให้ครบ")
+pib_lesson = PackedStringArray("ถอนโปรแกรมต้องทำผ่านหน้าตั้งค่า ไอคอนเป็นแค่ทางลัดเท่านั้น", "ของระบบอย่าถอน ถอนเฉพาะตัวที่รู้แน่ว่าเป็นโฆษณา")

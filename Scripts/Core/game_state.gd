@@ -16,6 +16,12 @@ enum Grade {
 }
 
 const ECONOMY_PATH := "res://Resources/Balance/economy.tres"
+## เงินในมือห้ามเกินนี้ (ECONOMY_ENERGY 1.4) — ส่วนเกินเข้ากองทุนหมู่บ้าน
+const MONEY_CAP := 50_000
+
+signal reputation_changed(value: int, delta: int)
+## บิลรายเดือน { month, power, grandma, internet, total, paid, debt }
+signal bill_paid(bill: Dictionary)
 
 ## บทของแต่ละรอบ (index 0 = รอบ 1) · รอบ 1 เล่นผ่านเควสต์หลักแล้ว (main.tres) จึงไม่เปิดซ้ำ
 const CHAPTERS := [
@@ -88,6 +94,14 @@ var part_clears: Dictionary[StringName, int] = { }
 ## ธงเนื้อเรื่อง เช่น &"ch11_choice": &"stay" | &"city" | &"coworking"
 var story_flags: Dictionary = { }
 var ending: StringName = &""
+## ชื่อเสียง 0–100 (GAME_REDESIGN 7.3)
+var reputation := 20
+## ระดับงาน → จำนวนงานที่ได้ ⭐⭐ ขึ้นไป (ปลดระดับถัดไป · LEVEL_DESIGN ข้อ 6)
+var level_stars: Dictionary[int, int] = { }
+## หนี้ค้าง (จ่ายบิลไม่พอ — ไม่ game over)
+var debt := 0
+## เงินที่ล้น MONEY_CAP
+var village_fund := 0
 
 
 func _ready() -> void:
@@ -105,7 +119,12 @@ func reset() -> void:
 	part_clears.clear()
 	story_flags.clear()
 	ending = &""
+	reputation = economy.reputation_start
+	level_stars.clear()
+	debt = 0
+	village_fund = 0
 	money_changed.emit(money, 0)
+	reputation_changed.emit(reputation, 0)
 
 # ---------------------------------------------------------------- เงิน
 
@@ -114,7 +133,61 @@ func add_money(delta: int) -> void:
 	if delta == 0:
 		return
 	money += delta
+	if money > MONEY_CAP:
+		village_fund += money - MONEY_CAP
+		delta -= money - MONEY_CAP
+		money = MONEY_CAP
 	money_changed.emit(money, delta)
+
+
+func add_reputation(delta: int) -> void:
+	if delta == 0:
+		return
+	var before := reputation
+	reputation = clampi(reputation + delta, 0, 100)
+	reputation_changed.emit(reputation, reputation - before)
+
+
+## จ่ายบิลรายเดือน (TimeSystem.month_ended) · เงินไม่พอ = จ่ายเท่าที่มี ส่วนที่เหลือเป็นหนี้
+func pay_month_bill(month: int) -> Dictionary:
+	var e := economy if economy else EconomyConfig.new()
+	var bill := {
+		"month": month,
+		"power": e.month_value(e.bill_power, month),
+		"grandma": e.bill_grandma,
+		"internet": e.bill_internet,
+	}
+	bill["total"] = int(bill["power"]) + int(bill["grandma"]) + int(bill["internet"]) + debt
+	var paid := mini(maxi(money, 0), int(bill["total"]))
+	add_money(-paid)
+	debt = int(bill["total"]) - paid
+	bill["paid"] = paid
+	bill["debt"] = debt
+	bill_paid.emit(bill)
+	return bill
+
+
+## ยศช่าง 0–4 จาก XP
+func rank() -> int:
+	var e := economy if economy else EconomyConfig.new()
+	var r := 0
+	for i in e.rank_xp.size():
+		if xp >= e.rank_xp[i]:
+			r = i
+	return r
+
+
+func rank_name() -> String:
+	var e := economy if economy else EconomyConfig.new()
+	return e.rank_names[clampi(rank(), 0, e.rank_names.size() - 1)]
+
+
+## งานระดับนี้ขึ้นกระดานได้ไหม · Lv1–2 เปิดตั้งแต่แรก · Lv n+1 ต้องได้ ⭐⭐ ใน Lv n ครบ unlock_stars_needed งาน
+func level_unlocked(level: int) -> bool:
+	if level <= 2:
+		return true
+	var e := economy if economy else EconomyConfig.new()
+	return level_stars.get(level - 1, 0) >= e.unlock_stars_needed
 
 
 func can_afford(cost: int) -> bool:
@@ -124,7 +197,8 @@ func can_afford(cost: int) -> bool:
 
 
 ## เรียกจาก PartMinigame ตอนจบงานลูกค้า · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย · fee −1 = ใช้ค่าจาก economy
-func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1) -> Dictionary:
+## level 1–5 = ค่าแรงฐาน/XP ตามระดับ (LEVEL_DESIGN ข้อ 2) · 0 = แบบเดิม (repair_fee ต่อ Part)
+func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1, level := 0) -> Dictionary:
 	var e := economy
 	if e == null:
 		e = EconomyConfig.new()
@@ -137,7 +211,10 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 	else:
 		grade = Grade.GOOD
 
-	var fee: int = fee_override if fee_override >= 0 else e.repair_fee.get(part_id, e.default_fee)
+	var fee: int = fee_override
+	if fee < 0:
+		fee = e.fee_for_level(level) if level > 0 else e.repair_fee.get(part_id, e.default_fee)
+	var xp_mult := e.xp_mult_for_level(level) if level > 0 else 1.0
 	var delta := 0
 	var sat := 0
 	var gained := 0
@@ -155,9 +232,19 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 			sat = e.satisfaction_fail
 			gained = roundi(e.xp_base * e.xp_mult_fail)
 
+	gained = roundi(gained * xp_mult)
 	add_money(delta)
 	satisfaction_history.append(sat)
 	xp += gained
+	var rep := 0
+	match grade:
+		Grade.GOOD:
+			rep = e.rep_three_star if score >= e.three_star_score else e.rep_good
+		Grade.FAIL:
+			rep = e.rep_damaged if damaged else e.rep_fail
+	add_reputation(rep)
+	if level > 0 and grade == Grade.GOOD:
+		level_stars[level] = level_stars.get(level, 0) + 1
 	if grade != Grade.FAIL:
 		part_clears[part_id] = part_clears.get(part_id, 0) + 1
 
@@ -169,17 +256,12 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 		"satisfaction": sat,
 		"xp": gained,
 		"damaged": damaged,
+		"level": level,
+		"reputation": rep,
 	}
 	repair_recorded.emit(result)
-	_advance_after_repair()
+	# [9 ต.ค.] เวลาไม่เดินที่นี่แล้ว — DayLoop เดินนาฬิกาตามช่องของงาน (LEVEL_DESIGN 4.2)
 	return result
-
-
-## งานซ่อม 1 งานกินเวลา 1 ช่วง (เช้า → เที่ยง → เย็น) · ไม่ข้ามวันเอง — จบวันต้องนอน
-func _advance_after_repair() -> void:
-	var ts: TimeSystem = EventManager.time_system
-	if ts and not ts.finished and ts.cur_period != TimeSystem.TIME.EVENING:
-		EventManager.next_period.emit()
 
 
 func average_satisfaction() -> float:
@@ -213,7 +295,7 @@ func finish_game() -> void:
 
 ## ฉากจบตาม GAME_LOOP §6 · ยศช่างยังไม่มี จึงใช้ XP แทนชั่วคราว
 func decide_ending() -> StringName:
-	if average_satisfaction() < 40.0 or money < 0:
+	if average_satisfaction() < 40.0 or money < 0 or debt > 0:
 		return &"failure"
 	match story_flags.get(&"ch11_choice", &"stay"):
 		&"city":

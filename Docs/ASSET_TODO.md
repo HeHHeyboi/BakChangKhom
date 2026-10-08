@@ -292,7 +292,7 @@ signature, ui frame, border, drop shadow blur, blurry, deformed hands
 - [ ] **เปิด Godot 1 รอบ** ให้ import รูป 39 ไฟล์ในโฟลเดอร์ `Part*` แล้ว `git add Assets/MiniGame/Part*/*.import` *(สำคัญที่สุด — ดู `BUG_LIST.md` BUG-09)*
 - [ ] ย้าย `Assets/MiniGame/box.png` / `box_on_hover.png` → `PartRam/ram_box_normal.png` / `ram_box_hover.png`
 - [ ] ลบ asset ชุดเก่าหลังเปลี่ยนโค้ดไปใช้ชุดใหม่แล้ว: `ram.png` · `ramDirty.png` · `ramSligtDirty.png` · `eraser.png`
-- [ ] ย่อ `RoomBG.jpg` · `HomeBG.jpg` · `Market.jpg` · `Chapter2_bg.jpg` จาก 1920×1080 → 1152×648
+- [ ] ย่อ `RoomBG.jpg` · `HomeBG.jpg` · `Market.jpg` · `Chapter2_bg.jpg` จาก 1920×1080 → 1152×648 (9 ต.ค.: ฉากบ้าน/ร้านไม่ใช้ HomeBG/RoomBG แล้ว เหลือ find-item กับฉากหลังบท)
 - [ ] บีบไฟล์ใหญ่เกิน: `mb_mainboard.png` 1.47 MB · `mb_case_open.png` 1.41 MB · `gpu_cable_messy.png` 1.15 MB · `gpu_cable_tidy.png` 887 KB
 - [ ] ลบไฟล์ซ้ำ `TileMap/Walk_Khom.png` (ซ้ำกับ `SpriteSheets/`) และ `Assets/Gen/` ที่ว่างแล้ว
 - [ ] เลือกให้เหลืออันเดียว: `char_pib_normal.png` vs `char_pib_neutral.png`

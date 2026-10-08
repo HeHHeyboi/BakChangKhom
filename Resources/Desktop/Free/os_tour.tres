@@ -1,0 +1,65 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 0
+title = "ทำความรู้จัก ขมOS"
+pc_name = "คอมที่เพิ่งประกอบ"
+request = "เครื่องเปิดติดแล้ว! ลองใช้ทีละขั้นตามโน้ตนี้"
+files = Array[Dictionary]([{
+"name": "ไฟล์ทดสอบ.doc",
+"size_mb": 1,
+"folder": "เดสก์ท็อป",
+"kind": "junk",
+"note": "ไฟล์ไว้ลองลบ",
+"reply": "ลบได้เลย"
+}, {
+"name": "ยินดีต้อนรับ.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "เครื่องนี้ขมประกอบเองกับมือ ทุกชิ้นเสียบถูกที่"
+}, {
+"name": "คู่มือขมOS.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ไอคอน = ทางลัด · โฟลเดอร์ = ที่เก็บไฟล์ · ถังขยะ = ที่พักไฟล์ที่ลบ · ตั้งค่า = ปรับเครื่อง/ถอนโปรแกรม"
+}, {
+"name": "วอลเปเปอร์ทุ่งนา.jpg",
+"size_mb": 3,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "ภาพพื้นหลังของเครื่องนี้"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_total_mb = 256000
+disk_free_mb = 200000
+browser_ad = true
+traps = Array[StringName]([])
+ask_options = PackedStringArray("-", "-")
+ask_best = 0
+ask_answer = ""
+explain_options = PackedStringArray("-", "-")
+explain_best = 0
+pib_intro = PackedStringArray("เปิดติดแล้ว! นี่คือขมOS ระบบปฏิบัติการของเครื่อง เป็นตัวกลางให้เราสั่งงานคอมได้", "ทำตามโน้ตสีเหลืองทีละข้อนะ ปิ๊บจะชี้ให้ว่าต้องกดตรงไหน")
+pib_lesson = PackedStringArray()

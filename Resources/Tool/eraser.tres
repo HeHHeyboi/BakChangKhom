@@ -9,3 +9,4 @@ id = &"eraser"
 display_name = "ยางลบ"
 icon = ExtResource("1_ikbhb")
 action = 16
+time_minutes = 8

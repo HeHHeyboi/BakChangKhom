@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_teacher_ram"
+customer = "ครู"
+reason = "คอมห้องสมุดโรงเรียนเสีย ผอ.บอกให้ลองมาร้านขม"
+device = "คอมห้องสมุด ตั้งข้างหน้าต่าง โดนลมฝนบ่อย"
+symptom = "ช่วงหน้าฝนเปิดแล้วจอดำ มีเสียงปี๊บ บางวันก็ติด"
+level = 2
+est_slots = 3
+due_shifts = 3
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_teacher_ram.txt"
+thanks_text = "เด็ก ๆ ได้ยืมหนังสือผ่านคอมอีกแล้ว ขอบใจจ้ะ"
+complain_text = "ยังเปิดติดบ้างไม่ติดบ้างจ้ะ ครูขอเอาไปลองก่อนนะ"

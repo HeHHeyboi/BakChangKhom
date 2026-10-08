@@ -72,9 +72,18 @@ func clear() -> void:
 func push(path: String, ctx: Variant = null) -> Node:
 	if !ResourceLoader.exists(path):
 		return null
-	await Fade.fade_out()
 	var n: Node = load(path).instantiate()
 	n.set_meta("ctx", ctx)
+	return await push_node(n)
+
+
+## วางโหนดที่สร้างเองเป็น overlay (มีจอดำ fade เหมือน push) · ตั้ง meta ให้เสร็จก่อนเรียก (_ready ของโหนดอ่านได้)
+## ใช้โดย DayLoop.start_repair (meta work_order) · DebugMenu._open_minigame (meta standalone)
+## [Claude 8 ต.ค. 2569] คืนฟังก์ชันนี้ — commit b6cf245 รวมเข้า push() แต่ยังมีที่เรียกอยู่ 2 ที่
+func push_node(n: Node) -> Node:
+	if n == null:
+		return null
+	await Fade.fade_out()
 	if _stack.is_empty():
 		_set_location_paused(true)
 	else:

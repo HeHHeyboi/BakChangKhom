@@ -41,7 +41,7 @@ func _ready() -> void:
 	)
 	ts.set_clock(-10)
 	_check(ts.current_minute == 0, "set_clock ติดลบ → 00:00")
-	ts.set_date(1, 1)
+	ts.set_shift(1, 9 * 60)
 	var m0 := ts.current_minute
 	await DayLoop.time_skip(0)
 	_check(ts.current_minute == m0, "time_skip 0 นาที → ไม่ทำอะไร")
@@ -61,7 +61,7 @@ func _ready() -> void:
 		and GameState.money == money0 + GameState.economy.default_fee + GameState.economy.tip_three_star,
 		"คะแนนเกิน 100 → clamp · Part ไม่รู้จัก → ค่าซ่อม default",
 	)
-	DayLoop.job_done_today = false
+	DayLoop._result_pending = false
 
 	# --- ลูกค้ากรอกไม่ครบ
 	var bad := CustomerCase.new()
@@ -93,7 +93,7 @@ func _ready() -> void:
 		"บันทึกผลงานครั้งเดียว (ได้ %d)" % (GameState.satisfaction_history.size() - jobs1),
 	)
 	_check(not Global.in_minigame, "มินิเกมปิดแล้ว in_minigame = false")
-	DayLoop.job_done_today = false
+	DayLoop._result_pending = false
 
 	# --- QTE
 	var q := QteRunner.new()
@@ -141,12 +141,13 @@ func _ready() -> void:
 	nodlg.arrive_dialog = ""
 	DayLoop.today_case = nodlg
 	DayLoop.play_arrival(true)
-	await _frames(3)
+	await get_tree().create_timer(1.4).timeout # จอดำ fade ก่อนมินิเกมขึ้น
 	var opened := false
 	for n in SceneRouter.overlay_stack.get_children():
 		if n is PartMinigame:
 			opened = true
-			n.queue_free()
+	if opened:
+		SceneRouter.pop()
 	_check(opened and not DialogScene.visible, "ลูกค้าไม่มีบท → เปิดมินิเกมเลย")
 	await _frames(3)
 	_check(not DayLoop._working and not Global.in_minigame, "ปิดมินิเกมแล้วปลดล็อกการ์ด")

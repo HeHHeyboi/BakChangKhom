@@ -4,15 +4,24 @@
 [ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="2_week"]
 [ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="3_case"]
 [ext_resource type="Resource" path="res://Resources/Week/week1.tres" id="w1"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d2_headman_mainboard.tres" id="p1"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d3_kid_gpu.tres" id="p2"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d4_teacher_frontpanel.tres" id="p3"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d5_director_bios.tres" id="p4"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d6_girl_ram.tres" id="p5"]
-[ext_resource type="Resource" path="res://Resources/Customers/w1_d7_amnuay_mainboard.tres" id="p6"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d6_girl_ram.tres" id="p0"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_min_ram.tres" id="p1"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_teacher_ram.tres" id="p2"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_coworker_ram.tres" id="p3"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d2_headman_mainboard.tres" id="p4"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d7_amnuay_mainboard.tres" id="p5"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d3_kid_gpu.tres" id="p6"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d4_teacher_frontpanel.tres" id="p7"]
+[ext_resource type="Resource" path="res://Resources/Customers/w1_d5_director_bios.tres" id="p8"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_yai_chat.tres" id="d0"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_headman_chat.tres" id="d1"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_amnuay_space.tres" id="d2"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_min_space.tres" id="d3"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_kid_ads.tres" id="d4"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_director_ads.tres" id="d5"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
 script = ExtResource("1_loop")
 week_plans = Array[ExtResource("2_week")]([ExtResource("w1")])
-random_pool = Array[ExtResource("3_case")]([ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6")])
+random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d2"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5")])

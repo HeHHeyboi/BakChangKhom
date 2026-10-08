@@ -150,8 +150,8 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 
 | ไฟล์ | ขนาดจริง | ใช้ที่ไหน | สถานะ |
 |---|---|---|---|
-| `HomeBG.jpg` | 1920×1080 | `Scene/Location/Home.tscn` (BG scale 0.595) | ⚠️ ใหญ่เกิน ควรทำ 1152×648 |
-| `RoomBG.jpg` | 1920×1080 | `Scene/Location/Room.tscn` | ⚠️ ใหญ่เกิน |
+| `HomeBG.jpg` | 1920×1080 | ฉากหลังบทใน `day_loop.gd` / `game_state.gd` (9 ต.ค. `Home.tscn` เปลี่ยนเป็น `bg_village_day.jpg`) | ⚠️ ใหญ่เกิน ควรทำ 1152×648 |
+| `RoomBG.jpg` | 1920×1080 | `find_item_minigame.tscn` (9 ต.ค. `Room.tscn` เปลี่ยนเป็น `bg_shop_open.jpg`) | ⚠️ ใหญ่เกิน |
 | `Market.jpg` | 1920×1080 | `Scene/Location/Market.tscn` | ⚠️ ใหญ่เกิน |
 | `Chapter2_bg.jpg` | 1920×1080 | `Constant.CHAPTER2_BG_IMAGE` | ⚠️ ใหญ่เกิน |
 | `Office.png` | 740×555 (4:3) | prologue (ฉากออฟฟิศ) | 🔴 ผิดสัดส่วน + เล็กกว่าจอ → เบลอ **ต้องทำใหม่** |
@@ -167,7 +167,7 @@ blurry, jpeg artifacts, extra limbs, deformed hands
 | ไฟล์ | ขนาด | ใช้ที่ไหน |
 |---|---|---|
 | `Idle.png` | 265×519 | `Global._CharacterMap["ขม"]` |
-| `GrandmaNormal.png` | 235×421 | `Global._CharacterMap["ยาย"]` + `Home.tscn` |
+| `GrandmaNormal.png` | 235×421 | `SimpleNPC.tscn` (9 ต.ค. `Home.tscn` ใช้ `Home/grandma_idle.png` แทน) |
 | `GradmaHighlight.png` | 235×421 | `Home.tscn` texture_hover | *(สะกดผิด: Gradma → Grandma)* |
 
 > ระบบ dialog ทำ highlight/fade ด้วยการ modulate สีในโค้ด (`character_sprite.gd` — `darkened(0.7)` / `lightened(1)`)

@@ -1,0 +1,93 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 0
+title = "คอมของขม"
+pc_name = "คอมของขม"
+request = "ไม่มีลูกค้ารอ ใช้ได้ตามสบาย ฝึกมือไว้ก่อน"
+files = Array[Dictionary]([{
+"name": "อะไหล่ที่ต้องสั่ง.doc",
+"size_mb": 1,
+"folder": "เดสก์ท็อป",
+"kind": "user",
+"note": "แรม DDR4 8GB ×2 · ซิลิโคนหลอดใหญ่ · พัดลม 12 ซม. ×3 · ผ้าไมโครไฟเบอร์"
+}, {
+"name": "บัญชีร้านเดือนนี้.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "รายรับ-รายจ่ายของร้าน · อย่าลืมจ่ายค่าไฟสิ้นเดือน"
+}, {
+"name": "เบอร์ลูกค้าประจำ.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ลุงอำนวย · ผู้ใหญ่บ้าน · ครูห้องสมุด · ผอ."
+}, {
+"name": "รูปกับยาย.jpg",
+"size_mb": 4,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "ยายยิ้มแป้นหน้าบ้าน วันที่ขมกลับมาจากกรุงเทพ"
+}, {
+"name": "วันแรกที่เปิดร้าน.jpg",
+"size_mb": 5,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "ป้ายร้านยังเอียงอยู่เลย"
+}, {
+"name": "วันแรกที่เปิดร้าน - สำเนา.jpg",
+"size_mb": 5,
+"folder": "รูปภาพ",
+"kind": "dup",
+"dup_of": "วันแรกที่เปิดร้าน.jpg"
+}, {
+"name": "คู่มือเมนบอร์ด.pdf",
+"size_mb": 12,
+"folder": "ดาวน์โหลด",
+"kind": "junk",
+"note": "คู่มือเมนบอร์ดรุ่นที่ลุงอำนวยใช้"
+}, {
+"name": "ไดรเวอร์การ์ดจอ.exe",
+"size_mb": 650,
+"folder": "ดาวน์โหลด",
+"kind": "junk",
+"note": "ตัวติดตั้งไดรเวอร์ที่ลงไปแล้ว"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "พูดคุย",
+"publisher": "pudkui.co.th",
+"size_mb": 350,
+"desktop_icon": true,
+"app": true
+}, {
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+disk_total_mb = 256000
+disk_free_mb = 120000
+traps = Array[StringName]([])
+ask_options = PackedStringArray("-", "-")
+ask_best = 0
+ask_answer = ""
+explain_options = PackedStringArray("-", "-")
+explain_best = 0
+pib_intro = PackedStringArray("นี่คอมของขมเอง ใช้ได้ตามสบายเลยนะ", "ลองฝึกเปิดไฟล์ ลบไฟล์ ถอนโปรแกรมไว้ เวลาลูกค้ามาจะได้คล่อง ปิดเครื่องได้ที่ปุ่มเริ่ม")
+pib_lesson = PackedStringArray()

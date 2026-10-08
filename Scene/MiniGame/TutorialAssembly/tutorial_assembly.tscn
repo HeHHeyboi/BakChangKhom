@@ -10,25 +10,14 @@
 [ext_resource type="Texture2D" uid="uid://quiqc7xspufy" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="g1"]
 [ext_resource type="Script" uid="uid://bbj8d3fhkjtbr" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="g2"]
 [ext_resource type="Script" uid="uid://dsa2srhpy1t5h" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="g3"]
-[ext_resource type="Texture2D" uid="uid://deqx5nsi02gtd" path="res://Assets/MiniGame/Scene2D/esd_mat_view.png" id="g4"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/psu.tres" id="g5"]
-[ext_resource type="Texture2D" uid="uid://6agnnfdvg5rf" path="res://Assets/MiniGame/PartGpu/gpu_psu.png" id="g6"]
 [ext_resource type="Script" uid="uid://d0g1eqmi2im1e" path="res://Scripts/MiniGame/PartBase/scene2d/item_2d.gd" id="g7"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/mainboard.tres" id="g8"]
-[ext_resource type="Texture2D" uid="uid://cw5rb82t545sd" path="res://Assets/MiniGame/PartMainboard/mb_mainboard.png" id="g9"]
-[ext_resource type="Texture2D" uid="uid://dwfpdgk748ww" path="res://Assets/MiniGame/Scene2D/mb_in_case.png" id="g10"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/cpu.tres" id="g11"]
-[ext_resource type="Texture2D" uid="uid://b84tbxtnhrp8y" path="res://Assets/MiniGame/PartMainboard/mb_cpu.png" id="g12"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/cpu_cooler.tres" id="g13"]
-[ext_resource type="Texture2D" uid="uid://67isgu4ypllg" path="res://Assets/MiniGame/PartMainboard/mb_cooler.png" id="g14"]
 [ext_resource type="Resource" uid="uid://b4ntdvsd2um4s" path="res://Resources/Parts/Ram/ram_stick.tres" id="g15"]
-[ext_resource type="Texture2D" uid="uid://dggbo116mnf" path="res://Assets/MiniGame/PartRam/ram_clean.png" id="g16"]
-[ext_resource type="Texture2D" uid="uid://dl06r2jawgx6q" path="res://Assets/MiniGame/Scene2D/ram_mini.png" id="g17"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/ssd_m2.tres" id="g18"]
-[ext_resource type="Texture2D" uid="uid://dy7e3oe6bu82x" path="res://Assets/MiniGame/Scene2D/ssd_m2.png" id="g19"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/gpu.tres" id="g20"]
-[ext_resource type="Texture2D" uid="uid://d34xmhbu36ldw" path="res://Assets/MiniGame/PartGpu/gpu_card.png" id="g21"]
-[ext_resource type="Texture2D" uid="uid://c86yk2osew78o" path="res://Assets/MiniGame/Scene2D/build_bg.png" id="g22"]
 [ext_resource type="Script" uid="uid://cmbn5o0o6feu5" path="res://Scripts/MiniGame/PartBase/scene2d/socket_2d.gd" id="g23"]
 [ext_resource type="Texture2D" uid="uid://bw4atqigc0mq8" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="g24"]
 [ext_resource type="Texture2D" uid="uid://dyyt8f1ew2xx1" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="g25"]
@@ -36,6 +25,18 @@
 [ext_resource type="Texture2D" uid="uid://dr1cdde7n47bc" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="g27"]
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
 
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_tray_bg.png" id="a1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_case_bg.png" id="a2"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_psu.png" id="a3"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_psu_side.png" id="a4"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_mainboard.png" id="a5"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_cpu.png" id="a6"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_cooler.png" id="a7"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_ram.png" id="a8"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_ram_edge.png" id="a9"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_ssd.png" id="a10"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_gpu.png" id="a11"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_gpu_edge.png" id="a12"]
 [node name="TutorialAssembly" unique_id=238071051 instance=ExtResource("0_base")]
 script = ExtResource("1_main")
 start_phase = 0
@@ -107,7 +108,8 @@ offset_right = 1084.2354
 offset_bottom = 420.0
 mouse_filter = 2
 script = ExtResource("g2")
-background = ExtResource("g4")
+background = ExtResource("a1")
+bg_scale = 0.5
 label = "ชิ้นส่วน"
 aliases = PackedStringArray()
 
@@ -121,117 +123,117 @@ mouse_filter = 2
 [node name="Psu" type="Control" parent="Stage/Views/Tray/Parts" index="0" unique_id=1410532902]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 262.0
-offset_top = 52.0
-offset_right = 432.0
-offset_bottom = 173.0
-pivot_offset = Vector2(85, 60.5)
+offset_left = 285
+offset_top = 60
+offset_right = 412.5
+offset_bottom = 179.0
+pivot_offset = Vector2(63.75, 59.5)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g5")
-texture = ExtResource("g6")
+texture = ExtResource("a3")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g6")
+"case": ExtResource("a4")
 })
 hint_flip = true
 
 [node name="Mainboard" type="Control" parent="Stage/Views/Tray/Parts" index="1" unique_id=1929261817]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 452.0
-offset_top = 40.0
-offset_right = 652.0
-offset_bottom = 230.0
-pivot_offset = Vector2(100, 95)
+offset_left = 470
+offset_top = 40
+offset_right = 677.4
+offset_bottom = 247.4
+pivot_offset = Vector2(103.7, 103.7)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g8")
-texture = ExtResource("g9")
+texture = ExtResource("a5")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g10")
+"case": ExtResource("a5")
 })
 hint_flip = true
 
 [node name="Cpu" type="Control" parent="Stage/Views/Tray/Parts" index="2" unique_id=903886534]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 682.0
-offset_top = 62.0
-offset_right = 772.0
-offset_bottom = 152.0
-pivot_offset = Vector2(45, 45)
+offset_left = 830
+offset_top = 60
+offset_right = 861.88
+offset_bottom = 91.88
+pivot_offset = Vector2(15.94, 15.94)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g11")
-texture = ExtResource("g12")
+texture = ExtResource("a6")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g12")
+"case": ExtResource("a6")
 })
 hint_flip = true
 
 [node name="Cooler" type="Control" parent="Stage/Views/Tray/Parts" index="3" unique_id=1630376424]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 792.0
-offset_top = 48.0
-offset_right = 912.0
-offset_bottom = 168.0
-pivot_offset = Vector2(60, 60)
+offset_left = 720
+offset_top = 45
+offset_right = 800.75
+offset_bottom = 125.75
+pivot_offset = Vector2(40.38, 40.38)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g13")
-texture = ExtResource("g14")
+texture = ExtResource("a7")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g14")
+"case": ExtResource("a7")
 })
 hint_flip = true
 
 [node name="Ram" type="Control" parent="Stage/Views/Tray/Parts" index="4" unique_id=1807030065]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 270.0
-offset_top = 236.0
-offset_right = 510.0
-offset_bottom = 322.0
-pivot_offset = Vector2(120, 43)
+offset_left = 290
+offset_top = 215
+offset_right = 403.05
+offset_bottom = 241.35
+pivot_offset = Vector2(56.53, 13.17)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g15")
-texture = ExtResource("g16")
+texture = ExtResource("a8")
 looks = Dictionary[String, Texture2D]({
-"mini": ExtResource("g17")
+"mini": ExtResource("a9")
 })
 
 [node name="Ssd" type="Control" parent="Stage/Views/Tray/Parts" index="5" unique_id=1622454354]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 540.0
-offset_top = 262.0
-offset_right = 740.0
-offset_bottom = 318.0
-pivot_offset = Vector2(100, 28)
+offset_left = 300
+offset_top = 275
+offset_right = 368.0
+offset_bottom = 293.7
+pivot_offset = Vector2(34, 9.35)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g18")
-texture = ExtResource("g19")
+texture = ExtResource("a10")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g19")
+"case": ExtResource("a10")
 })
 
 [node name="Gpu" type="Control" parent="Stage/Views/Tray/Parts" index="6" unique_id=2080681975]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 752.0
-offset_top = 212.0
-offset_right = 922.0
-offset_bottom = 274.0
-pivot_offset = Vector2(85, 31)
+offset_left = 700
+offset_top = 180
+offset_right = 914.2
+offset_bottom = 286.25
+pivot_offset = Vector2(107.1, 53.12)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g20")
-texture = ExtResource("g21")
+texture = ExtResource("a11")
 looks = Dictionary[String, Texture2D]({
-"case": ExtResource("g21")
+"case": ExtResource("a12")
 })
 
 [node name="ToBuild" type="Control" parent="Stage/Views/Tray" index="1" unique_id=2131298440]
@@ -254,17 +256,18 @@ offset_right = 1084.2354
 offset_bottom = 420.0
 mouse_filter = 2
 script = ExtResource("g2")
-background = ExtResource("g22")
+background = ExtResource("a2")
+bg_scale = 0.5
 label = "ประกอบในเคส"
 aliases = PackedStringArray()
 
 [node name="PsuBay" type="Control" parent="Stage/Views/Build" index="0" unique_id=2130948874]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 651.0
-offset_top = 228.0
-offset_right = 740.0
-offset_bottom = 317.0
+offset_left = 432
+offset_top = 266
+offset_right = 544.5
+offset_bottom = 330.5
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"psu_bay"
@@ -273,10 +276,10 @@ look = "case"
 [node name="MbStandoff" type="Control" parent="Stage/Views/Build" index="1" unique_id=855687710]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 460.0
-offset_top = 124.0
-offset_right = 655.0
-offset_bottom = 332.0
+offset_left = 448
+offset_top = 42
+offset_right = 631.0
+offset_bottom = 225.0
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"mb_standoff"
@@ -285,10 +288,10 @@ look = "case"
 [node name="PcieSlot" type="Control" parent="Stage/Views/Build" index="2" unique_id=397127224]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 514.0
-offset_top = 222.0
-offset_right = 612.0
-offset_bottom = 258.0
+offset_left = 439.0
+offset_top = 159.8
+offset_right = 628.0
+offset_bottom = 195.8
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"pcie_x16"
@@ -297,50 +300,52 @@ look = "case"
 [node name="M2Slot" type="Control" parent="Stage/Views/Build" index="3" unique_id=1815299719]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 546.0
-offset_top = 266.0
-offset_right = 594.0
-offset_bottom = 280.0
+offset_left = 478.0
+offset_top = 138.8
+offset_right = 538.0
+offset_bottom = 155.3
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"m2_slot"
 look = "case"
 
-[node name="RamSlot" type="Control" parent="Stage/Views/Build" index="4" unique_id=399276098]
+[node name="CpuSocket" type="Control" parent="Stage/Views/Build" index="4" unique_id=1507661846]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 600.0
-offset_top = 136.0
-offset_right = 612.0
-offset_bottom = 226.0
-mouse_filter = 2
-script = ExtResource("g23")
-socket_type = &"ram_slot"
-look = "mini"
-
-[node name="CpuSocket" type="Control" parent="Stage/Views/Build" index="5" unique_id=1507661846]
-unique_name_in_owner = true
-anchors_preset = 0
-offset_left = 554.0
-offset_top = 148.0
-offset_right = 586.0
-offset_bottom = 184.0
+offset_left = 527.7
+offset_top = 84.2
+offset_right = 555.8
+offset_bottom = 112.3
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"cpu_socket"
 look = "case"
 
-[node name="CoolerMount" type="Control" parent="Stage/Views/Build" index="6" unique_id=1914520358]
+
+[node name="CoolerMount" type="Control" parent="Stage/Views/Build" index="5" unique_id=1914520358]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 540.0
-offset_top = 134.0
-offset_right = 600.0
-offset_bottom = 198.0
+offset_left = 506.1
+offset_top = 62.6
+offset_right = 577.3
+offset_bottom = 133.8
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"cooler_mount"
 look = "case"
+
+
+[node name="RamSlot" type="Control" parent="Stage/Views/Build" index="6" unique_id=399276098]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 592.4
+offset_top = 57.0
+offset_right = 599.2
+offset_bottom = 156.8
+mouse_filter = 2
+script = ExtResource("g23")
+socket_type = &"ram_slot"
+look = "mini"
 
 [node name="ToTray" type="Control" parent="Stage/Views/Build" index="7" unique_id=1345351780]
 anchors_preset = 0
