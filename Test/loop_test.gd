@@ -72,7 +72,10 @@ func _ready() -> void:
 		uniq[i] = true
 	_check(DayLoop.board.size() == 5 and uniq.size() == 5 and DayLoop.board.all(func(j: Dictionary) -> bool: return j["case"].level <= 2),
 		"กะ 1 กระดานมีงาน Lv1–2 %d ใบ (ไม่ซ้ำ) %s" % [DayLoop.board.size(), ids])
-	_check(DayLoop.forced_case != null and DayLoop.forced_case.id == &"w1_d1_amnuay_ram", "กะ 1 มีงานบังคับ ลุงอำนวย")
+	_check(DayLoop.forced_case != null and DayLoop.forced_case.id == &"w1_d1_amnuay_space", "กะ 1 มีงานบังคับ ลุงอำนวย")
+	_check(DayLoop.forced_case.level == 1 and DayLoop.forced_case.part_id == "part_desktop", "งานแรกของลุงเป็นงานบนจอ Lv1 (ไม่ซ้ำเควสต์ซ่อมแรม)")
+	# ส่วนที่เหลือของเทสต์ทดสอบกลไกเวลา/ปลดระดับด้วยงาน Lv2 → ใช้เคสซ่อมแรมเดิมเป็นงานบังคับแทน
+	DayLoop.forced_case = load("res://Resources/Customers/w1_d1_amnuay_ram.tres")
 
 	# ---------------- C · เล่นกะ 1
 	EventManager.eventMap[EventManager.EventID.MAIN].isDone = true
@@ -102,9 +105,9 @@ func _ready() -> void:
 	_check(not job_text.contains("ทำความสะอาดแรม") and job_text.contains("อาการ"), "การ์ดบนกระดานบอกอาการ ไม่บอก Part/ชื่องาน")
 	# [Claude 9 ต.ค.] กระดานสัปดาห์ 1 มี Lv1 (ขมOS) ปน → เลือกงาน Lv2 ใบแรก (ไม่มีก็เติมงาน)
 	var j2 := -1
-	for tries in 12:
+	for tries in 60: # งาน Lv2 ซ่อมแรม (เคยทำแล้ว → ไม่บวกช่องครั้งแรก · เวลาคาดได้)
 		for i in DayLoop.board.size():
-			if DayLoop.board[i]["case"].level == 2:
+			if DayLoop.board[i]["case"].level == 2 and DayLoop.board[i]["case"].part_id == "part_ram":
 				j2 = i
 				break
 		if j2 >= 0:
@@ -129,9 +132,9 @@ func _ready() -> void:
 	DayLoop.add_jobs(2)
 	ts.set_clock(17 * 60 + 30)
 	var j_ot := -1
-	for tries in 12: # งาน Lv1 (1 ช่อง) ไม่ล่วงเวลา → เติมงานจนมี Lv2
+	for tries in 30: # งาน Lv1 (1 ช่อง) ไม่ล่วงเวลา → เติมงานจนมี Lv2
 		for i in DayLoop.board.size():
-			if DayLoop.job_fit(DayLoop.board[i]["case"]) == &"ot":
+			if DayLoop.job_fit(DayLoop.board[i]["case"]) == &"ot" and DayLoop.job_slots(DayLoop.board[i]["case"]) == 3: # [10 ต.ค.] งานโต๊ะช่าง 4 ช่องทำให้สุ่มพลาด
 				j_ot = i
 				break
 		if j_ot >= 0:
@@ -175,7 +178,7 @@ func _ready() -> void:
 	_check(GameState.reputation < rep, "ลูกค้าที่รอนานเกินเดินออก → ชื่อเสียงลด (%d → %d)" % [rep, GameState.reputation])
 	DayLoop._on_primary()
 	await _frames(3)
-	_check(DialogScene.visible and DialogScene.Title.get_parsed_text().contains("คอมเก่า"), "สรุปสัปดาห์ → บท Chapter 2")
+	_check(DialogScene.visible and DialogScene.Title.text.contains("คอมเก่า"), "สรุปสัปดาห์ → บท Chapter 2")
 	DialogScene.dialog_end()
 	await _frames(3)
 	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.BOARD, "สัปดาห์ 2 กะ 1 → กระดานงาน")
@@ -230,7 +233,8 @@ func _finish_minigame(score: int) -> void:
 ## เอางาน Lv1 ใบแรกออกจากกระดาน (ไม่หักชื่อเสียง) แล้วสุ่มใบใหม่ — ใช้หางาน Lv2 ในสัปดาห์ที่ Lv1 70%
 func _swap_job() -> void:
 	for i in DayLoop.board.size():
-		if DayLoop.board[i]["case"].level == 1:
+		var c: CustomerCase = DayLoop.board[i]["case"]
+		if not (c.level == 2 and c.part_id == "part_ram"):
 			DayLoop.board.remove_at(i)
 			break
 	DayLoop.add_jobs(1)

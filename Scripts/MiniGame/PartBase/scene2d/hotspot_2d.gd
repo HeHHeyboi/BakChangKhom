@@ -16,6 +16,7 @@ const COL_GLOW := Color(1, 0.86, 0.35)
 @export var accepts: Array[ToolDef.Action]
 @export var harmfull: Dictionary[ToolDef.Action, StringName]
 
+@warning_ignore("unused_signal") ## [Claude 10 ต.ค. 2569] emit จากสคริปต์อื่น/ลูก
 signal tool_used(tool: ToolDef, result: int)
 
 var hovered := false

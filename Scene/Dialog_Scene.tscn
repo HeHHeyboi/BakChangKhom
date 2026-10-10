@@ -38,7 +38,7 @@ skip_btn = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Skip")
 [node name="BG" type="Sprite2D" parent="." unique_id=1107860285]
 position = Vector2(576, 324)
 
-[node name="Title" type="RichTextLabel" parent="." unique_id=1788113842]
+[node name="Title" type="Label" parent="." unique_id=1788113842]
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 83.0
@@ -46,7 +46,7 @@ grow_horizontal = 2
 layout_direction = 1
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/normal_font_size = 64
+theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 
 [node name="CharacterPos" type="Node2D" parent="." unique_id=574585530]

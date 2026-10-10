@@ -44,8 +44,8 @@ signal month_ended(month: int)
 ## ครบ 60 กะ → ฉากจบ
 signal game_ended
 
-@onready var timeText = $PanelContainer/HBoxContainer/Time as RichTextLabel
-@onready var dateText = $PanelContainer/HBoxContainer/Date as RichTextLabel
+@onready var timeText = $PanelContainer/HBoxContainer/Time as Label ## [Claude 10 ต.ค. 2569] เดิม RichTextLabel — engine แจ้ง "Rect2i size is negative" กับข้อความไทย
+@onready var dateText = $PanelContainer/HBoxContainer/Date as Label
 @export var money_label: Label
 
 ## กะที่เท่าไรของทั้งเกม 1–60 (ไม่โชว์ผู้เล่น)
@@ -84,7 +84,7 @@ func _exit_tree() -> void:
 
 func _ready() -> void:
 	if dateText:
-		dateText.add_theme_font_size_override("normal_font_size", 20)
+		dateText.add_theme_font_size_override("font_size", 20)
 	set_shift(1)
 	var gs := get_node_or_null(^"/root/GameState")
 	if gs == null:
@@ -302,30 +302,28 @@ static func slots_text(slots: int) -> String:
 func updateTime() -> void:
 	if timeText == null or dateText == null:
 		return
-	timeText.clear()
 	var br := in_break()
+	var col := Color.LIGHT_YELLOW
+	var txt := ""
 	if current_minute < WORK_START:
-		timeText.push_color(Color.LIGHT_YELLOW)
-		timeText.append_text("เปิดร้าน")
+		txt = "เปิดร้าน"
 	elif br != &"":
-		timeText.push_color(Color.LIGHT_GREEN)
-		timeText.append_text("พักเที่ยง" if br == &"lunch" else "พักบ่าย")
+		col = Color.LIGHT_GREEN
+		txt = "พักเที่ยง" if br == &"lunch" else "พักบ่าย"
 	elif current_minute >= CLOSE:
-		timeText.push_color(Color.SALMON)
-		timeText.append_text("ล่วงเวลา" if current_minute > CLOSE else "ปิดร้าน")
+		col = Color.SALMON
+		txt = "ล่วงเวลา" if current_minute > CLOSE else "ปิดร้าน"
 	else:
 		match cur_period:
-			TIME.MORNING:
-				timeText.push_color(Color.LIGHT_YELLOW)
 			TIME.NOON:
-				timeText.push_color(Color.YELLOW)
+				col = Color.YELLOW
 			TIME.EVENING:
-				timeText.push_color(Color.ORANGE)
-		timeText.append_text(PERIOD_NAME[cur_period].trim_prefix("ช่วง"))
-	timeText.pop()
-	dateText.clear()
-	dateText.append_text(
-		"%s · สัปดาห์ %d · กะ %d/%d\n🕘 %s · ชม.งาน %d/%d" % [
+				col = Color.ORANGE
+		txt = PERIOD_NAME[cur_period].trim_prefix("ช่วง")
+	timeText.add_theme_color_override("font_color", col)
+	timeText.text = txt
+	dateText.text = (
+		"%s · สัปดาห์ %d · กะ %d/%d\n%s น. · ชม.งาน %d/%d" % [
 			MONTH_NAME[month() - 1],
 			week(),
 			shift_in_week(),
@@ -333,5 +331,5 @@ func updateTime() -> void:
 			clock_text(current_minute),
 			floori(worked_minutes_month / 60.0),
 			floori(work_slots_per_month() / 2.0),
-		],
+		]
 	)

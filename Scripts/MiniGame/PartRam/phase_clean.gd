@@ -151,29 +151,75 @@ func _action_names(flags: int) -> String:
 	return " / ".join(names)
 
 
+## [Claude 10 ต.ค. 2569] เดิมเลือกอุปกรณ์ที่ไม่เข้ากับขั้นแล้ว "ไม่มีอะไรเกิดขึ้น" (เหมือนกดไม่ได้)
+## ตอนนี้ทุกชิ้นกดได้: ✅ เหมาะ = คืบ 50% · 🟡 พอใช้ = คืบ 25% + ปิ๊บบอกว่ามีอันที่ดีกว่า · ❌ ไม่เหมาะ = ปิ๊บคว้าไว้ + อธิบาย + หัก 5 (ครั้งแรกต่อชิ้นต่อขั้น)
 func _on_tool_used(tool: ToolDef, step: CleanStep) -> void:
 	if not visible or _finishing or _busy:
 		return
+	var fit := tool_fit(tool, step)
+	match fit:
+		CleanTool.Fit.IDEAL:
+			_animate_tool(tool, true)
+			_progress_by(GAIN[CleanTool.Fit.IDEAL])
+		CleanTool.Fit.LIMITED:
+			_animate_tool(tool, true)
+			_progress_by(GAIN[CleanTool.Fit.LIMITED])
+			var key := "%s:%d" % [tool.id, step]
+			if not _limited_charged.has(key):
+				_limited_charged[key] = true
+				say_text([_why(tool, step)], PibHint.Mood.NORMAL)
+		_:
+			_animate_tool(tool, false)
+			var key := "%s:%d" % [tool.id, step]
+			if not _blocked_once.has(key):
+				_blocked_once[key] = true
+				_penalty += 5
+				mistake.emit(&"handling", 5)
+			say_text([_why(tool, step)], PibHint.Mood.WORRY)
+
+
+## อุปกรณ์นี้เหมาะกับขั้นนี้แค่ไหน (เรียกจากเทสต์ได้)
+func tool_fit(tool: ToolDef, step: CleanStep) -> CleanTool.Fit:
+	var brush_blow := tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW) != 0
+	var scrub := tool.action & ToolDef.Action.SCRUB != 0
+	var wipe := tool.action & ToolDef.Action.WIPE != 0
 	match step:
 		CleanStep.DUST_BOARD:
-			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
-				# _say_for(tool, step, tool.line_ideal, PibHint.Mood.HAPPY)
-				_animate_tool(tool, true)
-				_progress_by(GAIN[CleanTool.Fit.IDEAL])
+			if brush_blow:
+				return CleanTool.Fit.IDEAL
+			if wipe:
+				return CleanTool.Fit.LIMITED
 		CleanStep.SCRUB_CONTACTS:
-			# var key := "%s:%d" % [tool.id, step]
-			if tool.action & (ToolDef.Action.SCRUB):
-				_animate_tool(tool, true)
-				_progress_by(GAIN[CleanTool.Fit.IDEAL])
-			elif tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
-				_animate_tool(tool, true)
-				_progress_by(GAIN[CleanTool.Fit.LIMITED])
+			if scrub:
+				return CleanTool.Fit.IDEAL
+			if brush_blow or wipe:
+				return CleanTool.Fit.LIMITED
 		CleanStep.CLEAN_SLOT:
-			if tool.action & (ToolDef.Action.BRUSH | ToolDef.Action.BLOW):
-				_animate_tool(tool, true)
-				_progress_by(GAIN[CleanTool.Fit.IDEAL])
-			elif tool.action & (ToolDef.Action.SCRUB):
-				_progress_by(GAIN[CleanTool.Fit.LIMITED])
+			if brush_blow:
+				return CleanTool.Fit.IDEAL
+	return CleanTool.Fit.FORBIDDEN
+
+
+## เหตุผลที่ปิ๊บพูด (พอใช้ / ไม่เหมาะ)
+func _why(tool: ToolDef, step: CleanStep) -> String:
+	if tool.action & ToolDef.Action.SCREW:
+		return "ไขควงไว้ขันน็อตนะขม ปลายแข็ง ๆ ขูดแผงแรมเป็นรอยได้ เลือกอันอื่นดีกว่า"
+	match step:
+		CleanStep.DUST_BOARD:
+			if tool.action & ToolDef.Action.SCRUB:
+				return "ยางลบไว้ขัดคราบ ไม่ใช่ปัดฝุ่น ถูแรง ๆ บนแผงชิ้นเล็ก ๆ หลุดได้ ใช้แปรงหรือลูกยางเป่าดีกว่า"
+			if tool.action & ToolDef.Action.WIPE:
+				return "เช็ดได้ แต่ฝุ่นหยาบแบบนี้แปรงหรือลูกยางเป่าเร็วกว่า ไม่เปลืองผ้าด้วย"
+		CleanStep.SCRUB_CONTACTS:
+			if tool.action & ToolDef.Action.WIPE:
+				return "ผ้าชุบ IPA เช็ดขาทองได้ แต่คราบหนาแบบนี้ยางลบขัดออกเร็วกว่า"
+			return "ลมกับแปรงพาฝุ่นออกได้ แต่คราบที่เกาะติดขาทองต้องขัดเบา ๆ ด้วยยางลบ"
+		CleanStep.CLEAN_SLOT:
+			if tool.action & ToolDef.Action.SCRUB:
+				return "ยางลบมีเศษร่วง ถ้าตกลงไปในร่องสล็อตเขี่ยออกยากมาก ใช้แปรงหรือลูกยางเป่าดีกว่า"
+			if tool.action & ToolDef.Action.WIPE:
+				return "ร่องสล็อตแคบ ผ้าเข้าไปไม่ถึง แถมใยผ้าติดค้างได้ ใช้แปรงหรือลูกยางเป่านะ"
+	return "อันนี้ไม่เหมาะกับขั้นนี้ ลองชี้ดูคุณสมบัติแล้วเลือกใหม่"
 
 
 ## อุปกรณ์ลอยมาถูไปมาที่เป้าหมาย (รูป 2D ในชั้นบนของฉาก) · ห้ามใช้ = ปิ๊บคว้าไว้ก่อนถึง

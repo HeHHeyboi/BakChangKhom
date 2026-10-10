@@ -83,13 +83,19 @@ func _next_hint() -> void:
 
 
 func _beep() -> void:
+	# [10 ต.ค.] เสียงบี๊บจริง (รหัส POST แรมเสีย: สั้น 3 ครั้ง × 3 รอบ) · ภาพกระพริบตามจังหวะ
+	if has_node(^"/root/Audio"):
+		get_node(^"/root/Audio").sfx(&"beep_ram")
 	var fx := node("BeepFx") as Control
 	fx.pivot_offset = fx.size / 2.0
 	fx.show()
 	fx.scale = Vector2.ONE * 0.6
-	var tw := create_tween().set_loops(3)
-	tw.tween_property(fx, "scale", Vector2.ONE * 1.2, 0.25)
-	tw.tween_property(fx, "scale", Vector2.ONE * 0.6, 0.05)
+	var tw := create_tween()
+	for g in 3:
+		for k in 3:
+			tw.tween_property(fx, "scale", Vector2.ONE * 1.2, 0.08) # ตรงกับเสียง: บี๊บ 0.18 วิ เว้น 0.16 วิ
+			tw.tween_property(fx, "scale", Vector2.ONE * 0.6, 0.26)
+		tw.tween_interval(0.6)
 	tw.finished.connect(fx.hide)
 
 

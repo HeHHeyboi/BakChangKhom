@@ -93,8 +93,9 @@ func _build_skip() -> void:
 	b.name = "Skip"
 	b.text = "ข้าม ►"
 	b.focus_mode = Control.FOCUS_NONE
-	b.add_theme_font_size_override("font_size", 18)
-	b.position = Vector2(1060, 12)
+	b.add_theme_font_size_override("font_size", 20)
+	b.position = Vector2(496, 594) # [10 ต.ค.] แถบล่างกลาง (สไลด์ย่อลงไม่ให้ปุ่มบังรูป)
+	b.custom_minimum_size = Vector2(160, 50)
 	b.pressed.connect(skip)
 	var root := get_node_or_null(^"Control")
 	if root == null:

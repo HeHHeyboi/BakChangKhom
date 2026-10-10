@@ -29,6 +29,8 @@ func _ready() -> void:
 	for k in Audio.SFX:
 		_check(Audio._stream(Audio.SFX[k]) != null, "โหลดเสียง %s ได้" % k)
 	_check((Audio._stream(Audio.MUSIC[&"village"]) as AudioStreamOggVorbis).loop, "เพลงวนลูป")
+	for k in Audio.BEEP:
+		_check(Audio._stream("res://Assets/Audio/Sfx/Beep/beep_%s.wav" % k) != null, "รหัสบี๊บ %s" % k)
 	start._on_option_button_pressed()
 	await _frames(2)
 	var sp: SettingsPanel = start.SettingScene

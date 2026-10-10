@@ -1,78 +1,144 @@
 [gd_scene format=3 uid="uid://cdd6joa1wt3t0"]
 
-[ext_resource type="Texture2D" uid="uid://c0jo4bxs3frca" path="res://Assets/Background/Market.jpg" id="1_rr2rx"]
 [ext_resource type="Script" uid="uid://godvt5jylxpk" path="res://Scripts/Market/market.gd" id="1_xtt0p"]
-[ext_resource type="PackedScene" uid="uid://bv27tmq83wldi" path="res://Scene/Player.tscn" id="2_wpv1i"]
-[ext_resource type="Script" uid="uid://bb02p754hgi5d" path="res://Scripts/Market/button.gd" id="3_806qg"]
+[ext_resource type="Texture2D" path="res://Assets/Background/bg_market_day.jpg" id="2_bg"]
+[ext_resource type="Script" uid="uid://f601kgx8e3pv" path="res://Scripts/Home/map_place_holder.gd" id="3_map"]
+[ext_resource type="Script" path="res://Scripts/Market/market_stall.gd" id="4_stall"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wpv1i"]
-size = Vector2(63, 653)
+[sub_resource type="StyleBoxFlat" id="SB_map"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5w0dp"]
-size = Vector2(403.5, 1157)
+[sub_resource type="StyleBoxFlat" id="SB_map_hover"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.89, 0.68, 0.43, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.86, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_806qg"]
-size = Vector2(86.5, 1157)
+[sub_resource type="StyleBoxFlat" id="SB_say"]
+content_margin_left = 20.0
+content_margin_right = 20.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 0.98, 0.92, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
-[node name="Market" type="Node2D" unique_id=1087055904]
+[node name="Market" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_xtt0p")
 
-[node name="Market" type="Sprite2D" parent="." unique_id=849862107]
-position = Vector2(578.9998, 324.0002)
-scale = Vector2(0.60104185, 0.60000044)
-texture = ExtResource("1_rr2rx")
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_lock_ = true
 
-[node name="Player" parent="." unique_id=1463755562 instance=ExtResource("2_wpv1i")]
-position = Vector2(74, 471)
+[node name="StallParts" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 375.0
+offset_right = 330.0
+offset_bottom = 610.0
+ignore_texture_size = true
+script = ExtResource("4_stall")
+message = "ร้านอะไหล่คอม — เร็ว ๆ นี้มาซื้ออะไหล่ไปซ่อมได้ที่นี่"
+label_text = "ร้านอะไหล่คอม"
 
-[node name="Wall" type="StaticBody2D" parent="." unique_id=1265011343]
+[node name="StallSnack" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 295.0
+offset_right = 630.0
+offset_bottom = 440.0
+ignore_texture_size = true
+script = ExtResource("4_stall")
+message = "ขนมหอมจัง… ตอนนี้ยังไม่หิว ไว้มาใหม่นะ"
+label_text = "ร้านขนม"
+
+[node name="StallGrocery" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 376.0
+offset_right = 1070.0
+offset_bottom = 620.0
+ignore_texture_size = true
+script = ExtResource("4_stall")
+message = "ร้านของชำ — ถ้ายายฝากซื้อของ มาที่นี่นะ"
+label_text = "ร้านของชำ"
+
+[node name="MapPlaceHolder" type="Button" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 582.0
+offset_right = 158.0
+offset_bottom = 632.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_hover_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_pressed_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_map")
+theme_override_styles/hover = SubResource("SB_map_hover")
+theme_override_styles/pressed = SubResource("SB_map_hover")
+theme_override_styles/disabled = SubResource("SB_map")
+text = "แผนที่"
+script = ExtResource("3_map")
+
+[node name="Say" type="PanelContainer" parent="."]
 visible = false
-position = Vector2(-33, 322)
-collision_layer = 2
+layout_mode = 0
+offset_left = 236.0
+offset_top = 560.0
+offset_right = 916.0
+offset_bottom = 630.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_say")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=1691276105]
-position = Vector2(0, 3)
-shape = SubResource("RectangleShape2D_wpv1i")
+[node name="Text" type="Label" parent="Say"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="Wall3" type="StaticBody2D" parent="." unique_id=711293230]
-visible = false
-position = Vector2(1186, 325)
-collision_layer = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3" unique_id=2051298995]
-position = Vector2(0, 3)
-shape = SubResource("RectangleShape2D_wpv1i")
-
-[node name="Wall2" type="StaticBody2D" parent="." unique_id=1280826171]
-visible = false
-position = Vector2(359, 238)
-rotation = -1.5708
-collision_layer = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2" unique_id=1472489747]
-position = Vector2(32.75, 216.5)
-shape = SubResource("RectangleShape2D_5w0dp")
-
-[node name="Wall4" type="StaticBody2D" parent="." unique_id=23782797]
-visible = false
-position = Vector2(368, 791)
-rotation = -1.5708
-collision_layer = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4" unique_id=16889995]
-position = Vector2(191.25, 216.5)
-shape = SubResource("RectangleShape2D_806qg")
-
-[node name="Button" type="Button" parent="." unique_id=1092605283]
-offset_left = 42.0
-offset_top = 564.0
-offset_right = 219.0
-offset_bottom = 622.0
-text = "Map"
-script = ExtResource("3_806qg")
-
-[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=822432842]
-position = Vector2(74, 471)
-
-[connection signal="hidden" from="." to="." method="_on_hidden"]
-[connection signal="pressed" from="Button" to="Button" method="_on_pressed"]
+[connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]

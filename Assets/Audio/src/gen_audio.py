@@ -284,8 +284,65 @@ def sfx():
     save("Sfx/pop", np.sin(2 * math.pi * (500 + 1500 * tt / 0.12) * tt) * np.exp(-tt * 30) * 0.5)
 
 
+def beep_ram():
+    """Part RAM: รหัส POST แรมเสียแบบ AMI = บี๊บสั้น 3 ครั้ง วน 3 รอบ"""
+    save("Sfx/beep_ram", beep_pattern("SSS", 3, 0.6))
+
+
+## รหัสบี๊บ BIOS ที่ใช้บ่อย (ยึดตาราง AMI/Award มาตรฐาน) · S = สั้น · L = ยาว · "~" = ดังค้างยาว
+BEEP_CODES = {
+    "ok": "S",            # 1 สั้น — ผ่าน POST ปกติ
+    "post_err": "SS",     # 2 สั้น — POST ผิดพลาด (ดูข้อความบนจอ)
+    "ram": "SSS",         # 3 สั้น — หน่วยความจำ (แรม) มีปัญหา (AMI)
+    "timer": "SSSS",      # 4 สั้น — ไทเมอร์บนเมนบอร์ด
+    "cpu": "SSSSS",       # 5 สั้น — ซีพียู
+    "keyboard": "SSSSSS", # 6 สั้น — ตัวควบคุมคีย์บอร์ด
+    "vram": "SSSSSSSS",   # 8 สั้น — หน่วยความจำการ์ดจอ
+    "video": "LSS",       # 1 ยาว 2 สั้น — การ์ดจอ
+    "video2": "LSSS",     # 1 ยาว 3 สั้น — การ์ดจอ (Award)
+    "ram_award": "LLL",   # ยาวซ้ำ ๆ — แรมหลวม/เสีย (Award)
+}
+
+
+def pc_speaker(dur, freq=1000):
+    """ลำโพงบนเมนบอร์ด: คลื่นสี่เหลี่ยม ~1 kHz ผ่านลำโพงจิ๋ว (ขอบมน ไม่มีเบส)"""
+    tt = np.arange(int(dur * SR)) / SR
+    sq = np.sign(np.sin(2 * math.pi * freq * tt)) * 0.6
+    sq = np.convolve(sq, np.ones(6) / 6, mode="same")
+    return sq * np.minimum(1, np.minimum(tt / 0.004, (dur - tt) / 0.004))
+
+
+def beep_pattern(code, repeat=1, gap=1.0):
+    SHORT, LONG, OFF = 0.18, 0.75, 0.16
+    seq = []
+    for rep in range(repeat):
+        for c in code:
+            seq.append(("on", SHORT if c == "S" else LONG))
+            seq.append(("off", OFF))
+        seq.append(("off", gap))
+    total = sum(d for _, d in seq)
+    buf = np.zeros(int(total * SR) + 100)
+    t = 0.0
+    for kind, d in seq:
+        if kind == "on":
+            add(buf, pc_speaker(d), t)
+        t += d
+    return buf
+
+
+def beep_set():
+    for k, code in BEEP_CODES.items():
+        save("Sfx/Beep/beep_" + k, beep_pattern(code, 1 if k == "ok" else 2, 0.9))
+
+
+if len(sys.argv) > 2 and sys.argv[2] == "beep":
+    beep_ram()
+    beep_set()
+    sys.exit()
 song_menu()
 song_village()
 song_work()
 jingle_demo()
 sfx()
+beep_ram()
+beep_set()

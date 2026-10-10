@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d3tpe65flyrex"]
 
 [ext_resource type="Script" uid="uid://b6y2dqj2hp41s" path="res://Scripts/MiniGame/find_item_minigame.gd" id="1_feygu"]
-[ext_resource type="Texture2D" uid="uid://0abmohme5tku" path="res://Assets/Background/RoomBG.jpg" id="2_kt573"]
+[ext_resource type="Texture2D" uid="uid://x1g63kx30mw6" path="res://Assets/Background/bg_khom_room.jpg" id="2_kt573"]
 [ext_resource type="Texture2D" uid="uid://cl3geaph6h53t" path="res://Assets/MiniGame/box.png" id="3_ad3c0"]
 [ext_resource type="Texture2D" uid="uid://cddhpu756wbba" path="res://Assets/MiniGame/box_on_hover.png" id="4_l2pj6"]
 [ext_resource type="Script" uid="uid://bebw7l4xouf2" path="res://Scripts/MiniGame/search_box.gd" id="5_ic58l"]
@@ -18,46 +18,51 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_kt573")
 expand_mode = 1
+stretch_mode = 6
 metadata/_edit_lock_ = true
 
-[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=207630307]
+[node name="RichTextLabel" type="Label" parent="." unique_id=207630307]
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -96.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_font_sizes/normal_font_size = 74
-fit_content = true
+theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
+theme_override_colors/font_outline_color = Color(0.22, 0.12, 0.05, 1)
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 44
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Box" type="TextureButton" parent="." unique_id=1484821036]
-offset_left = 120.0
-offset_top = 361.00003
-offset_right = 376.0
-offset_bottom = 617.0
-scale = Vector2(0.6555256, 0.6555256)
+offset_left = 752.0
+offset_top = 232.0
+offset_right = 1008.0
+offset_bottom = 488.0
+scale = Vector2(0.6, 0.6)
 texture_normal = ExtResource("3_ad3c0")
 texture_hover = ExtResource("4_l2pj6")
 script = ExtResource("5_ic58l")
 
 [node name="Box2" type="TextureButton" parent="." unique_id=1339965900]
-offset_left = 409.0
-offset_top = 216.00002
-offset_right = 665.0
-offset_bottom = 472.0
-scale = Vector2(0.5371395, 0.5371395)
+offset_left = 296.0
+offset_top = 282.0
+offset_right = 552.0
+offset_bottom = 538.0
+scale = Vector2(0.54, 0.54)
 texture_normal = ExtResource("3_ad3c0")
 texture_hover = ExtResource("4_l2pj6")
 script = ExtResource("5_ic58l")
 
 [node name="Box3" type="TextureButton" parent="." unique_id=1330143155]
-offset_left = 849.0
-offset_top = 404.0
-offset_right = 1105.0
-offset_bottom = 660.0
-scale = Vector2(0.76851785, 0.76851785)
+offset_left = 870.0
+offset_top = 440.0
+offset_right = 1126.0
+offset_bottom = 696.0
+scale = Vector2(0.74, 0.74)
 texture_normal = ExtResource("3_ad3c0")
 texture_hover = ExtResource("4_l2pj6")
 script = ExtResource("5_ic58l")

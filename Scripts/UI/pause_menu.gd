@@ -36,6 +36,8 @@ func can_pause() -> bool:
 		return false
 	if Global.in_minigame:
 		return false
+	if MapPanel.visible: # [Claude 10 ต.ค. 2569] Esc ปิดแผนที่ก่อน
+		return false
 	return true
 
 

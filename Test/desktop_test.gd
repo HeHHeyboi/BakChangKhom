@@ -14,12 +14,12 @@ func _ready() -> void:
 		if f.ends_with(".tres"):
 			var t: DesktopTask = load("res://Resources/Desktop/" + f)
 			_check(t != null and t.problems().is_empty(), "DesktopTask %s ครบ %s" % [f, t.problems() if t else "โหลดไม่ได้"])
-	for c in ["lv1_yai_chat", "lv1_headman_chat", "lv1_amnuay_space", "lv1_min_space", "lv1_kid_ads", "lv1_director_ads",
+	for c in ["lv1_yai_chat", "lv1_headman_chat", "lv1_amnuay_space", "w1_d1_amnuay_space", "lv1_min_space", "lv1_kid_ads", "lv1_director_ads",
 			"lv1_min_hang", "lv1_teacher_printer", "lv1_headman_sound", "lv1_girl_wifi", "lv1_yai_backup", "lv1_amnuay_startup", "lv1_director_update"]:
 		var cc: CustomerCase = load("res://Resources/Customers/%s.tres" % c)
 		_check(cc.level == 1 and cc.problems().is_empty(), "ลูกค้า %s ครบ %s" % [c, cc.problems()])
 	var pool: Array = DayLoop.random_pool
-	_check(pool.filter(func(c): return c.level == 1).size() == 13, "random_pool มีงาน Lv1 13 งาน (1-1 … 1-10)")
+	_check(pool.filter(func(c): return c.level == 1).size() == 12, "random_pool มีงาน Lv1 12 งาน (1-1 … 1-10 · ลุงอำนวยลบไฟล์เป็นงานบังคับกะ 1)")
 
 	# ---- [10 ต.ค.] OS อยู่ในจอบนโต๊ะ (framed) + จอบูตในโหนดเดียวกัน
 	var bm: DesktopMinigame = (load(SCENE) as PackedScene).instantiate()

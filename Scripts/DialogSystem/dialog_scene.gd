@@ -12,7 +12,7 @@ extends CanvasLayer
 
 @onready var bg_node = $"BG" as Sprite2D
 @onready var ShowSprites = $"CharacterPos" as CharacterPos
-@onready var Title = $"Title" as RichTextLabel
+@onready var Title = $"Title" as Label
 
 const DIALOG = "dialog"
 const CHOICE = "choice"
@@ -34,8 +34,7 @@ signal on_dialog_finish
 
 
 func set_title(title: String):
-	Title.clear()
-	Title.add_text(title)
+	Title.text = title
 
 
 func _enter_tree() -> void:

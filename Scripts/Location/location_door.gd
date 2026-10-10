@@ -1,3 +1,4 @@
+@tool
 class_name LocationDoor extends SceneHotspot
 ## จุดกดเปลี่ยนฉาก (ประตู · ป้าย · ทางเดิน) — ใส่รูปได้ (texture_normal/hover) หรือไม่ใส่ก็ได้ (กรอบเรืองแสงตอนชี้)
 ## [Claude 9 ต.ค. 2569] ใช้ใน Home (ประตูหน้าบ้าน) · Village (กลับบ้าน · ป้ายไปร้าน) · Room (ออกหน้าบ้าน)

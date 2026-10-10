@@ -25,16 +25,14 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer" unique_id=28475656]
 layout_mode = 2
 
-[node name="Time" type="RichTextLabel" parent="PanelContainer/HBoxContainer" unique_id=1812622510]
+[node name="Time" type="Label" parent="PanelContainer/HBoxContainer" unique_id=1812622510]
 clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 layout_direction = 2
-theme_override_font_sizes/normal_font_size = 30
-bbcode_enabled = true
+theme_override_font_sizes/font_size = 30
 autowrap_mode = 0
-scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -43,14 +41,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Date" type="RichTextLabel" parent="PanelContainer/HBoxContainer" unique_id=1253106072]
+[node name="Date" type="Label" parent="PanelContainer/HBoxContainer" unique_id=1253106072]
 clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
-theme_override_font_sizes/normal_font_size = 22
-bbcode_enabled = true
-scroll_active = false
+theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 vertical_alignment = 1
 

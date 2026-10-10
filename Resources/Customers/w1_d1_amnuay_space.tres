@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Desktop/task_free_space_photos.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d1_amnuay_space"
+customer = "ลุงอำนวย"
+reason = "ยายเล่าให้ลุงฟังว่าขมกลับมาเปิดร้านซ่อมคอม — ลูกค้าคนแรกของร้าน"
+device = "คอมตั้งโต๊ะของลุง ใช้ดูข่าวกับเก็บรูปหลาน"
+symptom = "เครื่องฟ้องว่าพื้นที่เต็ม เซฟรูปงานบวชหลานไม่ได้"
+level = 1
+est_slots = 1
+due_shifts = 0
+part_id = "part_desktop"
+job_title = "ลบไฟล์ซ้ำ ทำที่ว่าง"
+desktop_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/w1_d1_amnuay_space.txt"
+thanks_text = "เซฟรูปได้แล้ว แถมรูปเดิมก็อยู่ครบ ขอบใจมากนะขม เดี๋ยวลุงบอกต่อทั้งหมู่บ้านเลย"
+complain_text = "รูปงานบวชหายไปไหนขม! ลุงหาไม่เจอแล้ว"
+forced = true

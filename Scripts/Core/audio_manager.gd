@@ -19,6 +19,20 @@ const SFX := {
 	&"coin": "res://Assets/Audio/Sfx/coin.wav",
 	&"boot": "res://Assets/Audio/Sfx/boot.wav",
 	&"pop": "res://Assets/Audio/Sfx/pop.wav",
+	&"beep_ram": "res://Assets/Audio/Sfx/beep_ram.wav", # รหัส POST แรมเสีย (Part RAM คลิกลำโพง)
+}
+## รหัสบี๊บ BIOS (Assets/Audio/Sfx/Beep/) → ความหมาย · เล่น: Audio.beep(&"video")
+const BEEP := {
+	&"ok": "บี๊บสั้น 1 ครั้ง — ผ่าน POST ปกติ",
+	&"post_err": "สั้น 2 ครั้ง — POST ผิดพลาด ดูข้อความบนจอ",
+	&"ram": "สั้น 3 ครั้ง — แรมมีปัญหา (AMI)",
+	&"timer": "สั้น 4 ครั้ง — ไทเมอร์บนเมนบอร์ด",
+	&"cpu": "สั้น 5 ครั้ง — ซีพียู",
+	&"keyboard": "สั้น 6 ครั้ง — ตัวควบคุมคีย์บอร์ด",
+	&"vram": "สั้น 8 ครั้ง — หน่วยความจำการ์ดจอ",
+	&"video": "ยาว 1 สั้น 2 — การ์ดจอ",
+	&"video2": "ยาว 1 สั้น 3 — การ์ดจอ (Award)",
+	&"ram_award": "ยาวซ้ำ ๆ — แรมหลวม/เสีย (Award)",
 }
 const FADE := 1.2
 const MUSIC_DB := -6.0
@@ -100,8 +114,16 @@ func stop_music() -> void:
 		create_tween().tween_property(p, "volume_db", -80.0, FADE)
 
 
+## เล่นรหัสบี๊บ BIOS (ไว้ใช้กับงานวินิจฉัยอื่น ๆ)
+func beep(code: StringName) -> void:
+	_play(_stream("res://Assets/Audio/Sfx/Beep/beep_%s.wav" % code), 1.0)
+
+
 func sfx(key: StringName, pitch := 1.0) -> void:
-	var st := _stream(SFX.get(key, ""))
+	_play(_stream(SFX.get(key, "")), pitch)
+
+
+func _play(st: AudioStream, pitch: float) -> void:
 	if st == null:
 		return
 	for p in _sfx:

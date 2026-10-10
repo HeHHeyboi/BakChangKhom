@@ -1,3 +1,4 @@
+@tool
 extends SceneHotspot
 ## คอมของขมบนโต๊ะร้าน — กดแล้วเปิดขมOS แบบเล่นอิสระ (ไม่มีลูกค้า ไม่คิดคะแนน/เงิน)
 ## ไฟล์/โปรแกรมในเครื่องแก้ได้ที่ Resources/Desktop/Free/khom_pc.tres · [Claude 9 ต.ค. 2569]

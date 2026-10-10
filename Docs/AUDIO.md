@@ -15,6 +15,11 @@
 | `Assets/Audio/Sfx/coin.wav` | เงินเข้า | สั้น | เหรียญ |
 | `Assets/Audio/Sfx/boot.wav` | ขมOS บูต | 1 วิ | ปี๊บ POST + พัดลม |
 | `Assets/Audio/Sfx/pop.wav` | (สำรอง) หน้าต่างเด้ง | สั้น | ป๊อบ |
+| `Assets/Audio/Sfx/beep_ram.wav` | Part RAM ขั้นดูอาการ คลิกลำโพงบนเมนบอร์ด | ~4.9 วิ | รหัส POST แรมเสียแบบ AMI: บี๊บสั้น 3 ครั้ง × 3 รอบ (ภาพลำโพงกระพริบตามจังหวะ) |
+| `Assets/Audio/Sfx/Beep/beep_*.wav` | รหัสบี๊บ BIOS 10 แบบ ไว้ใช้กับงานวินิจฉัย (`Audio.beep(&"video")` · ความหมายใน `Audio.BEEP`) | 1–5 วิ | ok 1 สั้น · post_err 2 สั้น · ram 3 สั้น · timer 4 · cpu 5 · keyboard 6 · vram 8 สั้น · video ยาว1 สั้น2 · video2 ยาว1 สั้น3 · ram_award ยาวซ้ำ |
+
+เสียงบี๊บ: คลื่นสี่เหลี่ยม ~1 kHz แบบลำโพงจิ๋วบนเมนบอร์ด · สั้น 0.18 วิ · ยาว 0.75 วิ · เว้น 0.16 วิ — ยึดตารางรหัส AMI/Award มาตรฐาน
+(ถ้ามีไฟล์เสียงอ้างอิงที่ทีมอัดเอง ปรับความถี่/จังหวะได้ที่ `pc_speaker()` / `beep_pattern()` ใน gen_audio.py)
 
 สร้างใหม่/แก้ทำนอง: `python3 Assets/Audio/src/gen_audio.py Assets/Audio` (ต้องมี numpy + ffmpeg) — ทำนองอยู่ในตัวแปร `mel` ของแต่ละเพลง (เลขโน้ต MIDI, ความยาวเป็นเขบ็ต 1 ชั้น)
 

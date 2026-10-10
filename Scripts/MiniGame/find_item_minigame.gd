@@ -2,7 +2,7 @@ extends Node
 
 @onready var timer = Timer.new()
 var box_click_count = 2
-@onready var text = $RichTextLabel as RichTextLabel
+@onready var text = $RichTextLabel as Label ## [Claude 10 ต.ค. 2569] Label แทน RichTextLabel (บั๊ก Rect2i กับข้อความไทย) · ฉาก = ห้องของขม (bg_khom_room)
 @onready var eraser = $Eraser as TextureRect
 var dialog_arr = ["ยางลบอยู่ไหนนะ ลองหาในกล่องดูก่อน", "ไม่มีในกล่องนี้แฮะ", "หรือว่าอยู่ในกล่องนั้น"]
 

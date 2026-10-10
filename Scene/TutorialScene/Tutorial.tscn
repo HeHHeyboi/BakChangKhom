@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="2_3cocp"]
 [ext_resource type="Resource" uid="uid://dex66o3vsog27" path="res://Resources/tutorial1.tres" id="3_3cs6x"]
 [ext_resource type="Resource" uid="uid://cffbfrrxldydc" path="res://Resources/ram_cleaning.tres" id="4_3cs6x"]
+[ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="5_theme"]
 
 [node name="Tutorial" type="CanvasLayer" unique_id=1701626485]
 layer = 120
@@ -20,16 +21,26 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("5_theme")
 metadata/_edit_lock_ = true
 
-[node name="Slide" type="TextureRect" parent="Control" unique_id=681950440]
+[node name="Background" type="ColorRect" parent="Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+color = Color(0.47, 0.29, 0.15, 1)
+
+[node name="Slide" type="TextureRect" parent="Control" unique_id=681950440]
+layout_mode = 0
+offset_left = 57.6
+offset_top = 4.0
+offset_right = 1094.4
+offset_bottom = 587.2
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Next" type="Button" parent="Control" unique_id=1558089892]
 layout_mode = 1
@@ -38,11 +49,13 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -228.0
-offset_top = -80.0
+offset_left = -250.0
+offset_top = -58.0
+offset_right = -40.0
+offset_bottom = -4.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 26
 text = "ถัดไป"
 
 [node name="Previous" type="Button" parent="Control" unique_id=773762281]
@@ -50,20 +63,22 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -80.0
-offset_right = 228.0
+offset_left = 40.0
+offset_top = -58.0
+offset_right = 250.0
+offset_bottom = -4.0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 26
 text = "ย้อนกลับ"
 
 [node name="Caption" type="Label" parent="Control"]
 layout_mode = 0
-offset_left = 110.0
-offset_top = 42.0
-offset_right = 1042.0
-offset_bottom = 118.0
+offset_left = 157.0
+offset_top = 40.0
+offset_right = 996.0
+offset_bottom = 108.0
 theme_override_colors/font_color = Color(0.172549, 0.0941176, 0.0627451, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 25
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3

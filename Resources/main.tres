@@ -16,7 +16,7 @@ metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 script = ExtResource("1_naor1")
 title = "ห้องของขม"
 dialog_file = "res://Assets/Dialog/MainQuest/GoToRoom.txt"
-bg_name = "uid://0abmohme5tku"
+bg_name = "uid://x1g63kx30mw6"
 quest_text_th = "ไปร้านซ่อมคอม ดูคอมเครื่องเก่า"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
