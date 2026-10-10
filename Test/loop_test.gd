@@ -16,6 +16,7 @@ func _ready() -> void:
 	get_parent().remove_child(self)
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
+	DayLoop.demo_shifts = 7 # [10 ต.ค.] เกมจริงจบบทที่ 1 ที่กะ 5 — เทสต์นี้เลื่อนไป 7 เพื่อทดสอบสรุปสัปดาห์ด้วย
 	ts.break_started.connect(func(k: StringName) -> void: _breaks.append(k))
 	ts.week_ended.connect(func(w: int) -> void: _weeks.append(w))
 	ts.month_ended.connect(func(m: int) -> void: _months.append(m))
@@ -184,20 +185,25 @@ func _ready() -> void:
 	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.BOARD, "สัปดาห์ 2 กะ 1 → กระดานงาน")
 	_check(DayLoop.effective_weights(2)[2] > 0.0, "สัปดาห์ 2 มีสัดส่วน Lv3 แล้ว (%s)" % DayLoop.effective_weights(2))
 
-	# [10 ต.ค.] เดโมจบที่กะ 7: ปิดร้านกะ 7 → การ์ดจบเดโม → กลับบ้าน + ป้าย "กำลังพัฒนา"
+	# [10 ต.ค.] จบบท (demo_shifts): ปิดร้านกะสุดท้าย → การ์ดจบบท → กลับบ้าน → บทยาย → ป้าย "กำลังพัฒนา"
+	# (เกมจริงจบที่กะ 5 = จบบทที่ 1 · เทสต์นี้ตั้ง 7 เพื่อทดสอบสรุปสัปดาห์ + Chapter 2 ก่อน)
 	for s in [6, 7]:
 		ts.set_clock(TimeSystem.CLOSE)
 		await _frames(3)
 		_check(DayLoop._card == DayLoop.Card.SHIFT_END and ts.shift == s, "กะ %d ปิดร้าน" % s)
 		if s == 7:
-			_check(DayLoop._primary.text.contains("เดโม"), "กะ 7 ปุ่มปิดร้าน = จบการเล่นเดโม")
+			_check(DayLoop._primary.text.contains("จบบทที่"), "กะ 7 ปุ่มปิดร้าน = จบบท (%s)" % DayLoop._primary.text)
 		DayLoop._on_primary()
 		await _frames(3)
 	_check(DayLoop.demo_over and ts.shift == 7 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 7 กะ → การ์ดสิ้นสุดการเล่นเดโม")
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
+	_check(DayLoop._title.text.contains("จบบทที่ 1") and DayLoop._body.text.contains("ยศช่าง"), "การ์ดจบบทมียศช่าง")
 	DayLoop._on_primary()
-	await _wait(1.6)
-	_check(SceneRouter.current_id == SceneRouter.HOME and DayLoop._demo_banner.visible, "กลับบ้าน → ป้ายกำลังพัฒนาให้ครบลูป")
+	await _wait(3.0)
+	_check(SceneRouter.current_id == SceneRouter.HOME and DialogScene.visible and DialogScene.Title.text == "จบบทที่ 1", "กลับบ้าน → บทปิดบทกับยาย (%s · %s · %s)" % [SceneRouter.current_id, DialogScene.visible, DialogScene.Title.text])
+	DialogScene.dialog_end()
+	await _frames(3)
+	_check(DayLoop._demo_banner.visible, "จบบทกับยาย → ป้ายจบบทที่ 1 (กำลังพัฒนาบทที่ 2)")
 	_check(DayLoop._card == DayLoop.Card.NONE and not DayLoop._board_panel.visible, "หลังจบเดโมไม่มีกระดานงาน")
 	_check(DayLoop._demo_card.visible and DayLoop._demo_layer.layer > 100, "หน้าจบเดโมอยู่กลางจอ เหนือ HUD")
 	_check(Audio.want_music() == &"demo_end", "จบเดโม → เพลงจบเดโม")

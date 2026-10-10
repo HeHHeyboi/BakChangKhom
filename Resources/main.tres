@@ -24,9 +24,8 @@ metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 script = ExtResource("1_naor1")
 action = 1
 emitType = 1
-scene_path = "uid://d3tpe65flyrex"
-showHUD = true
-quest_text_th = "หายางลบ"
+scene_path = "res://Scene/MiniGame/PowerCheck/power_check.tscn"
+quest_text_th = "ตรวจคอมเก่า ทำไมเปิดไม่ติด"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_asm01"]

@@ -32,9 +32,11 @@ extends CanvasLayer
 
 @export_group("เดโม")
 ## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
-@export var demo_shifts := 7
-@export var demo_banner_title := "สิ้นสุดการเล่นเดโม"
-@export_multiline var demo_banner_text := "ขอบคุณที่ทดลองเล่นนะ!\nตอนนี้เกมกำลังพัฒนาให้ครบลูป\nแล้วพบกับร้านบักช่างขมฉบับเต็มเร็ว ๆ นี้"
+@export var demo_shifts := 5 ## [10 ต.ค.] 5 = จบบทที่ 1 (ครบ 1 สัปดาห์)
+@export var demo_banner_title := "จบบทที่ 1"
+@export_multiline var demo_banner_text := "ขอบคุณที่เล่นบทแรกของร้านบักช่างขมนะ!\nบทที่ 2 กำลังพัฒนาให้ครบลูป\nแล้วพบกันเร็ว ๆ นี้"
+## บทปิดท้ายเมื่อกลับถึงบ้าน (ว่าง = ข้าม)
+@export_file("*.txt") var chapter_end_dialog := "res://Assets/Dialog/Chapter1End.txt"
 
 ## สัดส่วนงาน Lv1/2/3/4/5 (%) ต่อสัปดาห์ 1–12 (LEVEL_DESIGN ข้อ 6) · WeekPlan.level_weights ทับได้
 const DEFAULT_WEIGHTS := [
@@ -531,8 +533,11 @@ func time_skip(minutes: int, seconds := 1.0) -> void:
 	_skipping = true
 	var from := ts.current_minute
 	var to := mini(from + minutes, 24 * 60 - 1)
-	_skip_caption.text = ("%d นาทีต่อมา…" % minutes) if minutes < 60 else ("%d ชั่วโมงต่อมา…" % floori(minutes / 60.0))
-	_skip_clock.text = TimeSystem.clock_text(from)
+	if ts.show_clock:
+		_skip_caption.text = ("%d นาทีต่อมา…" % minutes) if minutes < 60 else ("%d ชั่วโมงต่อมา…" % floori(minutes / 60.0))
+	else:
+		_skip_caption.text = "เวลาผ่านไป…"
+	_skip_clock.text = _skip_text(from)
 	_skip_overlay.modulate.a = 0.0
 	_skip_overlay.visible = true
 	var tw := create_tween()
@@ -551,7 +556,31 @@ func _skip_step(v: float) -> void:
 	var ts := _ts()
 	if ts:
 		ts.set_clock(int(v))
-	_skip_clock.text = TimeSystem.clock_text(int(v))
+	_skip_clock.text = _skip_text(int(v))
+
+
+## ข้อความใหญ่ตอนเวลาหมุน: นาฬิกา หรือ "เหลือ N เทิร์น"
+func _skip_text(minute: int) -> String:
+	var ts := _ts()
+	if ts == null or ts.show_clock:
+		return TimeSystem.clock_text(minute)
+	return "เหลือ " + TimeSystem.turns_text(floori(TimeSystem.work_minutes_between(minute, TimeSystem.CLOSE) / float(TimeSystem.SLOT_MIN)))
+
+
+## เวลาที่งานใช้: "3 เทิร์น" (โหมดเทิร์น) หรือ "~3 ช่อง (1½ ชม.)" (โหมดนาฬิกา)
+func _cost_text(slots: int) -> String:
+	var ts := _ts()
+	if ts and not ts.show_clock:
+		return TimeSystem.turns_text(slots)
+	return "~%d ช่อง (%s)" % [slots, TimeSystem.slots_text(slots)]
+
+
+## ตอนนี้: นาฬิกา หรือ "เหลือ N เทิร์น"
+func _now_text() -> String:
+	var ts := _ts()
+	if ts == null:
+		return ""
+	return ("🕘 " + TimeSystem.clock_text(ts.current_minute)) if ts.show_clock else ("เหลือ " + TimeSystem.turns_text(ts.turns_left()))
 
 
 func _ts() -> TimeSystem:
@@ -599,7 +628,10 @@ func is_demo_last_shift() -> bool:
 func finish_demo() -> void:
 	_demo_ack = true
 	_hide()
-	SceneRouter.go(SceneRouter.HOME) # เปลี่ยนฉาก → autosave
+	await SceneRouter.go(SceneRouter.HOME) # เปลี่ยนฉาก → autosave
+	# [10 ต.ค.] บทปิดบทกับยาย ก่อนขึ้นหน้าจบบท
+	if chapter_end_dialog != "" and EventManager.play_story_dialog(demo_banner_title, chapter_end_dialog, "res://Assets/Background/bg_home_inside.jpg", ["ขม", "ยาย"]):
+		await DialogScene.on_dialog_finish
 	_show_demo_banner(true)
 
 
@@ -683,7 +715,7 @@ func _build_demo_banner() -> void:
 		row.add_child(b)
 	_demo_badge = Button.new()
 	_demo_badge.name = "Badge"
-	_demo_badge.text = "★ จบเดโมแล้ว · กดเพื่อดูอีกครั้ง"
+	_demo_badge.text = "★ %s · กดเพื่อดูอีกครั้ง" % demo_banner_title
 	_demo_badge.focus_mode = Control.FOCUS_NONE
 	_demo_badge.add_theme_font_size_override("font_size", 20)
 	for st2 in ["normal", "hover", "pressed"]:
@@ -878,16 +910,16 @@ func _show_card(card: Card) -> void:
 		Card.JOB_FORCED:
 			c = forced_case
 			_title.text = "งานด่วน! · %s" % c.level_name()
-			_body.text = "%s รอเครื่องอยู่\nเครื่อง: %s\nอาการ: %s\n⏱ ~%d ช่อง · ค่าแรง ฿%d" % [
+			_body.text = "%s รอเครื่องอยู่\nเครื่อง: %s\nอาการ: %s\nใช้ %s · ค่าแรง ฿%d" % [
 				c.customer,
 				c.device,
 				c.symptom,
-				job_slots(c),
+				_cost_text(job_slots(c)),
 				_fee(c),
 			]
 			_primary.text = "เริ่มซ่อม"
 		Card.RESULT:
-			_title.text = "ส่งเครื่องคืนลูกค้า · 🕘 %s" % TimeSystem.clock_text(ts.current_minute)
+			_title.text = "ส่งเครื่องคืนลูกค้า · %s" % _now_text()
 			var r := last_result
 			var money: int = r.get("money", 0)
 			var grade: int = clampi(int(r.get("grade", GameState.Grade.PASS)), 0, GRADE_TEXT.size() - 1)
@@ -913,19 +945,19 @@ func _show_card(card: Card) -> void:
 		Card.SHIFT_END:
 			var earned := GameState.money - shift_start_money
 			var ot := ot_slots_now()
-			_title.text = "ปิดร้าน · กะ %d/%d · 🕘 %s" % [ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, TimeSystem.clock_text(ts.current_minute)]
-			_body.text = "งานเสร็จกะนี้ %d งาน · รายได้ %s฿%d\nงานค้างบนกระดาน %d ใบ (ต่อกะหน้า)%s\nชื่อเสียง %d · %s" % [
+			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · 🕘 " + TimeSystem.clock_text(ts.current_minute)) if ts.show_clock else ""]
+			_body.text = "งานเสร็จวันนี้ %d งาน · รายได้ %s฿%d\nงานค้างบนกระดาน %d ใบ (ต่อพรุ่งนี้)%s\nชื่อเสียง %d · %s" % [
 				shift_results.size(),
 				"+" if earned >= 0 else "−",
 				absi(earned),
 				board.size(),
-				("\nล่วงเวลา %d ช่อง · ค่าไฟ ฿%d" % [ot, ot * _econ().ot_cost_per_slot]) if ot > 0 else "",
+				("\nล่วงเวลา %s · ค่าไฟ ฿%d" % [_cost_text(ot), ot * _econ().ot_cost_per_slot]) if ot > 0 else "",
 				GameState.reputation,
 				GameState.rank_name(),
 			]
-			_primary.text = "ปิดร้าน → สรุปสัปดาห์" if ts.is_last_shift_of_week() else "ปิดร้าน → กะถัดไป"
+			_primary.text = "ปิดร้าน → สรุปบท" if ts.is_last_shift_of_week() else "ปิดร้าน → วันถัดไป"
 			if is_demo_last_shift():
-				_primary.text = "ปิดร้าน → จบการเล่นเดโม"
+				_primary.text = "ปิดร้าน → จบบทที่ %d" % ts.chapter()
 			if _close_requested and ts.current_minute < TimeSystem.CLOSE:
 				_secondary.text = "กลับไปทำงานต่อ"
 				_secondary.visible = true
@@ -967,15 +999,17 @@ func _show_card(card: Card) -> void:
 			]
 			_primary.text = "กลับหน้าแรก"
 		Card.DEMO_END:
-			_title.text = "สิ้นสุดการเล่นเดโม · ครบ %d วัน" % demo_shifts
-			_body.text = "ขมเปิดร้านมาครบ %d วันแล้ว!\n\nซ่อมไปทั้งหมด %d งาน · เงิน ฿%d\nชื่อเสียง %d · ยศ %s · XP %d\nความพอใจเฉลี่ย %d\n\nกลับบ้านไปพักกับยายกันเถอะ" % [
+			var nxt := GameState.xp_next()
+			_title.text = "%s · เปิดร้านครบ %d วัน" % [demo_banner_title, demo_shifts]
+			_body.text = "ขมเปิดร้านมาครบ %d วันแล้ว!\n\nซ่อมไปทั้งหมด %d งาน · เงิน ฿%d\nชื่อเสียง %d · ความพอใจเฉลี่ย %d\nยศช่าง: %s (%s)%s\n\nกลับบ้านไปเล่าให้ยายฟังกันเถอะ" % [
 				demo_shifts,
 				GameState.satisfaction_history.size(),
 				GameState.money,
 				GameState.reputation,
-				GameState.rank_name(),
-				GameState.xp,
 				roundi(GameState.average_satisfaction()),
+				GameState.rank_name(),
+				("XP %d/%d" % [GameState.xp, nxt]) if nxt > 0 else "XP %d" % GameState.xp,
+				"  ★ เลื่อนขั้นแล้ว!" if GameState.rank() > 0 else "",
 			]
 			_primary.text = "กลับบ้าน"
 
@@ -986,12 +1020,20 @@ func _fill_board() -> void:
 	for n in _board_list.get_children():
 		_board_list.remove_child(n)
 		n.queue_free()
-	_board_title.text = "กระดานงาน · กะ %d/%d · 🕘 %s · เหลือ %s" % [
-		ts.shift_in_week(),
-		TimeSystem.SHIFTS_PER_WEEK,
-		TimeSystem.clock_text(ts.current_minute),
-		TimeSystem.slots_text(floori(ts.remaining_work_minutes() / float(TimeSystem.SLOT_MIN))),
-	]
+	if ts.show_clock:
+		_board_title.text = "กระดานงาน · กะ %d/%d · 🕘 %s · เหลือ %s" % [
+			ts.shift_in_week(),
+			TimeSystem.SHIFTS_PER_WEEK,
+			TimeSystem.clock_text(ts.current_minute),
+			TimeSystem.slots_text(floori(ts.remaining_work_minutes() / float(TimeSystem.SLOT_MIN))),
+		]
+	else:
+		_board_title.text = "กระดานงาน · บทที่ %d วันที่ %d/%d · เหลือ %s" % [
+			ts.chapter(),
+			ts.shift_in_week(),
+			TimeSystem.SHIFTS_PER_WEEK,
+			TimeSystem.turns_text(ts.turns_left()),
+		]
 	var note := ""
 	if not walkouts.is_empty():
 		note = "ลูกค้าเดินออกเพราะรอนานเกิน: %s" % ", ".join(walkouts)
@@ -1025,13 +1067,12 @@ func _fill_board() -> void:
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		body.add_theme_font_size_override("font_size", 14)
 		body.add_theme_color_override("font_color", Color(0.15, 0.12, 0.1))
-		body.text = "อาการ: %s\nมาเพราะ: %s\n⏱ ~%d ช่อง (%s) · ฿%d · %s" % [
+		body.text = "อาการ: %s\nมาเพราะ: %s\nใช้ %s · ฿%d · %s" % [
 			c.symptom,
 			c.reason,
-			job_slots(c),
-			TimeSystem.slots_text(job_slots(c)),
+			_cost_text(job_slots(c)),
 			_fee(c),
-			"ต้องเสร็จกะนี้" if due <= 0 else "รับภายใน %d กะ" % due,
+			"ต้องเสร็จวันนี้" if due <= 0 else "รับภายใน %d วัน" % due,
 		]
 		text.add_child(body)
 		var btns := VBoxContainer.new()
@@ -1044,7 +1085,7 @@ func _fill_board() -> void:
 			&"ot":
 				take.text = "รับงาน\n(ล่วงเวลา)"
 			_:
-				take.text = "ไม่ทันกะนี้"
+				take.text = "เทิร์นไม่พอ"
 				take.disabled = true
 		take.pressed.connect(accept_job.bind(i))
 		btns.add_child(take)

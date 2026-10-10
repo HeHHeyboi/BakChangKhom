@@ -1,0 +1,369 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/PowerCheck/power_check.gd" id="s"]
+[ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="th"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/power_bg.jpg" id="bg"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/pc_back.png" id="back"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/fan.png" id="fan"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/fan_grill.png" id="grill"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/psu_sw_off.png" id="psu"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/strip.png" id="strip"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/strip_sw_off.png" id="ssw"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/plug.png" id="plug"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/pc_front.png" id="front"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/power_btn.png" id="btn"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/power_btn_hover.png" id="btnh"]
+
+[sub_resource type="StyleBoxFlat" id="SB_paper"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.98, 0.95, 0.87, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_plate"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_led"]
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.15, 0.15, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="PowerCheck" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("th")
+script = ExtResource("s")
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+texture = ExtResource("bg")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="PcBack" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 330.0
+offset_top = 90.0
+offset_right = 630.0
+offset_bottom = 550.0
+mouse_filter = 2
+texture = ExtResource("back")
+
+[node name="Fan" type="TextureRect" parent="PcBack"]
+layout_mode = 0
+offset_left = 45.0
+offset_top = 314.0
+offset_right = 155.0
+offset_bottom = 424.0
+mouse_filter = 2
+pivot_offset = Vector2(55, 55)
+texture = ExtResource("fan")
+
+[node name="FanGrill" type="TextureRect" parent="PcBack"]
+layout_mode = 0
+offset_left = 45.0
+offset_top = 314.0
+offset_right = 155.0
+offset_bottom = 424.0
+mouse_filter = 2
+texture = ExtResource("grill")
+
+[node name="Inlet" type="Control" parent="PcBack"]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 352.0
+offset_right = 222.0
+offset_bottom = 360.0
+mouse_filter = 2
+
+[node name="PsuSwitch" type="TextureButton" parent="PcBack"]
+layout_mode = 0
+offset_left = 194.0
+offset_top = 382.0
+offset_right = 238.0
+offset_bottom = 438.0
+tooltip_text = "สวิตช์พาวเวอร์ซัพพลาย (I = เปิด · O = ปิด)"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("psu")
+
+[node name="Strip" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 680.0
+offset_top = 500.0
+offset_right = 1120.0
+offset_bottom = 600.0
+mouse_filter = 2
+texture = ExtResource("strip")
+
+[node name="StripSwitch" type="TextureButton" parent="Strip"]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 20.0
+offset_right = 78.0
+offset_bottom = 76.0
+tooltip_text = "สวิตช์ปลั๊กพ่วง"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("ssw")
+
+[node name="Cable" type="Line2D" parent="."]
+width = 9.0
+default_color = Color(0.16, 0.16, 0.18, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Plug" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 560.0
+offset_top = 575.0
+offset_right = 650.0
+offset_bottom = 635.0
+tooltip_text = "ปลั๊กไฟของคอม"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("plug")
+
+[node name="Front" type="Control" parent="."]
+layout_mode = 0
+offset_left = 930.0
+offset_top = 24.0
+offset_right = 1140.0
+offset_bottom = 370.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Front"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 210.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.1, 0.06, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "หน้าเครื่อง"
+horizontal_alignment = 1
+
+[node name="PcFront" type="TextureRect" parent="Front"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 36.0
+offset_right = 205.0
+offset_bottom = 336.0
+mouse_filter = 2
+texture = ExtResource("front")
+
+[node name="PowerButton" type="TextureButton" parent="Front/PcFront"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 158.0
+offset_right = 132.0
+offset_bottom = 222.0
+tooltip_text = "ปุ่มเปิดเครื่อง"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("btn")
+texture_hover = ExtResource("btnh")
+
+[node name="Led" type="Panel" parent="Front/PcFront"]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 236.0
+offset_right = 108.0
+offset_bottom = 252.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_led")
+
+[node name="BeepFx" type="Label" parent="Front"]
+layout_mode = 0
+offset_left = -150.0
+offset_top = 150.0
+offset_right = -10.0
+offset_bottom = 210.0
+visible = false
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0.03, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 40
+text = "บี๊บ!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 14.0
+offset_right = 316.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_plate")
+
+[node name="Label" type="Label" parent="Title"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 22
+text = "ตรวจเครื่องเบื้องต้น"
+horizontal_alignment = 1
+
+[node name="Checklist" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 72.0
+offset_right = 316.0
+offset_bottom = 300.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_paper")
+
+[node name="Box" type="VBoxContainer" parent="Checklist"]
+layout_mode = 2
+
+[node name="Head" type="Label" parent="Checklist/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.3, 0.08, 1)
+theme_override_font_sizes/font_size = 19
+text = "เปิดไม่ติด? ไล่เช็คทีละขั้น"
+
+[node name="Steps" type="VBoxContainer" parent="Checklist/Box"]
+layout_mode = 2
+
+[node name="Step1" type="Label" parent="Checklist/Box/Steps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "เสียบปลั๊กให้แน่น"
+
+[node name="Step2" type="Label" parent="Checklist/Box/Steps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "เปิดสวิตช์ปลั๊กพ่วง"
+
+[node name="Step3" type="Label" parent="Checklist/Box/Steps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "เปิดสวิตช์ PSU หลังเครื่อง"
+
+[node name="Step4" type="Label" parent="Checklist/Box/Steps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "กดปุ่มเปิดเครื่อง"
+
+[node name="Step5" type="Label" parent="Checklist/Box/Steps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "ฟังเสียงบี๊บ แล้วบอกอาการ"
+
+[node name="Bubble" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 556.0
+offset_right = 540.0
+offset_bottom = 636.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_paper")
+
+[node name="Text" type="Label" parent="Bubble"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 18
+text = "ขม: …"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Quiz" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 120.0
+offset_right = 852.0
+offset_bottom = 470.0
+theme_override_styles/panel = SubResource("SB_paper")
+
+[node name="Box" type="VBoxContainer" parent="Quiz"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Question" type="Label" parent="Quiz/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 22
+text = "บี๊บสั้น 3 ครั้ง แปลว่าอะไร?"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Answers" type="VBoxContainer" parent="Quiz/Box"]
+layout_mode = 2
+
+[node name="Ram" type="Button" parent="Quiz/Box/Answers"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "แรม (หน่วยความจำ) มีปัญหา"
+
+[node name="Gpu" type="Button" parent="Quiz/Box/Answers"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "การ์ดจอเสีย"
+
+[node name="Power" type="Button" parent="Quiz/Box/Answers"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "ไฟไม่เข้าเครื่อง"
+
+[node name="Replay" type="Button" parent="Quiz/Box"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "ฟังเสียงบี๊บอีกครั้ง"
+
+[node name="Done" type="Button" parent="Quiz/Box"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "ไปต่อ"

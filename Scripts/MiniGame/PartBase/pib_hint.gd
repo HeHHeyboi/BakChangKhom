@@ -24,6 +24,8 @@ enum Mood {
 @export var mood_textures: Dictionary[Mood, Texture2D] = { }
 ## ตัวอักษรต่อวินาที (0 = ขึ้นทั้งบรรทัดทันที)
 @export var chars_per_sec := 45.0
+## [Claude 10 ต.ค. 2569] ขอบบนของกล่องคำใบ้ (ปิ๊บตัวเล็ก + ข้อความ) · -1 = ตามซีน (300) · บทฝึกประกอบคอมตั้ง 424 ไม่ให้บังช่อง PSU
+@export var toast_top := -1.0
 
 ## connect from Godot's Editor
 signal line_finished
@@ -45,6 +47,8 @@ var _closing := false # กำลังลอยลง (ยังเห็นอ
 func _ready() -> void:
 	_pib_home_y = pib_sprite.position.y
 	_toast_home_y = toast_pib.position.y
+	if toast_top >= 0.0:
+		toast_box.position.y = toast_top
 	pib_sprite.pivot_offset = Vector2(pib_sprite.size.x / 2.0, pib_sprite.size.y)
 	toast_box.hide()
 	# เริ่มต้นซ่อนเสมอ ไม่ขึ้นกับค่า visible ที่เซฟใน .tscn

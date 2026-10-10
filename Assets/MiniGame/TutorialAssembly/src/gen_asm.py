@@ -363,7 +363,8 @@ SOCK = {
     "RamSlot": (*board_px(MB_RAM_X[0] - 1.5, MB_RAM_Y[0]), 9 * V, 133 * V),
     "M2Slot": (*board_px(*MB_M2), 80 * V, 22 * V),
     "PcieSlot": (*board_px(-12, MB_PCIE_Y - 8), 252 * V, 48 * V),
-    "PsuBay": (432, 266, 150 * V, 86 * V),
+    # [10 ต.ค.] PSU ชิดมุมล่างหลังเคส (ผนังหลังซ้าย 420 · พื้น 354) ไม่ทับฝาปิดช่อง PCIe
+    "PsuBay": (421, 352 - 86 * V, 150 * V, 86 * V),
 }
 
 # ================================================================ ฉาก
@@ -416,7 +417,7 @@ def bg_build():
     p.rect(420, 22, 332, 332, (186, 195, 208, 255), INK, 1.4, r=4)
     # ช่องหลังเคส: I/O + ฝาปิดช่อง PCIe
     p.rect(422, 50, 20, 92, (60, 66, 80, 255), INK, 1.0)
-    for i in range(7):
+    for i in range(6):  # [10 ต.ค.] 7 → 6 ฝา ไม่ให้ลงไปทับช่อง PSU
         y = 158 + i * 17
         p.rect(422, y, 14, 13, METAL_M, INK, 0.8)
         p.line([(425, y + 6.5), (433, y + 6.5)], METAL_D, 0.8)
@@ -434,8 +435,9 @@ def bg_build():
     for i in range(3):
         p.rect(648, 270 + i * 25, 76, 18, METAL, INK, 0.8, r=2)
     # ฐานวาง PSU
-    p.rect(426, 262, 124, 76, (168, 178, 192, 255), INK, 1.0, r=3)
-    for (x, y) in [(434, 330), (540, 330), (434, 270), (540, 270)]:
+    bx_, by_, bw_, bh_ = SOCK["PsuBay"]
+    p.rect(bx_ - 1, by_ - 3, bw_ + 4, bh_ + 4, (168, 178, 192, 255), INK, 1.0, r=3)
+    for (x, y) in [(bx_ + 8, by_ + bh_ - 8), (bx_ + bw_ - 8, by_ + bh_ - 8), (bx_ + 8, by_ + 4), (bx_ + bw_ - 8, by_ + 4)]:
         p.circle(x, y, 3, DARK, None)
     # เสารองบอร์ด (ทองเหลือง)
     for (hx, hy) in MB_HOLES:
@@ -445,14 +447,14 @@ def bg_build():
     # กรอบจาง ๆ ตรงที่วางบอร์ด
     bx, by = BOARD_O
     p.rect(bx, by, 244 * V, 244 * V, None, (160, 170, 186, 255), 0.8, r=2)
-    img.resize((1152 * BG_X, 420 * BG_X), Image.LANCZOS).convert("RGB").save(os.path.join(OUT_DIR, "asm_case_bg.png"))
+    img.resize((1152 * BG_X, 420 * BG_X), Image.LANCZOS).convert("RGB").save(os.path.join(OUT_DIR, "asm_case_bg%s.png" % SUFFIX))
 
 
 def layer(name, fn):
     k = BG_X * SS
     img = Image.new("RGBA", (1152 * k, 420 * k), (0, 0, 0, 0))
     fn(img, k)
-    img.resize((1152 * BG_X, 420 * BG_X), Image.LANCZOS).save(os.path.join(OUT_DIR, "asm_layer_%s.png" % name))
+    img.resize((1152 * BG_X, 420 * BG_X), Image.LANCZOS).save(os.path.join(OUT_DIR, "asm_layer_%s%s.png" % (name, SUFFIX if name in ("psu", "cables") else "")))
 
 
 def mm_pen(img, k, sock):
@@ -583,7 +585,16 @@ def parts():
         finish(img, name, TEX_K, w, h)
 
 
-if __name__ == "__main__":
+# [10 ต.ค.] ภาพเดิมอยู่ใน Git LFS ห้ามเขียนทับ → รุ่นที่ย้าย PSU ใช้ชื่อลงท้าย _v2
+# python gen_asm.py <out> psu_v2  = สร้างเฉพาะ asm_case_bg_v2 · asm_layer_psu_v2 · asm_layer_cables_v2
+SUFFIX = "_v2"
+
+if __name__ == "__main__" and "psu_v2" in sys.argv[2:]:
+    bg_build()
+    layer("psu", L_psu)
+    layer("cables", L_cables)
+    print("PsuBay", [round(a, 1) for a in SOCK["PsuBay"]])
+elif __name__ == "__main__":
     parts()
     bg_tray()
     bg_build()

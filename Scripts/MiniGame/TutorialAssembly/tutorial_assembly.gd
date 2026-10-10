@@ -26,10 +26,10 @@ const TEX_BOOT_OK := preload("res://Assets/MiniGame/PartRam/ram_tex_screen_boot_
 ## [Claude 9 ต.ค. 2569] ภาพ "ประกอบแล้ว" ของแต่ละชิ้น (ขนาดเท่ามุม Build วางทับเป๊ะ) — ใส่เสร็จแล้วชิ้นที่ลอยหายไป เหลือภาพนี้
 ## วาดจาก Assets/MiniGame/TutorialAssembly/src/gen_asm.py (แก้ตำแหน่ง socket ต้องสร้างภาพใหม่ด้วย)
 const LAYER_DIR := "res://Assets/MiniGame/TutorialAssembly/asm_layer_%s.png"
-## socket_type → ชื่อภาพ · เรียงตามลำดับซ้อน (ล่าง → บน)
+## socket_type → ชื่อภาพ · เรียงตามลำดับซ้อน (ล่าง → บน) · [10 ต.ค.] psu/cables ใช้ _v2 (PSU ชิดมุมล่างหลังเคส)
 const LAYERS := {
-	&"psu_bay": "psu", &"mb_standoff": "mb", &"cpu_socket": "cpu", &"cooler_mount": "cooler",
-	&"ram_slot": "ram", &"m2_slot": "ssd", &"pcie_x16": "gpu", &"cables": "cables",
+	&"psu_bay": "psu_v2", &"mb_standoff": "mb", &"cpu_socket": "cpu", &"cooler_mount": "cooler",
+	&"ram_slot": "ram", &"m2_slot": "ssd", &"pcie_x16": "gpu", &"cables": "cables_v2",
 }
 const LAYER_FADE := 0.25
 ## หลังเปิดเครื่อง → ทำความรู้จัก ขมOS (phase_power)
@@ -49,6 +49,9 @@ func _ready() -> void:
 	if dialog_path.is_empty():
 		dialog_path = PIB_PATH
 	minigame_finished.connect(_on_minigame_finished)
+	if pib: # [10 ต.ค.] กล่องคำใบ้ลงไปอยู่แถบโต๊ะล่าง ไม่บัง PSU ที่มุมล่างของเคส
+		pib.toast_top = 424.0
+		pib.toast_box.position.y = 424.0
 	skippable = true # [Claude 5 ต.ค. 2569] ข้ามได้ตอนเป็น Tutorial/เควสต์ · งานลูกค้าข้ามไม่ได้ (PartMinigame เช็ก work_order)
 	_build_layers()
 	super._ready()

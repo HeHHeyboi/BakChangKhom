@@ -9,6 +9,49 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="SB_rank"]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+bg_color = Color(0.22845358, 0.22845358, 0.22845358, 0.92)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.12, 0.12, 0.12, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.95, 0.62, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_rankup"]
+content_margin_left = 24.0
+content_margin_right = 24.0
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.98, 0.94, 0.84, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.95, 0.62, 0.2, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 10
+
 [node name="TimeSystem" type="CanvasLayer" unique_id=1106151211 node_paths=PackedStringArray("money_label")]
 process_mode = 3
 layer = 100
@@ -16,8 +59,8 @@ script = ExtResource("1_nyd0s")
 money_label = NodePath("PanelContainer/HBoxContainer/MoneyLabel")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=549087680]
-offset_right = 492.0
-offset_bottom = 91.0
+offset_right = 340.0
+offset_bottom = 58.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_nyd0s")
@@ -31,7 +74,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 layout_direction = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 21
 autowrap_mode = 0
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -46,7 +89,7 @@ clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -55,6 +98,59 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.6
 theme_override_colors/font_color = Color(1, 0.9309246, 0.62782896, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 19
 text = "Money"
 horizontal_alignment = 1
+
+[node name="RankPanel" type="PanelContainer" parent="."]
+offset_top = 61.0
+offset_right = 340.0
+offset_bottom = 85.0
+mouse_filter = 2
+tooltip_text = "ยศช่างของขม — ได้ XP จากงานซ่อม ครบเกณฑ์แล้วเลื่อนขั้น"
+theme_override_styles/panel = SubResource("SB_rank")
+
+[node name="Box" type="HBoxContainer" parent="RankPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Rank" type="Label" parent="RankPanel/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "ช่างมือใหม่"
+
+[node name="Bar" type="ProgressBar" parent="RankPanel/Box"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+max_value = 1.0
+step = 0.001
+show_percentage = false
+
+[node name="Xp" type="Label" parent="RankPanel/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+theme_override_font_sizes/font_size = 11
+text = "0/500 XP"
+
+[node name="RankUp" type="PanelContainer" parent="."]
+visible = false
+offset_left = 346.0
+offset_top = 150.0
+offset_right = 806.0
+offset_bottom = 250.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_rankup")
+
+[node name="Text" type="Label" parent="RankUp"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.22, 0.05, 1)
+theme_override_font_sizes/font_size = 30
+text = "เลื่อนขั้น!"
+horizontal_alignment = 1
+vertical_alignment = 1

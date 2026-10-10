@@ -7,6 +7,7 @@ extends Control
 
 @onready var _say: Control = $Say
 @onready var _say_text: Label = $Say/Text
+@onready var shop_panel: ShopPanel = $ShopPanel
 var _tw: Tween
 
 
@@ -24,3 +25,9 @@ func say(text: String) -> void:
 	_tw.tween_interval(say_seconds)
 	_tw.tween_property(_say, "modulate:a", 0.0, 0.4)
 	_tw.tween_callback(_say.hide)
+
+
+## เปิดหน้าต่างร้านค้าของแผง (เรียกจาก MarketStall)
+func open_shop(shop_name: String, items: Array[ShopItem], greeting := "") -> void:
+	_say.hide()
+	shop_panel.open(shop_name, items, greeting)

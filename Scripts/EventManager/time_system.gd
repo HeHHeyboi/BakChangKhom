@@ -50,6 +50,10 @@ signal game_ended
 
 ## กะที่เท่าไรของทั้งเกม 1–60 (ไม่โชว์ผู้เล่น)
 var shift := 1
+## [Claude 10 ต.ค. 2569] true = HUD/การ์ดบอกเวลาเป็นนาฬิกา (แบบเดิม) · false = บอกเป็น "เทิร์น" แบบ Volcano Princess
+## 1 เทิร์น = 1 ช่อง 30 นาที (SLOT_MIN) · วันหนึ่งมี 16 เทิร์น · 1 บท = 1 สัปดาห์ (5 วัน)
+@export var show_clock := false
+
 var current_minute := OPEN
 var cur_period: TIME = TIME.MORNING
 var finished := false
@@ -84,11 +88,13 @@ func _exit_tree() -> void:
 
 func _ready() -> void:
 	if dateText:
-		dateText.add_theme_font_size_override("font_size", 20)
+		dateText.add_theme_font_size_override("font_size", 14) # [10 ต.ค.] ย่อ HUD
 	set_shift(1)
 	var gs := get_node_or_null(^"/root/GameState")
 	if gs == null:
 		return
+	if not gs.rank_up.is_connected(_on_rank_up):
+		gs.rank_up.connect(_on_rank_up)
 	if not gs.money_changed.is_connected(_on_money_changed):
 		gs.money_changed.connect(_on_money_changed)
 	_on_money_changed(gs.money, 0)
@@ -132,6 +138,30 @@ func work_slots_per_month() -> int:
 
 
 ## เวลางานจริงระหว่าง a ถึง b (นาที) — ไม่นับก่อน 09:00 และช่วงพัก
+## เทิร์นที่เหลือของวันนี้ (with_ot = นับช่วงล่วงเวลาด้วย)
+func turns_left(with_ot := false) -> int:
+	return floori(remaining_work_minutes(with_ot) / float(SLOT_MIN))
+
+
+## เทิร์นเต็มของ 1 วัน
+static func turns_per_shift() -> int:
+	return floori(work_minutes_between(OPEN, CLOSE) / float(SLOT_MIN))
+
+
+static func turns_text(n: int) -> String:
+	return "%d เทิร์น" % n
+
+
+## บทที่ (1 บท = 1 สัปดาห์)
+func chapter() -> int:
+	return week()
+
+
+## เหลืออีกกี่วันจบบท (วันนี้ไม่นับ)
+func days_left_in_chapter() -> int:
+	return SHIFTS_PER_WEEK - shift_in_week()
+
+
 static func work_minutes_between(a: int, b: int) -> int:
 	var lo := maxi(a, WORK_START)
 	if b <= lo:
@@ -302,6 +332,9 @@ static func slots_text(slots: int) -> String:
 func updateTime() -> void:
 	if timeText == null or dateText == null:
 		return
+	if not show_clock:
+		_update_turns()
+		return
 	var br := in_break()
 	var col := Color.LIGHT_YELLOW
 	var txt := ""
@@ -333,3 +366,68 @@ func updateTime() -> void:
 			floori(work_slots_per_month() / 2.0),
 		]
 	)
+
+
+## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "บทที่ 1 · วันที่ 2/5 · อีก 3 วันจบบท"
+func _update_turns() -> void:
+	var br := in_break()
+	var n := turns_left()
+	var col := Color.LIGHT_YELLOW
+	var txt := turns_text(n)
+	if br != &"":
+		col = Color.LIGHT_GREEN
+		txt = "พักเที่ยง" if br == &"lunch" else "พักบ่าย"
+	elif current_minute >= CLOSE:
+		col = Color.SALMON
+		txt = "ล่วงเวลา" if current_minute > CLOSE else "ปิดร้าน"
+	elif n <= 4:
+		col = Color.ORANGE
+	timeText.add_theme_color_override("font_color", col)
+	timeText.text = txt
+	var left := days_left_in_chapter()
+	dateText.text = "บทที่ %d · วันที่ %d/%d\n%s" % [
+		chapter(),
+		shift_in_week(),
+		SHIFTS_PER_WEEK,
+		("อีก %d วันจบบท" % left) if left > 0 else "วันสุดท้ายของบท",
+	]
+
+
+# ---------------------------------------------------------------- ยศช่าง [Claude 10 ต.ค. 2569]
+var _shown_xp := -1
+
+
+func _process(_delta: float) -> void:
+	var gs := get_node_or_null(^"/root/GameState")
+	if gs == null or gs.xp == _shown_xp:
+		return
+	_shown_xp = gs.xp
+	update_rank()
+
+
+## แถบยศใต้ป้ายเวลา: ชื่อยศ · แถบ XP · "120/500 XP"
+func update_rank() -> void:
+	var gs := get_node_or_null(^"/root/GameState")
+	var box := get_node_or_null(^"RankPanel/Box")
+	if gs == null or box == null:
+		return
+	(box.get_node(^"Rank") as Label).text = gs.rank_name()
+	(box.get_node(^"Bar") as ProgressBar).value = gs.rank_progress()
+	var nxt: int = gs.xp_next()
+	(box.get_node(^"Xp") as Label).text = ("%d/%d XP" % [gs.xp, nxt]) if nxt > 0 else ("%d XP · ยศสูงสุด" % gs.xp)
+
+
+func _on_rank_up(_rank: int, rank_name: String) -> void:
+	var p := get_node_or_null(^"RankUp") as Control
+	if p == null:
+		return
+	(p.get_node(^"Text") as Label).text = "เลื่อนขั้น!  ขมเป็น \"%s\" แล้ว" % rank_name
+	p.show()
+	p.modulate.a = 0.0
+	if has_node(^"/root/Audio"):
+		get_node(^"/root/Audio").sfx(&"success")
+	var tw := create_tween()
+	tw.tween_property(p, "modulate:a", 1.0, 0.25)
+	tw.tween_interval(2.6)
+	tw.tween_property(p, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(p.hide)

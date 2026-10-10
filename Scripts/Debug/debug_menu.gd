@@ -52,7 +52,7 @@ func _ready() -> void:
 		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → 18:30)", "call": EventManager.advance_period },
 		{ "label": "เวลา: ปิดร้าน → กะถัดไป", "call": DayLoop.end_shift },
 		{ "label": "เวลา: ไป 18:30 กะสุดท้ายของสัปดาห์", "call": _jump_week_end },
-		{ "label": "เดโม: ไป 18:30 กะสุดท้ายของเดโม (กะ 7)", "call": func() -> void: EventManager.time_system.set_shift(maxi(DayLoop.demo_shifts, 1), TimeSystem.CLOSE) },
+		{ "label": "จบบท: ไปปิดร้านวันสุดท้ายของบทที่ 1 (วัน 5)", "call": func() -> void: EventManager.time_system.set_shift(maxi(DayLoop.demo_shifts, 1), TimeSystem.CLOSE) },
 		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ⭐⭐ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()

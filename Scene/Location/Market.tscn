@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" path="res://Assets/Background/bg_market_day.jpg" id="2_bg"]
 [ext_resource type="Script" uid="uid://f601kgx8e3pv" path="res://Scripts/Home/map_place_holder.gd" id="3_map"]
 [ext_resource type="Script" path="res://Scripts/Market/market_stall.gd" id="4_stall"]
+[ext_resource type="Script" path="res://Scripts/Market/shop_panel.gd" id="5_shop"]
+[ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="6_theme"]
 
 [sub_resource type="StyleBoxFlat" id="SB_map"]
 content_margin_left = 14.0
@@ -79,7 +81,7 @@ offset_right = 330.0
 offset_bottom = 610.0
 ignore_texture_size = true
 script = ExtResource("4_stall")
-message = "ร้านอะไหล่คอม — เร็ว ๆ นี้มาซื้ออะไหล่ไปซ่อมได้ที่นี่"
+message = "มาซื้ออะไหล่ไปซ่อมคอมได้ที่นี่"
 label_text = "ร้านอะไหล่คอม"
 
 [node name="StallSnack" type="TextureButton" parent="."]
@@ -90,7 +92,7 @@ offset_right = 630.0
 offset_bottom = 440.0
 ignore_texture_size = true
 script = ExtResource("4_stall")
-message = "ขนมหอมจัง… ตอนนี้ยังไม่หิว ไว้มาใหม่นะ"
+message = "ขนมหอม ๆ จ้า"
 label_text = "ร้านขนม"
 
 [node name="StallGrocery" type="TextureButton" parent="."]
@@ -101,7 +103,7 @@ offset_right = 1070.0
 offset_bottom = 620.0
 ignore_texture_size = true
 script = ExtResource("4_stall")
-message = "ร้านของชำ — ถ้ายายฝากซื้อของ มาที่นี่นะ"
+message = "ของใช้ในบ้าน ยายฝากซื้ออะไรมาที่นี่ได้"
 label_text = "ร้านของชำ"
 
 [node name="MapPlaceHolder" type="Button" parent="."]
@@ -140,5 +142,58 @@ theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+offset_left = 316.0
+offset_top = 120.0
+offset_right = 836.0
+offset_bottom = 520.0
+theme = ExtResource("6_theme")
+theme_override_styles/panel = SubResource("SB_say")
+script = ExtResource("5_shop")
+
+[node name="Box" type="VBoxContainer" parent="ShopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="ShopPanel/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.22, 0.05, 1)
+theme_override_font_sizes/font_size = 30
+text = "ร้านค้า"
+horizontal_alignment = 1
+
+[node name="Note" type="Label" parent="ShopPanel/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 0.8)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Scroll" type="ScrollContainer" parent="ShopPanel/Box"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="ShopPanel/Box/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Empty" type="Label" parent="ShopPanel/Box"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.4, 0.3, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = "ยังไม่มีของขาย"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Close" type="Button" parent="ShopPanel/Box"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "ออกจากร้าน"
 
 [connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]

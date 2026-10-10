@@ -20,6 +20,9 @@ const ECONOMY_PATH := "res://Resources/Balance/economy.tres"
 const MONEY_CAP := 50_000
 
 signal reputation_changed(value: int, delta: int)
+## [Claude 10 ต.ค. 2569] ได้ XP · เลื่อนยศช่าง (HUD โชว์ป้าย "เลื่อนขั้น!")
+signal xp_changed(value: int, delta: int)
+signal rank_up(rank: int, rank_name: String)
 ## บิลรายเดือน { month, power, grandma, internet, total, paid, debt }
 signal bill_paid(bill: Dictionary)
 
@@ -177,6 +180,35 @@ func rank() -> int:
 	return r
 
 
+## เพิ่ม XP · ข้ามเกณฑ์ยศ → rank_up
+func add_xp(gained: int) -> void:
+	if gained == 0:
+		return
+	var before := rank()
+	xp = maxi(xp + gained, 0)
+	xp_changed.emit(xp, gained)
+	var after := rank()
+	if after > before:
+		rank_up.emit(after, rank_name())
+
+
+## XP ที่ต้องมีเพื่อขึ้นยศถัดไป (-1 = ยศสูงสุดแล้ว)
+func xp_next() -> int:
+	var e := economy if economy else EconomyConfig.new()
+	var r := rank()
+	return e.rank_xp[r + 1] if r + 1 < e.rank_xp.size() else -1
+
+
+## ความคืบหน้าในยศปัจจุบัน 0–1 (ยศสูงสุด = 1)
+func rank_progress() -> float:
+	var e := economy if economy else EconomyConfig.new()
+	var nxt := xp_next()
+	if nxt < 0:
+		return 1.0
+	var cur: int = e.rank_xp[rank()]
+	return clampf(float(xp - cur) / float(maxi(nxt - cur, 1)), 0.0, 1.0)
+
+
 func rank_name() -> String:
 	var e := economy if economy else EconomyConfig.new()
 	return e.rank_names[clampi(rank(), 0, e.rank_names.size() - 1)]
@@ -235,7 +267,7 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 	gained = roundi(gained * xp_mult)
 	add_money(delta)
 	satisfaction_history.append(sat)
-	xp += gained
+	add_xp(gained)
 	var rep := 0
 	match grade:
 		Grade.GOOD:

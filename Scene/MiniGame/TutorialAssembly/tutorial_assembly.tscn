@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/part_stage_2d.tscn" id="st2d"]
 
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_tray_bg.png" id="a1"]
-[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_case_bg.png" id="a2"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_case_bg_v2.png" id="a2"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_psu.png" id="a3"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_psu_side.png" id="a4"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_mainboard.png" id="a5"]
@@ -266,10 +266,10 @@ aliases = PackedStringArray()
 [node name="PsuBay" type="Control" parent="Stage/Views/Build" index="0" unique_id=2130948874]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 432
-offset_top = 266
-offset_right = 544.5
-offset_bottom = 330.5
+offset_left = 421.0
+offset_top = 287.5
+offset_right = 533.5
+offset_bottom = 352.0
 mouse_filter = 2
 script = ExtResource("g23")
 socket_type = &"psu_bay"
