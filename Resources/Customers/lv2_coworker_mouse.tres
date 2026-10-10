@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Bench/bench_mouse_coworker.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_coworker_mouse"
+customer = "เพื่อนร่วมงาน"
+reason = "ตามมาเที่ยวบ้านขม เลยหอบคอมมาด้วย"
+device = "คอมตั้งโต๊ะของเพื่อนร่วมงาน"
+symptom = "เมาส์ไม่ขยับ เปลี่ยนตัวใหม่ก็ไม่หาย"
+level = 2
+est_slots = 2
+due_shifts = 2
+part_id = "part_bench"
+job_title = "เมาส์/คีย์บอร์ดไม่ทำงาน"
+bench_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_coworker_mouse.txt"
+thanks_text = "ขยับแล้ว! เสียดายเงินค่าเมาส์ใหม่จัง ฮ่า ๆ"
+complain_text = "ยังไม่ขยับเลยนะขม…"

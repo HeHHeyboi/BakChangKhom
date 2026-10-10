@@ -1,12 +1,13 @@
 [gd_resource type="Resource" script_class="TutorialSlides" format=3 uid="uid://dex66o3vsog27"]
 
 [ext_resource type="Script" uid="uid://wqsge0jtfd64" path="res://Scripts/Resources/tutorial_slides.gd" id="1_s"]
-[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_01.png" id="t0"]
-[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_02.png" id="t1"]
-[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_start_03.png" id="t2"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_new_01.png" id="t0"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_new_02.png" id="t1"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_new_03.png" id="t2"]
+[ext_resource type="Texture2D" path="res://Assets/Tutorial/BasicStart/tut_new_04.png" id="t3"]
 
 [resource]
 script = ExtResource("1_s")
-ImageSlide = Array[Texture2D]([ExtResource("t0"), ExtResource("t1"), ExtResource("t2")])
-Captions = Array[String](["คลิกที่ของหรือคนในฉากเพื่อโต้ตอบ", "เห็นเครื่องหมาย ! ที่ไหน แปลว่ามีเรื่องรออยู่ตรงนั้น กดได้เลย", "มุมขวาบนคือภารกิจที่ต้องทำ และช่วงเวลาของวัน เช้า · เที่ยง · เย็น"])
+ImageSlide = Array[Texture2D]([ExtResource("t0"), ExtResource("t1"), ExtResource("t2"), ExtResource("t3")])
+Captions = Array[String](["คลิกที่ของหรือคนในฉากเพื่อโต้ตอบ", "เห็นเครื่องหมาย ! ที่ไหน แปลว่ามีเรื่องรออยู่ตรงนั้น กดได้เลย", "มุมซ้ายบนคือวัน เวลา และเงิน · มุมขวาบนคือเควสต์ กด \"ซ่อน\" หรือปุ่ม Q เพื่อพับเก็บ", "ในร้านมีกระดานงาน เลือกรับงานลูกค้าได้ กด \"ย่อ\" เพื่อซ่อนกระดาษ · กด Esc เพื่อพักเกม"])
 metadata/_custom_type_script = "uid://wqsge0jtfd64"

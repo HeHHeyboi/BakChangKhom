@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BenchTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/bench_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 1
+title = "จอไม่ขึ้นหลังย้ายเครื่อง"
+pc_name = "คอมห้องคอมโรงเรียน"
+request = "ย้ายโต๊ะใหม่แล้วเสียบสายกลับ เครื่องติดแต่จอขึ้นว่าไม่มีสัญญาณ"
+start_plugs = {
+"keyboard": "usb1",
+"mouse": "usb3",
+"monitor": "hdmi_mb",
+"power": "power"
+}
+broken_port = ""
+has_gpu = true
+traps = Array[StringName]([&"force_plug", &"pull_power"])
+ask_options = PackedStringArray("ก่อนจอไม่ขึ้น มีการถอดหรือย้ายสายไหมครับ", "จอซื้อมาเมื่อไหร่ครับ", "ห้องนี้มีกี่เครื่องครับ")
+ask_best = 0
+ask_answer = "ภารโรงย้ายโต๊ะให้ แล้วครูเสียบสายจอกลับเองตรงช่องที่เห็นว่าหัวเข้า"
+ask_note = "ครูเสียบสายจอเองหลังย้ายโต๊ะ"
+explain_options = PackedStringArray("เครื่องนี้มีการ์ดจอ ต้องเสียบสายจอที่ช่องของการ์ดจอด้านล่าง ไม่ใช่ช่องบนเมนบอร์ด ตอนนี้ขึ้นภาพแล้ว", "จอเสียครับ ต้องซื้อใหม่", "ต้องลงโปรแกรมจอใหม่")
+explain_best = 0
+pib_intro = PackedStringArray("จอขึ้นว่าไม่มีสัญญาณ แปลว่าจอเปิดอยู่แต่ไม่ได้รับภาพ ดูว่าสายจอเสียบช่องไหน", "เครื่องที่มีการ์ดจอ ภาพออกที่ช่องของการ์ดจอ ช่องจอบนเมนบอร์ดจะใช้ไม่ได้")
+pib_lesson = PackedStringArray("มีการ์ดจอ เสียบสายจอที่การ์ดจอเสมอ", "ไม่มีสัญญาณ ส่วนใหญ่เป็นเรื่องสาย ไม่ใช่จอเสีย")

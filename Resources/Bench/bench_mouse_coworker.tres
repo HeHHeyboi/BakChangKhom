@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BenchTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/bench_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 0
+title = "เมาส์ไม่ทำงาน"
+pc_name = "คอมของเพื่อนร่วมงาน"
+request = "ขยับเมาส์แล้วลูกศรไม่ขยับเลย ซื้อเมาส์ใหม่มาก็ไม่หาย"
+start_plugs = {
+"keyboard": "usb1",
+"mouse": "usb2",
+"monitor": "hdmi_gpu",
+"power": "power"
+}
+broken_port = "usb2"
+has_gpu = true
+traps = Array[StringName]([&"force_plug", &"pull_power"])
+ask_options = PackedStringArray("เมาส์เสียบอยู่ช่องไหน เคยย้ายช่องไหมครับ", "ใช้เมาส์ยี่ห้ออะไรครับ", "ทำงานวันละกี่ชั่วโมงครับ")
+ask_best = 0
+ask_answer = "เสียบช่องเดิมมาตลอด เปลี่ยนเมาส์ใหม่ก็เสียบช่องเดิมนั่นแหละ"
+ask_note = "เสียบช่องเดิมตลอด (ลองช่องอื่น)"
+explain_options = PackedStringArray("ช่อง USB ช่องเดิมเสีย ผมย้ายเมาส์ไปช่องอื่นแล้วใช้ได้ ไม่ต้องซื้อเมาส์ใหม่ ถ้าเป็นอีกให้ลองสลับช่องก่อน", "เมาส์เสียครับ ต้องซื้อใหม่", "ต้องเปลี่ยนเมนบอร์ดทั้งแผ่น")
+explain_best = 0
+pib_intro = PackedStringArray("อุปกรณ์ไม่ทำงาน ลองดูไฟที่ตัวมันก่อน แล้วลองสลับช่อง USB ดู", "คลิกหัวสายเพื่อถอด แล้วคลิกช่องที่จะเสียบ หัวกับช่องต้องรูปร่างเดียวกันนะ")
+pib_lesson = PackedStringArray("ช่อง USB เสียได้ สลับช่องคือวิธีทดสอบที่ง่ายที่สุด", "ไม่ต้องซื้อของใหม่ก่อนลองไล่หาสาเหตุ")

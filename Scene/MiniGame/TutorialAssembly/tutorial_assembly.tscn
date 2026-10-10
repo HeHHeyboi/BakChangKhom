@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://bmhdkxq6vwkwg" path="res://Scripts/MiniGame/TutorialAssembly/phase_power.gd" id="7_power"]
 [ext_resource type="Script" uid="uid://d0t5bihc62lhh" path="res://Scripts/MiniGame/TutorialAssembly/phase_summary.gd" id="7_summary"]
 [ext_resource type="Texture2D" uid="uid://ccixyjtudeyme" path="res://Assets/MiniGame/PartCommon/part_bg_workshop_wall.png" id="8_wall"]
-[ext_resource type="Texture2D" uid="uid://quiqc7xspufy" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="g1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/overview_shop_2x.jpg" id="g1"]
 [ext_resource type="Script" uid="uid://bbj8d3fhkjtbr" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="g2"]
 [ext_resource type="Script" uid="uid://dsa2srhpy1t5h" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="g3"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/psu.tres" id="g5"]
@@ -19,7 +19,8 @@
 [ext_resource type="Resource" path="res://Resources/Parts/Common/ssd_m2.tres" id="g18"]
 [ext_resource type="Resource" path="res://Resources/Parts/Common/gpu.tres" id="g20"]
 [ext_resource type="Script" uid="uid://cmbn5o0o6feu5" path="res://Scripts/MiniGame/PartBase/scene2d/socket_2d.gd" id="g23"]
-[ext_resource type="Texture2D" uid="uid://bw4atqigc0mq8" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="g24"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/desk_pc_2x.png" id="g24"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_screen_os.png" id="a13"]
 [ext_resource type="Texture2D" uid="uid://dyyt8f1ew2xx1" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="g25"]
 [ext_resource type="Texture2D" uid="uid://tg788nclphe6" path="res://Assets/MiniGame/PartFrontPanel/fp_led_on.png" id="g26"]
 [ext_resource type="Texture2D" uid="uid://dr1cdde7n47bc" path="res://Assets/MiniGame/PartFrontPanel/fp_led_off.png" id="g27"]
@@ -62,6 +63,7 @@ offset_bottom = 420.0
 mouse_filter = 2
 script = ExtResource("g2")
 background = ExtResource("g1")
+bg_scale = 0.5
 bg_offset = Vector2(0, -150)
 label = "ภาพรวมร้าน"
 aliases = PackedStringArray()
@@ -123,10 +125,10 @@ mouse_filter = 2
 [node name="Psu" type="Control" parent="Stage/Views/Tray/Parts" index="0" unique_id=1410532902]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 285
-offset_top = 60
-offset_right = 412.5
-offset_bottom = 179.0
+offset_left = 300
+offset_top = 135
+offset_right = 427.5
+offset_bottom = 254.0
 pivot_offset = Vector2(63.75, 59.5)
 mouse_filter = 2
 script = ExtResource("g7")
@@ -191,11 +193,11 @@ hint_flip = true
 [node name="Ram" type="Control" parent="Stage/Views/Tray/Parts" index="4" unique_id=1807030065]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 290
-offset_top = 215
-offset_right = 403.05
-offset_bottom = 241.35
-pivot_offset = Vector2(56.53, 13.17)
+offset_left = 300
+offset_top = 285
+offset_right = 413.05
+offset_bottom = 311.35
+pivot_offset = Vector2(56.52, 13.17)
 mouse_filter = 2
 script = ExtResource("g7")
 data = ExtResource("g15")
@@ -207,10 +209,10 @@ looks = Dictionary[String, Texture2D]({
 [node name="Ssd" type="Control" parent="Stage/Views/Tray/Parts" index="5" unique_id=1622454354]
 unique_name_in_owner = true
 anchors_preset = 0
-offset_left = 300
-offset_top = 275
-offset_right = 368.0
-offset_bottom = 293.7
+offset_left = 480
+offset_top = 292
+offset_right = 548.0
+offset_bottom = 310.7
 pivot_offset = Vector2(34, 9.35)
 mouse_filter = 2
 script = ExtResource("g7")
@@ -368,6 +370,7 @@ offset_bottom = 420.0
 mouse_filter = 2
 script = ExtResource("g2")
 background = ExtResource("g24")
+bg_scale = 0.5
 label = "จอ/คอม"
 aliases = PackedStringArray("Front")
 focus_x = 560.0
@@ -385,6 +388,7 @@ script = ExtResource("g7")
 mode = 0
 looks = Dictionary[String, Texture2D]({
 "boot_ok": ExtResource("g25"),
+"os": ExtResource("a13"),
 "off": null
 })
 state = "off"

@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 9
+title = "อัปเดตเครื่องห้องธุรการ"
+pc_name = "คอมห้องธุรการ"
+request = "เครื่องขึ้นให้อัปเดตทุกวัน กดเลื่อนไปเรื่อย ๆ ไม่รู้ต้องทำยังไง"
+files = Array[Dictionary]([{
+"name": "ตารางสอน.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ตารางสอนเทอมนี้"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+unsaved_doc = "หนังสือเชิญประชุม.doc"
+update_mb = 900
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"unsaved_work", &"interrupt_update", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("มีงานอะไรเปิดค้างไว้ยังไม่บันทึกไหมครับ", "โรงเรียนเปิดกี่โมงครับ", "ห้องนี้ใครใช้เครื่องบ้างครับ")
+ask_best = 0
+ask_answer = "มีหนังสือเชิญประชุมที่พิมพ์ค้างไว้ ยังไม่ได้เซฟ ฝากด้วยนะ"
+ask_note = "หนังสือเชิญประชุม ยังไม่บันทึก!"
+explain_options = PackedStringArray("อัปเดตความปลอดภัยเสร็จแล้ว ต้องรีสตาร์ตให้จบ บันทึกงานก่อนรีสตาร์ตทุกครั้ง และระหว่างอัปเดตห้ามปิดเครื่อง", "อัปเดตไม่จำเป็น กดเลื่อนไปเรื่อย ๆ ก็ได้", "รีบก็ปิดเครื่องระหว่างอัปเดตได้เลย")
+explain_best = 0
+pib_intro = PackedStringArray("อัปเดตอยู่ในตั้งค่า กดอัปเดต ตรวจหา ดาวน์โหลดและติดตั้ง แล้วรีสตาร์ต", "ก่อนรีสตาร์ตบันทึกงานที่เปิดค้างก่อนนะ ระหว่างติดตั้งห้ามปิดเครื่อง")
+pib_lesson = PackedStringArray("อัปเดตปิดช่องโหว่ เครื่องปลอดภัยขึ้น", "บันทึกงาน แล้วค่อยรีสตาร์ต · ห้ามปิดเครื่องตอนอัปเดต")

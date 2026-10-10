@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Bench/bench_monitor_teacher.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_teacher_monitor"
+customer = "ครู"
+reason = "ห้องคอมโรงเรียนย้ายโต๊ะ แล้วจอไม่ขึ้นหนึ่งเครื่อง"
+device = "คอมห้องคอมโรงเรียน"
+symptom = "เครื่องติด แต่จอขึ้นว่าไม่มีสัญญาณ"
+level = 2
+est_slots = 2
+due_shifts = 2
+part_id = "part_bench"
+job_title = "จอไม่ขึ้น (สายจอผิดช่อง)"
+bench_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_teacher_monitor.txt"
+thanks_text = "ขึ้นภาพแล้ว! เด็ก ๆ ได้เรียนคอมพรุ่งนี้แน่"
+complain_text = "จอก็ยังมืดอยู่นะขม…"

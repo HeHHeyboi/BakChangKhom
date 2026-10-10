@@ -1,5 +1,5 @@
 extends Phase2D
-## Phase 3 · POWER_TEST — กดปุ่มเปิดเครื่องหน้าเคส → ไฟ LED ติด → จอขึ้น → ทำความรู้จัก ขมOS → จบ
+## Phase 3 · POWER_TEST — กดปุ่มเปิดเครื่องหน้าเคส → ไฟ LED ติด → ซูมเข้าจอ → บูต + ทำความรู้จัก ขมOS (โหนดเดียว) → จบ
 ## [Claude 9 ต.ค. 2569] เดิมจบที่จอขึ้น "บูตผ่าน" · ตอนนี้เปิดขมOS (tour_mode) ให้ลองใช้ทีละขั้น (LEVEL_DESIGN: เลเวลแรกเป็นงานบนจอ)
 
 enum Stage { WAIT_POWER, BOOT, OS, DONE }
@@ -7,7 +7,6 @@ enum Stage { WAIT_POWER, BOOT, OS, DONE }
 var _built := false
 var _stage: Stage = Stage.WAIT_POWER
 var _rail_checks: Array = []
-var _power_said := false # กันบทเก่าที่ปิดทีหลัง (กดปุ่มเปิดระหว่างปิ๊บยังพูดอยู่) ไปเปิด OS ก่อนเวลา
 
 
 func init():
@@ -17,7 +16,6 @@ func init():
 		_rail_checks.append(PhaseUI.check_item(rail, "กดปุ่มเปิดเครื่องหน้าเคส"))
 		_rail_checks.append(PhaseUI.check_item(rail, "ทำความรู้จัก ขมOS"))
 	_stage = Stage.WAIT_POWER
-	_power_said = false
 	for c in _rail_checks:
 		PhaseUI.set_check(c, false)
 	show()
@@ -44,30 +42,22 @@ func _on_clicked(p: Item2D) -> void:
 	await wait(0.8)
 	if not visible:
 		return
-	(node("Monitor") as Item2D).set_state("boot_ok")
-	_power_said = true
-	say("ASM_POWER_OK", PibHint.Mood.HAPPY)
+	# [10 ต.ค.] จอบูต + ขมOS เป็นโหนดเดียวกัน (DesktopMinigame framed) — ซูมเข้าจอแล้วบูตในนั้นเลย
+	# ไม่ใช้ภาพนิ่ง boot_ok / os ของ Monitor แล้ว · ปิ๊บของ OS ทักเอง (os_tour.pib_intro)
+	_stage = Stage.OS
+	await owner.open_os_tour()
+	if not visible:
+		return
+	_stage = Stage.DONE
+	PhaseUI.set_check(_rail_checks[1], true)
+	say("ASM_OS_DONE", PibHint.Mood.HAPPY)
 
 
 func _on_pib_done() -> void:
 	if not visible:
 		return
-	match _stage:
-		Stage.BOOT:
-			if not _power_said:
-				return
-			_stage = Stage.OS
-			await wait(0.3)
-			if not visible:
-				return
-			await owner.open_os_tour()
-			if not visible:
-				return
-			_stage = Stage.DONE
-			PhaseUI.set_check(_rail_checks[1], true)
-			say("ASM_OS_DONE", PibHint.Mood.HAPPY)
-		Stage.DONE:
-			finish()
+	if _stage == Stage.DONE:
+		finish()
 
 
 ## ข้ามด้วย Debug ระหว่างเปิด OS → ปิด OS ด้วย

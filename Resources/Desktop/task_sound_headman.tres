@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 5
+title = "แก้เสียงไม่ออก"
+pc_name = "คอมที่ทำการผู้ใหญ่บ้าน"
+request = "จะเปิดเสียงประกาศหมู่บ้าน แต่ลำโพงเงียบ"
+files = Array[Dictionary]([{
+"name": "ประกาศงานวัด.mp3",
+"size_mb": 5,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "เสียงประกาศที่อัดไว้"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+sound_devices = Array[Dictionary]([{
+"name": "หูฟัง (ไม่ได้เสียบ)",
+"works": false
+}, {
+"name": "ลำโพง (ในตัวเครื่อง)",
+"works": true
+}])
+sound_device = 0
+sound_muted = true
+sound_volume = 10
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"delete_system", &"delete_user"])
+ask_options = PackedStringArray("ก่อนเสียงหาย มีใครมาใช้เครื่องไหมครับ", "ประกาศเรื่องอะไรครับ", "ลำโพงซื้อมาเท่าไหร่ครับ")
+ask_best = 0
+ask_answer = "หลานมาเสียบหูฟังเล่นเกมเมื่อวาน แล้วก็ถอดไป"
+ask_note = "หลานเสียบหูฟังแล้วถอดไป"
+explain_options = PackedStringArray("เสียงไปออกที่หูฟังที่ถอดไปแล้ว ผมเปลี่ยนกลับเป็นลำโพงแล้วเปิดเสียงให้ ถ้าเงียบอีกให้ดูตรงเสียงที่แถบงานก่อน", "ลำโพงเสีย ต้องซื้อใหม่ครับ", "ต้องลงไดรเวอร์เสียงใหม่ทุกวัน")
+explain_best = 0
+pib_intro = PackedStringArray("เสียงไม่ออกส่วนใหญ่ไม่ได้เสีย กดตรงคำว่าเสียงที่แถบงานด้านล่าง ดูว่าเลือกอุปกรณ์ไหน ปิดเสียงไว้ไหม", "ไดรเวอร์เสียงเป็นของระบบนะ อย่าไปถอน")
+pib_lesson = PackedStringArray("เช็กง่าย ๆ ก่อนเสมอ อุปกรณ์ที่เลือก ปุ่มปิดเสียง ระดับเสียง", "ส่วนใหญ่ไม่ต้องซื้อของใหม่เลย")

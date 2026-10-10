@@ -49,6 +49,18 @@ const C_AD := Color(1.0, 0.45, 0.2)
 @export var tour_mode := false
 ## ชั้นของหน้าจอ OS (tour ต้องอยู่เหนือ UI ของบทฝึก)
 @export var ui_layer := 5
+## [Claude 10 ต.ค. 2569] แสดง OS ในจอมอนิเตอร์บนโต๊ะ (มุมใกล้หน้าจอ เนียนกับโต๊ะ) · false = เต็มจอแบบเดิม
+## ทุกที่ใช้ซีนเดียวกัน: บทฝึก (tour) · คอมในร้าน (free) · งานลูกค้า
+@export var framed := true
+## จอบูตในโหนดเดียวกัน (ข้อความตรวจเครื่อง → โลโก้ ขมOS → เดสก์ท็อป) · คลิกเพื่อข้าม
+@export var boot_screen := true
+
+signal booted
+
+## พื้นที่จอในภาพ os_frame_desk.png (พิกัดหน้าจอเกม 1152×648) · OS 1152×648 ถูกย่อลงมาใส่ (สเกล 0.85)
+const FRAME_SCREEN := Rect2(86, 14, 979.2, 550.8)
+const TEX_FRAME := preload(DIR + "os_frame_desk.png")
+const BOOT_LINES := ["ขมBIOS v1.0", "ตรวจซีพียู ........ ผ่าน", "ตรวจแรม 8 GB ...... ผ่าน", "ตรวจ SSD 256 GB ... ผ่าน", "กำลังเริ่ม ขมOS ..."]
 
 signal tour_finished(skipped: bool)
 
@@ -92,6 +104,10 @@ var _popup_seq := 0
 
 # ---- UI
 var _ui: Control
+var _root: Control
+var _boot: Control
+var _boot_tw: Tween
+var is_booting := false
 var _icons: Control
 var _win_layer: Control
 var _modal: ColorRect
@@ -119,6 +135,9 @@ var _settings_rows: VBoxContainer
 var _settings_disk: ProgressBar
 var _settings_disk_label: Label
 var _popup_timer: Timer
+## [10 ต.ค.] ส่วนเสริม: ตัวจัดการงาน · เครื่องพิมพ์ · เสียง · Wi-Fi · USB · อัปเดต · ขมการ์ด · จอภาพ (os_extra.gd)
+var extra: OsExtra
+var _ask_note_label: Label
 
 
 func _ready() -> void:
@@ -136,17 +155,24 @@ func _ready() -> void:
 		_finish.call_deferred(false)
 		return
 	_load_state()
+	extra = OsExtra.new(self)
+	extra.load_state()
 	if free_mode:
 		customer_name = "ขม"
 		_build_ui()
 		_set_step(Step.WORK)
-		_pib_lines(task.pib_intro)
 		if tour_mode:
 			_tour_build()
+		if is_booting:
+			await booted
+		_pib_lines(task.pib_intro)
 		return
 	_build_ui()
 	_set_step(Step.LISTEN)
-	_open_ask()
+	if is_booting:
+		await booted
+	if step == Step.LISTEN and not _modal.visible:
+		_open_ask()
 
 
 func _resolve_task() -> void:
@@ -225,6 +251,9 @@ func ask(i: int) -> String:
 	var good := i == task.ask_best
 	if not good:
 		lose(&"listen", 10, "ถามลูกค้าไม่ตรงประเด็น")
+	elif task.ask_note != "" and is_instance_valid(_ask_note_label):
+		_ask_note_label.text = task.ask_note
+		_ask_note_label.show()
 	_set_step(Step.WORK)
 	return task.ask_answer if good else task.ask_answer_wrong
 
@@ -479,6 +508,8 @@ func _check_reason() -> String:
 			if free_mb < task.free_space_target_mb:
 				return "ยังเซฟไม่ได้ พื้นที่เหลือ %s (ต้อง %s) — ลบแล้วอย่าลืมล้างถังขยะ" % [
 					size_text(free_mb), size_text(task.free_space_target_mb)]
+		_:
+			return extra.check_reason()
 	return ""
 
 
@@ -618,12 +649,14 @@ func _tour_update_ring(delta: float) -> void:
 		return
 	_tour_t += delta
 	var t := _tour_target()
-	if t == null or not t.is_visible_in_tree() or step == Step.DONE:
+	if t == null or not t.is_visible_in_tree() or step == Step.DONE or is_booting:
 		_tour_ring.hide()
 		return
-	var r := t.get_global_rect().grow(6.0 + 3.0 * sin(_tour_t * 6.0))
+	# พิกัดใน _ui (จอถูกย่อตอน framed → ใช้ global_rect ตรง ๆ ไม่ได้)
+	var at := _ui.get_global_transform().affine_inverse() * t.global_position
+	var r := Rect2(at, t.size).grow(6.0 + 3.0 * sin(_tour_t * 6.0))
 	_tour_ring.show()
-	_tour_ring.global_position = r.position
+	_tour_ring.position = r.position
 	_tour_ring.size = r.size
 	_tour_ring.move_to_front()
 
@@ -687,11 +720,32 @@ func _build_ui() -> void:
 	layer.name = "Os"
 	layer.layer = ui_layer
 	add_child(layer)
+	_root = Control.new()
+	_root.name = "Root"
+	_root.size = SCREEN
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(_root)
+	if framed:
+		var desk := TextureRect.new()
+		desk.name = "Desk"
+		desk.texture = TEX_FRAME # วาดไว้ 2× → ย่อให้พอดีจอ (ตั้ง expand_mode ก่อน size)
+		desk.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		desk.stretch_mode = TextureRect.STRETCH_SCALE
+		desk.size = SCREEN
+		desk.mouse_filter = Control.MOUSE_FILTER_STOP # กันคลิกทะลุไปฉากข้างหลัง
+		_root.add_child(desk)
 	_ui = Control.new()
 	_ui.name = "Screen"
 	_ui.size = SCREEN
 	_ui.theme = _make_theme()
-	layer.add_child(_ui)
+	if framed:
+		_ui.position = FRAME_SCREEN.position
+		_ui.scale = Vector2.ONE * (FRAME_SCREEN.size.x / SCREEN.x)
+		_ui.clip_contents = true # หน้าต่างลากออกนอกจอ → ไม่ทับขอบจอ
+	_root.add_child(_ui)
+	if framed:
+		_root.modulate.a = 0.0
+		create_tween().tween_property(_root, "modulate:a", 1.0, 0.3)
 
 	var wall := TextureRect.new()
 	wall.texture = TEX_WALL
@@ -740,6 +794,103 @@ func _build_ui() -> void:
 	_popup_timer.start()
 
 	_refresh_all()
+	extra.build_ui()
+	if boot_screen:
+		_build_boot()
+
+
+# ---------------------------------------------------------------- จอบูต (โหนดเดียวกับ OS)
+
+
+func _build_boot() -> void:
+	is_booting = true
+	_boot = Control.new()
+	_boot.name = "Boot"
+	_boot.size = SCREEN
+	_boot.mouse_filter = Control.MOUSE_FILTER_STOP
+	_boot.gui_input.connect(func(e: InputEvent):
+		if e is InputEventMouseButton and e.pressed:
+			skip_boot())
+	_ui.add_child(_boot)
+	var black := ColorRect.new()
+	black.color = Color(0.02, 0.02, 0.03)
+	black.size = SCREEN
+	black.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boot.add_child(black)
+	var post := _label("", 26, Color(0.75, 0.95, 0.75))
+	post.name = "Post"
+	post.position = Vector2(70, 60)
+	_boot.add_child(post)
+	var logo := Control.new()
+	logo.name = "Logo"
+	logo.size = SCREEN
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	logo.modulate.a = 0.0
+	_boot.add_child(logo)
+	var icon := TextureRect.new()
+	icon.texture = TEX_START
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size = Vector2(150, 150)
+	icon.position = Vector2((SCREEN.x - 150) / 2.0, 170)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	logo.add_child(icon)
+	var title := _label("ขมOS", 54, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.size = Vector2(SCREEN.x, 70)
+	title.position = Vector2(0, 330)
+	logo.add_child(title)
+	var bar_bg := ColorRect.new()
+	bar_bg.color = Color(1, 1, 1, 0.15)
+	bar_bg.size = Vector2(320, 10)
+	bar_bg.position = Vector2((SCREEN.x - 320) / 2.0, 430)
+	bar_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	logo.add_child(bar_bg)
+	var bar := ColorRect.new()
+	bar.name = "Bar"
+	bar.color = Color(1.0, 0.75, 0.35)
+	bar.size = Vector2(0, 10)
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar_bg.add_child(bar)
+	var hint := _label("คลิกเพื่อข้าม", 18, Color(1, 1, 1, 0.35))
+	hint.position = Vector2(SCREEN.x - 150, SCREEN.y - 40)
+	_boot.add_child(hint)
+
+	_boot_tw = create_tween()
+	_boot_tw.tween_interval(0.35)
+	for line in BOOT_LINES:
+		_boot_tw.tween_callback(func(): post.text += ("\n" if post.text != "" else "") + line)
+		_boot_tw.tween_interval(0.22)
+	_boot_tw.tween_interval(0.25)
+	_boot_tw.tween_property(post, "modulate:a", 0.0, 0.2)
+	_boot_tw.tween_property(logo, "modulate:a", 1.0, 0.3)
+	_boot_tw.tween_property(bar, "size:x", 320.0, 1.0).set_trans(Tween.TRANS_SINE)
+	_boot_tw.tween_property(_boot, "modulate:a", 0.0, 0.35)
+	_boot_tw.tween_callback(_end_boot)
+
+
+## ข้ามจอบูต (คลิก หรือเรียกจากเทสต์)
+func skip_boot() -> void:
+	if not is_booting:
+		return
+	if _boot_tw and _boot_tw.is_valid():
+		_boot_tw.kill()
+	_end_boot()
+
+
+func _end_boot() -> void:
+	if not is_booting:
+		return
+	is_booting = false
+	if is_instance_valid(_boot):
+		_boot.queue_free()
+	_boot = null
+	booted.emit()
+
+
+## ตำแหน่งจุดบนหน้าจอเกม (viewport) ของจุด local ใน Control c — ใช้วาง PopupMenu ตอนจอถูกย่อ (framed)
+func _to_viewport(c: Control, local := Vector2.ZERO) -> Vector2i:
+	return Vector2i(c.get_global_transform_with_canvas() * local)
 
 
 ## ธีมของขมOS: ปุ่มสีอ่อนตัวหนังสือเข้ม (ธีมหลักของเกมเป็นตัวหนังสือสีขาว อ่านไม่ออกบนหน้าต่างสีครีม)
@@ -836,6 +987,10 @@ func _build_note() -> void:
 	var r := _label(task.request, 13, Color(0.4, 0.3, 0.2))
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(r)
+	_ask_note_label = _label("", 14, Color(0.7, 0.2, 0.1))
+	_ask_note_label.name = "AskNote"
+	_ask_note_label.hide()
+	box.add_child(_ask_note_label)
 	_note_checks.clear()
 	var lines: Array = ["ฟังลูกค้า", "ดูอาการ + ลงมือ", "ลองใช้ให้ลูกค้าดู", "อธิบายให้ลูกค้าฟัง"]
 	if tour_mode:
@@ -931,6 +1086,18 @@ func _build_taskbar() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(spacer)
+	for tray in [["Wi-Fi", func(): extra.open_wifi()], ["เสียง", func(): extra.open_sound()]]:
+		var tb := Button.new()
+		tb.name = "Tray_" + String(tray[0]).validate_node_name()
+		tb.text = tray[0]
+		tb.flat = true
+		tb.focus_mode = Control.FOCUS_NONE
+		tb.add_theme_color_override("font_color", Color.WHITE)
+		tb.add_theme_color_override("font_hover_color", Color(1, 0.9, 0.6))
+		tb.add_theme_font_size_override("font_size", 14)
+		tb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		tb.pressed.connect(tray[1])
+		row.add_child(tb)
 	_disk_label = _label("", 15, Color.WHITE)
 	_disk_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_disk_label)
@@ -945,6 +1112,7 @@ func _build_taskbar() -> void:
 	var items := [
 		["เอกสาร", TEX_FOLDER], ["รูปภาพ", TEX_PICTURES], ["ดาวน์โหลด", TEX_DOWNLOADS],
 		["เบราว์เซอร์", TEX_BROWSER], ["ตั้งค่า", TEX_SETTINGS], ["ถังขยะ", TEX_TRASH],
+		["ตัวจัดการงาน", TEX_SETTINGS], ["ขมการ์ด (ความปลอดภัย)", TEX_SETTINGS],
 	]
 	for i in items.size():
 		_start_menu.add_icon_item(_small(items[i][1]), items[i][0], i)
@@ -985,7 +1153,7 @@ func _small(tex: Texture2D) -> Texture2D:
 
 func _show_start_menu(from: Control) -> void:
 	_start_menu.reset_size()
-	_start_menu.popup(Rect2i(Vector2i(from.global_position) - Vector2i(0, _start_menu.size.y + 4), Vector2i.ZERO))
+	_start_menu.popup(Rect2i(_to_viewport(from) - Vector2i(0, _start_menu.size.y + 4), Vector2i.ZERO))
 
 
 func _on_start_menu(id: int) -> void:
@@ -1002,6 +1170,10 @@ func _on_start_menu(id: int) -> void:
 			open_settings()
 		5:
 			open_trash()
+		6:
+			extra.open_task_manager()
+		7:
+			extra.open_security()
 		99:
 			shut_down()
 
@@ -1062,6 +1234,8 @@ func _refresh_all() -> void:
 
 
 func _process(delta: float) -> void:
+	if is_instance_valid(_boot):
+		_boot.move_to_front()
 	if tour_mode:
 		_tour_update_ring(delta)
 	if is_instance_valid(_clock_label) and Engine.get_process_frames() % 30 == 0:
@@ -1142,7 +1316,7 @@ func _on_icon_input(e: InputEvent, ic: Control) -> void:
 		var can_delete := d.has("program") or d.has("file")
 		_icon_menu.set_item_disabled(1, not can_delete)
 		_icon_menu.set_item_text(1, "ลบไอคอน" if d.has("program") else "ลบ")
-		_icon_menu.popup(Rect2i(Vector2i(e.global_position), Vector2i.ZERO))
+		_icon_menu.popup(Rect2i(Vector2i(get_viewport().get_mouse_position()), Vector2i.ZERO))
 
 
 func _select_icon(ic: Control) -> void:
@@ -1171,6 +1345,10 @@ func _delete_icon_data(d: Dictionary) -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and event.ctrl_pressed and event.shift_pressed:
+		extra.open_task_manager()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_DELETE:
 		if is_instance_valid(_selected_icon) and step == Step.WORK:
 			_delete_icon_data(_selected_icon.get_meta("data"))
@@ -1257,7 +1435,10 @@ func open_explorer(folder: String) -> void:
 		side.custom_minimum_size.x = 140
 		row.add_child(side)
 		for fo in DesktopTask.FOLDERS:
+			if fo == DesktopTask.USB and not task.usb_drive:
+				continue
 			var b := Button.new()
+			b.name = "Folder_" + fo.validate_node_name()
 			b.text = fo
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.focus_mode = Control.FOCUS_NONE
@@ -1285,6 +1466,8 @@ func open_explorer(folder: String) -> void:
 		var bar := HBoxContainer.new()
 		right.add_child(bar)
 		var acts := [["เปิด", "open"], ["ลบ", "delete"]] if free_mode else [["เปิด", "open"], ["ถามลูกค้า", "ask"], ["ลบ", "delete"]]
+		if task.usb_drive:
+			acts.append_array([["คัดลอกไป USB", "copy_usb"], ["ย้ายไป USB", "move_usb"], ["ถอด USB", "eject"]])
 		for a in acts:
 			var b := Button.new()
 			b.text = a[0]
@@ -1312,6 +1495,9 @@ func _explorer_selected() -> Dictionary:
 
 
 func _explorer_action(what: String) -> void:
+	if what == "eject":
+		_explorer_status.text = extra.eject_usb()
+		return
 	var f := _explorer_selected()
 	if f.is_empty():
 		_pib_toast(&"SELECT_FIRST", 2.5)
@@ -1323,6 +1509,10 @@ func _explorer_action(what: String) -> void:
 			customer_say(ask_about(f))
 		"delete":
 			delete_file(f)
+		"copy_usb":
+			_explorer_status.text = extra.copy_to_usb(f)
+		"move_usb":
+			_explorer_status.text = extra.move_to_usb(f)
 
 
 func _on_explorer_key(e: InputEvent) -> void:
@@ -1337,6 +1527,9 @@ func _refresh_explorer() -> void:
 	_explorer_list.clear()
 	_explorer_path.text = "เครื่องนี้ › " + _explorer_folder
 	var list := visible_files(_explorer_folder)
+	if _explorer_folder == DesktopTask.USB and not extra.usb_present():
+		list.clear()
+		_explorer_path.text += "  (ถอดแล้ว)"
 	for f in list:
 		var i := _explorer_list.add_item("%s      %s" % [f.name, size_text(int(f.size_mb))], _file_tex(f))
 		_explorer_list.set_item_metadata(i, f)
@@ -1540,9 +1733,19 @@ func _wizard_page(w: OsWindow, page: int, bundle: bool) -> void:
 
 ## ตั้งค่า → แอป (ถอนการติดตั้ง) + พื้นที่จัดเก็บ
 func open_settings() -> void:
-	var w := open_window("settings", "ตั้งค่า", TEX_SETTINGS, Vector2(560, 400))
+	var w := open_window("settings", "ตั้งค่า", TEX_SETTINGS, Vector2(600, 430))
 	tour_event("open_settings")
 	if w.body.get_child_count() == 0:
+		var sec := HFlowContainer.new()
+		sec.name = "Sections"
+		for it in extra.settings_sections():
+			var sb := Button.new()
+			sb.text = it[0]
+			sb.name = "Sec_" + String(it[0]).validate_node_name()
+			sb.focus_mode = Control.FOCUS_NONE
+			sb.pressed.connect(it[1])
+			sec.add_child(sb)
+		w.body.add_child(sec)
 		w.body.add_child(_label("พื้นที่จัดเก็บ", 18, C_INK))
 		_settings_disk = ProgressBar.new()
 		_settings_disk.show_percentage = false

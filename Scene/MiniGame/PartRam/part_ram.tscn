@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://quiqc7xspufy" path="res://Assets/MiniGame/Scene2D/overview_shop.jpg" id="g1"]
 [ext_resource type="Script" uid="uid://bbj8d3fhkjtbr" path="res://Scripts/MiniGame/PartBase/scene2d/view_2d.gd" id="g2"]
 [ext_resource type="Script" uid="uid://dsa2srhpy1t5h" path="res://Scripts/MiniGame/PartBase/scene2d/hotspot_2d.gd" id="g3"]
-[ext_resource type="Texture2D" uid="uid://bw4atqigc0mq8" path="res://Assets/MiniGame/Scene2D/desk_pc.png" id="g4"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/Scene2D/desk_pc_2x.png" id="g4"]
 [ext_resource type="Texture2D" uid="uid://cs8ngu36itw5c" path="res://Assets/MiniGame/PartRam/ram_tex_screen_glitch.png" id="g5"]
 [ext_resource type="Texture2D" uid="uid://ba2ot5a4ockub" path="res://Assets/MiniGame/PartRam/ram_tex_screen_desktop.png" id="g6"]
 [ext_resource type="Texture2D" uid="uid://dyyt8f1ew2xx1" path="res://Assets/MiniGame/PartRam/ram_tex_screen_boot_ok.png" id="g7"]
@@ -127,6 +127,7 @@ offset_bottom = 420.0
 mouse_filter = 2
 script = ExtResource("g2")
 background = ExtResource("g4")
+bg_scale = 0.5
 label = "โต๊ะคอม"
 aliases = PackedStringArray("Front")
 focus_x = 560.0

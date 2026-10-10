@@ -155,6 +155,14 @@ func _ready() -> void:
 		"ปิดร้าน → กะ 2 · จ่ายค่าไฟล่วงเวลา 1 ช่อง ฿30")
 	_check(DayLoop._card == DayLoop.Card.BOARD and DayLoop.board.size() > 0, "กะ 2 กระดานมีงาน (%d ใบ)" % DayLoop.board.size())
 
+	# [10 ต.ค.] ย่อกระดาษงาน → เหลือแถบ · กดแถบ → กลับมา
+	DayLoop.set_cards_hidden(true)
+	await _frames(3)
+	_check(not DayLoop._board_panel.visible and DayLoop._cards_tab.visible and DayLoop._cards_tab.text.contains("กระดานงาน"), "ย่อกระดานงาน → เหลือแถบมุมขวา")
+	DayLoop._cards_tab.pressed.emit()
+	await _frames(3)
+	_check(DayLoop._board_panel.visible and not DayLoop._cards_tab.visible, "กดแถบ → กระดานงานกลับมา")
+
 	# กะ 2–5: ปิดร้านเลย · งานหมดเขตต้องเดินออก
 	for s in range(2, 6):
 		ts.set_clock(TimeSystem.CLOSE)
@@ -172,6 +180,24 @@ func _ready() -> void:
 	await _frames(3)
 	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.BOARD, "สัปดาห์ 2 กะ 1 → กระดานงาน")
 	_check(DayLoop.effective_weights(2)[2] > 0.0, "สัปดาห์ 2 มีสัดส่วน Lv3 แล้ว (%s)" % DayLoop.effective_weights(2))
+
+	# [10 ต.ค.] เดโมจบที่กะ 7: ปิดร้านกะ 7 → การ์ดจบเดโม → กลับบ้าน + ป้าย "กำลังพัฒนา"
+	for s in [6, 7]:
+		ts.set_clock(TimeSystem.CLOSE)
+		await _frames(3)
+		_check(DayLoop._card == DayLoop.Card.SHIFT_END and ts.shift == s, "กะ %d ปิดร้าน" % s)
+		if s == 7:
+			_check(DayLoop._primary.text.contains("เดโม"), "กะ 7 ปุ่มปิดร้าน = จบการเล่นเดโม")
+		DayLoop._on_primary()
+		await _frames(3)
+	_check(DayLoop.demo_over and ts.shift == 7 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 7 กะ → การ์ดสิ้นสุดการเล่นเดโม")
+	print("T   ", DayLoop._body.text.replace("\n", " | "))
+	DayLoop._on_primary()
+	await _wait(1.6)
+	_check(SceneRouter.current_id == SceneRouter.HOME and DayLoop._demo_banner.visible, "กลับบ้าน → ป้ายกำลังพัฒนาให้ครบลูป")
+	_check(DayLoop._card == DayLoop.Card.NONE and not DayLoop._board_panel.visible, "หลังจบเดโมไม่มีกระดานงาน")
+	DayLoop._reset_run()
+	_check(not DayLoop.demo_over and not DayLoop._demo_banner.visible and ts.shift == 1, "เริ่มใหม่ → ล้างสถานะเดโม")
 
 	# บิลรายเดือน
 	var m0 := GameState.money

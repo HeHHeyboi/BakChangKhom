@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Desktop/task_startup_amnuay.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv1_amnuay_startup"
+customer = "ลุงอำนวย"
+reason = "รอเปิดเครื่องนานจนชาเย็นชืด"
+device = "คอมตั้งโต๊ะของลุงอำนวย"
+symptom = "เปิดเครื่องช้ามาก"
+level = 1
+est_slots = 1
+due_shifts = 2
+part_id = "part_desktop"
+job_title = "ปิดโปรแกรมเปิดพร้อมเครื่อง"
+desktop_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv1_amnuay_startup.txt"
+thanks_text = "เปิดปุ๊บใช้ได้ปั๊บ เยี่ยมเลย!"
+complain_text = "ก็ยังช้าเหมือนเดิมนี่นา…"

@@ -14,11 +14,26 @@ func _ready() -> void:
 		if f.ends_with(".tres"):
 			var t: DesktopTask = load("res://Resources/Desktop/" + f)
 			_check(t != null and t.problems().is_empty(), "DesktopTask %s ครบ %s" % [f, t.problems() if t else "โหลดไม่ได้"])
-	for c in ["lv1_yai_chat", "lv1_headman_chat", "lv1_amnuay_space", "lv1_min_space", "lv1_kid_ads", "lv1_director_ads"]:
+	for c in ["lv1_yai_chat", "lv1_headman_chat", "lv1_amnuay_space", "lv1_min_space", "lv1_kid_ads", "lv1_director_ads",
+			"lv1_min_hang", "lv1_teacher_printer", "lv1_headman_sound", "lv1_girl_wifi", "lv1_yai_backup", "lv1_amnuay_startup", "lv1_director_update"]:
 		var cc: CustomerCase = load("res://Resources/Customers/%s.tres" % c)
 		_check(cc.level == 1 and cc.problems().is_empty(), "ลูกค้า %s ครบ %s" % [c, cc.problems()])
 	var pool: Array = DayLoop.random_pool
-	_check(pool.filter(func(c): return c.level == 1).size() == 6, "random_pool มีงาน Lv1 6 งาน")
+	_check(pool.filter(func(c): return c.level == 1).size() == 13, "random_pool มีงาน Lv1 13 งาน (1-1 … 1-10)")
+
+	# ---- [10 ต.ค.] OS อยู่ในจอบนโต๊ะ (framed) + จอบูตในโหนดเดียวกัน
+	var bm: DesktopMinigame = (load(SCENE) as PackedScene).instantiate()
+	bm.task = load("res://Resources/Desktop/task_install_chat.tres")
+	add_child(bm)
+	await _wait(0.9)
+	_check(bm.framed and bm._ui.scale.x < 0.9 and bm._root.has_node("Desk") and bm._ui.clip_contents, "OS แสดงในจอมอนิเตอร์บนโต๊ะ (ย่อ + ตัดขอบ)")
+	_check(bm.is_booting and is_instance_valid(bm._boot) and not bm._modal.visible, "เริ่มด้วยจอบูต · ยังไม่ถามลูกค้า")
+	await _shot("boot")
+	await _wait(3.2)
+	_check(not bm.is_booting and bm._modal.visible, "บูตเสร็จเอง → ขึ้นหน้าต่างถามลูกค้า")
+	await _shot("framed_ask")
+	bm.queue_free()
+	await _frames(2)
 
 	# ---- 1-1 ลงโปรแกรม: ตกทั้งสองกับดัก แล้วถอนแก้
 	var m := await _open("task_install_chat")
@@ -110,6 +125,8 @@ func _ready() -> void:
 	m = (load(SCENE) as PackedScene).instantiate()
 	m.set_meta("work_order", cc)
 	SceneRouter.push_node(m)
+	await _frames(2)
+	m.skip_boot()
 	await get_tree().create_timer(1.4).timeout
 	_check(m.task == cc.desktop_task and m.customer_name == "ยาย", "work_order → ใช้ DesktopTask ของลูกค้า")
 	m.ask(m.task.ask_best)
@@ -129,17 +146,31 @@ func _ready() -> void:
 	add_child(home)
 	await _frames(1)
 	_check(home.has_node("Grandma") and home.has_node("Door") and home.has_node("Door/caution") and home.has_node("MapPlaceHolder") and not home.has_node("PC"),
-		"บ้านยายฉากใหม่: ยาย · ป้ายไปร้าน · แผนที่")
+		"ในบ้านขมกับยาย: ยาย · ประตูหน้าบ้าน · แผนที่")
+	_check(home.get_node("Door") is LocationDoor and home.get_node("Door").target == SceneRouter.VILLAGE, "ประตูในบ้าน → หน้าบ้าน")
 	home.queue_free()
+	var vil: Control = load("res://Scene/Location/Village.tscn").instantiate()
+	add_child(vil)
+	await _frames(1)
+	_check(vil.get_node("ShopSign").target == SceneRouter.ROOM and vil.get_node("HomeDoor").target == SceneRouter.HOME and vil.has_node("ShopSign/caution") and not vil.has_node("Grandma"),
+		"หน้าบ้าน: ป้าย → ร้าน · เรือน → กลับบ้าน")
+	vil.queue_free()
 	var room: Control = load("res://Scene/Location/Room.tscn").instantiate()
 	add_child(room)
 	await _frames(1)
 	var pc = room.get_node("PC")
 	_check(pc is SceneHotspot and room.get_node("Door") is SceneHotspot and room.has_node("Event"), "ร้านฉากใหม่: คอมของขม · ทางออก · จุดเควสต์")
+	_check(SceneRouter.LOCATIONS.has(SceneRouter.VILLAGE) and ResourceLoader.exists(SceneRouter.LOCATIONS[SceneRouter.VILLAGE]), "SceneRouter มีฉากหน้าบ้าน")
 	var fm: DesktopMinigame = pc.open_pc()
 	_check(fm != null and Global.in_minigame, "กดคอมในร้าน → เปิดขมOS")
 	_check(pc.open_pc() == null, "เปิดซ้ำระหว่างอยู่ในคอมไม่ได้")
+	while is_instance_valid(fm) and not fm.is_booting:
+		await _frames(1)
+	await _wait(0.8)
+	await _shot("shop_pc_boot")
+	fm.skip_boot()
 	await get_tree().create_timer(1.4).timeout
+	await _shot("shop_pc")
 	_check(fm.free_mode and fm.step == DesktopMinigame.Step.WORK and not fm._modal.visible and fm.app_installed, "เล่นอิสระ: ไม่มีขั้นฟัง · มีแอปพูดคุยในเครื่อง")
 	var money1 := GameState.money
 	fm.delete_file(fm.find_file("รูปกับยาย.jpg"))
@@ -159,7 +190,21 @@ func _open(task_name: String) -> DesktopMinigame:
 	m.task = load("res://Resources/Desktop/%s.tres" % task_name)
 	add_child(m)
 	await _frames(2)
+	m.skip_boot()
+	await _frames(1)
 	return m
+
+
+func _wait(s: float) -> void:
+	await get_tree().create_timer(s).timeout
+
+
+## SHOT=<โฟลเดอร์> → เซฟภาพหน้าจอ (ต้องรันแบบมีหน้าจอ ไม่ใช่ --headless)
+func _shot(n: String) -> void:
+	if OS.get_environment("SHOT") == "":
+		return
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_jpg(OS.get_environment("SHOT") + "/desktop_%s.jpg" % n, 0.8)
 
 
 func _frames(n: int) -> void:

@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 7
+title = "สำรองรูปลง USB"
+pc_name = "คอมของยาย"
+request = "กลัวรูปหลานหาย อยากเก็บไว้ใน USB อีกที่"
+files = Array[Dictionary]([{
+"name": "รูปงานบวชหลาน.jpg",
+"size_mb": 8,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "หลานบวชที่วัดบ้าน"
+}, {
+"name": "รูปทำบุญบ้าน.jpg",
+"size_mb": 6,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "ทำบุญขึ้นบ้านใหม่"
+}, {
+"name": "รูปหลานรับปริญญา.jpg",
+"size_mb": 7,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "ยายภูมิใจที่สุด"
+}, {
+"name": "สูตรแกงส้ม.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "สูตรของยาย"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+usb_drive = true
+usb_mb = 16000
+backup_folder = "รูปภาพ"
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"move_not_copy", &"delete_user", &"delete_system"])
+ask_options = PackedStringArray("อยากสำรองรูปไหนบ้างครับ", "ยายใช้คอมวันละกี่ชั่วโมงครับ", "USB ซื้อมาเท่าไหร่ครับ")
+ask_best = 0
+ask_answer = "รูปในโฟลเดอร์รูปภาพทั้งหมดเลยจ้ะ ในเครื่องก็ต้องอยู่นะ ยายดูทุกวัน"
+ask_note = "รูปภาพทั้งหมด · ในเครื่องต้องอยู่ด้วย"
+explain_options = PackedStringArray("รูปคัดลอกลง USB แล้ว ในเครื่องก็ยังอยู่ เก็บ USB ไว้ที่ปลอดภัย และกดถอดอย่างปลอดภัยก่อนดึงทุกครั้ง", "รูปย้ายไปอยู่ใน USB หมดแล้ว ในเครื่องไม่มีแล้วนะยาย", "ดึง USB ออกตอนไหนก็ได้ไม่ต้องกดอะไร")
+explain_best = 0
+pib_intro = PackedStringArray("สำรอง = ทำให้มีสองที่ เปิดหน้าต่างไฟล์ เลือกรูปแล้วกด \"คัดลอกไป USB\" ทีละรูป", "อย่ากด \"ย้าย\" นะ ย้ายแล้วในเครื่องจะไม่เหลือ เสร็จแล้วกดถอด USB อย่างปลอดภัย")
+pib_lesson = PackedStringArray("คัดลอก = มีทั้งต้นฉบับและสำเนา · ย้าย = ไปอยู่ที่ใหม่ที่เดียว", "ถอด USB อย่างปลอดภัยทุกครั้ง ไฟล์จะได้ไม่เสีย")

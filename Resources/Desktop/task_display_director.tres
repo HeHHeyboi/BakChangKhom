@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 11
+title = "แก้จอแตก ตัวหนังสือใหญ่"
+pc_name = "คอมห้องพักครู"
+request = "จอดูแตก ๆ ตัวหนังสือใหญ่จนล้นจอ เปิดเอกสารดูไม่ครบ"
+files = Array[Dictionary]([{
+"name": "แผนงานโรงเรียน.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "แผนงานปีนี้"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+resolutions = Array[Dictionary]([{
+"name": "800 × 600",
+"ok": true,
+"best": false
+}, {
+"name": "1366 × 768",
+"ok": true,
+"best": true
+}, {
+"name": "2560 × 1440",
+"ok": false,
+"best": false
+}])
+display_res = 0
+display_scale = 150
+display_scale_best = 100
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"bad_resolution", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("จอเริ่มเป็นแบบนี้ตั้งแต่เมื่อไหร่ครับ", "โรงเรียนมีนักเรียนกี่คนครับ", "ใช้คอมทำอะไรบ่อยสุดครับ")
+ask_best = 0
+ask_answer = "ตั้งแต่ภารโรงย้ายจอมาใหม่ แล้วลองกดตั้งค่าอะไรไปก็ไม่รู้"
+ask_note = "ย้ายจอ + มีคนกดตั้งค่ามั่ว"
+explain_options = PackedStringArray("ตั้งความละเอียดกลับเป็นค่าที่แนะนำ และขนาดตัวหนังสือ 100% จอจะคมและพอดี ถ้าเลือกแล้วจอดำให้กดคืนค่าเดิม", "จอเสีย ต้องซื้อใหม่ครับ", "ตั้งความละเอียดสูงสุดไว้จะคมที่สุด")
+explain_best = 0
+pib_intro = PackedStringArray("จอแตกตัวใหญ่ส่วนมากเพราะความละเอียดไม่ตรงจอ ไปที่ตั้งค่า แล้วกดจอภาพ", "เลือกอันที่เขียนว่าแนะนำ ถ้าเลือกแล้วจอดำ ให้กดคืนค่าเดิม")
+pib_lesson = PackedStringArray("ความละเอียดที่แนะนำคือค่าที่ตรงกับจอ คมที่สุด", "ค่าสูงเกินที่จอรองรับ จอจะดำ")

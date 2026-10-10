@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 8
+title = "ทำให้เปิดเครื่องเร็วขึ้น"
+pc_name = "คอมของลุงอำนวย"
+request = "กดเปิดเครื่องแล้วรอเป็นนาที กว่าจะใช้ได้"
+files = Array[Dictionary]([{
+"name": "รูปสวนผัก.jpg",
+"size_mb": 5,
+"folder": "รูปภาพ",
+"kind": "user",
+"note": "สวนผักหลังบ้านลุง"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "เกมฟาร์มผัก",
+"publisher": "Farm Studio",
+"size_mb": 800,
+"desktop_icon": true
+}, {
+"name": "โปรแกรมแชตเก่า",
+"publisher": "OldChat",
+"size_mb": 200
+}, {
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+processes = Array[Dictionary]([{
+"name": "เกมฟาร์มผัก",
+"kind": "app",
+"startup": true,
+"boot_s": 7,
+"cpu": 20
+}, {
+"name": "โปรแกรมแชตเก่า",
+"kind": "app",
+"startup": true,
+"boot_s": 6,
+"cpu": 5
+}, {
+"name": "ตัวอัปเดตเครื่องพิมพ์",
+"kind": "app",
+"startup": true,
+"boot_s": 5,
+"cpu": 3
+}, {
+"name": "ขมการ์ด (แอนตี้ไวรัส)",
+"kind": "system",
+"startup": true,
+"boot_s": 4,
+"cpu": 2
+}, {
+"name": "ไดรเวอร์เสียง",
+"kind": "system",
+"startup": true,
+"boot_s": 1,
+"cpu": 1
+}])
+boot_target_s = 16
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"disable_system", &"kill_system", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("เปิดเครื่องแล้วมีโปรแกรมอะไรเด้งขึ้นมาเองบ้างครับ", "ลุงปลูกผักอะไรบ้างครับ", "ซื้อแรมเพิ่มไหมครับ")
+ask_best = 0
+ask_answer = "ขึ้นเกมฟาร์มผักของหลาน โปรแกรมแชตเก่า แล้วก็อะไรเครื่องพิมพ์ไม่รู้ ลุงไม่ได้ใช้สักอัน"
+ask_note = "ลุงไม่ใช้: เกมฟาร์ม · แชตเก่า · เครื่องพิมพ์"
+explain_options = PackedStringArray("ปิดโปรแกรมที่ไม่ใช้ไม่ให้เปิดพร้อมเครื่อง โปรแกรมยังอยู่ อยากใช้ก็กดเปิดเอง แอนตี้ไวรัสยังเปิดไว้เหมือนเดิม", "ลบโปรแกรมทิ้งหมดแล้วครับ", "ปิดแอนตี้ไวรัสด้วยจะได้เร็วขึ้น")
+explain_best = 0
+pib_intro = PackedStringArray("เปิดเครื่องช้าเพราะโปรแกรมแย่งกันเปิดพร้อมเครื่อง เปิดตัวจัดการงาน แล้วไปแท็บเปิดพร้อมเครื่อง", "ปิดเฉพาะตัวที่ลูกค้าไม่ใช้ แอนตี้ไวรัสกับของระบบต้องเปิดไว้")
+pib_lesson = PackedStringArray("ปิดเปิดพร้อมเครื่อง ไม่ใช่การลบโปรแกรม", "ของระบบกับแอนตี้ไวรัสต้องเปิดพร้อมเครื่องเสมอ")

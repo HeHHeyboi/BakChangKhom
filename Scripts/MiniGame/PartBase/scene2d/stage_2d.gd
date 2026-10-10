@@ -203,6 +203,9 @@ func go_to(view_name: StringName, instant := false, record := true) -> void:
 		return
 	if v == _view:
 		return
+	# [Claude 10 ต.ค. 2569] เปลี่ยนมุมซ้อนระหว่าง crossfade เดิมยังไม่จบ → มุมเก่าค้างโปร่งแสงทับ (เห็นเป็นภาพซ้อน)
+	if _transition_tween and _transition_tween.is_valid() and _transition_tween.is_running():
+		reset_zoom()
 	if record and current_view != &"" and current_view != v.name:
 		_history.append(current_view)
 		if _history.size() > 12:

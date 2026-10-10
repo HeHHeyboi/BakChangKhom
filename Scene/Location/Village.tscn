@@ -1,0 +1,132 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://b1fuvp4gp45um" path="res://Scripts/home.gd" id="1_vgjmv"]
+[ext_resource type="Texture2D" uid="uid://c2r6txcptq5nb" path="res://Assets/Background/bg_village_day.jpg" id="1_bg"]
+[ext_resource type="Script" uid="uid://f601kgx8e3pv" path="res://Scripts/Home/map_place_holder.gd" id="2_b6yaw"]
+[ext_resource type="Texture2D" path="res://Assets/Home/sign_shop.png" id="3_sign"]
+[ext_resource type="Texture2D" path="res://Assets/Home/sign_shop_hover.png" id="4_signh"]
+[ext_resource type="Script" path="res://Scripts/Location/location_door.gd" id="7_c1wnw"]
+[ext_resource type="PackedScene" uid="uid://wvisrff7ykkt" path="res://Scene/caution_marker.tscn" id="12_vgjmv"]
+
+[sub_resource type="StyleBoxFlat" id="SB_map"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_map_hover"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.89, 0.68, 0.43, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.86, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Village" type="Control" unique_id=767628700]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vgjmv")
+
+[node name="BG" type="TextureRect" parent="." unique_id=98894313]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("1_bg")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="MapPlaceHolder" type="Button" parent="." unique_id=1436856254]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 582.0
+offset_right = 158.0
+offset_bottom = 632.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_hover_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_pressed_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_map")
+theme_override_styles/hover = SubResource("SB_map_hover")
+theme_override_styles/pressed = SubResource("SB_map_hover")
+theme_override_styles/disabled = SubResource("SB_map")
+text = "แผนที่"
+script = ExtResource("2_b6yaw")
+
+[node name="ShopSign" type="TextureButton" parent="." unique_id=1209763700]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 392.0
+offset_right = 980.0
+offset_bottom = 597.0
+tooltip_text = "ไปร้านซ่อมคอมขม"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("3_sign")
+texture_hover = ExtResource("4_signh")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("7_c1wnw")
+target = 1
+label_text = "ไปร้านซ่อมคอม"
+label_below = true
+
+[node name="Label" type="Label" parent="ShopSign" unique_id=1209763701]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = 160.0
+offset_bottom = 100.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 17
+text = "ร้านซ่อมคอมขม"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="caution" parent="ShopSign" unique_id=1040492700 instance=ExtResource("12_vgjmv")]
+layout_mode = 0
+offset_left = 58.0
+offset_top = -70.0
+offset_right = 135.0
+offset_bottom = 7.0
+trackEvents = Dictionary[int, PackedByteArray]({
+1: PackedByteArray(1)
+})
+
+
+[node name="HomeDoor" type="TextureButton" parent="." unique_id=1209763710]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 110.0
+offset_right = 430.0
+offset_bottom = 330.0
+ignore_texture_size = true
+script = ExtResource("7_c1wnw")
+label_text = "กลับบ้าน (ยายอยู่บ้าน)"
+label_below = true
+
+[connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]

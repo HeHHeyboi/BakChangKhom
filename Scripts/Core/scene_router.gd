@@ -6,12 +6,14 @@ enum LocationID {
 	WORKSHOP,
 	WORKBENCH,
 	MARKET,
+	VILLAGE, ## [Claude 9 ต.ค. 2569] หน้าบ้าน (ทางผ่านบ้าน ↔ ร้าน) — ต่อท้าย enum ไม่ให้เลขเดิมเลื่อน
 }
 const HOME = LocationID.HOME
 const ROOM = LocationID.ROOM
 const WORKSHOP = LocationID.WORKSHOP
 const WORKBENCH = LocationID.WORKBENCH
 const MARKET = LocationID.MARKET
+const VILLAGE = LocationID.VILLAGE
 
 signal location_changed(id: LocationID)
 signal overlay_closed(scene_path: String, result: Variant)
@@ -22,6 +24,7 @@ const LOCATIONS := {
 	WORKSHOP: "res://Scene/Location/Workshop.tscn",
 	WORKBENCH: "res://Scene/Location/Workbench.tscn",
 	MARKET: "res://Scene/Location/Market.tscn",
+	VILLAGE: "res://Scene/Location/Village.tscn",
 }
 
 var overlay_stack: CanvasLayer

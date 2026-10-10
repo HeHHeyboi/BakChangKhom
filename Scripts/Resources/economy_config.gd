@@ -12,6 +12,7 @@ class_name EconomyConfig extends Resource
 	&"part_front_panel": 200,
 	&"part_bios": 350,
 	&"part_desktop": 60, # ขมOS งานบนจอ Lv1
+	&"part_bench": 150, # โต๊ะหลังเครื่อง Lv2
 }
 ## ค่าซ่อมเมื่อไม่มีใน repair_fee
 @export var default_fee := 200
@@ -25,6 +26,7 @@ class_name EconomyConfig extends Resource
 	&"part_front_panel": 200,
 	&"part_bios": 500,
 	&"part_desktop": 100, # ล้างถังขยะทั้งที่มีไฟล์ลูกค้า = ของหาย (ค่ากู้ข้อมูล/ชดเชย)
+	&"part_bench": 200, # คีย์บอร์ดเปียก/ช่องเสีย
 }
 @export var default_penalty := 300
 

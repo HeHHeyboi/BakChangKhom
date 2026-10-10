@@ -1,0 +1,65 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 10
+title = "เครื่องอืด: สแกนไวรัส + ล้างดิสก์"
+pc_name = "โน้ตบุ๊กของมิ้น"
+request = "เครื่องอืดมาก พัดลมดังตลอด เปิดเว็บก็ช้า"
+files = Array[Dictionary]([{
+"name": "รายงานส่งอาจารย์.doc",
+"size_mb": 3,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "รายงานที่มิ้นทำอยู่"
+}, {
+"name": "ธีมเกมฟรี.exe",
+"size_mb": 15,
+"folder": "ดาวน์โหลด",
+"kind": "junk",
+"note": "ไฟล์ที่โหลดมาจากเว็บแปลก ๆ"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}, {
+"name": "ขมการ์ด",
+"publisher": "ขมOS",
+"size_mb": 200,
+"system": true
+}])
+threats = Array[Dictionary]([{
+"name": "ตัวขุดเหรียญแฝง",
+"where": "ดาวน์โหลด › ธีมเกมฟรี.exe"
+}, {
+"name": "ส่วนเสริมเบราว์เซอร์ปลอม",
+"where": "เบราว์เซอร์"
+}])
+temp_mb = 6000
+disk_free_mb = 1500
+browser_ad = false
+traps = Array[StringName]([&"disable_antivirus", &"allow_threat", &"delete_user", &"delete_system"])
+ask_options = PackedStringArray("ก่อนเครื่องอืด โหลดอะไรมาลงไหม", "ซื้อเครื่องมากี่ปีแล้ว", "ใช้เน็ตบ้านหรือเน็ตมือถือ")
+ask_best = 0
+ask_answer = "โหลดธีมเกมฟรีมาลองเมื่ออาทิตย์ก่อน หลังจากนั้นแหละพัดลมดังตลอด"
+ask_note = "อืดหลังโหลดธีมเกมฟรี"
+explain_options = PackedStringArray("สแกนเจอไวรัสขุดเหรียญที่มากับธีมเกม กักกันแล้ว ล้างไฟล์ชั่วคราวด้วย อย่าโหลดของฟรีจากเว็บแปลก ๆ และอย่าปิดแอนตี้ไวรัส", "ปิดแอนตี้ไวรัสไปแล้วเครื่องเลยเร็ว", "เครื่องเก่าแล้ว ซื้อใหม่ดีกว่า")
+explain_best = 0
+pib_intro = PackedStringArray("เครื่องอืดพัดลมดังตลอด อาจมีโปรแกรมแอบใช้เครื่อง เปิดขมการ์ดจากปุ่มเริ่มหรือตั้งค่า แล้วสแกนทั้งเครื่อง", "เจอแล้วกดกักกัน อย่ากดอนุญาต แล้วล้างไฟล์ชั่วคราวให้พื้นที่กลับมา")
+pib_lesson = PackedStringArray("กักกัน = แยกไวรัสออกไปขังไว้ ทำงานไม่ได้", "ไฟล์ชั่วคราวเต็มก็ทำให้อืดได้ ล้างได้ไม่กระทบไฟล์ลูกค้า")

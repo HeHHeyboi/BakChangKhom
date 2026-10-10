@@ -19,9 +19,21 @@
 [ext_resource type="Resource" path="res://Resources/Customers/lv1_min_space.tres" id="d3"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv1_kid_ads.tres" id="d4"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv1_director_ads.tres" id="d5"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_min_hang.tres" id="e0"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_teacher_printer.tres" id="e1"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_headman_sound.tres" id="e2"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_girl_wifi.tres" id="e3"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_yai_backup.tres" id="e4"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_amnuay_startup.tres" id="e5"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv1_director_update.tres" id="e6"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_min_virus.tres" id="e7"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_teacher_display.tres" id="e8"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_coworker_mouse.tres" id="b0"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_teacher_monitor.tres" id="b1"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_kid_keyboard.tres" id="b2"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
 script = ExtResource("1_loop")
 week_plans = Array[ExtResource("2_week")]([ExtResource("w1")])
-random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d2"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5")])
+random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d2"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5"), ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("b0"), ExtResource("b1"), ExtResource("b2")])

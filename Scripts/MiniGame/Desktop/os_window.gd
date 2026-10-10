@@ -139,10 +139,10 @@ func _gui_input(event: InputEvent) -> void:
 func _on_bar_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_drag = event.pressed
-		_drag_off = event.global_position - global_position
+		_drag_off = get_parent_control().get_local_mouse_position() - position # พิกัดของพ่อ (จอ OS อาจถูกย่อ)
 		if event.pressed:
 			move_to_front()
 	elif event is InputEventMouseMotion and _drag:
-		var p: Vector2 = event.global_position - _drag_off
+		var p: Vector2 = get_parent_control().get_local_mouse_position() - _drag_off
 		var area := get_parent_area_size()
 		position = Vector2(clampf(p.x, -size.x + 80, area.x - 80), clampf(p.y, 0, area.y - TITLE_H))

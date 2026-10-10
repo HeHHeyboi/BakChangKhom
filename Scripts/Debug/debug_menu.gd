@@ -41,12 +41,23 @@ func _ready() -> void:
 		{ "label": "ขมOS 1-1 ลงโปรแกรม (ทดสอบ)", "call": _open_desktop.bind("task_install_chat") },
 		{ "label": "ขมOS 1-2 ลบไฟล์ซ้ำ (ทดสอบ)", "call": _open_desktop.bind("task_free_space_photos") },
 		{ "label": "ขมOS 1-3 ถอนโปรแกรมโฆษณา (ทดสอบ)", "call": _open_desktop.bind("task_uninstall_ads_kid") },
+		{ "label": "ขมOS 1-4 ปิดโปรแกรมค้าง (ทดสอบ)", "call": _open_desktop.bind("task_close_hang_shop") },
+		{ "label": "ขมOS 1-5 เครื่องพิมพ์ (ทดสอบ)", "call": _open_desktop.bind("task_printer_teacher") },
+		{ "label": "ขมOS 1-6 เสียงไม่ออก (ทดสอบ)", "call": _open_desktop.bind("task_sound_headman") },
+		{ "label": "ขมOS 1-7 ต่อ Wi-Fi (ทดสอบ)", "call": _open_desktop.bind("task_wifi_girl") },
+		{ "label": "ขมOS 1-8 สำรองลง USB (ทดสอบ)", "call": _open_desktop.bind("task_backup_yai") },
+		{ "label": "ขมOS 1-9 เปิดพร้อมเครื่อง (ทดสอบ)", "call": _open_desktop.bind("task_startup_amnuay") },
+		{ "label": "ขมOS 1-10 อัปเดต (ทดสอบ)", "call": _open_desktop.bind("task_update_office") },
+		{ "label": "ขมOS Lv2 สแกนไวรัส (ทดสอบ)", "call": _open_desktop.bind("task_virus_min") },
+		{ "label": "ขมOS Lv2 จอภาพ (ทดสอบ)", "call": _open_desktop.bind("task_display_director") },
 		# [Claude 9 ต.ค. 2569] ทดสอบลูปกะ/สัปดาห์/เดือน (Docs/LEVEL_DESIGN.md ข้อ 4)
+		{ "label": "โต๊ะหลังเครื่อง Lv2: เมาส์ไม่ทำงาน (ทดสอบ)", "minigame": "res://Scene/MiniGame/Bench/back_bench.tscn" },
 		{ "label": "ลูปร้าน: ข้ามเควสต์ เริ่มรับลูกค้า (ไปห้องขม)", "call": _start_shop_loop },
 		{ "label": "เวลา: ทำงาน +1 ชม.", "call": func() -> void: EventManager.time_system.advance_minutes(60) },
 		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → 18:30)", "call": EventManager.advance_period },
 		{ "label": "เวลา: ปิดร้าน → กะถัดไป", "call": DayLoop.end_shift },
 		{ "label": "เวลา: ไป 18:30 กะสุดท้ายของสัปดาห์", "call": _jump_week_end },
+		{ "label": "เดโม: ไป 18:30 กะสุดท้ายของเดโม (กะ 7)", "call": func() -> void: EventManager.time_system.set_shift(maxi(DayLoop.demo_shifts, 1), TimeSystem.CLOSE) },
 		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ⭐⭐ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()
@@ -69,8 +80,15 @@ func _build_ui() -> void:
 	title.text = "Debug: Jump Quest (F1 to close)"
 	vbox.add_child(title)
 
+	# [10 ต.ค.] รายการยาว → เลื่อนได้ (ล้อเมาส์/ลากแถบ)
+	var scroll := ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.custom_minimum_size = Vector2(360, 520)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vbox.add_child(scroll)
 	_button_list = VBoxContainer.new()
-	vbox.add_child(_button_list)
+	_button_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_button_list)
 
 	_refresh_buttons()
 

@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/Bench/bench_minigame.gd" id="1_bench"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="2_pib"]
+[ext_resource type="Resource" path="res://Resources/Bench/bench_mouse_coworker.tres" id="3_task"]
+
+[node name="BackBench" type="Node2D" node_paths=PackedStringArray("pib")]
+script = ExtResource("1_bench")
+task = ExtResource("3_task")
+pib = NodePath("PibHint")
+dialog_path = "res://Assets/Dialog/MiniGame/Desktop_Pib.txt"
+part_id = &"part_bench"
+
+[node name="PibHint" parent="." instance=ExtResource("2_pib")]

@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 6
+title = "ต่อ Wi-Fi บ้านให้"
+pc_name = "คอมของเด็กหญิง"
+request = "เน็ตไม่ได้ ส่งการบ้านออนไลน์ไม่ได้"
+files = Array[Dictionary]([{
+"name": "การบ้านภาษาไทย.doc",
+"size_mb": 1,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "การบ้านที่ต้องส่ง"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+wifi = Array[Dictionary]([{
+"name": "FREE_WIFI_ฟรี",
+"locked": false,
+"right": false,
+"signal": 3
+}, {
+"name": "บ้านแม่ไก่",
+"locked": true,
+"password": "maikai2569",
+"right": true,
+"signal": 3
+}, {
+"name": "ร้านกาแฟลุงชิต",
+"locked": true,
+"password": "chit1234",
+"right": false,
+"signal": 1
+}])
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"open_wifi", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("รหัส Wi-Fi บ้านคืออะไรครับ", "ชอบเรียนวิชาอะไรครับ", "ใช้เน็ตบ้านค่ายไหนครับ")
+ask_best = 0
+ask_answer = "แม่จดไว้ข้างเราเตอร์ว่า maikai2569 ค่ะ"
+ask_note = "Wi-Fi บ้านแม่ไก่ · รหัส maikai2569"
+explain_options = PackedStringArray("ต่อ Wi-Fi บ้านด้วยรหัสแล้ว เน็ตฟรีไม่มีรหัสอย่าต่อนะ คนอื่นแอบดูข้อมูลได้", "เน็ตฟรีเร็วกว่า ใช้อันนั้นแทนก็ได้", "ไม่ต้องใส่รหัสก็ต่อได้ทุกที่")
+explain_best = 0
+pib_intro = PackedStringArray("ต่อเน็ตกดตรงคำว่า Wi-Fi ที่แถบงาน เลือกเครือข่ายบ้านลูกค้าแล้วใส่รหัส", "ถามรหัสจากลูกค้าก่อนนะ เน็ตฟรีไม่มีรหัสอย่าไปต่อ")
+pib_lesson = PackedStringArray("เครือข่ายที่ไม่มีรหัส ใครก็เข้าได้ ข้อมูลเราอาจรั่ว", "ชื่อเครือข่ายต้องตรงกับของบ้านลูกค้า")

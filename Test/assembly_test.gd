@@ -59,7 +59,10 @@ func _ready() -> void:
 
 	# ---- เปิดเครื่อง → ทำความรู้จัก ขมOS → ปิดเครื่อง → สรุป
 	await _wait(0.5)
+	await _shot("power")
 	m.stage.press_part(m.find_child("PowerButton", true, false))
+	await _wait(0.4)
+	await _shot("power_on")
 	var guard := 0
 	while not is_instance_valid(m.os_tour) and guard < 100:
 		guard += 1
@@ -67,6 +70,10 @@ func _ready() -> void:
 	var os: DesktopMinigame = m.os_tour
 	_check(os != null and os.tour_mode and os.free_mode, "เปิดเครื่องแล้วขึ้น ขมOS (แทนจอ OK)")
 	if os:
+		await _wait(0.9)
+		_check(os.framed and os.is_booting, "เปิดเครื่อง → ซูมเข้าจอบนโต๊ะ · บูตในโหนด OS เดียวกัน")
+		await _shot("os_boot")
+		os.skip_boot()
 		await _wait(0.6)
 		await _shot("os_tour")
 		os.shut_down()

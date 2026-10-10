@@ -66,6 +66,10 @@ func _ready():
 
 
 func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
+	# [Claude 10 ต.ค.] กันเปิดบทซ้อน (เช่น กดยายสองครั้ง) — เดิมบทถูกอ่านซ้ำเข้า DialogDict แล้วเลือกตัวเลือกแล้วไม่ไปต่อ
+	if visible and not dialog_stack.is_empty():
+		push_warning("DialogScene: มีบทเปิดอยู่แล้ว ไม่เปิดซ้อน (%s)" % file_path)
+		return
 	Global.showDialog()
 	bg_node.scale = Vector2(1, 1)
 	if !chars.is_empty():
@@ -97,6 +101,7 @@ func show_dialog(file_path: StringName, bg_name: String, chars: Array = []):
 func read_file(file_path: StringName):
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	var type = DIALOG
+	DialogDict = { DIALOG: [] } # เริ่มใหม่ทุกไฟล์ ไม่ให้ทางเลือกของบทก่อนค้าง
 
 	var line_num = 0
 
@@ -123,12 +128,16 @@ func read_file(file_path: StringName):
 				type = header
 		match type:
 			CHOICE, DIALOG:
-				DialogDict[type].append(parse_text(line))
+				var tok = parse_text(line)
+				if tok != null:
+					DialogDict[type].append(tok)
 			_:
 				if !DialogDict.has(type):
 					DialogDict[type] = []
 					continue
-				DialogDict[type].append(parse_text(line))
+				var tok = parse_text(line)
+				if tok != null:
+					DialogDict[type].append(tok)
 	file.close()
 
 
@@ -277,7 +286,7 @@ func next_text() -> void:
 
 # NOTE: maybe this is a signal
 func dialog_end() -> void:
-	on_dialog_finish.emit()
+	# ล้างสถานะก่อนแจ้งจบ — ผู้ฟังสัญญาณเปิดบทถัดไปต่อได้ทันที (เดิมล้างทีหลังเลยลบบทใหม่ทิ้ง)
 	Global.hideDialog()
 	self.visible = false
 	DialogDict.clear()
@@ -286,6 +295,7 @@ func dialog_end() -> void:
 	DialogDict[DIALOG] = []
 	ShowSprites.reset()
 	_recent.clear()
+	on_dialog_finish.emit()
 
 
 func click_choice(button: Button) -> void:

@@ -130,7 +130,8 @@ func _show_line(t: DialogToken) -> void:
 		return
 	dialog_label.visible_ratio = 0.0
 	_type_tw = create_tween()
-	_type_tw.tween_property(dialog_label, "visible_ratio", 1.0, n / chars_per_sec)
+	var cps := GameSettings.text_speed(chars_per_sec) # [10 ต.ค.] ความเร็วที่ผู้เล่นตั้งในหน้าตั้งค่า
+	_type_tw.tween_property(dialog_label, "visible_ratio", 1.0, n / maxf(cps, 1.0))
 	_type_tw.tween_callback(next_mark.show)
 
 

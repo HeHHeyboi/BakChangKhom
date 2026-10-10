@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="BenchTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/bench_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 2
+title = "ทำความสะอาดคีย์บอร์ด"
+pc_name = "คอมของเด็ก"
+request = "ขนมตกใส่คีย์บอร์ด ปุ่มติด ๆ กดไม่ลง"
+start_plugs = {
+"keyboard": "usb1",
+"mouse": "usb3",
+"monitor": "hdmi_gpu",
+"power": "power"
+}
+broken_port = ""
+has_gpu = true
+dirt_spots = 6
+traps = Array[StringName]([&"water", &"clean_plugged", &"force_plug", &"pull_power"])
+ask_options = PackedStringArray("อะไรตกใส่คีย์บอร์ดครับ เปียกไหม", "เล่นเกมอะไรอยู่ครับ", "ปิดเครื่องตอนไหนครับ")
+ask_best = 0
+ask_answer = "ขนมกรอบตกใส่ ไม่เปียกครับ แต่แม่จะเอาผ้าเปียกเช็ด ผมเลยรีบเอามาก่อน"
+ask_note = "ขนมกรอบ ไม่เปียก (ห้ามใช้น้ำ)"
+explain_options = PackedStringArray("ถอดคีย์บอร์ดก่อนทำความสะอาด ใช้แปรงปัดแล้วเป่าด้วยลูกยาง ห้ามใช้ผ้าเปียกเพราะน้ำเข้าใต้ปุ่มทำให้เสีย", "ล้างน้ำทั้งอันแล้วตากแดด", "เคาะแรง ๆ ทุกวันก็พอ")
+explain_best = 0
+pib_intro = PackedStringArray("ก่อนทำความสะอาด ถอดสายคีย์บอร์ดออกก่อน แล้วกดยกคีย์บอร์ดมาทำความสะอาด", "ใช้แปรงปัดเศษให้หลุด แล้วเป่าออกด้วยลูกยาง ห้ามใช้น้ำนะ")
+pib_lesson = PackedStringArray("ทำความสะอาดอุปกรณ์ไฟฟ้า ถอดสายก่อนเสมอ", "แปรงกับลูกยางพอแล้ว น้ำทำให้ปุ่มช็อตได้")

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Desktop/task_virus_min.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_min_virus"
+customer = "มิ้น"
+reason = "พรุ่งนี้ต้องส่งรายงาน แต่เครื่องอืดจนพิมพ์ไม่ทัน"
+device = "โน้ตบุ๊กของมิ้น"
+symptom = "อืดมาก พัดลมดังตลอด"
+level = 2
+est_slots = 3
+due_shifts = 2
+part_id = "part_desktop"
+job_title = "เครื่องอืด (ไวรัส/ดิสก์เต็ม)"
+desktop_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_min_virus.txt"
+thanks_text = "เร็วขึ้นเยอะเลย พัดลมก็เงียบแล้ว ขอบใจนะ"
+complain_text = "ยังอืดเหมือนเดิมเลย…"

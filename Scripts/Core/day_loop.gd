@@ -15,7 +15,7 @@ extends CanvasLayer
 ## ลูกค้าที่สุ่มขึ้นกระดาน (ห้ามใส่ลูกค้า forced) · ใช้ระดับ (level) ของแต่ละคนเลือกตามสัดส่วน
 @export var random_pool: Array[CustomerCase] = []
 ## สถานที่ที่ถือว่าเป็น "ร้าน" (การ์ดขึ้นเฉพาะที่นี่)
-@export var shop_locations: Array[SceneRouter.LocationID] = [SceneRouter.HOME, SceneRouter.ROOM]
+@export var shop_locations: Array[SceneRouter.LocationID] = [SceneRouter.HOME, SceneRouter.ROOM, SceneRouter.VILLAGE]
 ## รอให้อยู่ในร้านกี่วินาทีก่อนลูกค้า forced เดินเข้ามา
 @export var forced_delay := 0.8
 ## ข้ามเควสต์หลัก (Debug F1)
@@ -29,6 +29,11 @@ extends CanvasLayer
 @export var break_minutes := 30
 ## แอนิเมชันเวลาหมุนยาวกี่วินาที (เวลาจริง)
 @export var time_skip_seconds := 1.0
+
+@export_group("เดโม")
+## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
+@export var demo_shifts := 7
+@export var demo_banner_text := "สิ้นสุดการเล่นเดโมแล้ว\nเกมกำลังพัฒนาให้ครบลูป ขอบคุณที่ทดลองเล่นนะ"
 
 ## สัดส่วนงาน Lv1/2/3/4/5 (%) ต่อสัปดาห์ 1–12 (LEVEL_DESIGN ข้อ 6) · WeekPlan.level_weights ทับได้
 const DEFAULT_WEIGHTS := [
@@ -61,6 +66,7 @@ enum Card {
 	SHIFT_END,
 	WEEK_SUMMARY,
 	ENDING,
+	DEMO_END,
 }
 
 ## งานบนกระดาน: { "case": CustomerCase, "due_shift": int (กะสุดท้ายที่ยังรับได้), "phone": bool }
@@ -86,6 +92,10 @@ var _parts_seen: Dictionary = { } # part_id → true (ครั้งแรก�
 var _last_bill: Dictionary = { }
 var _pending_summary_week := 0
 var _game_over := false
+## จบเดโมแล้ว (ครบ demo_shifts กะ) · _demo_ack = กดกลับบ้านแล้ว (โชว์ป้ายแทนการ์ด)
+var demo_over := false
+var _demo_ack := false
+var _demo_banner: PanelContainer
 var _working := false # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
 var _shop_time := 0.0
 var _break_done := false
@@ -113,6 +123,10 @@ var _board_list: VBoxContainer
 var _board_close: Button
 var _board_wait: Button
 var _card := Card.NONE
+## [10 ต.ค.] ย่อกระดาษงาน (กระดานงาน · การ์ดงานด่วน/ผลงาน/ปิดร้าน) → เหลือแถบ "กระดานงาน" ให้กดเปิดคืน
+var cards_hidden := false
+var _cards_tab: Button
+const HIDEABLE := [Card.BOARD, Card.JOB_FORCED, Card.RESULT, Card.SHIFT_END]
 
 
 func _ready() -> void:
@@ -141,6 +155,7 @@ func _connect() -> void:
 		[ts.break_started, _on_break_started],
 		[ts.clock_changed, _on_clock_changed],
 		[GameState.repair_recorded, _on_repair_recorded],
+		[SceneRouter.location_changed, func(_id): autosave()],
 	]
 	for l in links:
 		if not (l[0] as Signal).is_connected(l[1]):
@@ -310,6 +325,14 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 		board.append({ "case": fc, "due_shift": ts.shift + fc.due_shifts, "phone": false })
 	add_jobs(_econ().month_value(_econ().board_new_per_shift, ts.month()))
 	_board_dirty = true
+	autosave.call_deferred()
+
+
+## [10 ต.ค.] บันทึกอัตโนมัติ (SaveGame) — ไม่บันทึกตอนยังอยู่เมนูหลัก/บทนำ หรือระหว่างมินิเกม
+func autosave() -> bool:
+	if Global.on_start or Global.in_minigame or _working:
+		return false
+	return SaveGame.save()
 
 
 func _on_break_started(kind: StringName) -> void:
@@ -551,7 +574,54 @@ func end_shift() -> void:
 	var ot := ot_slots_now()
 	if ot > 0:
 		GameState.add_money(-ot * _econ().ot_cost_per_slot)
+	if is_demo_last_shift():
+		demo_over = true
+		_close_requested = false
+		_board_dirty = true
+		return
 	ts.end_shift()
+
+
+## กะนี้เป็นกะสุดท้ายของเดโมไหม
+func is_demo_last_shift() -> bool:
+	var ts := _ts()
+	return demo_shifts > 0 and ts != null and ts.shift >= demo_shifts
+
+
+## การ์ดจบเดโม → กลับบ้าน → ป้าย "กำลังพัฒนาให้ครบลูป"
+func finish_demo() -> void:
+	_demo_ack = true
+	_hide()
+	SceneRouter.go(SceneRouter.HOME) # เปลี่ยนฉาก → autosave
+	_show_demo_banner(true)
+
+
+func _show_demo_banner(on: bool) -> void:
+	if not is_instance_valid(_demo_banner):
+		_demo_banner = PanelContainer.new()
+		_demo_banner.name = "DemoBanner"
+		_demo_banner.add_theme_stylebox_override("panel", _card_style())
+		_demo_banner.position = Vector2(326, 18)
+		_demo_banner.custom_minimum_size = Vector2(500, 0)
+		add_child(_demo_banner)
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override("separation", 8)
+		_demo_banner.add_child(box)
+		var t := Label.new()
+		t.name = "Text"
+		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		t.add_theme_font_size_override("font_size", 20)
+		t.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
+		box.add_child(t)
+		var b := Button.new()
+		b.text = "กลับเมนูหลัก"
+		b.focus_mode = Control.FOCUS_NONE
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.pressed.connect(func(): PauseMenu.go_to_main_menu())
+		box.add_child(b)
+	(_demo_banner.find_child("Text", true, false) as Label).text = demo_banner_text
+	_demo_banner.visible = on
 
 
 func ot_slots_now() -> int:
@@ -581,6 +651,9 @@ func _continue_after_summary() -> void:
 ## เริ่มเกมใหม่หลังฉากจบ: เงิน/คะแนน/เวลา กลับค่าเริ่มต้น
 func _reset_run() -> void:
 	_game_over = false
+	demo_over = false
+	_demo_ack = false
+	_show_demo_banner(false)
 	_pending_summary_week = 0
 	week_results.clear()
 	board.clear()
@@ -606,6 +679,8 @@ func _reset_run() -> void:
 func _process(delta: float) -> void:
 	if _ts() == null:
 		return
+	if _demo_ack and is_instance_valid(_demo_banner):
+		_demo_banner.visible = not (DialogScene.visible or Global.in_minigame)
 	_watchdog(delta)
 	var want := _decide_card()
 	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
@@ -623,7 +698,15 @@ func _process(delta: float) -> void:
 	if want == Card.NONE:
 		_shop_time = 0.0
 		_hide()
+		_cards_tab.visible = false
 		return
+	if cards_hidden and want in HIDEABLE:
+		_panel.visible = false
+		_board_panel.visible = false
+		_cards_tab.visible = true
+		_cards_tab.text = "📋 กระดานงาน (%d)" % board.size() if want == Card.BOARD else "📋 ดูการ์ดงาน"
+		return
+	_cards_tab.visible = false
 	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible):
 		_show_card(want)
 
@@ -653,6 +736,8 @@ func _watchdog(delta: float) -> void:
 func _decide_card() -> Card:
 	if _working or Global.in_minigame or DialogScene.visible or _skipping:
 		return Card.NONE
+	if demo_over:
+		return Card.NONE if _demo_ack else Card.DEMO_END
 	if _pending_summary_week > 0:
 		return Card.WEEK_SUMMARY
 	if _game_over:
@@ -755,6 +840,8 @@ func _show_card(card: Card) -> void:
 				GameState.rank_name(),
 			]
 			_primary.text = "ปิดร้าน → สรุปสัปดาห์" if ts.is_last_shift_of_week() else "ปิดร้าน → กะถัดไป"
+			if is_demo_last_shift():
+				_primary.text = "ปิดร้าน → จบการเล่นเดโม"
 			if _close_requested and ts.current_minute < TimeSystem.CLOSE:
 				_secondary.text = "กลับไปทำงานต่อ"
 				_secondary.visible = true
@@ -795,6 +882,18 @@ func _show_card(card: Card) -> void:
 				GameState.reputation,
 			]
 			_primary.text = "กลับหน้าแรก"
+		Card.DEMO_END:
+			_title.text = "สิ้นสุดการเล่นเดโม · ครบ %d วัน" % demo_shifts
+			_body.text = "ขมเปิดร้านมาครบ %d วันแล้ว!\n\nซ่อมไปทั้งหมด %d งาน · เงิน ฿%d\nชื่อเสียง %d · ยศ %s · XP %d\nความพอใจเฉลี่ย %d\n\nกลับบ้านไปพักกับยายกันเถอะ" % [
+				demo_shifts,
+				GameState.satisfaction_history.size(),
+				GameState.money,
+				GameState.reputation,
+				GameState.rank_name(),
+				GameState.xp,
+				roundi(GameState.average_satisfaction()),
+			]
+			_primary.text = "กลับบ้าน"
 
 
 ## กระดานงาน — แถวละ 1 งาน: ลูกค้า · ระดับ · อาการ (ไม่บอก Part) · เวลา · ค่าแรง · กำหนดรับ · [รับงาน] [ปฏิเสธ]
@@ -880,11 +979,16 @@ func _on_primary() -> void:
 			start_repair()
 		Card.RESULT:
 			_result_pending = false
+			autosave.call_deferred()
 		Card.SHIFT_END:
 			end_shift()
 		Card.WEEK_SUMMARY:
 			_continue_after_summary()
+		Card.DEMO_END:
+			finish_demo()
 		Card.ENDING:
+			SaveGame.clear()
+			Global.on_start = true
 			_reset_run()
 			SceneRouter.clear()
 			var err := get_tree().change_scene_to_file("res://Scene/Start_Scene.tscn")
@@ -951,10 +1055,14 @@ func _build_ui() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
 	_panel.add_child(box)
+	var trow := HBoxContainer.new()
+	box.add_child(trow)
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 22)
 	_title.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
-	box.add_child(_title)
+	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	trow.add_child(_title)
+	trow.add_child(_hide_button())
 	_body = Label.new()
 	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.custom_minimum_size = Vector2(332, 0)
@@ -985,10 +1093,14 @@ func _build_ui() -> void:
 	var bbox := VBoxContainer.new()
 	bbox.add_theme_constant_override("separation", 8)
 	_board_panel.add_child(bbox)
+	var btrow := HBoxContainer.new()
+	bbox.add_child(btrow)
 	_board_title = Label.new()
 	_board_title.add_theme_font_size_override("font_size", 19)
 	_board_title.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
-	bbox.add_child(_board_title)
+	_board_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	btrow.add_child(_board_title)
+	btrow.add_child(_hide_button())
 	_board_note = Label.new()
 	_board_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_board_note.add_theme_font_size_override("font_size", 14)
@@ -1018,4 +1130,35 @@ func _build_ui() -> void:
 	_board_close.pressed.connect(close_shop)
 	brow.add_child(_board_close)
 	_board_panel.visible = false
+	_cards_tab = Button.new()
+	_cards_tab.name = "CardsTab"
+	_cards_tab.focus_mode = Control.FOCUS_NONE
+	_cards_tab.position = Vector2(930, 100)
+	_cards_tab.custom_minimum_size = Vector2(206, 44)
+	_cards_tab.add_theme_font_size_override("font_size", 18)
+	_cards_tab.add_theme_stylebox_override("normal", _card_style())
+	_cards_tab.add_theme_stylebox_override("hover", _card_style())
+	_cards_tab.add_theme_stylebox_override("pressed", _card_style())
+	_cards_tab.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
+	_cards_tab.add_theme_color_override("font_hover_color", Color(0.6, 0.3, 0.05))
+	_cards_tab.pressed.connect(func(): set_cards_hidden(false))
+	_cards_tab.visible = false
+	add_child(_cards_tab)
 	_build_time_skip()
+
+
+## ย่อ/ขยายกระดาษงาน (ดูฉากข้างหลังได้ · กดแถบมุมขวาเพื่อเปิดคืน)
+func set_cards_hidden(on: bool) -> void:
+	cards_hidden = on
+	_card = Card.NONE # บังคับวาดใหม่ตอนเปิดคืน
+	_board_dirty = true
+
+
+func _hide_button() -> Button:
+	var b := Button.new()
+	b.text = "ย่อ ▾"
+	b.tooltip_text = "ซ่อนกระดาษงาน (กดแถบมุมขวาเพื่อเปิดคืน)"
+	b.focus_mode = Control.FOCUS_NONE
+	b.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	b.pressed.connect(func(): set_cards_hidden(true))
+	return b

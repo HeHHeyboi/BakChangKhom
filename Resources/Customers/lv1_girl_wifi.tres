@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Desktop/task_wifi_girl.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv1_girl_wifi"
+customer = "เด็กหญิง"
+reason = "ต้องส่งการบ้านออนไลน์คืนนี้"
+device = "โน้ตบุ๊กของเด็กหญิง"
+symptom = "เข้าเน็ตไม่ได้"
+level = 1
+est_slots = 1
+due_shifts = 1
+part_id = "part_desktop"
+job_title = "ต่อ Wi-Fi"
+desktop_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv1_girl_wifi.txt"
+thanks_text = "เข้าเน็ตได้แล้ว ส่งการบ้านทันค่ะ!"
+complain_text = "ยังเข้าไม่ได้เลยค่ะพี่…"

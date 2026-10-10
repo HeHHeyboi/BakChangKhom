@@ -140,11 +140,19 @@ func _fade_layer(key: StringName, animate: bool) -> void:
 	await tw.finished
 
 
-## ชิ้นส่วนทั้งหมดบนแผ่นรอง (ลูกของ node Parts) เรียงตามลำดับประกอบ
+## ชิ้นส่วนทั้งหมด (ลูกของ node Parts ตอนเริ่ม) เรียงตามลำดับประกอบ — รวมชิ้นที่ใส่ลงเคสแล้ว
+## [Claude 10 ต.ค. 2569] เดิมอ่านจาก Parts ทุกครั้ง พอชิ้นถูกย้ายลงเคส (reparent) ก็หายจากรายการ → หน้าสรุปว่าง
+var _all_parts: Array[Item2D] = []
+
+
 func parts() -> Array[Item2D]:
+	if _all_parts.is_empty():
+		for n in %Parts.get_children():
+			if n is Item2D:
+				_all_parts.append(n)
 	var a: Array[Item2D] = []
-	for n in %Parts.get_children() + _installed_parts():
-		if n is Item2D:
+	for n in _all_parts:
+		if is_instance_valid(n):
 			a.append(n)
 	return a
 

@@ -17,7 +17,7 @@ script = ExtResource("1_naor1")
 title = "ห้องของขม"
 dialog_file = "res://Assets/Dialog/MainQuest/GoToRoom.txt"
 bg_name = "uid://0abmohme5tku"
-quest_text_th = "เข้าห้องไปดูคอมพิวเตอร์"
+quest_text_th = "ไปร้านซ่อมคอม ดูคอมเครื่องเก่า"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_ur0up"]

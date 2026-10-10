@@ -12,6 +12,7 @@ const PART_SCENES := {
 	"part_front_panel": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
 	"part_bios": "res://Scene/MiniGame/PartBios/part_bios.tscn",
 	"part_desktop": "res://Scene/MiniGame/Desktop/desktop_window.tscn", # ขมOS งานบนจอ Lv1 → ใส่ desktop_task ด้วย
+	"part_bench": "res://Scene/MiniGame/Bench/back_bench.tscn", # โต๊ะหลังเครื่อง Lv2 → ใส่ bench_task ด้วย [10 ต.ค.]
 }
 
 @export_group("ลูกค้า")
@@ -36,9 +37,11 @@ const PART_SCENES := {
 
 @export_group("งานซ่อม")
 ## Core Part ที่ต้องซ่อม → เปิดมินิเกมตัวนั้น
-@export_enum("part_ram", "part_mainboard", "part_gpu", "part_front_panel", "part_bios", "part_desktop") var part_id: String = "part_ram"
+@export_enum("part_ram", "part_mainboard", "part_gpu", "part_front_panel", "part_bios", "part_desktop", "part_bench") var part_id: String = "part_ram"
 ## งานบนจอ (part_desktop) — ข้อมูลเครื่อง/ไฟล์/กับดักในขมOS (Resources/Desktop/*.tres) · [Claude 9 ต.ค. 2569]
 @export var desktop_task: DesktopTask
+## งานโต๊ะหลังเครื่อง (part_bench) — สาย/ช่อง/คีย์บอร์ดสกปรก (Resources/Bench/*.tres) · [Claude 10 ต.ค. 2569]
+@export var bench_task: BenchTask
 ## ชื่องานบนการ์ดผลงาน เช่น "ทำความสะอาดแรม" (การ์ดบนกระดานไม่โชว์ — ผู้เล่นต้องวินิจฉัยเอง)
 @export var job_title: String
 ## ค่าซ่อม (บาท) · −1 = ใช้ค่าจาก Resources/Balance/economy.tres
@@ -109,6 +112,11 @@ func problems() -> PackedStringArray:
 			out.append("งานบนจอ (part_desktop) ต้องใส่ desktop_task")
 		else:
 			out.append_array(desktop_task.problems())
+	if part_id == "part_bench" and scene_override == "":
+		if bench_task == null:
+			out.append("งานโต๊ะหลังเครื่อง (part_bench) ต้องใส่ bench_task")
+		else:
+			out.append_array(bench_task.problems())
 	if scene_path() == "" or not ResourceLoader.exists(scene_path()):
 		out.append("ไม่พบมินิเกม %s" % scene_path())
 	if arrive_dialog != "":

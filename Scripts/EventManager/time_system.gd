@@ -25,7 +25,7 @@ enum TIME {
 }
 const PERIOD_START := { TIME.MORNING: 9 * 60, TIME.NOON: 13 * 60, TIME.EVENING: 16 * 60 }
 const PERIOD_NAME := { TIME.MORNING: "ช่วงเช้า", TIME.NOON: "ช่วงบ่าย", TIME.EVENING: "ช่วงเย็น" }
-const MONTH_NAME := ["ต.ค.", "พ.ย.", "ธ.ค."]
+const MONTH_NAME := ["ม.ค.", "ก.พ.", "มี.ค."] # [Claude 10 ต.ค. 2569] เกมเริ่มเดือนมกราคม
 
 ## ช่วงเวลาเปลี่ยน (เช้า → บ่าย → เย็น)
 signal period_changed(period: TIME)

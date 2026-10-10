@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Bench/bench_keyboard_kid.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_kid_keyboard"
+customer = "เด็ก"
+reason = "ทำขนมหกใส่คีย์บอร์ด กลัวแม่ดุ"
+device = "คอมตั้งโต๊ะของเด็ก"
+symptom = "ปุ่มติด กดไม่ลง"
+level = 2
+est_slots = 2
+due_shifts = 2
+part_id = "part_bench"
+job_title = "ทำความสะอาดคีย์บอร์ด"
+bench_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_kid_keyboard.txt"
+thanks_text = "กดลื่นเหมือนใหม่เลยพี่! ขอบคุณครับ"
+complain_text = "ปุ่มยังติดอยู่เลยพี่…"

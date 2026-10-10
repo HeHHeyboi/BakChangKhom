@@ -13,12 +13,33 @@ func init():
 		c.queue_free()
 	for p in owner.parts():
 		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
 		_list.add_child(row)
+		var ic := TextureRect.new() # [Claude 10 ต.ค. 2569] รูปชิ้นส่วน (เดิมมีแต่ชื่อ)
+		ic.texture = p.texture
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.custom_minimum_size = Vector2(44, 30)
+		row.add_child(ic)
 		var a := PhaseUI.label(row, p.data.display_name, 18, PhaseUI.COL_INK)
 		a.autowrap_mode = TextServer.AUTOWRAP_OFF
 		a.custom_minimum_size.x = 300
 		var b := PhaseUI.label(row, "→  " + String(owner.CORE_NAME.get(p.data.core_part, "-")), 18, PhaseUI.COL_HEAD)
 		b.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var os_row := HBoxContainer.new() # ระบบในเครื่อง — งานบนจอ Lv1
+	os_row.add_theme_constant_override("separation", 10)
+	_list.add_child(os_row)
+	var os_ic := TextureRect.new()
+	os_ic.texture = load("res://Assets/MiniGame/Desktop/os_start.png")
+	os_ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	os_ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	os_ic.custom_minimum_size = Vector2(44, 30)
+	os_row.add_child(os_ic)
+	var oa := PhaseUI.label(os_row, "ระบบ ขมOS", 18, PhaseUI.COL_INK)
+	oa.autowrap_mode = TextServer.AUTOWRAP_OFF
+	oa.custom_minimum_size.x = 300
+	var ob := PhaseUI.label(os_row, "→  งานบนจอ Lv1 · ลงโปรแกรม ลบไฟล์ ถอนโฆษณา", 18, PhaseUI.COL_HEAD)
+	ob.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_go.disabled = false
 	show()
 	allow([])
@@ -41,8 +62,8 @@ func _build() -> void:
 	t.position = Vector2(40, 20)
 	_list = VBoxContainer.new()
 	_list.position = Vector2(40, 90)
-	_list.size = Vector2(720, 260)
-	_list.add_theme_constant_override("separation", 8)
+	_list.size = Vector2(720, 270)
+	_list.add_theme_constant_override("separation", 2)
 	card.add_child(_list)
 	_go = PhaseUI.button(card, "ไปงานซ่อมแรก ►", Rect2(560, 360, 210, 52), _on_go)
 

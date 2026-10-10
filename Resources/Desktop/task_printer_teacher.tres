@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 4
+title = "เพิ่มเครื่องพิมพ์ให้ครู"
+pc_name = "คอมของครู"
+request = "สั่งพิมพ์ใบงานแล้วไม่ออกเลย พรุ่งนี้ต้องใช้สอน"
+files = Array[Dictionary]([{
+"name": "ใบงานวิทย์ ป.5.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ใบงานที่ครูทำเอง"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+printers = Array[Dictionary]([{
+"name": "เครื่องพิมพ์ห้องธุรการ",
+"note": "อาคาร 2 · ห้อง ผอ.",
+"right": false
+}, {
+"name": "เครื่องพิมพ์ห้องพักครู",
+"note": "อาคาร 1 · ข้างโต๊ะครู",
+"right": true
+}, {
+"name": "เครื่องพิมพ์ห้องสมุด",
+"note": "อาคาร 3",
+"right": false
+}])
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"wrong_printer", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("เครื่องพิมพ์ที่จะใช้อยู่ห้องไหนครับ", "ครูสอนวิชาอะไรครับ", "อยากได้หมึกสีไหมครับ")
+ask_best = 0
+ask_answer = "เครื่องที่ห้องพักครูชั้นล่าง ข้างโต๊ะครูนี่แหละ"
+ask_note = "เครื่องพิมพ์: ห้องพักครู"
+explain_options = PackedStringArray("เพิ่มเครื่องพิมพ์ห้องพักครูแล้วตั้งเป็นค่าเริ่มต้น ต่อไปกดพิมพ์ได้เลย ถ้าไม่ออกให้ดูชื่อเครื่องที่เลือก", "ต้องลงโปรแกรมใหม่ทุกครั้งที่จะพิมพ์", "พิมพ์ไปเครื่องไหนก็ได้ เดี๋ยวมีคนเอามาให้")
+explain_best = 0
+pib_intro = PackedStringArray("เครื่องพิมพ์ต้องเพิ่มเข้าเครื่องก่อน ไปที่ตั้งค่า แล้วกดเครื่องพิมพ์", "ในโรงเรียนมีหลายเครื่อง เลือกให้ตรงห้องที่ครูบอก แล้วตั้งเป็นค่าเริ่มต้น ลองพิมพ์หน้าทดสอบด้วย")
+pib_lesson = PackedStringArray("เครื่องพิมพ์ค่าเริ่มต้นคือเครื่องที่ถูกใช้ตอนกดพิมพ์", "พิมพ์ผิดเครื่อง เอกสารอาจไปออกให้คนอื่นเห็น")

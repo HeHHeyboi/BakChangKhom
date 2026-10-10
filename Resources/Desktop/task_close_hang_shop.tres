@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="DesktopTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+
+[resource]
+script = ExtResource("1_task")
+goal = 3
+title = "ปิดโปรแกรมคิดเงินที่ค้าง"
+pc_name = "คอมร้านชำ"
+request = "โปรแกรมคิดเงินค้าง กดอะไรก็ไม่ขยับ ลูกค้ารอจ่ายเงินอยู่"
+files = Array[Dictionary]([{
+"name": "ใบเสร็จเดือนนี้.doc",
+"size_mb": 2,
+"folder": "เอกสาร",
+"kind": "user",
+"note": "ใบเสร็จของร้าน"
+}, {
+"name": "ขมOS",
+"size_mb": 20000,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+}, {
+"name": "ไฟล์บูตเครื่อง",
+"size_mb": 300,
+"folder": "ระบบ (C:)",
+"kind": "system",
+"note": ""
+}])
+programs = Array[Dictionary]([{
+"name": "โปรแกรมคิดเงิน",
+"publisher": "ร้านค้าดี",
+"size_mb": 300,
+"desktop_icon": true
+}, {
+"name": "ไดรเวอร์เสียง",
+"publisher": "ขมOS",
+"size_mb": 40,
+"system": true
+}])
+processes = Array[Dictionary]([{
+"name": "โปรแกรมคิดเงิน",
+"kind": "hang",
+"cpu": 99
+}, {
+"name": "ตารางบัญชี",
+"kind": "unsaved",
+"cpu": 2
+}, {
+"name": "ขมOS เดสก์ท็อป",
+"kind": "system",
+"cpu": 3
+}, {
+"name": "ไดรเวอร์เสียง",
+"kind": "system",
+"cpu": 1
+}])
+disk_free_mb = 20000
+browser_ad = false
+traps = Array[StringName]([&"kill_system", &"kill_unsaved", &"delete_system", &"delete_user"])
+ask_options = PackedStringArray("ตอนนี้มีงานอะไรเปิดค้างไว้อีกไหมครับ", "ซื้อเครื่องนี้มากี่ปีแล้วครับ", "ลองถอดปลั๊กหรือยังครับ")
+ask_best = 0
+ask_answer = "มีตารางบัญชีที่แม่พิมพ์ค้างไว้ ยังไม่ได้กดบันทึกเลย อันนั้นอย่าปิดนะ"
+ask_note = "ตารางบัญชี ยังไม่บันทึก อย่าปิด!"
+explain_options = PackedStringArray("โปรแกรมค้างให้เปิดตัวจัดการงาน (Ctrl+Shift+Esc) แล้วกดจบงานเฉพาะตัวที่ไม่ตอบสนอง งานอื่นยังอยู่ครบ", "ค้างเมื่อไหร่ถอดปลั๊กเลย เร็วสุด", "ลงโปรแกรมคิดเงินใหม่ทุกครั้งที่ค้าง")
+explain_best = 0
+pib_intro = PackedStringArray("โปรแกรมค้างกดกากบาทไม่ได้ ต้องใช้ตัวจัดการงาน กด Ctrl+Shift+Esc หรือปุ่มเริ่ม แล้วเลือกตัวจัดการงาน", "จบงานเฉพาะตัวที่ขึ้นว่าไม่ตอบสนองนะ ของระบบกับงานที่ลูกค้ายังไม่บันทึกอย่าไปปิด")
+pib_lesson = PackedStringArray("ตัวจัดการงานปิดได้ทีละโปรแกรม ไม่ต้องดับทั้งเครื่อง", "ดูสถานะกับประเภทก่อนกดจบงานเสมอ")
