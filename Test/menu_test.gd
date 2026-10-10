@@ -10,6 +10,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	var vol0: float = GameSettings.get_value("master_volume")
 	var spd0: float = GameSettings.get_value("text_speed")
+	var mus0: float = GameSettings.get_value("music_volume")
 
 	# ---- เมนูหลักเป็นโหนด
 	var start: Control = load("res://Scene/Start_Scene.tscn").instantiate()
@@ -20,6 +21,14 @@ func _ready() -> void:
 	_check(start.get_node("Menu/Continue_Button").visible == SaveGame.exists(), "ปุ่มเล่นต่อขึ้นเมื่อมีเซฟเท่านั้น")
 	_check(start.is_in_group("main_menu") and start.get_node("Khom") is TextureRect and start.get_node("Title").text == "บักช่างขม", "เมนูหลักมีชื่อเกม + ตัวละคร (โหนด)")
 	await _shot("main_menu")
+	# [10 ต.ค.] เสียง: บัส Music/SFX · เพลงเมนู · ไฟล์ครบ
+	_check(AudioServer.get_bus_index("Music") > 0 and AudioServer.get_bus_index("SFX") > 0, "มีบัสเสียง Music / SFX")
+	_check(Audio.want_music() == &"menu", "อยู่เมนูหลัก → เพลงเมนู")
+	for k in Audio.MUSIC:
+		_check(Audio._stream(Audio.MUSIC[k]) != null, "โหลดเพลง %s ได้" % k)
+	for k in Audio.SFX:
+		_check(Audio._stream(Audio.SFX[k]) != null, "โหลดเสียง %s ได้" % k)
+	_check((Audio._stream(Audio.MUSIC[&"village"]) as AudioStreamOggVorbis).loop, "เพลงวนลูป")
 	start._on_option_button_pressed()
 	await _frames(2)
 	var sp: SettingsPanel = start.SettingScene
@@ -28,6 +37,8 @@ func _ready() -> void:
 	_check(is_equal_approx(GameSettings.get_value("master_volume"), 0.4) and AudioServer.get_bus_volume_db(0) < -7.0, "ลากเสียงรวม → ใช้ทันที (%.1f dB)" % AudioServer.get_bus_volume_db(0))
 	sp.volume.value = 0
 	_check(AudioServer.is_bus_mute(0), "เสียง 0 → ปิดเสียง")
+	sp.music.value = 30
+	_check(is_equal_approx(GameSettings.get_value("music_volume"), 0.3) and AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music")) < -9.0, "ลากเพลง → บัส Music เบาลง")
 	sp.text_speed.value = 100
 	_check(GameSettings.text_speed() == 100.0 and sp.text_speed_value.text == "เร็ว", "ความเร็วข้อความ → เร็ว")
 	var cfg := ConfigFile.new()
@@ -73,6 +84,7 @@ func _ready() -> void:
 
 	GameSettings.set_value("master_volume", vol0)
 	GameSettings.set_value("text_speed", spd0)
+	GameSettings.set_value("music_volume", mus0)
 	print("T DONE fails=", fails)
 	get_tree().quit()
 

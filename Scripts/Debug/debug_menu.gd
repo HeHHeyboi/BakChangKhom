@@ -13,19 +13,14 @@ var _button_list: VBoxContainer
 func _ready() -> void:
 	layer = 100
 	visible = false
-	jump_points = [
-		{
-			"label": "Go to Your Room and Clean the Ram",
-			"event_id": EventManager.EventID.MAIN,
-			"task_index": 1,
-			"location": SceneRouter.HOME,
-		},
-		{
-			"label": "ข้ามไป Tutorial ประกอบคอม (กด ! ในห้อง)",
-			"event_id": EventManager.EventID.MAIN,
-			"task_index": 3,
-			"location": SceneRouter.ROOM,
-		},
+	jump_points = []
+	# [Claude 10 ต.ค. 2569] เควสต์หลัก: กดแล้วขั้นนั้น "เสร็จ" (รวมขั้นก่อนหน้า) → ไปขั้นถัดไป · บันทึกเกมให้ด้วย
+	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
+	if ev:
+		for i in ev.totalTask:
+			jump_points.append({ "label": "✓ เควสต์ %d เสร็จ: %s" % [i + 1, ev._tasks[i].quest_text_th], "call": _complete_quest.bind(i) })
+	jump_points.append({ "label": "✓ จบเควสต์หลักทั้งหมด → เริ่มลูปร้าน", "call": _complete_quest.bind(999) })
+	jump_points += [
 		{
 			# [Claude 2 ต.ค. 2569] เปิดมินิเกมตรง ๆ ไม่แตะเควสต์หลัก (Part ที่ยังไม่มีเควสต์)
 			"label": "เล่น Part Mainboard + CPU (ทดสอบ)",
@@ -114,6 +109,25 @@ func _unlock_levels() -> void:
 	for lv in range(2, 5):
 		GameState.level_stars[lv] = maxi(GameState.level_stars.get(lv, 0), 2)
 	DayLoop.add_jobs(3)
+
+
+func _complete_quest(index: int) -> void:
+	if Global.isInMinigame():
+		return
+	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
+	if ev == null:
+		return
+	Global.on_start = false
+	EventManager.tutorial.hide()
+	var cur := get_tree().current_scene
+	if cur and cur.is_in_group("main_menu"):
+		cur.hide() # กดจากเมนูหลัก → ซ่อนเมนู
+	EventManager.complete_step(EventManager.EventID.MAIN, mini(index, ev.totalTask - 1))
+	EventManager.showUI()
+	# ขั้นถัดไปอยู่ที่ไหน: คุยกับยาย/ไปร้าน = ในบ้าน · ที่เหลือ (ร้าน) · จบแล้ว = ร้าน (กระดานงาน)
+	var next: int = ev.currentTask
+	await SceneRouter.go(SceneRouter.HOME if (not ev.isDone and next <= 1) else SceneRouter.ROOM)
+	SaveGame.save() # บันทึกตรง ๆ (autosave อาจข้ามถ้าลูปร้านเปิดบทพักทันที)
 
 
 func _start_shop_loop() -> void:

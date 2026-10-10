@@ -124,14 +124,7 @@ static func load_into() -> int:
 	if ev:
 		EventManager.currentEvent = EventManager.EventID.MAIN
 		if bool(q.get("done", false)):
-			ev.set_step(ev.totalTask - 1)
-			ev._tasks[ev.totalTask - 1].set_done()
-			ev.currentTask = ev.totalTask
-			ev.isDone = true
-			EventManager.questboard.update_task("", ev)
-			EventManager.questboard.show()
-			EventManager.time_system.show()
-			EventManager.sendUpdatedEvent.emit(EventManager.EventID.MAIN, ev)
+			EventManager.finish_event(EventManager.EventID.MAIN)
 		else:
 			EventManager.jump_event(EventManager.EventID.MAIN, int(q.get("task", 0)))
 	var loc := int(d.get("location", SceneRouter.HOME))

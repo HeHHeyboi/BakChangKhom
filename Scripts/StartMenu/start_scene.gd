@@ -5,6 +5,7 @@ extends Control
 @export var SettingScene: SettingsPanel
 @export var tutorial: TextureRect
 var showTutorial = false
+var _confirm_new := false
 
 
 func _ready() -> void:
@@ -53,7 +54,16 @@ func _on_option_button_pressed() -> void:
 func _on_start_button_pressed() -> void:
 	if showTutorial:
 		return
-	SaveGame.clear() # เริ่มใหม่ = ลบเซฟเดิม
+	# [10 ต.ค.] มีเซฟอยู่ → ถามก่อน (กดซ้ำ = เริ่มใหม่ · เซฟเดิมถูกแทนที่ด้วยเซฟใหม่ตอนเข้าบ้าน)
+	if SaveGame.exists() and not _confirm_new:
+		_confirm_new = true
+		$Menu/Start_Button.text = "เริ่มใหม่? กดอีกครั้ง"
+		$Menu/Start_Button.tooltip_text = "เซฟเดิมจะถูกแทนที่ด้วยเกมใหม่"
+		return
+	SaveGame.clear() # เริ่มใหม่ = ลบเซฟเดิม → เซฟใหม่สร้างเองตอนเข้าฉากแรก
+	DayLoop._reset_run()
+	EventManager.jump_event(EventManager.EventID.MAIN, 0) # เควสต์กลับขั้นแรก (กรณีกลับเมนูมาเริ่มใหม่)
+	EventManager.hideUI()
 	showTutorial = true
 	EventManager.show_tutorial(EventManager.TutorialState.BASIC_START)
 

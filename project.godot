@@ -31,6 +31,7 @@ DayLoop="*res://Scene/Core/day_loop.tscn"
 SceneRouter="*uid://bsmp1pfk2iobb"
 Fade="*uid://b02nmvfjtu017"
 PauseMenu="*res://Scene/UI/pause_menu.tscn"
+Audio="*res://Scripts/Core/audio_manager.gd"
 
 [display]
 

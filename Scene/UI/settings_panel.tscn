@@ -30,9 +30,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -330.0
-offset_top = -210.0
+offset_top = -260.0
 offset_right = 330.0
-offset_bottom = 210.0
+offset_bottom = 260.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -68,6 +68,54 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "80%"
+horizontal_alignment = 2
+
+[node name="MusicRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="Panel/VBox/MusicRow"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+text = "เพลง"
+
+[node name="Music" type="HSlider" parent="Panel/VBox/MusicRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 5.0
+value = 70.0
+
+[node name="MusicValue" type="Label" parent="Panel/VBox/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "70%"
+horizontal_alignment = 2
+
+[node name="SfxRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="Panel/VBox/SfxRow"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+text = "เสียงประกอบ"
+
+[node name="Sfx" type="HSlider" parent="Panel/VBox/SfxRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 5.0
+value = 70.0
+
+[node name="SfxValue" type="Label" parent="Panel/VBox/SfxRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "70%"
 horizontal_alignment = 2
 
 [node name="FullscreenRow" type="HBoxContainer" parent="Panel/VBox"]

@@ -16,7 +16,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	hide()
 	GameSettings.load_and_apply()
-	%ResumeButton.pressed.connect(resume)
+	%ResumeButton.pressed.connect(_on_resume_pressed)
+	%SaveButton.pressed.connect(save_now)
 	%SettingsButton.pressed.connect(_open_settings)
 	menu_button.pressed.connect(_on_menu_pressed)
 	%QuitButton.pressed.connect(func(): get_tree().quit())
@@ -55,6 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func open() -> void:
 	_confirm_menu = false
 	menu_button.text = "กลับเมนูหลัก"
+	%SaveButton.text = "บันทึกเกม"
 	settings.hide()
 	panel.show()
 	show()
@@ -65,6 +67,20 @@ func open() -> void:
 func resume() -> void:
 	hide()
 	get_tree().paused = false
+
+
+## [10 ต.ค.] เล่นต่อ = บันทึกให้ด้วย
+func _on_resume_pressed() -> void:
+	resume()
+	DayLoop.autosave()
+
+
+## บันทึกตอนนี้ (ปุ่ม "บันทึกเกม") · คืน true = บันทึกได้
+func save_now() -> bool:
+	var ok := DayLoop.autosave()
+	var info := SaveGame.info()
+	%SaveButton.text = ("บันทึกแล้ว ✓ วันที่ %d" % info.shift) if ok and not info.is_empty() else "บันทึกตอนนี้ไม่ได้"
+	return ok
 
 
 func _open_settings() -> void:

@@ -55,10 +55,40 @@ func _ready() -> void:
 	var cont: Button = start.get_node("Menu/Continue_Button")
 	_check(cont.visible and cont.text.contains("วันที่ 4"), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
 	start._on_start_button_pressed()
-	_check(not SaveGame.exists(), "เริ่มเกมใหม่ → ลบเซฟเดิม")
-	start.queue_free()
+	_check(SaveGame.exists() and start.get_node("Menu/Start_Button").text.contains("อีกครั้ง"), "มีเซฟ → เริ่มเกมใหม่ต้องกดยืนยันอีกครั้ง")
+	start._on_start_button_pressed()
+	_check(not SaveGame.exists() and ts.shift == 1 and GameState.money == GameState.economy.start_money, "กดยืนยัน → ลบเซฟเดิม · เริ่มวันที่ 1")
+	_check(ev.currentTask == 0 and not ev.isDone, "เริ่มใหม่ → เควสต์กลับขั้นแรก")
+	# จบสไลด์ → บทนำ → เข้าบ้าน = เซฟใหม่
+	if DialogScene.visible:
+		DialogScene.dialog_end()
 	EventManager.tutorial.hide()
+	start.tutorial_end()
+	DialogScene.dialog_end()
+	await get_tree().create_timer(1.6).timeout
+	_check(SaveGame.exists() and SaveGame.info() == { "shift": 1, "money": GameState.economy.start_money }, "เข้าบ้านครั้งแรก → สร้างเซฟใหม่ (%s)" % SaveGame.info())
+	start.queue_free()
 	await get_tree().process_frame
+
+	# ---- Debug: กดเควสต์ = ขั้นนั้นเสร็จ
+	DebugMenu._complete_quest(2)
+	await get_tree().create_timer(1.4).timeout
+	_check(ev.currentTask == 3 and ev._tasks[2].isDone and SceneRouter.current_id == SceneRouter.ROOM, "Debug เควสต์ 3 เสร็จ → ไปขั้น 4 ที่ร้าน")
+	DebugMenu._complete_quest(999)
+	await get_tree().create_timer(1.4).timeout
+	_check(ev.isDone and DayLoop._loop_active(), "Debug จบเควสต์ทั้งหมด → ลูปร้านทำงาน")
+	_check(SaveGame.load_into() >= 0 and ev.isDone, "เซฟหลังกด Debug โหลดกลับได้")
+
+	# ---- เมนูพัก: เล่นต่อ = บันทึก · ปุ่มบันทึกเกม
+	DialogScene.dialog_end() # บทพักหลังบทฝึกที่ลูปร้านเปิดเอง
+	DayLoop._working = false
+	SaveGame.clear()
+	PauseMenu.open()
+	PauseMenu._on_resume_pressed()
+	_check(SaveGame.exists() and not get_tree().paused, "เมนูพัก กดเล่นต่อ → บันทึกให้")
+	PauseMenu.open()
+	_check(PauseMenu.save_now() and PauseMenu.get_node("%SaveButton").text.contains("บันทึกแล้ว"), "ปุ่มบันทึกเกม → บันทึกแล้ว ✓")
+	PauseMenu.resume()
 
 	# คืนเซฟเดิมของผู้เล่น
 	if backup != "":

@@ -196,6 +196,10 @@ func _ready() -> void:
 	await _wait(1.6)
 	_check(SceneRouter.current_id == SceneRouter.HOME and DayLoop._demo_banner.visible, "กลับบ้าน → ป้ายกำลังพัฒนาให้ครบลูป")
 	_check(DayLoop._card == DayLoop.Card.NONE and not DayLoop._board_panel.visible, "หลังจบเดโมไม่มีกระดานงาน")
+	_check(DayLoop._demo_card.visible and DayLoop._demo_layer.layer > 100, "หน้าจบเดโมอยู่กลางจอ เหนือ HUD")
+	_check(Audio.want_music() == &"demo_end", "จบเดโม → เพลงจบเดโม")
+	DayLoop._demo_minimize(true)
+	_check(not DayLoop._demo_card.visible and DayLoop._demo_badge.visible, "อยู่ในบ้านต่อ → เหลือป้ายเล็ก")
 	DayLoop._reset_run()
 	_check(not DayLoop.demo_over and not DayLoop._demo_banner.visible and ts.shift == 1, "เริ่มใหม่ → ล้างสถานะเดโม")
 

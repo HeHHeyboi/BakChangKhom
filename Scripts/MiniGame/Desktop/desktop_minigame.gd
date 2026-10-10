@@ -804,6 +804,8 @@ func _build_ui() -> void:
 
 func _build_boot() -> void:
 	is_booting = true
+	if has_node(^"/root/Audio"):
+		get_node(^"/root/Audio").sfx(&"boot")
 	_boot = Control.new()
 	_boot.name = "Boot"
 	_boot.size = SCREEN

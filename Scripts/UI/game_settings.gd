@@ -7,6 +7,8 @@ const PATH := "user://settings.cfg"
 const SECTION := "settings"
 const DEFAULTS := {
 	"master_volume": 0.8, # 0..1 (บัส Master)
+	"music_volume": 0.7, # 0..1 (บัส Music) [10 ต.ค.]
+	"sfx_volume": 0.8, # 0..1 (บัส SFX)
 	"fullscreen": false,
 	"text_speed": 45.0, # ตัวอักษร/วินาที ของกล่องข้อความปิ๊บ (PibHint)
 }
@@ -65,9 +67,11 @@ static func text_speed(fallback := 45.0) -> float:
 
 static func _apply(key: String) -> void:
 	match key:
-		"master_volume":
-			var v := clampf(float(_data.master_volume), 0.0, 1.0)
-			var bus := AudioServer.get_bus_index("Master")
+		"master_volume", "music_volume", "sfx_volume":
+			var v := clampf(float(_data[key]), 0.0, 1.0)
+			var bus := AudioServer.get_bus_index({"master_volume": "Master", "music_volume": "Music", "sfx_volume": "SFX"}[key])
+			if bus < 0:
+				return
 			AudioServer.set_bus_mute(bus, v <= 0.001)
 			AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(v, 0.001)))
 		"fullscreen":

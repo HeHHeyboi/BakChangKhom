@@ -6,6 +6,10 @@ signal closed
 
 @onready var volume: HSlider = %Volume
 @onready var volume_value: Label = %VolumeValue
+@onready var music: HSlider = %Music
+@onready var music_value: Label = %MusicValue
+@onready var sfx: HSlider = %Sfx
+@onready var sfx_value: Label = %SfxValue
 @onready var fullscreen: CheckButton = %Fullscreen
 @onready var text_speed: HSlider = %TextSpeed
 @onready var text_speed_value: Label = %TextSpeedValue
@@ -18,6 +22,14 @@ func _ready() -> void:
 	volume.value_changed.connect(func(v: float):
 		GameSettings.set_value("master_volume", v / 100.0)
 		_refresh_labels())
+	music.value_changed.connect(func(v: float):
+		GameSettings.set_value("music_volume", v / 100.0)
+		_refresh_labels())
+	sfx.value_changed.connect(func(v: float):
+		GameSettings.set_value("sfx_volume", v / 100.0)
+		_refresh_labels()
+		if has_node(^"/root/Audio"):
+			get_node(^"/root/Audio").sfx(&"click"))
 	fullscreen.toggled.connect(func(on: bool): GameSettings.set_value("fullscreen", on))
 	text_speed.value_changed.connect(func(v: float):
 		GameSettings.set_value("text_speed", v)
@@ -47,6 +59,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _load_values() -> void:
 	volume.set_value_no_signal(float(GameSettings.get_value("master_volume")) * 100.0)
+	music.set_value_no_signal(float(GameSettings.get_value("music_volume")) * 100.0)
+	sfx.set_value_no_signal(float(GameSettings.get_value("sfx_volume")) * 100.0)
 	fullscreen.set_pressed_no_signal(bool(GameSettings.get_value("fullscreen")))
 	text_speed.set_value_no_signal(float(GameSettings.get_value("text_speed")))
 	_refresh_labels()
@@ -54,5 +68,7 @@ func _load_values() -> void:
 
 func _refresh_labels() -> void:
 	volume_value.text = "%d%%" % roundi(volume.value)
+	music_value.text = "%d%%" % roundi(music.value)
+	sfx_value.text = "%d%%" % roundi(sfx.value)
 	var t := text_speed.value
 	text_speed_value.text = "ช้า" if t < 35.0 else ("ปกติ" if t < 70.0 else "เร็ว")

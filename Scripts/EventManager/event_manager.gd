@@ -232,3 +232,31 @@ const TutorialState = Tutorial.TutorialState
 
 func show_tutorial(index: TutorialState) -> void:
 	tutorial.show_tutorial(index)
+
+
+## [Claude 10 ต.ค. 2569] จบเควสต์ทั้งเส้น (ทุกขั้นนับว่าเสร็จ) — ใช้ตอนโหลดเซฟ / Debug · ลูปร้านเริ่มทำงาน
+func finish_event(id: EventID) -> void:
+	var event = eventMap.get(id)
+	if event == null:
+		return
+	currentEvent = id
+	if event.totalTask > 0:
+		event.set_step(event.totalTask - 1)
+		event._tasks[event.totalTask - 1].set_done()
+	event.currentTask = event.totalTask
+	event.isDone = true
+	questboard.update_task("", event)
+	questboard.show()
+	time_system.show()
+	sendUpdatedEvent.emit(id, event)
+
+
+## [Claude 10 ต.ค. 2569] ทำขั้น index ให้เสร็จ (รวมขั้นก่อนหน้า) แล้วไปขั้นถัดไป · ขั้นสุดท้าย = จบเควสต์
+func complete_step(id: EventID, index: int) -> void:
+	var event = eventMap.get(id)
+	if event == null:
+		return
+	if index + 1 >= event.totalTask:
+		finish_event(id)
+	else:
+		jump_event(id, index + 1)

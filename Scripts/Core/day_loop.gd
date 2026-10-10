@@ -33,7 +33,8 @@ extends CanvasLayer
 @export_group("เดโม")
 ## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
 @export var demo_shifts := 7
-@export var demo_banner_text := "สิ้นสุดการเล่นเดโมแล้ว\nเกมกำลังพัฒนาให้ครบลูป ขอบคุณที่ทดลองเล่นนะ"
+@export var demo_banner_title := "สิ้นสุดการเล่นเดโม"
+@export_multiline var demo_banner_text := "ขอบคุณที่ทดลองเล่นนะ!\nตอนนี้เกมกำลังพัฒนาให้ครบลูป\nแล้วพบกับร้านบักช่างขมฉบับเต็มเร็ว ๆ นี้"
 
 ## สัดส่วนงาน Lv1/2/3/4/5 (%) ต่อสัปดาห์ 1–12 (LEVEL_DESIGN ข้อ 6) · WeekPlan.level_weights ทับได้
 const DEFAULT_WEIGHTS := [
@@ -95,7 +96,10 @@ var _game_over := false
 ## จบเดโมแล้ว (ครบ demo_shifts กะ) · _demo_ack = กดกลับบ้านแล้ว (โชว์ป้ายแทนการ์ด)
 var demo_over := false
 var _demo_ack := false
-var _demo_banner: PanelContainer
+var _demo_banner: Control
+var _demo_layer: CanvasLayer
+var _demo_card: PanelContainer
+var _demo_badge: Button
 var _working := false # กำลังคุยกับลูกค้า / อยู่ในมินิเกม
 var _shop_time := 0.0
 var _break_done := false
@@ -331,6 +335,9 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 ## [10 ต.ค.] บันทึกอัตโนมัติ (SaveGame) — ไม่บันทึกตอนยังอยู่เมนูหลัก/บทนำ หรือระหว่างมินิเกม
 func autosave() -> bool:
 	if Global.on_start or Global.in_minigame or _working:
+		return false
+	var cur := get_tree().current_scene
+	if cur and cur.is_in_group("main_menu") and cur.visible:
 		return false
 	return SaveGame.save()
 
@@ -596,32 +603,106 @@ func finish_demo() -> void:
 	_show_demo_banner(true)
 
 
+## [10 ต.ค.] หน้าจบเดโม: พื้นมืด + การ์ดกลางจอ ตัวใหญ่ (ชั้น 115 เหนือ HUD) · "อยู่ในบ้านต่อ" = ย่อเป็นป้ายเล็กด้านล่าง
 func _show_demo_banner(on: bool) -> void:
 	if not is_instance_valid(_demo_banner):
-		_demo_banner = PanelContainer.new()
-		_demo_banner.name = "DemoBanner"
-		_demo_banner.add_theme_stylebox_override("panel", _card_style())
-		_demo_banner.position = Vector2(326, 18)
-		_demo_banner.custom_minimum_size = Vector2(500, 0)
-		add_child(_demo_banner)
-		var box := VBoxContainer.new()
-		box.add_theme_constant_override("separation", 8)
-		_demo_banner.add_child(box)
-		var t := Label.new()
-		t.name = "Text"
-		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		t.add_theme_font_size_override("font_size", 20)
-		t.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
-		box.add_child(t)
-		var b := Button.new()
-		b.text = "กลับเมนูหลัก"
-		b.focus_mode = Control.FOCUS_NONE
-		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		b.pressed.connect(func(): PauseMenu.go_to_main_menu())
-		box.add_child(b)
-	(_demo_banner.find_child("Text", true, false) as Label).text = demo_banner_text
+		_build_demo_banner()
+	(_demo_card.find_child("Text", true, false) as Label).text = demo_banner_text
+	(_demo_card.find_child("Title", true, false) as Label).text = demo_banner_title
+	(_demo_card.find_child("Stats", true, false) as Label).text = "เปิดร้านครบ %d วัน · ซ่อม %d งาน · เงิน ฿%d · ชื่อเสียง %d · ยศ %s" % [
+		demo_shifts, GameState.satisfaction_history.size(), GameState.money, GameState.reputation, GameState.rank_name()]
 	_demo_banner.visible = on
+	_demo_layer.visible = on
+	if on:
+		_demo_minimize(false)
+
+
+func _build_demo_banner() -> void:
+	_demo_layer = CanvasLayer.new()
+	_demo_layer.name = "DemoEnd"
+	_demo_layer.layer = 115
+	add_child(_demo_layer)
+	_demo_banner = Control.new()
+	_demo_banner.name = "DemoBanner"
+	_demo_banner.size = Vector2(1152, 648)
+	_demo_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_demo_layer.add_child(_demo_banner)
+	var dim := ColorRect.new()
+	dim.name = "Dim"
+	dim.color = Color(0.06, 0.03, 0.02, 0.6)
+	dim.size = Vector2(1152, 648)
+	_demo_banner.add_child(dim)
+	_demo_card = PanelContainer.new()
+	_demo_card.name = "Card"
+	var sb := _card_style()
+	sb.set_border_width_all(6)
+	sb.set_corner_radius_all(22)
+	sb.set_content_margin_all(32)
+	sb.shadow_color = Color(0, 0, 0, 0.45)
+	sb.shadow_size = 18
+	_demo_card.add_theme_stylebox_override("panel", sb)
+	_demo_card.custom_minimum_size = Vector2(700, 0)
+	_demo_card.position = Vector2(226, 120)
+	_demo_banner.add_child(_demo_card)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 16)
+	_demo_card.add_child(box)
+	var title := Label.new()
+	title.name = "Title"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 44)
+	title.add_theme_color_override("font_color", Color(0.55, 0.25, 0.06))
+	box.add_child(title)
+	var t := Label.new()
+	t.name = "Text"
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	t.add_theme_font_size_override("font_size", 26)
+	t.add_theme_color_override("font_color", Color(0.22, 0.13, 0.06))
+	box.add_child(t)
+	var st := Label.new()
+	st.name = "Stats"
+	st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	st.add_theme_font_size_override("font_size", 18)
+	st.add_theme_color_override("font_color", Color(0.45, 0.3, 0.15))
+	box.add_child(st)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 20)
+	box.add_child(row)
+	for it in [["กลับเมนูหลัก", func(): PauseMenu.go_to_main_menu()], ["อยู่ในบ้านต่อ", func(): _demo_minimize(true)]]:
+		var b := Button.new()
+		b.name = "Btn_" + String(it[0]).validate_node_name()
+		b.text = it[0]
+		b.theme = load("res://Assets/UI/menu_theme.tres")
+		b.custom_minimum_size = Vector2(250, 70)
+		b.add_theme_font_size_override("font_size", 24)
+		b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(it[1])
+		row.add_child(b)
+	_demo_badge = Button.new()
+	_demo_badge.name = "Badge"
+	_demo_badge.text = "★ จบเดโมแล้ว · กดเพื่อดูอีกครั้ง"
+	_demo_badge.focus_mode = Control.FOCUS_NONE
+	_demo_badge.add_theme_font_size_override("font_size", 20)
+	for st2 in ["normal", "hover", "pressed"]:
+		_demo_badge.add_theme_stylebox_override(st2, _card_style())
+	_demo_badge.add_theme_color_override("font_color", Color(0.55, 0.25, 0.06))
+	_demo_badge.add_theme_color_override("font_hover_color", Color(0.75, 0.35, 0.05))
+	_demo_badge.position = Vector2(400, 586)
+	_demo_badge.custom_minimum_size = Vector2(352, 48)
+	_demo_badge.pressed.connect(_demo_minimize.bind(false))
+	_demo_banner.add_child(_demo_badge)
+
+
+## ย่อ (เดินดูบ้านต่อได้ · เหลือป้ายเล็ก) / ขยายคืน
+func _demo_minimize(on: bool) -> void:
+	if not is_instance_valid(_demo_banner):
+		return
+	_demo_banner.get_node("Dim").visible = not on
+	_demo_card.visible = not on
+	_demo_badge.visible = on
 
 
 func ot_slots_now() -> int:
@@ -651,6 +732,9 @@ func _continue_after_summary() -> void:
 ## เริ่มเกมใหม่หลังฉากจบ: เงิน/คะแนน/เวลา กลับค่าเริ่มต้น
 func _reset_run() -> void:
 	_game_over = false
+	_working = false
+	_result_pending = false
+	cards_hidden = false
 	demo_over = false
 	_demo_ack = false
 	_show_demo_banner(false)
@@ -679,8 +763,8 @@ func _reset_run() -> void:
 func _process(delta: float) -> void:
 	if _ts() == null:
 		return
-	if _demo_ack and is_instance_valid(_demo_banner):
-		_demo_banner.visible = not (DialogScene.visible or Global.in_minigame)
+	if _demo_ack and is_instance_valid(_demo_layer):
+		_demo_layer.visible = not (DialogScene.visible or Global.in_minigame or PauseMenu.visible)
 	_watchdog(delta)
 	var want := _decide_card()
 	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
