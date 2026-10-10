@@ -1,6 +1,6 @@
 # BUG_LIST.md — รายการบั๊กทั้งหมดที่ตรวจพบ
 
-> ตรวจจากโค้ดจริงที่ commit `4b84c10` · อัปเดต 28 ก.ย. 2569 (audit เพิ่มบน working tree ที่ยังไม่ commit — เพิ่ม `PhasePoweroff` + `PibHint.toast()`; audit หลักครั้งก่อนคือ 27 ก.ย. 2569 หลังทีมลง state machine 8 phase ของ Part RAM) · Godot 4.7
+> ตรวจจากโค้ดจริง · **อัปเดตล่าสุด 10 ต.ค. 2569** (ดูหัวข้อ 🆕 10 ต.ค.) · เดิม commit `4b84c10` · อัปเดต 28 ก.ย. 2569 (audit เพิ่มบน working tree ที่ยังไม่ commit — เพิ่ม `PhasePoweroff` + `PibHint.toast()`; audit หลักครั้งก่อนคือ 27 ก.ย. 2569 หลังทีมลง state machine 8 phase ของ Part RAM) · Godot 4.7
 > เอกสารคู่กัน: `Docs/SYNC_REVIEW.md` (รายละเอียดวิธีแก้) · `Docs/ASSET_TODO.md` (asset ที่ต้องทำ) · `Docs/MINIGAME1_DESIGN.md` (ดีไซน์เต็ม)
 > สถานะ: ✅ แก้แล้วในรีโป · 🔧 รอทำใน Godot · ⬜ ยังไม่แก้
 
@@ -10,12 +10,26 @@
 
 | ระดับ | ✅ แก้แล้ว | 🔧 รอทำใน Godot | ⬜ ยังไม่แก้ | รวม |
 |---|---|---|---|---|
-| 🔴 Critical | 12 | 0 | 2 | 14 |
-| 🟡 High | 9 | 0 | 2 | 11 |
-| 🟢 Low | 5 | 0 | 5 | 10 |
-| **รวม** | **26** | **0** | **9** | **35** |
+| 🔴 Critical | 14 | 0 | 0 | 14 |
+| 🟡 High | 11 | 0 | 0 | 11 |
+| 🟢 Low | 8 | 0 | 2 | 10 |
+| **รวม** | **33** | **0** | **2** | **35** |
 
-> นับใหม่ 6 ต.ค. 2569 จากหัวข้อ BUG-xx ในไฟล์นี้ (เดิม 25 / 11 / 36) — ไม่มี BUG-27 ในไฟล์ (เลขไม่เคยถูกใช้) จึงรวม 35 · BUG-32 และ BUG-34 ปิดแล้วตามหัวข้อ "อัปเดต 30 ก.ย." · **ยังเปิด 9:** BUG-14 · 15 · 16 · 17 · 21 · 22 · 23 · 25 · 35 (`output.txt` ยังอยู่ใน git)
+> นับใหม่ 10 ต.ค. 2569: ปิด BUG-14 · 15 · 16 · 17 · 21 · 22 · 23 → **ยังเปิด 2:** BUG-25 (ชื่อไฟล์สะกดผิด) · BUG-35 (`output.txt`) — Low ทั้งคู่ ไม่กระทบการเล่น
+> (นับครั้งก่อน 6 ต.ค. 2569 จากหัวข้อ BUG-xx ในไฟล์นี้ (เดิม 25 / 11 / 36) — ไม่มี BUG-27 ในไฟล์ (เลขไม่เคยถูกใช้) จึงรวม 35 · BUG-32 และ BUG-34 ปิดแล้วตามหัวข้อ "อัปเดต 30 ก.ย." · **ยังเปิด 9:** BUG-14 · 15 · 16 · 17 · 21 · 22 · 23 · 25 · 35 (`output.txt` ยังอยู่ใน git))
+
+---
+
+## 🆕 อัปเดต 10 ต.ค. 2569 — ตรวจบั๊กที่ยังเปิดเทียบโค้ดปัจจุบัน
+
+- **BUG-15 ✅ (ตัดสินใจแล้ว):** เกมเป็น point-and-click ทั้งเกม (ทาง ข) — แผนที่ใหม่กดแล้วไปเลย · ตลาดเลิกเดิน (`Market.tscn` เป็น Control ไม่มี Player) · `MainGame.tscn` / `Player.tscn` / `Scripts/Market/exit.gd` เหลือเป็น dead code รอลบ
+- **BUG-14 ✅ (ไม่กระทบแล้ว):** `simple_npc.gd` อยู่แค่ใน `MainGame.tscn` ที่ไม่ถูกโหลด — ลบพร้อม dead code ข้างบน
+- **BUG-16 ✅:** มินิเกมเปิดผ่าน `SceneRouter.push()` (fade ก่อน → ไม่เปิดเฟรมเดียวกับที่ tutorial จบ) · มินิเกมเก่า `minigame1.gd` ไม่ได้ใช้แล้ว (Part RAM ใหม่)
+- **BUG-17 ✅:** มินิเกมอยู่ใน `SceneRouter.overlay_stack` (CanvasLayer 10 เหนือฉาก) และฉากข้างล่างถูก `PROCESS_MODE_DISABLED` ระหว่างเล่น · ปิดด้วย `SceneRouter.pop()`
+- **BUG-21 · 22 · 23 ✅:** เลิกระบบเดิน (ไม่มีเดินทแยง) · ปุ่ม E ใน `exit.gd` ไม่ถูกใช้แล้ว · `Global.on_start` ถูกอ่านใน autosave / เมนูพัก
+- **ยังเปิด:** BUG-25 (ชื่อไฟล์สะกดผิด) · BUG-35 `output.txt` ยังอยู่ที่ root — Low ไม่กระทบการเล่น
+- **แก้เพิ่ม 10 ต.ค.:** error "Rect2i size is negative" (เลิกใช้ RichTextLabel ทั้งเกม) · warning `@tool` ของสคริปต์ลูก SceneHotspot · warning signal ไม่ได้ใช้ — ดู `LEVEL_DESIGN.md` ข้อ 8.5
+- **ระบบที่เคยบอกว่ายังไม่มี ตอนนี้มีแล้ว:** Save (`SaveGame` · `user://save.json`) · เสียง (autoload `Audio`) · ปิ๊บอยู่ใน `_CharacterMap`
 
 ---
 
@@ -207,7 +221,7 @@ BUG-14 (`simple_npc.gd` signature ผิด) · BUG-15 (ไม่มี Player /
 | ผล (ก่อนแก้) | ตอนนั้นยังหา texture เจอเพราะ cache ใน `.godot/` แต่พอ clone ใหม่หรือลบ cache uid ตายทั้งชุด |
 | ตรวจซ้ำ 23 ก.ย. 2569 | เช็กทั้ง 69 ไฟล์ `.import` ใต้ `Assets/MiniGame/Part*/` แล้ว — ทุกไฟล์มี `source_file` ตรงกับชื่อรูปที่อยู่จริง ไม่มีไฟล์กำพร้าเหลือ ปิดเป็น ✅ |
 
-### BUG-14 ⬜ `simple_npc.gd` เรียก `show_dialog()` ผิด signature
+### BUG-14 ✅ (10 ต.ค. dead code) `simple_npc.gd` เรียก `show_dialog()` ผิด signature
 
 | | |
 |---|---|
@@ -217,7 +231,7 @@ BUG-14 (`simple_npc.gd` signature ผิด) · BUG-15 (ไม่มี Player /
 | ผลจริง | ตอนนี้ยังไม่ระเบิดเพราะ `SimpleNPC` อยู่ใน `MainGame.tscn` ที่ไม่ถูกโหลด (ดู BUG-15) — พอเอา MainGame กลับมาใช้จะพังทันที |
 | แก้ | `DialogScene.show_dialog(Constant.CHAPTER1_RETURN_HOME_TEXT, Constant.CHAPTER2_BG_IMAGE, ["ขม", "ยาย"])` |
 
-### BUG-15 ⬜ `MainGame.tscn` ไม่เคยถูกโหลด — ทั้งเกมไม่มี Player
+### BUG-15 ✅ (10 ต.ค. เลือก point-and-click) `MainGame.tscn` ไม่เคยถูกโหลด — ทั้งเกมไม่มี Player
 
 | | |
 |---|---|
@@ -256,7 +270,7 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 ตรวจซ้ำ 23 ก.ย. 2569: `Scripts/constant.gd:17` ชี้ `res://Scene/MiniGame/PartRam/part_ram.tscn` แล้ว และไฟล์นั้นมีอยู่จริง ปิดเป็น ✅
 *(หมายเหตุ: ไฟล์ binary เก่า `Scene/MiniGame/Minigame1.scn` ยังค้างอยู่ในดิสก์แบบไม่มีใครอ้างถึง — ไม่ใช่บั๊ก แค่ dead file รอลบตอนล้าง asset)*
 
-### BUG-16 ⬜ tutorial กับมินิเกมขึ้นพร้อมกัน — คลิกทะลุ
+### BUG-16 ✅ (10 ต.ค. SceneRouter) tutorial กับมินิเกมขึ้นพร้อมกัน — คลิกทะลุ
 
 | | |
 |---|---|
@@ -264,7 +278,7 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 | สาเหตุ (ตรวจซ้ำ 23 ก.ย. 2569 — จุดโค้ดเปลี่ยนหลัง refactor `trigger_step()` ไม่มี "case 3" แล้ว แต่บั๊กยังจริงอยู่) | `_on_tutorial_end()` เรียก `_process_data()` → `get_tree().root.add_child(minigame)` แบบ synchronous ในสัญญาณเดียวกับที่ tutorial จบ · `minigame1.gd::_input()` ยังไม่เช็ก `Global.isDialogShown()`/`isInMinigame()` และไม่เคยเรียก `set_input_as_handled()` เลย → คลิกที่ตั้งใจกดบน UI ชั้นบนทะลุไปโดนมินิเกมข้างล่างได้ |
 | แก้ | รอ `EventManager.on_tutorial_finish` ให้ processing เสร็จเป็นเฟรมถัดไปก่อนค่อย `add_child(minigame)` · หรือใน `minigame1.gd::_input()` เช็ก `if Global.isDialogShown(): return` + `get_viewport().set_input_as_handled()` |
 
-### BUG-17 ⬜ มินิเกมถูก `add_child` ที่ `get_tree().root`
+### BUG-17 ✅ (10 ต.ค. SceneRouter overlay) มินิเกมถูก `add_child` ที่ `get_tree().root`
 
 ไม่ได้อยู่ใต้ฉากปัจจุบัน → ไม่บล็อกอินพุตของฉากข้างล่าง (กดปุ่มในห้องทะลุผ่านมินิเกมได้) และไม่ถูกลบตอนเปลี่ยนฉาก
 **แก้:** ใส่ `Control` เต็มจอที่ `mouse_filter = STOP` เป็นฉากหลังของมินิเกม หรือ add เข้า `get_tree().current_scene` แทน root
@@ -304,17 +318,17 @@ diff/merge ไม่ได้ review ไม่ได้ → Save As เป็น
 เดิม `event_manager.gd` เช็ก `if [2, 3].has(task)` — แทรก task ใหม่ตรงกลางเมื่อไรพังทันที
 แก้ใน commit `7c291e5`: `minigame_end()` เช็ก `data.isDone && data.action == QuestStep.Action.MINIGAME || ...` (data-driven จาก task ปัจจุบันเอง ไม่ใช่เลข index ที่ hardcode) ก่อนเรียก `update_event()`
 
-### BUG-21 ⬜ เดินทแยงมุมไม่ได้
+### BUG-21 ✅ (10 ต.ค. เลิกเดินแล้ว) เดินทแยงมุมไม่ได้
 
 `Scripts/player.gd::_physics_process()` ใช้ `if / elif` ไล่ทีละทิศ → กด W+D พร้อมกันจะได้แค่ขึ้น
 **แก้:** ใช้ `Input.get_vector("left", "right", "up", "down")` แทนทั้งบล็อก
 
-### BUG-22 ⬜ กด `E` ที่ไหนก็ toggle แผนที่ได้
+### BUG-22 ✅ (10 ต.ค. ตลาดไม่ใช้ exit.gd แล้ว · แผนที่เปิดจากปุ่ม/ปิดด้วย Esc) กด `E` ที่ไหนก็ toggle แผนที่ได้
 
 `Scripts/Market/exit.gd::_input()` ดักคีย์ E แบบ global โดยไม่เช็กว่าผู้เล่นอยู่ในโซนหรือไม่ และไม่เช็ก `isDialogShown()` / `isInMinigame()`
 **แก้:** ใช้ flag `playerEnter` แบบเดียวกับ `simple_npc.gd` + guard สถานะ
 
-### BUG-23 ⬜ `Global.on_start` เขียนอย่างเดียว ไม่มีใครอ่าน
+### BUG-23 ✅ (10 ต.ค. DayLoop.autosave · PauseMenu อ่านแล้ว) `Global.on_start` เขียนอย่างเดียว ไม่มีใครอ่าน
 
 `global.gd` + `start_scene.gd` — dead field ลบทิ้งหรือเอาไปใช้จริง
 

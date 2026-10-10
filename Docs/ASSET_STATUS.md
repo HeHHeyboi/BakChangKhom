@@ -7,6 +7,8 @@
 
 > ℹ️ ชุด `Assets/MiniGame/Scene2D/` (ฉากมินิเกม 2D · 30 ก.ย.) **ไม่นับ**ในตัวเลขนี้ เพราะไม่อยู่ในตาราง `ASSET_NAMING.md` · ดู `SCENE_2D.md` §3 และ `ASSET_TODO.md` ท้ายไฟล์
 
+> 🆕 **10 ต.ค. 2569 — ตัดสินใจ: ใช้ asset ที่ Claude สร้างด้วยโค้ดเป็นหลักไปก่อน** (ดูหัวข้อ "Asset ที่สร้างด้วยโค้ด" ด้านล่าง) · ถ้าทีมวาดภาพจริงมาแทนภายหลัง ใช้ชื่อไฟล์เดิมทับได้เลย ไม่ต้องแก้โค้ด (หรือสร้างชื่อใหม่แล้วเปลี่ยนใน Inspector)
+
 ## สรุป
 
 | | จำนวน |
@@ -61,10 +63,31 @@
 
 ดูรายการ 11 ไฟล์พร้อมคำตัดสินในหัวข้อท้ายของ `ASSET_NAMING.md`
 
+## 🖌 Asset ที่สร้างด้วยโค้ด — ใช้เป็นหลัก (10 ต.ค. 2569)
+
+ทุกชุดมีสคริปต์ Python (PIL / numpy) อยู่ในโฟลเดอร์ `src/` ข้างไฟล์ภาพ (มี `.gdignore` Godot ไม่ import) · รันซ้ำได้ผลเหมือนเดิมทุกครั้ง · **ไม่เขียนทับไฟล์ LFS เดิม** (สร้างชื่อใหม่เสมอ)
+
+| ชุด | ไฟล์ | สคริปต์ | ใช้ที่ |
+|---|---|---|---|
+| แผนที่หมู่บ้าน | `Assets/Map/map_bg.jpg` · `loc_home` · `loc_village` · `loc_shop` · `loc_market` · `loc_city` (.jpg) | `Assets/Map/src/gen_map.py` | `Scene/map.tscn` (การ์ดสถานที่ตัดจากฉากที่มีอยู่) |
+| ตลาด | `Assets/Background/bg_market_day.jpg` (ถนนหน้าบ้าน + แผง 3 ร้าน) | `gen_map.py` | `Scene/Location/Market.tscn` |
+| ห้องของขม | `Assets/Background/bg_khom_room.jpg` (ห้องไม้ + คอมเก่า CRT · ฟูก · โปสเตอร์) | `gen_map.py … room` | บท "ห้องของขม" (`Resources/main.tres`) · `find_item_minigame.tscn` |
+| ห้องเก็บของ | `Assets/Background/bg_storeroom.jpg` | `gen_map.py` | ยังไม่ได้ใช้ (สำรอง) |
+| ตรวจเครื่องเบื้องต้น | `Assets/MiniGame/PowerCheck/` power_bg · pc_back (PSU ล่าง) · fan · fan_grill · psu_sw_off/on · strip · strip_sw_off/on · plug · pc_front · power_btn(_hover) | `PowerCheck/src/gen_power.py` | `Scene/MiniGame/PowerCheck/power_check.tscn` |
+| ขมOS ในจอบนโต๊ะ | `Assets/MiniGame/Desktop/os_frame_desk.png` + ไอคอน `os_icon_*` | `Desktop/src/gen_frame.py` | `desktop_window.tscn` |
+| โต๊ะคอม / เมาส์มีสาย | `Assets/MiniGame/TutorialAssembly/desk_pc_2x.png` · `asm_*` | `TutorialAssembly/src/gen_desk.py` · `gen_asm.py` · `mouse_art.py` | บทฝึกประกอบคอม · Part BIOS/FrontPanel/GPU/Mainboard/RAM (bg_scale 0.5) |
+| ภาพ Part อื่น ๆ | `PartBios` · `PartFrontPanel` · `PartGpu` · `PartMainboard` | `Part*/src/gen_art.py` | มินิเกม Core Part |
+| สไลด์สอนเล่น | `Assets/Tutorial/BasicStart/tut_new_01–04.png` (ถ่ายจากฉากจริง) | `Assets/Tutorial/src/gen_start_slides.py` | `Resources/tutorial1.tres` (`tut_start_0x` เดิมไม่ได้แก้) |
+| เพลง + เสียง | `Assets/Audio/Music/*.ogg` (เมนู · หมู่บ้าน · ทำงาน · jingle จบบท) · `Sfx/*.wav` · `Sfx/Beep/beep_*.wav` (รหัส BIOS 10 แบบ) | `Assets/Audio/src/gen_audio.py` | autoload `Audio` · ดู `AUDIO.md` |
+| สีหน้าตัวละคร | `Assets/CharacterSprite/*` บางสีหน้า | `CharacterSprite/src/make_expr.py` | `_CharacterMap` |
+
+**วิธีเปลี่ยนเป็นภาพจริงภายหลัง:** วาดขนาดเท่าเดิม (ดูขนาดจากไฟล์ปัจจุบัน) → ตั้งชื่อไฟล์ใหม่ → ลากใส่ช่อง texture ใน Inspector ของโหนดที่ใช้ (ทุกฉากด้านบนสร้างเป็นโหนด) · สำหรับ PowerCheck/แผนที่ ตำแหน่งปุ่มอ้างพิกัดในภาพ — ถ้าภาพใหม่ย้ายของ ให้ลากโหนดตามใน Inspector
+
 ## ประวัติเอกสาร
 
 | วันที่ | การเปลี่ยนแปลง |
 |---|---|
+| 10 ต.ค. 2569 | ตัดสินใจใช้ asset ที่สร้างด้วยโค้ดเป็นหลัก · เพิ่มตาราง "Asset ที่สร้างด้วยโค้ด" (แผนที่ · ตลาด · ห้องของขม · ตรวจเครื่อง · ขมOS · โต๊ะคอม · สไลด์ · เสียง) |
 | 24 ก.ย. 2569 | สร้างเอกสาร — พบเพิ่มใหม่ 29 ไฟล์ เหลือขาด 118 และ 7 ไฟล์ที่เนื้อหาในภาพผิด |
 | 6 ต.ค. 2569 | ตรวจใหม่จากไฟล์จริง — ✅ 57 · 🔴 85 (เดิม 43 / 99) · +14 ไฟล์ (สไลด์ tutorial 7 · `gpu_card_dusty` · BIOS 6) · `_CharacterMap` ผูกครบแล้ว · สไลด์ชื่อไทยลบได้ · งานเปลี่ยนชื่อ 38 ไฟล์ + `speaker.png` ยังค้าง |
 | 29 ก.ย. 2569 | ตรวจใหม่หลัง commit `fc660aa` — ปิด 🟠 ครบทั้ง 7 ไฟล์ · มีไฟล์ใช้ได้ 43 เหลือขาด 99 · เพิ่มงาน `speaker.png` และงานเปลี่ยนชื่อ 38 ไฟล์ |
