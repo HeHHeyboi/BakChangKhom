@@ -50,7 +50,7 @@ var _lock_btn: Button
 func init():
 	if _tools.is_empty(): # init() ถูกเรียกทุกครั้งที่เข้า phase — โหลดครั้งเดียวพอ ไม่งั้นอุปกรณ์ซ้ำ
 		for p in DirAccess.get_files_at(Constant.TOOL_DIR):
-			var t := load(Constant.TOOL_DIR + p) as ToolDef
+			var t := load(Constant.TOOL_DIR + p.trim_suffix(".remap")) as ToolDef # export: "x.tres.remap"
 			if t:
 				_tools.append(t)
 	if not _built:

@@ -60,8 +60,10 @@ var _chk: Array[Label] = []
 func init():
 	if _tools.is_empty(): # init() ถูกเรียกทุกครั้งที่เข้า phase — โหลดครั้งเดียวพอ ไม่งั้นอุปกรณ์ซ้ำ
 		for p in DirAccess.get_files_at(Constant.TOOL_DIR):
-			var t := load(Constant.TOOL_DIR + p) as ToolDef
-			_tools.append(t)
+			# ตอน export .tres ถูกแปลงเป็น .res แล้วลิสต์ออกมาเป็น "x.tres.remap" — ต้องตัด .remap ก่อน load ไม่งั้นได้ null
+			var t := load(Constant.TOOL_DIR + p.trim_suffix(".remap")) as ToolDef
+			if t:
+				_tools.append(t)
 	if not _built:
 		print("build")
 		_build()
