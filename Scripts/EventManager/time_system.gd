@@ -57,7 +57,6 @@ signal game_ended
 
 @onready var timeText = $PanelContainer/HBoxContainer/Time as Label ## [Claude 10 ต.ค. 2569] เดิม RichTextLabel — engine แจ้ง "Rect2i size is negative" กับข้อความไทย
 @onready var dateText = $PanelContainer/HBoxContainer/Date as Label
-@export var money_label: Label
 
 ## กะที่เท่าไรของทั้งเกม 1–60 (ไม่โชว์ผู้เล่น)
 var shift := 1
@@ -101,23 +100,6 @@ func _ready() -> void:
 	if dateText:
 		dateText.add_theme_font_size_override("font_size", 14) # [10 ต.ค.] ย่อ HUD
 	set_shift(1)
-	var gs := get_node_or_null(^"/root/GameState")
-	if gs == null:
-		return
-	if not gs.rank_up.is_connected(_on_rank_up):
-		gs.rank_up.connect(_on_rank_up)
-	if not gs.money_changed.is_connected(_on_money_changed):
-		gs.money_changed.connect(_on_money_changed)
-	_on_money_changed(gs.money, 0)
-
-
-func _on_money_changed(money: int, _delta: int) -> void:
-	if money_label == null:
-		return
-	var value := str(money)
-	if absi(money) >= 1000:
-		value = "%.1fk" % (money / 1000.0)
-	money_label.text = "฿ %s" % value
 
 # ---------------------------------------------------------------- ปฏิทิน
 
@@ -447,7 +429,8 @@ func updateTime() -> void:
 	timeText.add_theme_color_override("font_color", col)
 	timeText.text = txt
 	dateText.text = (
-		"%s · สัปดาห์ %d · กะ %d/%d\n%s น. · ชม.งาน %d/%d" % [
+		"%s · สัปดาห์ %d · กะ %d/%d\n%s น. · ชม.งาน %d/%d"
+		% [
 			MONTH_NAME[month() - 1],
 			week(),
 			shift_in_week(),
@@ -485,43 +468,3 @@ func _update_turns() -> void:
 		week_in_month(),
 		MONTH_NAME[clampi(month(), 1, MONTH_NAME.size()) - 1],
 	]
-
-
-# ---------------------------------------------------------------- ยศช่าง [Claude 10 ต.ค. 2569]
-var _shown_xp := -1
-
-
-func _process(_delta: float) -> void:
-	var gs := get_node_or_null(^"/root/GameState")
-	if gs == null or gs.xp == _shown_xp:
-		return
-	_shown_xp = gs.xp
-	update_rank()
-
-
-## แถบยศใต้ป้ายเวลา: ชื่อยศ · แถบ XP · "120/500 XP"
-func update_rank() -> void:
-	var gs := get_node_or_null(^"/root/GameState")
-	var box := get_node_or_null(^"RankPanel/Box")
-	if gs == null or box == null:
-		return
-	(box.get_node(^"Rank") as Label).text = gs.rank_name()
-	(box.get_node(^"Bar") as ProgressBar).value = gs.rank_progress()
-	var nxt: int = gs.xp_next()
-	(box.get_node(^"Xp") as Label).text = ("%d/%d XP" % [gs.xp, nxt]) if nxt > 0 else ("%d XP · ยศสูงสุด" % gs.xp)
-
-
-func _on_rank_up(_rank: int, rank_name: String) -> void:
-	var p := get_node_or_null(^"RankUp") as Control
-	if p == null:
-		return
-	(p.get_node(^"Text") as Label).text = "เลื่อนขั้น!  ขมเป็น \"%s\" แล้ว" % rank_name
-	p.show()
-	p.modulate.a = 0.0
-	if has_node(^"/root/Audio"):
-		get_node(^"/root/Audio").sfx(&"success")
-	var tw := create_tween()
-	tw.tween_property(p, "modulate:a", 1.0, 0.25)
-	tw.tween_interval(2.6)
-	tw.tween_property(p, "modulate:a", 0.0, 0.4)
-	tw.tween_callback(p.hide)

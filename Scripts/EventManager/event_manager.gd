@@ -14,6 +14,11 @@ enum EventID {
 @onready var questboard = $"QuestBoard" as QuestBoard
 @onready var time_system = $"TimeSystem" as TimeSystem
 @onready var tutorial = $"Tutorial" as Tutorial
+## ป้ายเงินบน HUD (อยู่ในแผงของ TimeSystem แต่ EventManager เป็นคนอัปเดต)
+@export var money_label: Label
+## แถวชื่อยศ · แถบ XP · ตัวเลข XP (RankPanel/Box) และป้ายเลื่อนขั้น (RankUp) บน HUD — เช่นกัน
+@export var rank_box: Control
+@export var rank_up_panel: Control
 var currentEvent: EventID
 var pendingTask: int = -1
 ## true ระหว่างเล่นบทที่ไม่ใช่ขั้นของเควสต์ (บท Chapter ท้ายรอบ · Epilogue) — จบแล้วไม่ไปเดินเควสต์หลัก
@@ -28,6 +33,7 @@ func _ready() -> void:
 	var root_tree = get_tree().root.get_tree()
 	root_tree.node_added.connect(self._on_node_added)
 	DialogScene.on_dialog_finish.connect(self._on_dialog_finish)
+	_bind_game_state.call_deferred() # GameState เป็น autoload ที่โหลดหลัง EventManager
 	if eventMap.size() <= 0:
 		return
 	currentEvent = EventID.MAIN
@@ -37,6 +43,65 @@ func _ready() -> void:
 	questboard.update_task(event.get_task().quest_text_th, event)
 	sendUpdatedEvent.emit(currentEvent, event)
 	tutorial.on_tutorial_end.connect(_on_tutorial_end)
+
+
+func _bind_game_state() -> void:
+	if not GameState.money_changed.is_connected(_on_money_changed):
+		GameState.money_changed.connect(_on_money_changed)
+	if not GameState.rank_up.is_connected(_on_rank_up):
+		GameState.rank_up.connect(_on_rank_up)
+	_on_money_changed(GameState.money, 0)
+
+# ---------------------------------------------------------------- เงิน (HUD)
+
+
+func _on_money_changed(money: int, _delta: int) -> void:
+	if money_label == null:
+		return
+	var value := str(money)
+	if absi(money) >= 1000:
+		value = "%.1fk" % (money / 1000.0)
+	money_label.text = "฿ %s" % value
+
+
+# ---------------------------------------------------------------- ยศช่าง (HUD) [ย้ายมาจาก TimeSystem]
+var _shown_xp := -1
+
+
+## xp ถูกตั้งตรง ๆ ตอน reset/โหลดเซฟ (ไม่ยิง xp_changed) เลยต้องเช็กทุกเฟรม
+func _process(_delta: float) -> void:
+	if GameState.xp == _shown_xp:
+		return
+	_shown_xp = GameState.xp
+	update_rank()
+
+
+## แถบยศใต้ป้ายเวลา: ชื่อยศ · แถบ XP · "120/500 XP"
+func update_rank() -> void:
+	if rank_box == null:
+		return
+	(rank_box.get_node(^"Rank") as Label).text = GameState.rank_name()
+	(rank_box.get_node(^"Bar") as ProgressBar).value = GameState.rank_progress()
+	var nxt := GameState.xp_next()
+	(rank_box.get_node(^"Xp") as Label).text = (
+		("%d/%d XP" % [GameState.xp, nxt])
+		if nxt > 0
+		else ("%d XP · ยศสูงสุด" % GameState.xp)
+	)
+
+
+func _on_rank_up(_rank: int, rank_name: String) -> void:
+	if rank_up_panel == null:
+		return
+	(rank_up_panel.get_node(^"Text") as Label).text = "เลื่อนขั้น!  ขมเป็น \"%s\" แล้ว" % rank_name
+	rank_up_panel.show()
+	rank_up_panel.modulate.a = 0.0
+	Audio.sfx(&"success")
+	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) # ป้ายต้องจางหายแม้เปิดเมนูพัก (เดิมอยู่ใน TimeSystem ที่ process_mode=ALWAYS)
+	tw.tween_property(rank_up_panel, "modulate:a", 1.0, 0.25)
+	tw.tween_interval(2.6)
+	tw.tween_property(rank_up_panel, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(rank_up_panel.hide)
 
 
 func _on_node_added(node: Node) -> void:
@@ -260,3 +325,7 @@ func complete_step(id: EventID, index: int) -> void:
 		finish_event(id)
 	else:
 		jump_event(id, index + 1)
+
+
+func get_clock_text() -> String:
+	return TimeSystem.clock_text(time_system.current_minute)

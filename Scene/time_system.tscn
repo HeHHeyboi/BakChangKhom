@@ -52,11 +52,10 @@ corner_radius_bottom_left = 18
 shadow_color = Color(0, 0, 0, 0.4)
 shadow_size = 10
 
-[node name="TimeSystem" type="CanvasLayer" unique_id=1106151211 node_paths=PackedStringArray("money_label")]
+[node name="TimeSystem" type="CanvasLayer" unique_id=1106151211]
 process_mode = 3
 layer = 100
 script = ExtResource("1_nyd0s")
-money_label = NodePath("PanelContainer/HBoxContainer/MoneyLabel")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=549087680]
 offset_right = 340.0
