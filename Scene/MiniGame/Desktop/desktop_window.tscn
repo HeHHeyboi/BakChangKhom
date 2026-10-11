@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://bfdxwk4g4j861" path="res://Resources/Desktop/task_install_chat.tres" id="3_task"]
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="4_boot"]
 
-[node name="DesktopWindow" type="Node2D" unique_id=1845123255 node_paths=PackedStringArray("pib")]
+[node name="DesktopWindow" type="Node2D" unique_id=369883786 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_desk")
 task = ExtResource("3_task")
 pib = NodePath("PibHint")

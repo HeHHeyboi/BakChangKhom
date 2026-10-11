@@ -7,7 +7,13 @@ class_name DesktopMinigame extends PartMinigame
 ## logic (ask · delete_file · install_app · uninstall · check …) แยกจาก UI → Test/desktop_test.gd เรียกตรงได้
 ## [Claude 9 ต.ค. 2569]
 
-enum Step { LISTEN, WORK, EXPLAIN, SUMMARY, DONE }
+enum Step {
+	LISTEN,
+	WORK,
+	EXPLAIN,
+	SUMMARY,
+	DONE,
+}
 
 const PIB_PATH := "res://Assets/Dialog/MiniGame/Desktop_Pib.txt"
 const CAP := { &"fix": 40, &"safety": 30, &"listen": 20, &"explain": 10 }
@@ -60,24 +66,49 @@ signal booted
 ## พื้นที่จอในภาพ os_frame_desk.png (พิกัดหน้าจอเกม 1152×648) · OS 1152×648 ถูกย่อลงมาใส่ (สเกล 0.85)
 const FRAME_SCREEN := Rect2(86, 14, 979.2, 550.8)
 const TEX_FRAME := preload(DIR + "os_frame_desk.png")
-const BOOT_LINES := ["ขมBIOS v1.0", "ตรวจซีพียู ........ ผ่าน", "ตรวจแรม 8 GB ...... ผ่าน", "ตรวจ SSD 256 GB ... ผ่าน", "กำลังเริ่ม ขมOS ..."]
+const BOOT_LINES := [
+	"ขมBIOS v1.0",
+	"ตรวจซีพียู ........ ผ่าน",
+	"ตรวจแรม 8 GB ...... ผ่าน",
+	"ตรวจ SSD 256 GB ... ผ่าน",
+	"กำลังเริ่ม ขมOS ...",
+]
 
 signal tour_finished(skipped: bool)
 
 ## ขั้นของ tour: id · บอกให้ทำ · ปิ๊บอธิบายหลังทำเสร็จ
 const TOUR := [
-	{ "id": "open_docs", "text": "เปิดโฟลเดอร์เอกสาร", "how": "ดับเบิลคลิกไอคอน \"เอกสาร\" บนเดสก์ท็อป",
-		"done": "นี่คือหน้าต่างไฟล์ ไฟล์ทุกอย่างในเครื่องแยกเก็บเป็นโฟลเดอร์ เหมือนลิ้นชัก" },
-	{ "id": "open_browser", "text": "เปิดเบราว์เซอร์", "how": "กดรูปลูกโลกที่แถบงานด้านล่าง",
-		"done": "เบราว์เซอร์ใช้เปิดเว็บ ปุ่มสีจัดที่เขียนว่าโฆษณาอย่าไปกดนะ" },
-	{ "id": "open_settings", "text": "ดูพื้นที่ในหน้าตั้งค่า", "how": "กดรูปเฟืองที่แถบงาน",
-		"done": "หน้าตั้งค่าบอกพื้นที่เหลือ และเป็นที่ถอนโปรแกรมด้วย" },
-	{ "id": "delete_file", "text": "ลบไฟล์ทดสอบ", "how": "คลิกขวาที่ \"ไฟล์ทดสอบ.doc\" บนเดสก์ท็อป → ลบ",
-		"done": "ไฟล์ที่ลบยังไม่หายจริงนะ มันไปอยู่ในถังขยะ" },
-	{ "id": "empty_trash", "text": "ล้างถังขยะ", "how": "ดับเบิลคลิกถังขยะ → กด \"ล้างถังขยะ\"",
-		"done": "ล้างถังขยะแล้วไฟล์ถึงหายจริง พื้นที่ก็กลับมา" },
-	{ "id": "shutdown", "text": "ปิดเครื่อง", "how": "กดปุ่มเริ่มมุมซ้ายล่าง → ปิดเครื่อง",
-		"done": "" },
+	{
+		"id": "open_docs",
+		"text": "เปิดโฟลเดอร์เอกสาร",
+		"how": "ดับเบิลคลิกไอคอน \"เอกสาร\" บนเดสก์ท็อป",
+		"done": "นี่คือหน้าต่างไฟล์ ไฟล์ทุกอย่างในเครื่องแยกเก็บเป็นโฟลเดอร์ เหมือนลิ้นชัก",
+	},
+	{
+		"id": "open_browser",
+		"text": "เปิดเบราว์เซอร์",
+		"how": "กดรูปลูกโลกที่แถบงานด้านล่าง",
+		"done": "เบราว์เซอร์ใช้เปิดเว็บ ปุ่มสีจัดที่เขียนว่าโฆษณาอย่าไปกดนะ",
+	},
+	{
+		"id": "open_settings",
+		"text": "ดูพื้นที่ในหน้าตั้งค่า",
+		"how": "กดรูปเฟืองที่แถบงาน",
+		"done": "หน้าตั้งค่าบอกพื้นที่เหลือ และเป็นที่ถอนโปรแกรมด้วย",
+	},
+	{
+		"id": "delete_file",
+		"text": "ลบไฟล์ทดสอบ",
+		"how": "คลิกขวาที่ \"ไฟล์ทดสอบ.doc\" บนเดสก์ท็อป → ลบ",
+		"done": "ไฟล์ที่ลบยังไม่หายจริงนะ มันไปอยู่ในถังขยะ",
+	},
+	{
+		"id": "empty_trash",
+		"text": "ล้างถังขยะ",
+		"how": "ดับเบิลคลิกถังขยะ → กด \"ล้างถังขยะ\"",
+		"done": "ล้างถังขยะแล้วไฟล์ถึงหายจริง พื้นที่ก็กลับมา",
+	},
+	{ "id": "shutdown", "text": "ปิดเครื่อง", "how": "กดปุ่มเริ่มมุมซ้ายล่าง → ปิดเครื่อง", "done": "" },
 ]
 
 var tour_done: Dictionary = { } # id → true
@@ -195,7 +226,9 @@ func _load_state() -> void:
 	programs.clear()
 	for p in task.programs:
 		var d: Dictionary = p.duplicate(true)
-		d.merge({ "publisher": "", "size_mb": 100, "adware": false, "system": false, "desktop_icon": false, "app": false })
+		d.merge(
+			{ "publisher": "", "size_mb": 100, "adware": false, "system": false, "desktop_icon": false, "app": false }
+		)
 		d["installed"] = true
 		d["icon"] = bool(d.desktop_icon)
 		programs.append(d)
@@ -384,8 +417,18 @@ func click_download_ad() -> Dictionary:
 	_trap(&"fake_download", "ad_button", &"safety", 10, "กดปุ่มดาวน์โหลดที่เป็นโฆษณา")
 	var f := find_file("DOWNLOAD_NOW_ฟรี.exe")
 	if f.is_empty() or f.trashed:
-		f = { "name": "DOWNLOAD_NOW_ฟรี.exe", "size_mb": 3, "folder": "ดาวน์โหลด", "kind": "fake_installer",
-			"note": "", "dup_of": "", "trashed": false, "gone": false, "inspected": false, "asked": false }
+		f = {
+			"name": "DOWNLOAD_NOW_ฟรี.exe",
+			"size_mb": 3,
+			"folder": "ดาวน์โหลด",
+			"kind": "fake_installer",
+			"note": "",
+			"dup_of": "",
+			"trashed": false,
+			"gone": false,
+			"inspected": false,
+			"asked": false,
+		}
 		files.append(f)
 	_pib_toast(&"FAKE_DOWNLOAD")
 	_refresh_all()
@@ -397,8 +440,18 @@ func download_official() -> Dictionary:
 	var fname := "setup_%s.exe" % task.install_name
 	var f := find_file(fname)
 	if f.is_empty() or f.trashed:
-		f = { "name": fname, "size_mb": 95, "folder": "ดาวน์โหลด", "kind": "installer", "note": "", "dup_of": "",
-			"trashed": false, "gone": false, "inspected": false, "asked": false }
+		f = {
+			"name": fname,
+			"size_mb": 95,
+			"folder": "ดาวน์โหลด",
+			"kind": "installer",
+			"note": "",
+			"dup_of": "",
+			"trashed": false,
+			"gone": false,
+			"inspected": false,
+			"asked": false,
+		}
 		files.append(f)
 	_refresh_all()
 	return f
@@ -411,8 +464,19 @@ func install_app(with_bundle: bool) -> void:
 		free_mb -= task.install_size_mb
 		var p := find_program(task.install_name)
 		if p.is_empty():
-			programs.append({ "name": task.install_name, "publisher": task.install_site, "size_mb": task.install_size_mb,
-				"adware": false, "system": false, "desktop_icon": true, "app": true, "installed": true, "icon": true })
+			programs.append(
+				{
+					"name": task.install_name,
+					"publisher": task.install_site,
+					"size_mb": task.install_size_mb,
+					"adware": false,
+					"system": false,
+					"desktop_icon": true,
+					"app": true,
+					"installed": true,
+					"icon": true,
+				}
+			)
 		else:
 			p.installed = true
 			p.icon = true
@@ -425,8 +489,19 @@ func install_app(with_bundle: bool) -> void:
 func install_adware() -> void:
 	var p := find_program(task.bundle_name)
 	if p.is_empty():
-		programs.append({ "name": task.bundle_name, "publisher": "Super Deal Co.", "size_mb": ADWARE_SIZE_MB,
-			"adware": true, "system": false, "desktop_icon": true, "app": false, "installed": true, "icon": true })
+		programs.append(
+			{
+				"name": task.bundle_name,
+				"publisher": "Super Deal Co.",
+				"size_mb": ADWARE_SIZE_MB,
+				"adware": true,
+				"system": false,
+				"desktop_icon": true,
+				"app": false,
+				"installed": true,
+				"icon": true,
+			}
+		)
 		free_mb -= ADWARE_SIZE_MB
 	elif not p.installed:
 		p.installed = true
@@ -523,7 +598,9 @@ func _check_reason() -> String:
 					return "\"%s\" ของลูกค้าหายไปจากโฟลเดอร์! (อยู่ในถังขยะ)" % f.name
 			if free_mb < task.free_space_target_mb:
 				return "ยังเซฟไม่ได้ พื้นที่เหลือ %s (ต้อง %s) — ลบแล้วอย่าลืมล้างถังขยะ" % [
-					size_text(free_mb), size_text(task.free_space_target_mb)]
+					size_text(free_mb),
+					size_text(task.free_space_target_mb),
+				]
 		_:
 			return extra.check_reason()
 	return ""
@@ -570,7 +647,6 @@ func shut_down() -> void:
 		SceneRouter.pop()
 	else:
 		queue_free()
-
 
 # ---------------------------------------------------------------- ทำความรู้จัก OS (tour_mode)
 
@@ -817,7 +893,6 @@ func _build_ui() -> void:
 
 # ---------------------------------------------------------------- จอบูต (โหนดเดียวกับ OS)
 
-
 ## [13 ต.ค.] จอบูตแบบคอมจริง (POST → โลโก้ + จุดหมุน → หน้าลงชื่อเข้าใช้) = โหนด "Boot" ใน desktop_window.tscn
 ## (instance ของ Scene/MiniGame/Desktop/os_boot.tscn · Editable Children เปิดไว้ → แก้ข้อความ/ขนาดตัวหนังสือใน Inspector ได้)
 ## ตอนเริ่มย้ายเข้าไปอยู่ในจอ (Screen) ให้ย่อตามกรอบจอ · ไม่มีโหนดนี้ = สร้างจากซีนแทน
@@ -875,13 +950,22 @@ func _make_theme() -> Theme:
 	var th := Theme.new()
 	var ink := C_INK
 	for t in ["Button", "CheckBox", "MenuButton"]:
-		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
+		for c in [
+			"font_color",
+			"font_hover_color",
+			"font_pressed_color",
+			"font_focus_color",
+			"font_hover_pressed_color",
+		]:
 			th.set_color(c, t, ink)
 		th.set_color("font_disabled_color", t, Color(ink, 0.45))
 		th.set_font_size("font_size", t, 16)
 	var states := {
-		"normal": Color(0.93, 0.91, 0.86), "hover": Color(0.85, 0.92, 1.0),
-		"pressed": Color(0.72, 0.84, 0.97), "disabled": Color(0.9, 0.89, 0.86), "focus": Color(0, 0, 0, 0),
+		"normal": Color(0.93, 0.91, 0.86),
+		"hover": Color(0.85, 0.92, 1.0),
+		"pressed": Color(0.72, 0.84, 0.97),
+		"disabled": Color(0.9, 0.89, 0.86),
+		"focus": Color(0, 0, 0, 0),
 	}
 	for st in states:
 		var sb := StyleBoxFlat.new()
@@ -993,7 +1077,10 @@ func _build_note() -> void:
 	if tour_mode:
 		_check_btn.name = "SkipTour"
 		_check_btn.text = "ข้ามการแนะนำ ►"
-		_check_btn.pressed.connect(func(): _end_tour(true))
+		_check_btn.pressed.connect(
+			func():
+				_end_tour(true),
+		)
 	elif free_mode:
 		_check_btn.name = "PowerButton"
 		_check_btn.text = "ปิดเครื่อง"
@@ -1011,9 +1098,11 @@ func _build_note() -> void:
 		_giveup_btn.position = Vector2(900, 286)
 		_giveup_btn.custom_minimum_size = Vector2(210, 32)
 		_giveup_btn.hide()
-		_giveup_btn.pressed.connect(func():
-			give_up()
-			_open_summary())
+		_giveup_btn.pressed.connect(
+			func():
+				give_up()
+				_open_summary(),
+		)
 		_ui.add_child(_giveup_btn)
 
 
@@ -1026,7 +1115,9 @@ func _refresh_note() -> void:
 	if tour_mode:
 		for i in _note_checks.size():
 			var id: String = TOUR[i].id
-			_note_checks[i].text = ("☑ " if tour_done.has(id) else ("▶ " if id == _tour_current() else "☐ ")) + String(_note_checks[i].get_meta("text"))
+			_note_checks[i].text = ("☑ " if tour_done.has(id) else ("▶ " if id == _tour_current() else "☐ ")) + String(
+				_note_checks[i].get_meta("text")
+			)
 		return
 	if free_mode:
 		if is_instance_valid(_check_btn):
@@ -1066,9 +1157,24 @@ func _build_taskbar() -> void:
 	start.pressed.connect(_show_start_menu.bind(start))
 	row.add_child(start)
 	var quick := [
-		[TEX_FOLDER, "ไฟล์", func(): open_explorer("เดสก์ท็อป")],
-		[TEX_BROWSER, "เบราว์เซอร์", func(): open_browser()],
-		[TEX_SETTINGS, "ตั้งค่า", func(): open_settings()],
+		[
+			TEX_FOLDER,
+			"ไฟล์",
+			func():
+				open_explorer("เดสก์ท็อป"),
+		],
+		[
+			TEX_BROWSER,
+			"เบราว์เซอร์",
+			func():
+				open_browser(),
+		],
+		[
+			TEX_SETTINGS,
+			"ตั้งค่า",
+			func():
+				open_settings(),
+		],
 	]
 	for q in quick:
 		var b := _task_button(q[0], q[1])
@@ -1079,7 +1185,18 @@ func _build_taskbar() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(spacer)
-	for tray in [["Wi-Fi", func(): extra.open_wifi()], ["เสียง", func(): extra.open_sound()]]:
+	for tray in [
+		[
+			"Wi-Fi",
+			func():
+				extra.open_wifi(),
+		],
+		[
+			"เสียง",
+			func():
+				extra.open_sound(),
+		],
+	]:
 		var tb := Button.new()
 		tb.name = "Tray_" + String(tray[0]).validate_node_name()
 		tb.text = tray[0]
@@ -1103,9 +1220,14 @@ func _build_taskbar() -> void:
 	_start_menu = PopupMenu.new()
 	_start_menu.name = "StartMenu"
 	var items := [
-		["เอกสาร", TEX_FOLDER], ["รูปภาพ", TEX_PICTURES], ["ดาวน์โหลด", TEX_DOWNLOADS],
-		["เบราว์เซอร์", TEX_BROWSER], ["ตั้งค่า", TEX_SETTINGS], ["ถังขยะ", TEX_TRASH],
-		["ตัวจัดการงาน", TEX_SETTINGS], ["ขมการ์ด (ความปลอดภัย)", TEX_SETTINGS],
+		["เอกสาร", TEX_FOLDER],
+		["รูปภาพ", TEX_PICTURES],
+		["ดาวน์โหลด", TEX_DOWNLOADS],
+		["เบราว์เซอร์", TEX_BROWSER],
+		["ตั้งค่า", TEX_SETTINGS],
+		["ถังขยะ", TEX_TRASH],
+		["ตัวจัดการงาน", TEX_SETTINGS],
+		["ขมการ์ด (ความปลอดภัย)", TEX_SETTINGS],
 	]
 	for i in items.size():
 		_start_menu.add_icon_item(_small(items[i][1]), items[i][0], i)
@@ -1242,17 +1364,47 @@ func _rebuild_icons() -> void:
 		c.queue_free()
 	_selected_icon = null
 	var list: Array = [
-		{ "label": "เอกสาร", "tex": TEX_FOLDER, "open": func(): open_explorer("เอกสาร") },
-		{ "label": "รูปภาพ", "tex": TEX_PICTURES, "open": func(): open_explorer("รูปภาพ") },
-		{ "label": "ดาวน์โหลด", "tex": TEX_DOWNLOADS, "open": func(): open_explorer("ดาวน์โหลด") },
-		{ "label": "ถังขยะ", "tex": TEX_TRASH_FULL if not trashed_files().is_empty() else TEX_TRASH,
-			"open": func(): open_trash() },
-		{ "label": "เบราว์เซอร์", "tex": TEX_BROWSER, "open": func(): open_browser() },
+		{
+			"label": "เอกสาร",
+			"tex": TEX_FOLDER,
+			"open": func():
+				open_explorer("เอกสาร"),
+		},
+		{
+			"label": "รูปภาพ",
+			"tex": TEX_PICTURES,
+			"open": func():
+				open_explorer("รูปภาพ"),
+		},
+		{
+			"label": "ดาวน์โหลด",
+			"tex": TEX_DOWNLOADS,
+			"open": func():
+				open_explorer("ดาวน์โหลด"),
+		},
+		{
+			"label": "ถังขยะ",
+			"tex": TEX_TRASH_FULL if not trashed_files().is_empty() else TEX_TRASH,
+			"open": func():
+				open_trash(),
+		},
+		{
+			"label": "เบราว์เซอร์",
+			"tex": TEX_BROWSER,
+			"open": func():
+				open_browser(),
+		},
 	]
 	for p in programs:
 		if p.installed and p.icon:
-			list.append({ "label": p.name, "tex": TEX_ADWARE if p.adware else TEX_CHAT, "program": p,
-				"open": _open_program.bind(p) })
+			list.append(
+				{
+					"label": p.name,
+					"tex": TEX_ADWARE if p.adware else TEX_CHAT,
+					"program": p,
+					"open": _open_program.bind(p),
+				}
+			)
 	for f in visible_files("เดสก์ท็อป"):
 		list.append({ "label": f.name, "tex": _file_tex(f), "file": f, "open": _open_file_ui.bind(f) })
 	var per_col := 5
@@ -1338,7 +1490,10 @@ func _delete_icon_data(d: Dictionary) -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and event.ctrl_pressed and event.shift_pressed:
+	if (
+		event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE
+		and event.ctrl_pressed and event.shift_pressed
+	):
 		extra.open_task_manager()
 		get_viewport().set_input_as_handled()
 		return
@@ -1369,7 +1524,11 @@ func _open_program(p: Dictionary) -> void:
 		_spawn_popup()
 	elif p.get("app", false):
 		if free_mode:
-			_show_info(String(p.name), "ยังไม่มีข้อความใหม่\nล่าสุด: ยายส่งสติกเกอร์รูปดอกไม้มา \"กินข้าวยังลูก\"", TEX_CHAT)
+			_show_info(
+				String(p.name),
+				"ยังไม่มีข้อความใหม่\nล่าสุด: ยายส่งสติกเกอร์รูปดอกไม้มา \"กินข้าวยังลูก\"",
+				TEX_CHAT,
+			)
 		else:
 			customer_say("เปิดได้แล้ว! เดี๋ยวคืนนี้โทรหาหลานเลย", 3.0)
 	else:
@@ -1393,7 +1552,10 @@ func open_window(key: String, title: String, icon: Texture2D, size: Vector2) -> 
 	var n := _windows.size()
 	nw.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
 	nw.position = nw.position.clamp(Vector2.ZERO, _win_layer.size - size)
-	nw.closed.connect(func(): _windows.erase(key))
+	nw.closed.connect(
+		func():
+			_windows.erase(key),
+	)
 	_win_layer.add_child(nw)
 	_windows[key] = nw
 	return nw
@@ -1435,9 +1597,11 @@ func open_explorer(folder: String) -> void:
 			b.text = fo
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.focus_mode = Control.FOCUS_NONE
-			b.pressed.connect(func():
-				_explorer_folder = fo
-				_refresh_explorer())
+			b.pressed.connect(
+				func():
+					_explorer_folder = fo
+					_refresh_explorer(),
+			)
 			side.add_child(b)
 		var tb := Button.new()
 		tb.text = "ถังขยะ"
@@ -1453,12 +1617,19 @@ func open_explorer(folder: String) -> void:
 		_explorer_list = ItemList.new()
 		_explorer_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_explorer_list.fixed_icon_size = Vector2i(28, 28)
-		_explorer_list.item_activated.connect(func(i): _open_file_ui(_explorer_file(i)))
+		_explorer_list.item_activated.connect(
+			func(i):
+				_open_file_ui(_explorer_file(i)),
+		)
 		_explorer_list.gui_input.connect(_on_explorer_key)
 		right.add_child(_explorer_list)
 		var bar := HBoxContainer.new()
 		right.add_child(bar)
-		var acts := [["เปิด", "open"], ["ลบ", "delete"]] if free_mode else [["เปิด", "open"], ["ถามลูกค้า", "ask"], ["ลบ", "delete"]]
+		var acts := (
+			[["เปิด", "open"], ["ลบ", "delete"]]
+			if free_mode
+			else [["เปิด", "open"], ["ถามลูกค้า", "ask"], ["ลบ", "delete"]]
+		)
 		if task.usb_drive:
 			acts.append_array([["คัดลอกไป USB", "copy_usb"], ["ย้ายไป USB", "move_usb"], ["ถอด USB", "eject"]])
 		for a in acts:
@@ -1544,18 +1715,22 @@ func open_trash() -> void:
 		var rb := Button.new()
 		rb.text = "กู้คืน"
 		rb.focus_mode = Control.FOCUS_NONE
-		rb.pressed.connect(func():
-			var sel := _trash_list.get_selected_items()
-			if not sel.is_empty():
-				restore_file(_trash_list.get_item_metadata(sel[0])))
+		rb.pressed.connect(
+			func():
+				var sel := _trash_list.get_selected_items()
+				if not sel.is_empty():
+					restore_file(_trash_list.get_item_metadata(sel[0])),
+		)
 		bar.add_child(rb)
 		var eb := Button.new()
 		eb.text = "ล้างถังขยะ"
 		eb.focus_mode = Control.FOCUS_NONE
-		eb.pressed.connect(func():
-			var freed := empty_trash()
-			if freed > 0:
-				_pib_toast(&"TRASH_EMPTIED", 2.5))
+		eb.pressed.connect(
+			func():
+				var freed := empty_trash()
+				if freed > 0:
+					_pib_toast(&"TRASH_EMPTIED", 2.5),
+		)
 		bar.add_child(eb)
 	_refresh_trash()
 
@@ -1565,7 +1740,10 @@ func _refresh_trash() -> void:
 		return
 	_trash_list.clear()
 	for f in trashed_files():
-		var i := _trash_list.add_item("%s      %s   (จาก %s)" % [f.name, size_text(int(f.size_mb)), f.folder], _file_tex(f))
+		var i := _trash_list.add_item(
+			"%s      %s   (จาก %s)" % [f.name, size_text(int(f.size_mb)), f.folder],
+			_file_tex(f),
+		)
 		_trash_list.set_item_metadata(i, f)
 
 
@@ -1605,17 +1783,23 @@ func _browser_show(page: String) -> void:
 	if page == "official":
 		_browser_addr.text = "🔒 https://" + task.install_site
 		_browser_page.add_child(_label(task.install_name, 30, Color(0.2, 0.55, 0.35)))
-		var d := _label("โปรแกรมคุยกับครอบครัวและเพื่อน ส่งข้อความ โทรเห็นหน้า ฟรี\nเว็บนี้เป็นของผู้พัฒนาเอง", 16, C_INK)
+		var d := _label(
+			"โปรแกรมคุยกับครอบครัวและเพื่อน ส่งข้อความ โทรเห็นหน้า ฟรี\nเว็บนี้เป็นของผู้พัฒนาเอง",
+			16,
+			C_INK,
+		)
 		_browser_page.add_child(d)
 		var b := Button.new()
 		b.name = "OfficialDownload"
 		b.text = "ดาวน์โหลดสำหรับคอมพิวเตอร์"
 		b.custom_minimum_size = Vector2(300, 46)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		b.pressed.connect(func():
-			download_official()
-			_pib_toast(&"OFFICIAL_DONE", 3.0)
-			open_explorer("ดาวน์โหลด"))
+		b.pressed.connect(
+			func():
+				download_official()
+				_pib_toast(&"OFFICIAL_DONE", 3.0)
+				open_explorer("ดาวน์โหลด"),
+		)
 		_browser_page.add_child(b)
 		return
 	_browser_addr.text = "https://ค้นหา.ขม/?q=" + ("ดาวน์โหลด " + task.install_name if is_install else "ข่าววันนี้")
@@ -1639,9 +1823,11 @@ func _browser_show(page: String) -> void:
 		bs.set_corner_radius_all(8)
 		big.add_theme_stylebox_override("normal", bs)
 		big.add_theme_stylebox_override("hover", bs)
-		big.pressed.connect(func():
-			click_download_ad()
-			open_explorer("ดาวน์โหลด"))
+		big.pressed.connect(
+			func():
+				click_download_ad()
+				open_explorer("ดาวน์โหลด"),
+		)
 		col.add_child(big)
 		_browser_page.add_child(ad)
 	if is_install:
@@ -1655,9 +1841,11 @@ func _browser_show(page: String) -> void:
 		var other := LinkButton.new()
 		other.text = "รวมโปรแกรมฟรี 2569 โหลดได้ทุกตัว!!"
 		other.add_theme_font_size_override("font_size", 19)
-		other.pressed.connect(func():
-			click_download_ad()
-			open_explorer("ดาวน์โหลด"))
+		other.pressed.connect(
+			func():
+				click_download_ad()
+				open_explorer("ดาวน์โหลด"),
+		)
 		_browser_page.add_child(other)
 		_browser_page.add_child(_label("freeprogram-zz.biz/โหลดฟรี", 14, Color(0.2, 0.5, 0.25)))
 	else:
@@ -1701,7 +1889,10 @@ func _wizard_page(w: OsWindow, page: int, bundle: bool) -> void:
 			c2.size_flags_vertical = Control.SIZE_EXPAND_FILL
 			w.body.add_child(c2)
 			next.text = "ติดตั้ง"
-			next.pressed.connect(func(): _wizard_page(w, 2, c2.button_pressed))
+			next.pressed.connect(
+				func():
+					_wizard_page(w, 2, c2.button_pressed),
+			)
 		2:
 			w.body.add_child(_label("กำลังติดตั้ง…", 20, C_INK))
 			var bar := ProgressBar.new()
@@ -1710,10 +1901,12 @@ func _wizard_page(w: OsWindow, page: int, bundle: bool) -> void:
 			w.closable = false
 			var tw := create_tween()
 			tw.tween_property(bar, "value", 100.0, 1.2)
-			tw.tween_callback(func():
-				install_app(bundle)
-				w.closable = true
-				_wizard_page(w, 3, bundle))
+			tw.tween_callback(
+				func():
+					install_app(bundle)
+					w.closable = true
+					_wizard_page(w, 3, bundle),
+			)
 			return
 		3:
 			var l := _label("ติดตั้ง %s เสร็จแล้ว" % task.install_name, 20, C_INK)
@@ -1763,7 +1956,11 @@ func _refresh_settings() -> void:
 	var used := task.disk_total_mb - free_mb
 	_settings_disk.max_value = task.disk_total_mb
 	_settings_disk.value = used
-	_settings_disk_label.text = "ใช้ไป %s จาก %s · เหลือ %s" % [size_text(used), size_text(task.disk_total_mb), size_text(free_mb)]
+	_settings_disk_label.text = "ใช้ไป %s จาก %s · เหลือ %s" % [
+		size_text(used),
+		size_text(task.disk_total_mb),
+		size_text(free_mb),
+	]
 	for c in _settings_rows.get_children():
 		c.queue_free()
 	for p in programs:
@@ -1782,9 +1979,11 @@ func _refresh_settings() -> void:
 		var b := Button.new()
 		b.text = "ถอนการติดตั้ง"
 		b.focus_mode = Control.FOCUS_NONE
-		b.pressed.connect(func():
-			if uninstall(p):
-				_pib_toast(&"UNINSTALLED", 2.5))
+		b.pressed.connect(
+			func():
+				if uninstall(p):
+					_pib_toast(&"UNINSTALLED", 2.5),
+		)
 		row.add_child(b)
 		_settings_rows.add_child(row)
 
@@ -1814,9 +2013,11 @@ func _spawn_popup() -> void:
 	b.text = "กดรับรางวัลเลย!!"
 	b.custom_minimum_size.y = 46
 	b.add_theme_font_size_override("font_size", 20)
-	b.pressed.connect(func():
-		w.close()
-		click_ad_popup())
+	b.pressed.connect(
+		func():
+			w.close()
+			click_ad_popup(),
+	)
 	w.body.add_child(b)
 
 
@@ -1861,11 +2062,13 @@ func _open_ask() -> void:
 		b.text = task.ask_options[i]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size.y = 40
-		b.pressed.connect(func():
-			var ans := ask(i)
-			_close_modal()
-			customer_say(ans, 7.0)
-			_pib_lines(task.pib_intro))
+		b.pressed.connect(
+			func():
+				var ans := ask(i)
+				_close_modal()
+				customer_say(ans, 7.0)
+				_pib_lines(task.pib_intro),
+		)
 		w.body.add_child(b)
 
 
@@ -1890,10 +2093,12 @@ func _open_explain() -> void:
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.custom_minimum_size = Vector2(560, 44)
-		b.pressed.connect(func():
-			explain(i)
-			_open_summary()
-			_pib_lines(task.pib_lesson, PibHint.Mood.HAPPY))
+		b.pressed.connect(
+			func():
+				explain(i)
+				_open_summary()
+				_pib_lines(task.pib_lesson, PibHint.Mood.HAPPY),
+		)
 		w.body.add_child(b)
 
 
