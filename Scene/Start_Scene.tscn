@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bsawtj6pf21tc" path="res://Assets/CharacterSprite/char_grandma_smile.png" id="5_yai"]
 [ext_resource type="Texture2D" uid="uid://qwywwguxnpwl" path="res://Assets/Background/tutorial.jpg" id="6_pqbye"]
 [ext_resource type="PackedScene" path="res://Scene/UI/settings_panel.tscn" id="7_settings"]
+[ext_resource type="Texture2D" path="res://Assets/Logo/logo_horizontal.png" id="8_logo"]
 
 [sub_resource type="Gradient" id="Gradient_shade"]
 offsets = PackedFloat32Array(0, 0.45, 1)
@@ -76,6 +77,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="." unique_id=781232712]
+visible = false
 layout_mode = 0
 offset_left = 56.0
 offset_top = 40.0
@@ -91,6 +93,7 @@ theme_override_font_sizes/font_size = 104
 text = "บักช่างขม"
 
 [node name="Subtitle" type="Label" parent="." unique_id=464332577]
+visible = false
 layout_mode = 0
 offset_left = 64.0
 offset_top = 176.0
@@ -101,6 +104,17 @@ theme_override_colors/font_outline_color = Color(0.3, 0.14, 0.05, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 30
 text = "ร้านซ่อมคอมเล็ก ๆ ของขมกับยาย"
+
+[node name="Logo" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 26.0
+offset_right = 666.0
+offset_bottom = 222.0
+mouse_filter = 2
+texture = ExtResource("8_logo")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Menu" type="VBoxContainer" parent="." unique_id=197783449]
 layout_mode = 0
