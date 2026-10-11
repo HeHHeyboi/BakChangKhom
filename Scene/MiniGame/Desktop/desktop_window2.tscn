@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://cggfyl6no8alb"]
+
+[ext_resource type="Script" uid="uid://bq0g46pdu2xoq" path="res://Scripts/MiniGame/Desktop/desktop_minigame2.gd" id="1_hw1fy"]
+[ext_resource type="Texture2D" uid="uid://beia843eoudkm" path="res://Assets/MiniGame/Desktop/os_frame_desk.png" id="3_hh2bf"]
+[ext_resource type="PackedScene" uid="uid://bdf1p3qywimo3" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="3_xepuo"]
+[ext_resource type="Texture2D" uid="uid://d07dp7a6skaeb" path="res://Assets/MiniGame/Desktop/os_wallpaper.jpg" id="4_ycono"]
+[ext_resource type="Theme" uid="uid://dqmjso4136hff" path="res://Assets/Theme/task_icon.tres" id="5_4nblg"]
+[ext_resource type="Texture2D" uid="uid://c4gi3n3u3gv1d" path="res://Assets/MiniGame/Desktop/os_start.png" id="5_xepuo"]
+[ext_resource type="Texture2D" uid="uid://7gwal8dx3d16" path="res://Assets/MiniGame/Desktop/os_icon_folder.png" id="7_7dyty"]
+[ext_resource type="Texture2D" uid="uid://vmyermcs0242" path="res://Assets/MiniGame/Desktop/os_icon_browser.png" id="8_dgdh2"]
+[ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="9_dy1v8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycono"]
+bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
+border_width_top = 2
+border_color = Color(0.5179158, 0.4353445, 0.36556464, 1)
+
+[node name="DesktopWindow" type="Node2D" unique_id=369883786]
+script = ExtResource("1_hw1fy")
+
+[node name="PibHint" parent="." unique_id=917601885 instance=ExtResource("3_xepuo")]
+visible = false
+
+[node name="Os" type="CanvasLayer" parent="." unique_id=666869810]
+
+[node name="BG" type="TextureRect" parent="Os" unique_id=135316095]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_hh2bf")
+expand_mode = 1
+metadata/_edit_lock_ = true
+
+[node name="Screen" type="Control" parent="Os" unique_id=193592829]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -492.0
+offset_top = -312.99997
+offset_right = 492.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="Wallpaper" type="TextureRect" parent="Os/Screen" unique_id=166171707]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+texture = ExtResource("4_ycono")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Taskbar" type="Panel" parent="Os/Screen" unique_id=759739448]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -39.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ycono")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Os/Screen/Taskbar" unique_id=1889974492]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="StartMenu" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=977324162]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "เริ่ม"
+theme = ExtResource("5_4nblg")
+icon = ExtResource("5_xepuo")
+flat = true
+expand_icon = true
+
+[node name="Explorer" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=268582309]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "เริ่ม"
+theme = ExtResource("5_4nblg")
+icon = ExtResource("7_7dyty")
+flat = true
+expand_icon = true
+
+[node name="Browser" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1255886064]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "เริ่ม"
+theme = ExtResource("5_4nblg")
+icon = ExtResource("8_dgdh2")
+flat = true
+expand_icon = true
+
+[node name="Settings" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=175883923]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "เริ่ม"
+theme = ExtResource("5_4nblg")
+icon = ExtResource("9_dy1v8")
+flat = true
+expand_icon = true
+
+[node name="Spacer" type="Control" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=68081796]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Wifi" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1770146064]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "เริ่ม"
+focus_mode = 0
+theme = ExtResource("5_4nblg")
+text = "WI-FI"
+flat = true
+expand_icon = true
+
+[node name="Sound" type="Button" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1417133368]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "เริ่ม"
+focus_mode = 0
+theme = ExtResource("5_4nblg")
+text = "เสียง"
+flat = true
+expand_icon = true
+
+[node name="Disk" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1940721730]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+
+[node name="Clock" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1563288819]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
