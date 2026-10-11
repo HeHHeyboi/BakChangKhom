@@ -18,6 +18,7 @@
 | `REPAIR_SHOP_SYSTEM.md` | **ระบบร้านซ่อม** — ทางเลือก handle scene (แนะนำ SceneRouter + Overlay stack) · คิวงาน WorkOrder · ชั้นวางเครื่อง · สต็อกอะไหล่ · สั่งของจากร้านค้า (4 ต.ค. 2569) |
 | `CORE_PART_QTE.md` | **ข้อเสนอ QTE** ใน Core Part ทั้ง 5 — QTE 6 แบบ (จังหวะ · กดค้าง · วงหด · ลำดับ · มือนิ่ง · ถู) จุดใส่ราย phase · โครง `QteRunner` (4 ต.ค. 2569) |
 | `GAME_LOOP.md` | **ลูปเกมทั้งเกม** — ข้อ 0 = สถานะจริง 10 ต.ค. (เล่นจบบทที่ 1 · บทละ 5 วัน · เวลาเป็นเทิร์น · ยศช่าง) · แผน 12 บท → ฉากจบ |
+| `DESKTOP_OS_SCENE.md` | **ขมOS แบบวางใน Editor (11 ต.ค.)** — เหตุผลที่สร้าง `desktop_window2.tscn` + `desktop_minigame2.gd` (ซีนเดิมสร้าง UI ด้วยสคริปต์ ไม่เห็นหน้าตา) · โครงโหนด · `DesktopShortcut` · เมนูเริ่ม · สถานะเทียบซีนเดิม + ลำดับย้ายต่อ |
 | `AUDIO.md` | เพลง · เสียงประกอบ · รหัสบี๊บ BIOS 10 แบบ (สร้างด้วยโค้ด) |
 | `REPAIR_FLOW.md` | **เริ่มอ่านที่นี่** — ลูปงานซ่อม 5 scene (ShopCounter → Workbench → PartView → Reassemble → Handover), Part 13 ชิ้น, เครื่องมือ 21 ชิ้น, สเปก Resource/Manager/Scene |
 | `ASSET_RENAME.md` | ไฟล์ที่ชื่อยังไม่ตรงกฎ 38 ไฟล์ + ไฟล์ใหม่จากทีม · บอกชื่อใหม่และจุดที่โค้ดอ้างถึง |
