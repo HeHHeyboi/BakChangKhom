@@ -74,7 +74,7 @@
 | ห้องของขม | `Assets/Background/bg_khom_room.jpg` (ห้องไม้ + คอมเก่า CRT · ฟูก · โปสเตอร์) | `gen_map.py … room` | บท "ห้องของขม" (`Resources/main.tres`) · `find_item_minigame.tscn` |
 | ห้องเก็บของ | `Assets/Background/bg_storeroom.jpg` | `gen_map.py` | ยังไม่ได้ใช้ (สำรอง) |
 | ตรวจเครื่องเบื้องต้น | `Assets/MiniGame/PowerCheck/` power_bg · pc_back (PSU ล่าง) · fan · fan_grill · psu_sw_off/on · strip · strip_sw_off/on · plug · pc_front · power_btn(_hover) | `PowerCheck/src/gen_power.py` | `Scene/MiniGame/PowerCheck/power_check.tscn` |
-| ขมOS ในจอบนโต๊ะ | `Assets/MiniGame/Desktop/os_frame_desk.png` + ไอคอน `os_icon_*` | `Desktop/src/gen_frame.py` | `desktop_window.tscn` |
+| ขมOS ในจอบนโต๊ะ | `Assets/MiniGame/Desktop/os_frame_desk.png` + ไอคอน `os_icon_*` | `Desktop/src/gen_frame.py` | `desktop_window.tscn` (+ ต้นแบบ `desktop_window2.tscn` ใช้ไอคอน `os_icon_*` · วอลเปเปอร์ · ธีม `Assets/Theme/task_icon.tres` — ดู `DESKTOP_OS_SCENE.md`) |
 | โต๊ะคอม / เมาส์มีสาย | `Assets/MiniGame/TutorialAssembly/desk_pc_2x.png` · `asm_*` | `TutorialAssembly/src/gen_desk.py` · `gen_asm.py` · `mouse_art.py` | บทฝึกประกอบคอม · Part BIOS/FrontPanel/GPU/Mainboard/RAM (bg_scale 0.5) |
 | ภาพ Part อื่น ๆ | `PartBios` · `PartFrontPanel` · `PartGpu` · `PartMainboard` | `Part*/src/gen_art.py` | มินิเกม Core Part |
 | สไลด์สอนเล่น | `Assets/Tutorial/BasicStart/tut_new_01–04.png` (ถ่ายจากฉากจริง) | `Assets/Tutorial/src/gen_start_slides.py` | `Resources/tutorial1.tres` (`tut_start_0x` เดิมไม่ได้แก้) |

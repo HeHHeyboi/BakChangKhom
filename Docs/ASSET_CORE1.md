@@ -109,6 +109,6 @@
 
 | โฟลเดอร์ | ไฟล์ | ใช้ที่ |
 |---|---|---|
-| `Assets/MiniGame/Desktop/` | `os_wallpaper.jpg` · `os_start.png` · `os_sticky_note.png` · ไอคอน `os_icon_*` 14 ไฟล์ | ขมOS (`desktop_window.tscn`) |
+| `Assets/MiniGame/Desktop/` | `os_wallpaper.jpg` · `os_start.png` · `os_sticky_note.png` · ไอคอน `os_icon_*` 14 ไฟล์ | ขมOS (`desktop_window.tscn` · ต้นแบบ `desktop_window2.tscn` + `shortcut.tscn`) |
 | `Assets/Home/` | `grandma_idle.png` · `grandma_hover.png` · `sign_shop.png` · `sign_shop_hover.png` | ฉากบ้านยาย `Home.tscn` |
 | `Assets/MiniGame/TutorialAssembly/` | `asm_tray_bg` · `asm_case_bg` · `asm_mainboard/cpu/cooler/ram/ram_edge/ssd/gpu/gpu_edge/psu/psu_side` · `asm_layer_*` 8 ไฟล์ · `src/gen_asm.py` | บทฝึกประกอบคอม |
