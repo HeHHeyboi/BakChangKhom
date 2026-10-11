@@ -55,10 +55,11 @@ func _ready() -> void:
 	GameState.rank_up.connect(func(r, n): ups.append(n))
 	GameState.add_xp(450)
 	await _frames(2)
-	_check(ts.get_node("RankPanel/Box/Rank").text == "ช่างมือใหม่" and is_equal_approx(ts.get_node("RankPanel/Box/Bar").value, 0.9) and ts.get_node("RankPanel/Box/Xp").text == "450/500 XP", "แถบยศ 450/500")
+	var rb := EventManager.rank_box # แถบยศย้ายไปอยู่ที่ EventManager (HUD ของ autoload)
+	_check(rb.get_node("Rank").text == "ช่างมือใหม่" and is_equal_approx(rb.get_node("Bar").value, 0.9) and rb.get_node("Xp").text == "450/500 XP", "แถบยศ 450/500")
 	GameState.add_xp(100)
 	await _frames(2)
-	_check(ups == ["ช่างฝึกหัด"] and ts.get_node("RankUp").visible, "ครบ 500 XP → เลื่อนขั้นเป็นช่างฝึกหัด + ป้าย")
+	_check(ups == ["ช่างฝึกหัด"] and EventManager.rank_up_panel.visible, "ครบ 500 XP → เลื่อนขั้นเป็นช่างฝึกหัด + ป้าย")
 	await get_tree().create_timer(0.4).timeout
 	await _shot("hud")
 	GameState.xp = 0

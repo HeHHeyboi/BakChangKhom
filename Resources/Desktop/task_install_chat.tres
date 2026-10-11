@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://bfdxwk4g4j861"]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://iueqh6dxkxn8"]
 
 [ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
 

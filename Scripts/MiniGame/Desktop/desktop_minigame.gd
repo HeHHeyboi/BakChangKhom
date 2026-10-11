@@ -1268,7 +1268,9 @@ func _small(tex: Texture2D) -> Texture2D:
 
 func _show_start_menu(from: Control) -> void:
 	_start_menu.reset_size()
-	_start_menu.popup(Rect2i(_to_viewport(from) - Vector2i(0, _start_menu.size.y + 4), Vector2i.ZERO))
+	var pos = from.get_screen_position()
+	pos.y -= _start_menu.size.y
+	_start_menu.popup(Rect2i(Vector2i(pos), Vector2i.ZERO))
 
 
 func _on_start_menu(id: int) -> void:
@@ -1349,6 +1351,7 @@ func _refresh_all() -> void:
 
 
 func _process(delta: float) -> void:
+	_start_btn.disabled = _start_menu.visible
 	if is_instance_valid(_boot):
 		_boot.move_to_front()
 	if tour_mode:
