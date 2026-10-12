@@ -127,6 +127,7 @@ func end_task(p: Dictionary) -> bool:
 		"unsaved":
 			m._trap(&"kill_unsaved", "kill_" + String(p.name), &"listen", 10, "ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % p.name)
 			m.lost_user_file = true
+			m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 			pib_say("อ๊ะ! อันนั้นลูกค้ายังใช้อยู่ ข้อมูลที่ยังไม่บันทึกหายหมดแล้ว", PibHint.Mood.WORRY)
 	p.running = false
 	if p.kind == "hang" and is_instance_valid(_hang_win):
@@ -572,6 +573,7 @@ func restart_now() -> void:
 	if not doc_saved:
 		m._trap(&"unsaved_work", "unsaved", &"listen", 10, "รีสตาร์ตทั้งที่งานลูกค้ายังไม่บันทึก")
 		m.lost_user_file = true
+		m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 		pib_say("งานที่ลูกค้าพิมพ์ค้างไว้หายหมดเลย… ต้องกดบันทึกก่อนรีสตาร์ตทุกครั้ง", PibHint.Mood.WORRY)
 	if is_instance_valid(_doc_win):
 		_doc_win.queue_free()

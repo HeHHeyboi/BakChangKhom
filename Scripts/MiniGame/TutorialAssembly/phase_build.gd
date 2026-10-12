@@ -52,6 +52,8 @@ const SEAT := {
 var _built := false
 var _checks := { } # Item2D → Label
 var _seating := false
+## [Claude 13 ต.ค. 2569] ชิ้นที่วางลงช่องระหว่างกำลังขันน็อตชิ้นก่อน → เข้าคิว แล้วต้องติดตั้งให้แน่นเองทีละชิ้น (ไม่ข้ามน็อต)
+var _queue: Array = [] # [[Item2D, Socket2D], ...]
 
 
 func init():
@@ -98,21 +100,41 @@ func _socket_for(p: Item2D) -> Socket2D:
 
 
 func _on_installed(p: Item2D, s: Socket2D) -> void:
-	if not _checks.has(p) or s.accept_any or _seating:
+	if not _checks.has(p) or s.accept_any or _checks[p].get_meta("done", false):
 		return
-	s.highlight(Socket2D.HL.CLOSE)
 	p.mode = Item2D.Mode.STATIC # วางแล้วล็อกไว้ ไม่ให้หลุดออกระหว่าง Tutorial
-	_seating = true
-	allow([]) # ระหว่างติดตั้งห้ามหยิบชิ้นอื่น
-	await seat(p, s)
-	_seating = false
-	if not _alive():
+	if _seating:
+		# [13 ต.ค.] เดิมชิ้นที่วางซ้อนเข้ามาตอนกำลังขันน็อตจะถูกข้ามไปเลย (นับว่าติดตั้งแล้วโดยไม่ได้ขัน)
+		# → เข้าคิว ลอยค้างไว้ แล้วให้ผู้เล่นติดตั้งเองหลังชิ้นปัจจุบันเสร็จ
+		if not _queue.any(func(e): return e[0] == p):
+			_queue.append([p, s])
+			_hover(p, s)
+			_tip("ใจเย็น ๆ ขันชิ้นที่วางอยู่ให้แน่นก่อน แล้วค่อยติดตั้ง%sต่อนะ" % p.data.display_name.get_slice(" ", 0))
 		return
+	_seating = true
+	while true:
+		s.highlight(Socket2D.HL.CLOSE)
+		allow([p]) # [13 ต.ค.] allow([]) = "ทุกชิ้น" → เดิมระหว่างขันน็อตยังลากชิ้นอื่นได้ · ให้เหลือแค่ชิ้นนี้ (STATIC = ลากไม่ได้)
+		var ok := await seat(p, s)
+		if not _alive():
+			_seating = false
+			return
+		if ok:
+			PhaseUI.set_check(_checks[p], true)
+			var rect = PhaseUI.CARD_RECT
+			rect.position = Vector2(16, 450)
+			PhaseUI.part_card(self, p.data.display_name, "ติดตั้งแล้ว ✓", owner.core_name(p.data), rect)
+		if _queue.is_empty():
+			break
+		var nx: Array = _queue.pop_front()
+		p = nx[0]
+		s = nx[1]
+		await wait(0.5)
+		if not _alive():
+			_seating = false
+			return
+	_seating = false
 	allow(owner.parts())
-	PhaseUI.set_check(_checks[p], true)
-	var rect = PhaseUI.CARD_RECT
-	rect.position = Vector2(16, 450)
-	PhaseUI.part_card(self, p.data.display_name, "ติดตั้งแล้ว ✓", owner.core_name(p.data), rect)
 	if _next_part() == null:
 		clear_hint()
 		await owner.show_cables() # ครบแล้ว → ต่อสายไฟให้เห็นภาพประกอบเสร็จ
@@ -123,6 +145,18 @@ func _on_installed(p: Item2D, s: Socket2D) -> void:
 		if visible:
 			cam(&"Tray") # กลับไปหยิบชิ้นถัดไป
 		_next_hint()
+
+
+## ชิ้นที่เข้าคิว: ลอยค้างเหนือช่อง (ยังไม่ลงสุด) จนกว่าจะถึงคิวติดตั้ง
+func _hover(p: Item2D, s: Socket2D) -> void:
+	await wait(0.25) # ให้ stage.install เลื่อนชิ้นเข้าช่องเสร็จก่อน
+	if not is_instance_valid(p) or _checks[p].get_meta("done", false):
+		return
+	p.size = s.size
+	p.pivot_offset = p.size / 2.0
+	p.position = s.position + RAISE
+	p.scale = Vector2.ONE * LIFT_SCALE
+	p.modulate = Color(1.1, 1.1, 1.1)
 
 
 func _on_rejected(p: Item2D, _s: Socket2D, reason: Socket2D.Result) -> void:
@@ -140,15 +174,16 @@ func _on_rejected(p: Item2D, _s: Socket2D, reason: Socket2D.Result) -> void:
 
 
 ## ชิ้นลอยค้างเหนือช่อง → ผู้เล่นทำท่าของชิ้นนั้น → ลงสุด · ช่องที่ไม่มีใน SEAT = ลงเลย
-func seat(p: Item2D, s: Socket2D) -> void:
+## คืน true = ติดตั้งครบทุกจังหวะ · false = ถูกขัด (เช่นออกจากมินิเกมกลางทาง) → ห้ามนับว่าติดตั้งแล้ว
+func seat(p: Item2D, s: Socket2D) -> bool:
 	var cfg: Dictionary = SEAT.get(p.data.socket_type if p.data else &"", { })
 	if cfg.is_empty():
 		await owner.show_installed(p)
-		return
+		return _alive()
 	clear_hint()
 	await wait(0.2) # ให้ stage.install เลื่อนชิ้นเข้าช่องเสร็จก่อน
 	if not _alive():
-		return
+		return false
 	var home := s.position
 	p.size = s.size
 	p.pivot_offset = p.size / 2.0
@@ -169,8 +204,8 @@ func seat(p: Item2D, s: Socket2D) -> void:
 				await _screws(p, cfg.screw_after)
 		"m2":
 			await _m2(p, home)
-	if not is_instance_valid(p):
-		return
+	if not is_instance_valid(p) or not _alive():
+		return false
 	p.position = home
 	p.scale = Vector2.ONE
 	p.rotation = 0.0
@@ -178,6 +213,7 @@ func seat(p: Item2D, s: Socket2D) -> void:
 	p.modulate = Color.WHITE
 	clear_hint()
 	await owner.show_installed(p) # ภาพลอย → ภาพประกอบแล้ว
+	return true
 
 
 func _settle(p: Item2D, home: Vector2, dur: float) -> void:

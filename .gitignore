@@ -8,3 +8,7 @@
 
 # ไฟล์ที่ Claude สร้างชั่วคราว (ตัวจริงอยู่ใน Docs/Diagrams/)
 Claude outputs/
+
+# ไฟล์ที่ export ออกมา (ไม่ต้องเข้า git)
+*.exe
+*.pck

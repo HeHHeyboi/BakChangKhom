@@ -117,6 +117,7 @@ var _bubble_text: Label
 var _bubble_tw: Tween
 var _note_checks: Array[Label] = []
 var _check_btn: Button
+var _giveup_btn: Button ## [13 ต.ค.] ทางออกเมื่องานทำต่อไม่ได้แล้ว (ลบของลูกค้า/ตัวติดตั้งหายถาวร) — กันค้าง
 var _disk_label: Label
 var _clock_label: Label
 var _start_menu: PopupMenu
@@ -372,6 +373,7 @@ func empty_trash() -> int:
 				notes.append("ล้างถังขยะทั้งที่มีของลูกค้าอยู่ — หายถาวร")
 	free_mb += freed
 	_refresh_all()
+	_refresh_note()
 	if freed > 0:
 		tour_event("empty_trash")
 	return freed
@@ -486,6 +488,20 @@ func check() -> String:
 		return why
 	_set_step(Step.EXPLAIN)
 	return ""
+
+
+## [13 ต.ค.] ทางออกกันค้าง: ลองใช้ให้ลูกค้าดูไม่ผ่าน 2 ครั้ง หรือทำของลูกค้าหายถาวร → มีปุ่ม "ส่งงานตามสภาพ"
+func can_give_up() -> bool:
+	return step == Step.WORK and (check_fails >= 2 or lost_user_file)
+
+
+## ส่งเครื่องคืนทั้งที่งานยังไม่เสร็จ → คะแนนหมวดทำงาน/อธิบาย = 0 แล้วไปหน้าสรุป (ไม่ค้างในมินิเกม)
+func give_up() -> void:
+	if step != Step.WORK:
+		return
+	lose(&"fix", int(CAP[&"fix"]), "ส่งเครื่องคืนทั้งที่งานยังไม่เสร็จ")
+	lose(&"explain", int(CAP[&"explain"]))
+	_set_step(Step.SUMMARY)
 
 
 func _check_reason() -> String:
@@ -1026,6 +1042,20 @@ func _build_note() -> void:
 	else:
 		_check_btn.pressed.connect(_on_check_pressed)
 	_ui.add_child(_check_btn)
+	if not tour_mode and not free_mode:
+		_giveup_btn = Button.new()
+		_giveup_btn.name = "GiveUpButton"
+		_giveup_btn.text = "ส่งงานตามสภาพ"
+		_giveup_btn.tooltip_text = "ทำต่อไม่ได้แล้ว? ส่งเครื่องคืนตามสภาพ (งานไม่ผ่าน)"
+		_giveup_btn.focus_mode = Control.FOCUS_NONE
+		_giveup_btn.add_theme_font_size_override("font_size", 14)
+		_giveup_btn.position = Vector2(900, 286)
+		_giveup_btn.custom_minimum_size = Vector2(210, 32)
+		_giveup_btn.hide()
+		_giveup_btn.pressed.connect(func():
+			give_up()
+			_open_summary())
+		_ui.add_child(_giveup_btn)
 
 
 func _on_wall_input(e: InputEvent) -> void:
@@ -1050,6 +1080,8 @@ func _refresh_note() -> void:
 		_note_checks[i].text = ("☑ " if done[i] else "☐ ") + String(_note_checks[i].get_meta("text"))
 	if is_instance_valid(_check_btn):
 		_check_btn.disabled = step != Step.WORK
+	if is_instance_valid(_giveup_btn):
+		_giveup_btn.visible = can_give_up()
 
 
 func _build_taskbar() -> void:
@@ -1883,6 +1915,7 @@ func _on_check_pressed() -> void:
 	if why != "":
 		customer_say(why, 5.0)
 		_pib_toast(&"CHECK_FAIL", 3.0)
+		_refresh_note()
 		return
 	_close_popups_if_clean()
 	_open_explain()
@@ -1912,17 +1945,24 @@ func _open_summary() -> void:
 	if lost_user_file:
 		grade = "ไม่ผ่าน (ของลูกค้าหาย)"
 	w.body.add_child(_label("คะแนน %d / 100   %s" % [score, grade], 24, C_INK))
+	# [13 ต.ค.] รายละเอียดอยู่ในกล่องเลื่อนได้ — เดิมถ้าทำพลาดเยอะ ข้อความยาวจนดันปุ่ม "ส่งเครื่องคืน" ตกขอบหน้าต่าง กดต่อไม่ได้
+	var scroll := ScrollContainer.new()
+	scroll.name = "Details"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	w.body.add_child(scroll)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(col)
 	for cat in [&"fix", &"safety", &"listen", &"explain"]:
-		w.body.add_child(_label("• %s  %d / %d" % [CAT_NAMES[cat], score_of(cat), CAP[cat]], 17, C_INK))
+		col.add_child(_label("• %s  %d / %d" % [CAT_NAMES[cat], score_of(cat), CAP[cat]], 17, C_INK))
 	if not notes.is_empty():
-		w.body.add_child(HSeparator.new())
+		col.add_child(HSeparator.new())
 		for n in notes:
 			var l := _label("– " + n, 14, Color(0.6, 0.25, 0.15))
 			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			w.body.add_child(l)
-	var sp := Control.new()
-	sp.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	w.body.add_child(sp)
+			l.custom_minimum_size.x = 440
+			col.add_child(l)
 	var b := Button.new()
 	b.name = "Finish"
 	b.text = "ส่งเครื่องคืนลูกค้า"

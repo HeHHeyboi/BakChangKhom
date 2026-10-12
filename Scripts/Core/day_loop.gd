@@ -24,7 +24,9 @@ extends CanvasLayer
 @export_group("พักหลัง Tutorial")
 ## บทพักหลังจบ Tutorial ก่อนลูกค้าคนแรก (เล่นครั้งเดียวต่อเกม) · ว่าง = ไม่มีพัก
 @export_file("*.txt") var break_dialog := "res://Assets/Dialog/Break/after_tutorial.txt"
-@export_file("*.png", "*.jpg") var break_bg := "res://Assets/Background/HomeBG.jpg"
+## [13 ต.ค.] บทพักเกิดในห้องของขม (ยายเรียกลงไปกินขนม) → ใช้ภาพห้องชุดใหม่แทน HomeBG ลายเส้นเดิม
+@export_file("*.png", "*.jpg") var break_bg := "res://Assets/Background/bg_khom_room.jpg"
+@export var break_title := "ห้องของขม"
 ## หลังบทพัก เวลาในเกมเดินไปกี่นาที (08:30 → 09:00 เริ่มงาน)
 @export var break_minutes := 30
 ## แอนิเมชันเวลาหมุนยาวกี่วินาที (เวลาจริง)
@@ -511,7 +513,7 @@ func _play_break() -> void:
 	_break_done = true
 	_working = true
 	_hide()
-	if EventManager.play_story_dialog("พักก่อน", break_dialog, break_bg, DialogUtil.speakers_in(break_dialog)):
+	if EventManager.play_story_dialog(break_title, break_dialog, break_bg, DialogUtil.speakers_in(break_dialog)):
 		_wait_dialog(_after_break)
 	else:
 		_after_break()

@@ -1,20 +1,20 @@
 [gd_scene format=3 uid="uid://ddqejrf1gml67"]
 
-[ext_resource type="Script" path="res://Scripts/Map/map.gd" id="1_map"]
+[ext_resource type="Script" uid="uid://desjp04mfica7" path="res://Scripts/Map/map.gd" id="1_map"]
 [ext_resource type="PackedScene" path="res://Scene/UI/map_card.tscn" id="2_card"]
-[ext_resource type="Texture2D" path="res://Assets/Map/map_bg.jpg" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://cte8j5tptdw2m" path="res://Assets/Map/map_bg.jpg" id="3_bg"]
 [ext_resource type="Texture2D" uid="uid://btwqjmuop50qa" path="res://Assets/CharacterSprite/char_pib_point.png" id="4_pib"]
-[ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="5_theme"]
-[ext_resource type="Texture2D" path="res://Assets/Map/loc_home.jpg" id="t0"]
-[ext_resource type="Texture2D" path="res://Assets/Map/loc_village.jpg" id="t1"]
-[ext_resource type="Texture2D" path="res://Assets/Map/loc_shop.jpg" id="t2"]
-[ext_resource type="Texture2D" path="res://Assets/Map/loc_market.jpg" id="t3"]
-[ext_resource type="Texture2D" path="res://Assets/Map/loc_city.jpg" id="t4"]
+[ext_resource type="Theme" uid="uid://c7vkktysn6avj" path="res://Assets/UI/menu_theme.tres" id="5_theme"]
+[ext_resource type="Texture2D" uid="uid://wey5g723r3hr" path="res://Assets/Map/loc_home.jpg" id="t0"]
+[ext_resource type="Texture2D" uid="uid://2v8itbm4m2kw" path="res://Assets/Map/loc_village.jpg" id="t1"]
+[ext_resource type="Texture2D" uid="uid://c2metihkcgy25" path="res://Assets/Map/loc_shop.jpg" id="t2"]
+[ext_resource type="Texture2D" uid="uid://cgj2ewh5n5luw" path="res://Assets/Map/loc_market.jpg" id="t3"]
+[ext_resource type="Texture2D" uid="uid://kwmwe4skk7yk" path="res://Assets/Map/loc_city.jpg" id="t4"]
 
 [sub_resource type="StyleBoxFlat" id="SB_title"]
 content_margin_left = 14.0
-content_margin_right = 14.0
 content_margin_top = 8.0
+content_margin_right = 14.0
 content_margin_bottom = 8.0
 bg_color = Color(0.77, 0.56, 0.34, 1)
 border_width_left = 3
@@ -29,8 +29,8 @@ corner_radius_bottom_left = 14
 
 [sub_resource type="StyleBoxFlat" id="SB_speech"]
 content_margin_left = 18.0
-content_margin_right = 18.0
 content_margin_top = 12.0
+content_margin_right = 18.0
 content_margin_bottom = 12.0
 bg_color = Color(1, 0.98, 0.92, 1)
 border_width_left = 4
@@ -45,8 +45,8 @@ corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="SB_bar"]
 content_margin_left = 14.0
-content_margin_right = 14.0
 content_margin_top = 8.0
+content_margin_right = 14.0
 content_margin_bottom = 8.0
 bg_color = Color(0.36, 0.25, 0.16, 0.96)
 border_width_left = 4
@@ -54,16 +54,12 @@ border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.23, 0.16, 0.11, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
 
-[node name="Map" type="CanvasLayer"]
+[node name="Map" type="CanvasLayer" unique_id=1826300645]
 layer = 128
 script = ExtResource("1_map")
 
-[node name="Root" type="Control" parent="."]
+[node name="Root" type="Control" parent="." unique_id=1037851731]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -72,7 +68,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("5_theme")
 
-[node name="Dim" type="ColorRect" parent="Root"]
+[node name="Dim" type="ColorRect" parent="Root" unique_id=2113566245]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -81,7 +77,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
-[node name="Board" type="TextureRect" parent="Root"]
+[node name="Board" type="TextureRect" parent="Root" unique_id=973410501]
 layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 648.0
@@ -91,7 +87,7 @@ expand_mode = 1
 stretch_mode = 6
 metadata/_edit_lock_ = true
 
-[node name="Title" type="PanelContainer" parent="Root"]
+[node name="Title" type="PanelContainer" parent="Root" unique_id=333955884]
 layout_mode = 0
 offset_left = 446.0
 offset_top = 14.0
@@ -100,14 +96,14 @@ offset_bottom = 60.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("SB_title")
 
-[node name="Label" type="Label" parent="Root/Title"]
+[node name="Label" type="Label" parent="Root/Title" unique_id=811327110]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
 theme_override_font_sizes/font_size = 24
 text = "แผนที่หมู่บ้าน"
 horizontal_alignment = 1
 
-[node name="Cards" type="Control" parent="Root"]
+[node name="Cards" type="Control" parent="Root" unique_id=1264347595]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -116,18 +112,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Home" parent="Root/Cards" instance=ExtResource("2_card")]
+[node name="Home" parent="Root/Cards" unique_id=1540984636 instance=ExtResource("2_card")]
 layout_mode = 0
 offset_left = 110.0
 offset_top = 280.0
 offset_right = 320.0
 offset_bottom = 430.0
 title = "บ้าน"
-location = 0
 thumbnail = ExtResource("t0")
 hint = "บ้านของขมกับยาย — กลับไปพักหรือคุยกับยายได้"
 
-[node name="Village" parent="Root/Cards" instance=ExtResource("2_card")]
+[node name="Village" parent="Root/Cards" unique_id=1951956186 instance=ExtResource("2_card")]
 layout_mode = 0
 offset_left = 330.0
 offset_top = 75.0
@@ -138,7 +133,7 @@ location = 5
 thumbnail = ExtResource("t1")
 hint = "ถนนหน้าบ้าน ทางผ่านระหว่างบ้านกับร้าน"
 
-[node name="Shop" parent="Root/Cards" instance=ExtResource("2_card")]
+[node name="Shop" parent="Root/Cards" unique_id=77106188 instance=ExtResource("2_card")]
 layout_mode = 0
 offset_left = 440.0
 offset_top = 305.0
@@ -149,7 +144,7 @@ location = 1
 thumbnail = ExtResource("t2")
 hint = "ร้านซ่อมคอมของเรา ลูกค้ามารอที่นี่ เปิดคอมของขมก็ได้"
 
-[node name="Market" parent="Root/Cards" instance=ExtResource("2_card")]
+[node name="Market" parent="Root/Cards" unique_id=218879047 instance=ExtResource("2_card")]
 layout_mode = 0
 offset_left = 685.0
 offset_top = 65.0
@@ -160,7 +155,7 @@ location = 4
 thumbnail = ExtResource("t3")
 hint = "ตลาดในหมู่บ้าน มีแผงขายของ 3 ร้าน"
 
-[node name="City" parent="Root/Cards" instance=ExtResource("2_card")]
+[node name="City" parent="Root/Cards" unique_id=895762316 instance=ExtResource("2_card")]
 layout_mode = 0
 offset_left = 775.0
 offset_top = 270.0
@@ -172,7 +167,7 @@ thumbnail = ExtResource("t4")
 hint = "ในเมืองมีออฟฟิศกับงานใหญ่ ๆ รอขมอยู่"
 locked = true
 
-[node name="Speech" type="PanelContainer" parent="Root"]
+[node name="Speech" type="PanelContainer" parent="Root" unique_id=800969832]
 layout_mode = 0
 offset_left = 640.0
 offset_top = 452.0
@@ -181,7 +176,7 @@ offset_bottom = 546.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("SB_speech")
 
-[node name="Text" type="Label" parent="Root/Speech"]
+[node name="Text" type="Label" parent="Root/Speech" unique_id=1703481197]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
@@ -190,7 +185,7 @@ text = "จะไปไหนดีขม?"
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Pib" type="TextureRect" parent="Root"]
+[node name="Pib" type="TextureRect" parent="Root" unique_id=1125009673]
 layout_mode = 0
 offset_left = 1000.0
 offset_top = 372.0
@@ -202,14 +197,14 @@ expand_mode = 1
 stretch_mode = 5
 flip_h = true
 
-[node name="BottomBar" type="Panel" parent="Root"]
+[node name="BottomBar" type="Panel" parent="Root" unique_id=1812879863]
 layout_mode = 0
 offset_top = 560.0
 offset_right = 1152.0
 offset_bottom = 648.0
 theme_override_styles/panel = SubResource("SB_bar")
 
-[node name="Here" type="Label" parent="Root/BottomBar"]
+[node name="Here" type="Label" parent="Root/BottomBar" unique_id=1702035791]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 14.0
@@ -220,7 +215,7 @@ theme_override_font_sizes/font_size = 24
 text = "ตอนนี้อยู่: -"
 vertical_alignment = 1
 
-[node name="Tip" type="Label" parent="Root/BottomBar"]
+[node name="Tip" type="Label" parent="Root/BottomBar" unique_id=1925780181]
 layout_mode = 0
 offset_left = 460.0
 offset_top = 14.0
@@ -232,7 +227,7 @@ text = "กดรูปสถานที่เพื่อไปได้ทั
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Close" type="Button" parent="Root/BottomBar"]
+[node name="Close" type="Button" parent="Root/BottomBar" unique_id=374158863]
 layout_mode = 0
 offset_left = 980.0
 offset_top = 16.0
