@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cw5rb82t545sd"
 path.s3tc="res://.godot/imported/mb_mainboard.png-a39821765d1cfafaaa27e3b30c5070ff.s3tc.ctex"
+path.etc2="res://.godot/imported/mb_mainboard.png-a39821765d1cfafaaa27e3b30c5070ff.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://Assets/MiniGame/PartMainboard/mb_mainboard.png"
-dest_files=["res://.godot/imported/mb_mainboard.png-a39821765d1cfafaaa27e3b30c5070ff.s3tc.ctex"]
+dest_files=["res://.godot/imported/mb_mainboard.png-a39821765d1cfafaaa27e3b30c5070ff.s3tc.ctex", "res://.godot/imported/mb_mainboard.png-a39821765d1cfafaaa27e3b30c5070ff.etc2.ctex"]
 
 [params]
 
