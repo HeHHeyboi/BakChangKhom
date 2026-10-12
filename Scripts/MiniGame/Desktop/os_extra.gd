@@ -16,7 +16,7 @@ var task: DesktopTask
 
 # ---- สถานะ
 var procs: Array[Dictionary] = []
-var installed_printers: Array[Dictionary] = []
+var installed_printers: Array[DesktopPrinter] = []
 var default_printer := ""
 var printed_ok := false
 var sound_dev := 0
@@ -50,8 +50,7 @@ func _init(p_m) -> void:
 func load_state() -> void:
 	procs.clear()
 	for p in task.processes:
-		var d: Dictionary = p.duplicate(true)
-		d.merge({ "kind": "app", "startup": false, "boot_s": 2, "cpu": 1 })
+		var d: Dictionary = p.to_dict()
 		d["running"] = true
 		d["startup_on"] = bool(d.startup)
 		procs.append(d)
@@ -271,10 +270,10 @@ func settings_sections() -> Array:
 # ---------------------------------------------------------------- เครื่องพิมพ์ (1-5)
 
 
-func add_printer(p: Dictionary) -> void:
-	if p.is_empty() or installed_printers.has(p):
+func add_printer(p: DesktopPrinter) -> void:
+	if p == null or installed_printers.has(p):
 		return
-	if not p.get("right", false):
+	if not p.right:
 		m._trap(&"wrong_printer", "printer_" + String(p.name), &"fix", 10, "เพิ่มเครื่องพิมพ์ผิดเครื่อง (%s)" % p.name)
 		pib_say("เครื่องนั้นไม่ใช่ของห้องนี้นะ ดูชื่อให้ตรงกับที่ลูกค้าบอก", PibHint.Mood.WORRY)
 	installed_printers.append(p)
@@ -283,24 +282,24 @@ func add_printer(p: Dictionary) -> void:
 	_open_or_refresh("printers")
 
 
-func remove_printer(p: Dictionary) -> void:
+func remove_printer(p: DesktopPrinter) -> void:
 	installed_printers.erase(p)
 	if default_printer == p.name:
 		default_printer = installed_printers[0].name if not installed_printers.is_empty() else ""
 	_open_or_refresh("printers")
 
 
-func set_default_printer(p: Dictionary) -> void:
+func set_default_printer(p: DesktopPrinter) -> void:
 	if installed_printers.has(p):
 		default_printer = p.name
 	_open_or_refresh("printers")
 
 
-func _printer(n: String) -> Dictionary:
+func _printer(n: String) -> DesktopPrinter:
 	for p in task.printers:
 		if p.name == n:
 			return p
-	return { }
+	return null
 
 
 ## พิมพ์หน้าทดสอบไปเครื่องค่าเริ่มต้น · คืนข้อความผล
@@ -308,7 +307,7 @@ func print_test() -> String:
 	if default_printer == "":
 		return "ยังไม่มีเครื่องพิมพ์ในเครื่องเลย"
 	var p := _printer(default_printer)
-	printed_ok = p.get("right", false)
+	printed_ok = p != null and p.right
 	return "พิมพ์หน้าทดสอบที่ \"%s\" แล้ว — %s" % [
 		default_printer,
 		"ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…",
@@ -338,7 +337,7 @@ func open_printers() -> void:
 			continue
 		var row := HBoxContainer.new()
 		row.name = "Found_" + String(p.name).validate_node_name()
-		var l = m._label("%s\n%s" % [p.name, p.get("note", "")], 14, C_INK)
+		var l = m._label("%s\n%s" % [p.name, p.note], 14, C_INK)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(l)
 		row.add_child(_btn("เพิ่ม", add_printer.bind(p)))
@@ -360,8 +359,7 @@ func open_printers() -> void:
 func sound_ok() -> bool:
 	if task.sound_devices.is_empty():
 		return true
-	var dev: Dictionary = task.sound_devices[sound_dev]
-	return dev.get("works", false) and not muted and volume >= 20 and _driver_ok()
+	return task.sound_devices[sound_dev].works and not muted and volume >= 20 and _driver_ok()
 
 
 func _driver_ok() -> bool:
@@ -447,22 +445,22 @@ func open_sound() -> void:
 # ---------------------------------------------------------------- Wi-Fi (1-7)
 
 
-func _net(n: String) -> Dictionary:
+func _net(n: String) -> DesktopWifi:
 	for x in task.wifi:
 		if x.name == n:
 			return x
-	return { }
+	return null
 
 
 ## ต่อเครือข่าย · คืน "" = ต่อได้ · อื่น ๆ = เหตุที่ต่อไม่ได้
 func connect_wifi(n: String, password := "") -> String:
 	var net := _net(n)
-	if net.is_empty():
+	if net == null:
 		return "ไม่พบเครือข่าย"
-	if net.get("locked", false):
-		if password != String(net.get("password", "")):
+	if net.locked:
+		if password != net.password:
 			return "รหัสผ่านไม่ถูกต้อง"
-	elif not net.get("right", false):
+	elif not net.right:
 		m._trap(&"open_wifi", "wifi_" + n, &"safety", 10, "ต่อ Wi-Fi สาธารณะที่ไม่มีรหัส (%s)" % n)
 		pib_say("เน็ตฟรีไม่มีรหัสแบบนี้ ใครก็แอบดูข้อมูลได้ ใช้เน็ตบ้านลูกค้าดีกว่า", PibHint.Mood.WORRY)
 	wifi_connected = n
@@ -485,15 +483,15 @@ func open_wifi() -> void:
 	for net in task.wifi:
 		var row := HBoxContainer.new()
 		row.name = "Net_" + String(net.name).validate_node_name()
-		var bars := "▮".repeat(clampi(int(net.get("signal", 2)), 1, 3))
+		var bars := "▮".repeat(net.signal_level)
 		var l = m._label(
-			"%s  %s\n%s" % [net.name, bars, "ต้องใส่รหัส" if net.get("locked", false) else "ไม่มีรหัส (สาธารณะ)"],
+			"%s  %s\n%s" % [net.name, bars, "ต้องใส่รหัส" if net.locked else "ไม่มีรหัส (สาธารณะ)"],
 			14,
 			C_INK,
 		)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(l)
-		if net.get("locked", false):
+		if net.locked:
 			var pw := LineEdit.new()
 			pw.name = "Password"
 			pw.placeholder_text = "รหัสผ่าน"
@@ -591,7 +589,7 @@ func eject_usb() -> String:
 func backup_missing() -> Array[String]:
 	var out: Array[String] = []
 	for f in task.files:
-		if f.get("folder", "") != task.backup_folder or f.get("kind", "") != "user":
+		if f.folder_name() != task.backup_folder or f.kind != "user":
 			continue
 		var on_pc := false
 		var on_usb := false
@@ -789,7 +787,7 @@ func open_security() -> void:
 				"%s\n%s · %s"
 				% [
 					t.name,
-					t.get("where", ""),
+					t.where,
 					{ "found": "พบ!", "quarantine": "กักกันแล้ว", "allowed": "อนุญาตแล้ว" }.get(st, ""),
 				],
 				14,
@@ -821,7 +819,7 @@ func open_security() -> void:
 func set_resolution(i: int) -> bool:
 	if i < 0 or i >= task.resolutions.size():
 		return false
-	if not task.resolutions[i].get("ok", true):
+	if not task.resolutions[i].ok:
 		_pending_res = i
 		_open_or_refresh("display")
 		return false
@@ -850,7 +848,7 @@ func set_scale(pct: int) -> void:
 func display_ok() -> bool:
 	return (
 		task.resolutions.is_empty()
-		or (task.resolutions[res_i].get("best", false) and scale_pct == task.display_scale_best)
+		or (task.resolutions[res_i].best and scale_pct == task.display_scale_best)
 	)
 
 
@@ -859,7 +857,7 @@ func _apply_display() -> void:
 	if task.goal != DesktopTask.Goal.DISPLAY or not is_instance_valid(m._icons):
 		return
 	var f := scale_pct / 100.0
-	if not task.resolutions.is_empty() and not task.resolutions[res_i].get("best", false):
+	if not task.resolutions.is_empty() and not task.resolutions[res_i].best:
 		f *= 1.35
 	m._icons.scale = Vector2.ONE * clampf(f, 1.0, 2.2)
 
@@ -886,7 +884,7 @@ func open_display() -> void:
 	opt.name = "Resolution"
 	opt.focus_mode = Control.FOCUS_NONE
 	for r in task.resolutions:
-		opt.add_item(String(r.name) + ("  (แนะนำ)" if r.get("best", false) else ""))
+		opt.add_item(String(r.name) + ("  (แนะนำ)" if r.best else ""))
 	if not task.resolutions.is_empty():
 		opt.select(res_i)
 	opt.item_selected.connect(
@@ -925,7 +923,8 @@ func check_reason() -> String:
 		DesktopTask.Goal.PRINTER:
 			if not printed_ok:
 				return "สั่งพิมพ์แล้วกระดาษไม่ออกที่โต๊ะลูกค้า" if default_printer != "" else "ยังพิมพ์ไม่ได้ ไม่มีเครื่องพิมพ์ในเครื่อง"
-			if not _printer(default_printer).get("right", false):
+			var pr := _printer(default_printer)
+			if pr == null or not pr.right:
 				return "สั่งพิมพ์แล้วไปออกที่เครื่อง \"%s\"" % default_printer
 		DesktopTask.Goal.SOUND:
 			if not sound_ok():
@@ -934,7 +933,7 @@ func check_reason() -> String:
 			var net := _net(wifi_connected)
 			if wifi_connected == "":
 				return "ยังเข้าเน็ตไม่ได้เลย"
-			if not net.get("right", false):
+			if net == null or not net.right:
 				return "เข้าเน็ตได้ แต่เป็นเน็ตสาธารณะ ไม่ใช่เน็ตบ้านลูกค้า"
 		DesktopTask.Goal.BACKUP:
 			var miss := backup_missing()

@@ -21,7 +21,7 @@ enum Goal {
 }
 
 ## โฟลเดอร์ที่มีในเครื่อง (ใช้ในช่อง folder ของไฟล์)
-const FOLDERS: PackedStringArray = ["เดสก์ท็อป", "เอกสาร", "รูปภาพ", "ดาวน์โหลด", "ระบบ (C:)", "USB (E:)"]
+const FOLDERS: PackedStringArray = DesktopFile.FOLDER_NAMES
 ## โฟลเดอร์ USB (โชว์ในหน้าต่างไฟล์เมื่อ usb_drive = true)
 const USB := "USB (E:)"
 
@@ -35,13 +35,10 @@ const USB := "USB (E:)"
 @export_multiline var request := ""
 
 @export_group("ไฟล์ในเครื่อง")
-## {name, size_mb, folder, kind, note, dup_of}
-## kind: "user" ของลูกค้า (ห้ามลบ) · "dup" ไฟล์ซ้ำ · "system" ไฟล์ระบบ (ห้ามลบ) · "junk" ขยะ
-##       "installer" ตัวติดตั้งของจริง · "fake_installer" ตัวติดตั้งปลอม (ได้โปรแกรมโฆษณา)
-## note = ข้อความตอนเปิดดู · dup_of = ชื่อไฟล์ต้นฉบับ (ของ dup)
-@export var files: Array[Dictionary] = []
-## {name, publisher, size_mb, adware, system, desktop_icon}
-@export var programs: Array[Dictionary] = []
+## ไฟล์ในเครื่อง — ดูฟิลด์/ความหมาย kind ที่ DesktopFile
+@export var files: Array[DesktopFile] = []
+## โปรแกรมที่ติดตั้งอยู่ — ดู DesktopProgram
+@export var programs: Array[DesktopProgram] = []
 ## พื้นที่ทั้งหมด / ที่เหลือตอนเริ่ม (MB)
 @export var disk_total_mb := 64000
 @export var disk_free_mb := 8000
@@ -62,20 +59,19 @@ const USB := "USB (E:)"
 @export_group("งานอื่น (Lv1 1-4 … 1-10 · Lv2)")
 ## บรรทัดที่ขึ้นบนกระดาษโน้ตหลังถามลูกค้าถูกข้อ เช่น "รหัส Wi-Fi: maikai2569"
 @export var ask_note := ""
-## CLOSE_HANG / STARTUP — โปรแกรมในเครื่อง {name, kind: "app"|"hang"|"system"|"unsaved", startup: bool, boot_s: int, cpu: int}
-## hang = ค้าง (ต้องปิด) · unsaved = ลูกค้ายังเปิดใช้อยู่/ยังไม่บันทึก (อย่าปิด) · system = ของระบบ (อย่าปิด)
-@export var processes: Array[Dictionary] = []
+## CLOSE_HANG / STARTUP — โปรแกรมที่ทำงานอยู่ (hang = ค้างต้องปิด · unsaved/system = อย่าปิด) ดู DesktopProcess
+@export var processes: Array[DesktopProcess] = []
 ## STARTUP: เปิดเครื่องต้องเร็วกว่ากี่วินาที (8 วิ + boot_s ของตัวที่เปิดพร้อมเครื่อง)
 @export var boot_target_s := 25
-## PRINTER — เครื่องพิมพ์ที่ค้นเจอ {name, note, right: bool}
-@export var printers: Array[Dictionary] = []
-## SOUND — อุปกรณ์เสียง {name, works: bool} · เริ่มที่ sound_device · ปิดเสียงอยู่ไหม · ระดับเสียงเริ่ม
-@export var sound_devices: Array[Dictionary] = []
+## PRINTER — เครื่องพิมพ์ที่ค้นเจอ (DesktopPrinter)
+@export var printers: Array[DesktopPrinter] = []
+## SOUND — อุปกรณ์เสียง (DesktopSoundDevice) · เริ่มที่ sound_device · ปิดเสียงอยู่ไหม · ระดับเสียงเริ่ม
+@export var sound_devices: Array[DesktopSoundDevice] = []
 @export var sound_device := 0
 @export var sound_muted := true
 @export var sound_volume := 0
-## WIFI — เครือข่ายที่เห็น {name, locked: bool, password, right: bool, signal: 1–3}
-@export var wifi: Array[Dictionary] = []
+## WIFI — เครือข่ายที่เห็น (DesktopWifi)
+@export var wifi: Array[DesktopWifi] = []
 ## BACKUP — มี USB เสียบอยู่ · ความจุ (MB) · โฟลเดอร์ที่ต้องสำรอง (ไฟล์ kind "user" ในนั้น)
 @export var usb_drive := false
 @export var usb_mb := 16000
@@ -83,11 +79,11 @@ const USB := "USB (E:)"
 ## UPDATE — ขนาดอัปเดต · งานที่ลูกค้าเปิดค้างไว้ยังไม่บันทึก ("" = ไม่มี)
 @export var update_mb := 900
 @export var unsaved_doc := ""
-## VIRUS_SCAN — ไวรัสที่สแกนเจอ {name, where} · ไฟล์ชั่วคราว (MB)
-@export var threats: Array[Dictionary] = []
+## VIRUS_SCAN — ไวรัสที่สแกนเจอ (DesktopThreat) · ไฟล์ชั่วคราว (MB)
+@export var threats: Array[DesktopThreat] = []
 @export var temp_mb := 0
-## DISPLAY — ความละเอียด {name, ok: bool (จอรองรับ), best: bool} · เริ่มที่ display_res · ขนาดตัวหนังสือเริ่ม/ที่ถูก (%)
-@export var resolutions: Array[Dictionary] = []
+## DISPLAY — ความละเอียด (DesktopResolution) · เริ่มที่ display_res · ขนาดตัวหนังสือเริ่ม/ที่ถูก (%)
+@export var resolutions: Array[DesktopResolution] = []
 @export var display_res := 0
 @export var display_scale := 100
 @export var display_scale_best := 100
@@ -120,6 +116,9 @@ const USB := "USB (E:)"
 ## ช่องที่ขาด — CustomerCase.problems() เรียกต่อ
 func problems() -> PackedStringArray:
 	var out := PackedStringArray()
+	if [files, programs, processes, printers, sound_devices, wifi, threats, resolutions].any(func(a): return a.has(null)):
+		out.append("DesktopTask มีช่องว่าง (null) ในรายการ — ใส่ resource หรือลบช่องนั้น")
+		return out
 	if title.strip_edges() == "":
 		out.append("DesktopTask ไม่มี title")
 	if ask_options.size() < 2 or ask_best < 0 or ask_best >= ask_options.size():
@@ -127,39 +126,37 @@ func problems() -> PackedStringArray:
 	if explain_options.size() < 2 or explain_best < 0 or explain_best >= explain_options.size():
 		out.append("DesktopTask explain_options ต้องมี ≥2 ข้อ และ explain_best อยู่ในช่วง")
 	for f in files:
-		if not f.has("name") or not f.has("folder"):
-			out.append("DesktopTask ไฟล์ต้องมี name และ folder: %s" % f)
-		elif not FOLDERS.has(String(f.folder)):
-			out.append("DesktopTask โฟลเดอร์ \"%s\" ไม่มี (ใช้ %s)" % [f.folder, ", ".join(FOLDERS)])
+		if f.name.strip_edges() == "":
+			out.append("DesktopTask มีไฟล์ที่ยังไม่ตั้งชื่อ (โฟลเดอร์ %s)" % f.folder_name())
 	match goal:
 		Goal.UNINSTALL:
-			if not programs.any(func(p): return p.get("adware", false)):
+			if not programs.any(func(p): return p.adware):
 				out.append("DesktopTask UNINSTALL ต้องมีโปรแกรม adware อย่างน้อย 1")
 		Goal.FREE_SPACE:
 			if free_space_target_mb <= disk_free_mb:
 				out.append("DesktopTask FREE_SPACE: free_space_target_mb ต้องมากกว่า disk_free_mb")
 		Goal.CLOSE_HANG:
-			if not processes.any(func(p): return p.get("kind", "") == "hang"):
+			if not processes.any(func(p): return p.kind == "hang"):
 				out.append("DesktopTask CLOSE_HANG ต้องมีโปรแกรม kind = hang")
 		Goal.STARTUP:
-			if not processes.any(func(p): return p.get("startup", false) and p.get("kind", "") != "system"):
+			if not processes.any(func(p): return p.startup and p.kind != "system"):
 				out.append("DesktopTask STARTUP ต้องมีโปรแกรมเปิดพร้อมเครื่องที่ปิดได้")
 		Goal.PRINTER:
-			if not printers.any(func(p): return p.get("right", false)):
+			if not printers.any(func(p): return p.right):
 				out.append("DesktopTask PRINTER ต้องมีเครื่องพิมพ์ right = true")
 		Goal.SOUND:
-			if not sound_devices.any(func(d): return d.get("works", false)):
+			if not sound_devices.any(func(d): return d.works):
 				out.append("DesktopTask SOUND ต้องมีอุปกรณ์ works = true")
 		Goal.WIFI:
-			if not wifi.any(func(w): return w.get("right", false)):
+			if not wifi.any(func(w): return w.right):
 				out.append("DesktopTask WIFI ต้องมีเครือข่าย right = true")
 		Goal.BACKUP:
-			if not usb_drive or not files.any(func(f): return f.get("folder", "") == backup_folder and f.get("kind", "") == "user"):
+			if not usb_drive or not files.any(func(f): return f.folder_name() == backup_folder and f.kind == "user"):
 				out.append("DesktopTask BACKUP ต้องมี usb_drive และไฟล์ user ใน backup_folder")
 		Goal.VIRUS_SCAN:
 			if threats.is_empty():
 				out.append("DesktopTask VIRUS_SCAN ต้องมี threats")
 		Goal.DISPLAY:
-			if not resolutions.any(func(r): return r.get("best", false)):
+			if not resolutions.any(func(r): return r.best):
 				out.append("DesktopTask DISPLAY ต้องมีความละเอียด best = true")
 	return out

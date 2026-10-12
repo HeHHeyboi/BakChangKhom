@@ -1,6 +1,110 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://c0xh3oivs4wtf"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_igmli"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="3_qg5tq"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_84hsv"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_neg38"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_vqqtk"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_j4scx"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "รายงานกลุ่ม.doc"
+script = ExtResource("2_file")
+name = "รายงานกลุ่ม.doc"
+folder = 1
+kind = "user"
+size_mb = 3
+note = "รายงานกลุ่มฉบับล่าสุด แก้ถึงหน้า 12"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "รายงานกลุ่ม (1).doc"
+script = ExtResource("2_file")
+name = "รายงานกลุ่ม (1).doc"
+folder = 3
+kind = "dup"
+size_mb = 3
+note = "ฉบับเก่า โหลดซ้ำจากแชต ข้างในเหมือนตัวในเอกสาร"
+dup_of = "รายงานกลุ่ม.doc"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "รายงานกลุ่ม (2).doc"
+script = ExtResource("2_file")
+name = "รายงานกลุ่ม (2).doc"
+folder = 3
+kind = "dup"
+size_mb = 3
+dup_of = "รายงานกลุ่ม.doc"
+
+[sub_resource type="Resource" id="Resource_f4"]
+resource_name = "ซีรีส์ตอน1-8.mp4"
+script = ExtResource("2_file")
+name = "ซีรีส์ตอน1-8.mp4"
+folder = 3
+size_mb = 2400
+note = "ซีรีส์ที่โหลดไว้ดู"
+reply = "ดูจบแล้ว ลบได้เลย"
+
+[sub_resource type="Resource" id="Resource_f5"]
+resource_name = "ตัวติดตั้งเกมเก่า.exe"
+script = ExtResource("2_file")
+name = "ตัวติดตั้งเกมเก่า.exe"
+folder = 3
+size_mb = 900
+note = "ตัวติดตั้งเกมที่ลงไปแล้ว"
+reply = "ไม่เล่นแล้ว ลบได้"
+
+[sub_resource type="Resource" id="Resource_f6"]
+resource_name = "รูปกับเพื่อน"
+script = ExtResource("2_file")
+name = "รูปกับเพื่อน"
+folder = 2
+kind = "user"
+size_mb = 600
+note = "รูปทริปกับเพื่อน ม.5"
+
+[sub_resource type="Resource" id="Resource_f7"]
+resource_name = "รูปกับเพื่อน - สำเนา"
+script = ExtResource("2_file")
+name = "รูปกับเพื่อน - สำเนา"
+folder = 2
+kind = "dup"
+size_mb = 600
+dup_of = "รูปกับเพื่อน"
+
+[sub_resource type="Resource" id="Resource_f8"]
+resource_name = "การบ้านคณิต.doc"
+script = ExtResource("2_file")
+name = "การบ้านคณิต.doc"
+folder = 1
+kind = "user"
+
+[sub_resource type="Resource" id="Resource_f9"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f10"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
@@ -8,83 +112,14 @@ goal = 2
 title = "ทำที่ว่างให้โน้ตบุ๊กมิ้น"
 pc_name = "โน้ตบุ๊กของมิ้น"
 request = "เครื่องเต็ม เซฟรายงานกลุ่มส่งครูไม่ได้"
-files = Array[Dictionary]([{
-"name": "รายงานกลุ่ม.doc",
-"size_mb": 3,
-"folder": "เอกสาร",
-"kind": "user",
-"note": "รายงานกลุ่มฉบับล่าสุด แก้ถึงหน้า 12"
-}, {
-"name": "รายงานกลุ่ม (1).doc",
-"size_mb": 3,
-"folder": "ดาวน์โหลด",
-"kind": "dup",
-"dup_of": "รายงานกลุ่ม.doc",
-"note": "ฉบับเก่า โหลดซ้ำจากแชต ข้างในเหมือนตัวในเอกสาร"
-}, {
-"name": "รายงานกลุ่ม (2).doc",
-"size_mb": 3,
-"folder": "ดาวน์โหลด",
-"kind": "dup",
-"dup_of": "รายงานกลุ่ม.doc"
-}, {
-"name": "ซีรีส์ตอน1-8.mp4",
-"size_mb": 2400,
-"folder": "ดาวน์โหลด",
-"kind": "junk",
-"note": "ซีรีส์ที่โหลดไว้ดู",
-"reply": "ดูจบแล้ว ลบได้เลย"
-}, {
-"name": "ตัวติดตั้งเกมเก่า.exe",
-"size_mb": 900,
-"folder": "ดาวน์โหลด",
-"kind": "junk",
-"note": "ตัวติดตั้งเกมที่ลงไปแล้ว",
-"reply": "ไม่เล่นแล้ว ลบได้"
-}, {
-"name": "รูปกับเพื่อน",
-"size_mb": 600,
-"folder": "รูปภาพ",
-"kind": "user",
-"note": "รูปทริปกับเพื่อน ม.5"
-}, {
-"name": "รูปกับเพื่อน - สำเนา",
-"size_mb": 600,
-"folder": "รูปภาพ",
-"kind": "dup",
-"dup_of": "รูปกับเพื่อน"
-}, {
-"name": "การบ้านคณิต.doc",
-"size_mb": 1,
-"folder": "เอกสาร",
-"kind": "user"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3"), SubResource("Resource_f4"), SubResource("Resource_f5"), SubResource("Resource_f6"), SubResource("Resource_f7"), SubResource("Resource_f8"), SubResource("Resource_f9"), SubResource("Resource_f10")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
 disk_total_mb = 128000
 disk_free_mb = 150
 free_space_target_mb = 1500
 traps = Array[StringName]([&"delete_system", &"delete_user", &"click_ad", &"fake_download"])
 ask_options = PackedStringArray("ไฟล์ไหนที่มิ้นไม่ใช้แล้วบ้าง", "มิ้นใช้เครื่องนี้มากี่ปีแล้ว", "ขอลบทั้งโฟลเดอร์ดาวน์โหลดเลยได้ไหม")
-ask_best = 0
 ask_answer = "ซีรีส์ในดาวน์โหลดดูจบแล้ว ตัวติดตั้งเกมเก่าก็ไม่เล่นแล้ว แต่รายงานกลุ่มกับรูปเพื่อนห้ามหายนะ"
 explain_options = PackedStringArray("ไฟล์ที่โหลดซ้ำจะมีเลขต่อท้าย ลบตัวซ้ำแล้วล้างถังขยะ พื้นที่ก็กลับมา", "ต้องซื้อฮาร์ดดิสก์เพิ่มอย่างเดียว", "ลบทุกอย่างในดาวน์โหลดทิ้งเป็นประจำก็พอ")
-explain_best = 0
 pib_intro = PackedStringArray("เครื่องเต็ม ต้องหาไฟล์ที่ซ้ำกันแล้วลบออก", "ไฟล์ที่ชื่อมีคำว่าสำเนา ลองเปิดดูก่อนว่าซ้ำจริงไหม ของลูกค้าห้ามลบเด็ดขาด", "ลบแล้วไฟล์ยังอยู่ในถังขยะนะ ต้องล้างถังขยะพื้นที่ถึงจะคืน")
 pib_lesson = PackedStringArray("ลบไฟล์ให้ถามเจ้าของก่อนทุกครั้ง ไฟล์ระบบห้ามแตะ", "และจำไว้ว่าลบแล้วต้องล้างถังขยะ พื้นที่ถึงจะกลับมาจริง")

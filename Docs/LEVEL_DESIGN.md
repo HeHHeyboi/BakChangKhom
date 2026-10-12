@@ -391,8 +391,10 @@ class_name DesktopTask extends Resource
 enum Goal { INSTALL, UNINSTALL, FREE_SPACE, KILL_TASK, PRINTER, SOUND, WIFI, BACKUP, STARTUP, UPDATE }
 @export var goal: Goal
 @export var title := ""                       # "ลง LINE ให้ยาย"
-@export var files: Array[Dictionary] = []     # {name, size_mb, folder, kind: "user"|"dup"|"system"|"junk"}
-@export var programs: Array[Dictionary] = []  # {name, startup: bool, adware: bool, system: bool}
+@export var files: Array[DesktopFile] = []        # name, folder, kind: "user"|"dup"|"system"|"junk"|…, size_mb
+@export var programs: Array[DesktopProgram] = []  # name, publisher, size_mb, adware, system, desktop_icon, app
+# รายการอื่น (processes · printers · sound_devices · wifi · threats · resolutions) ก็เป็น Resource แยกคลาสเช่นกัน
+# อยู่ใน Scripts/Resources/Desktop/ — ตั้งค่าใน Inspector ได้ ไม่ต้องเขียน Dictionary
 @export var free_space_target_mb := 0
 @export var traps: Array[StringName] = []     # &"fake_download" · &"delete_system" · &"unsafe_eject" …
 @export var pib_dialog: String                # Assets/Dialog/Pib/Desktop_*.txt
