@@ -1,21 +1,39 @@
 class_name DesktopOS extends RefCounted
 
-
-class File extends RefCounted:
-	var fname: String
-	var description: String
-	var fsize: int
+enum WinType {
+	Explorer,
+}
 
 
-	func _init(name: String, desc: String, size: int) -> void:
-		self.fname = name
-		self.description = desc
-		self.fsize = size
+class Dir extends RefCounted:
+	var dname: String
+	var files: PackedInt32Array
 
 
-var fs: Array[File] = []
-var file_path: Dictionary[String, PackedInt32Array] = { }
+	func _init(name: String):
+		self.dname = name
 
 
-func add_file(location: String, fname: String, desc: String, size: int) -> void:
-	pass
+var fs: Array[DesktopFile] = []
+var dir_map: Dictionary[String, Dir] = { }
+var instances: Array[OsWindow] = []
+
+
+func create_dir(dir_name: String) -> void:
+	var d = Dir.new(dir_name)
+	if !dir_map.has(d.dname):
+		dir_map.set(d.dname, d)
+
+
+func add_file(file: DesktopFile) -> int:
+	var index = fs.size()
+	var dir = dir_map[file.folder_name()]
+	if dir == null:
+		return -1
+	dir.files.append(index)
+	fs.append(file)
+	return index
+
+
+func add_instance(win: OsWindow) -> void:
+	instances.append(win)

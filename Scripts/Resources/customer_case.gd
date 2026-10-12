@@ -15,6 +15,14 @@ const PART_SCENES := {
 	"part_bench": "res://Scene/MiniGame/Bench/back_bench.tscn", # โต๊ะหลังเครื่อง Lv2 → ใส่ bench_task ด้วย [10 ต.ค.]
 }
 
+const PART_RAM = "part_ram"
+const PART_MAINBOARD = "part_mainboard"
+const PART_GPU = "part_gpu"
+const PART_FRONT_PANEL = "part_front_panel"
+const PART_BIOS = "part_bios"
+const PART_DESKTOP = "part_desktop"
+const PART_BENCH = "part_bench"
+
 @export_group("ลูกค้า")
 ## รหัสงาน (ไม่ซ้ำกัน) เช่น w1_d1_amnuay
 @export var id: StringName
@@ -37,7 +45,15 @@ const PART_SCENES := {
 
 @export_group("งานซ่อม")
 ## Core Part ที่ต้องซ่อม → เปิดมินิเกมตัวนั้น
-@export_enum("part_ram", "part_mainboard", "part_gpu", "part_front_panel", "part_bios", "part_desktop", "part_bench") var part_id: String = "part_ram"
+@export_enum(
+	PART_RAM,
+	PART_MAINBOARD,
+	PART_GPU,
+	PART_FRONT_PANEL,
+	PART_BIOS,
+	PART_DESKTOP,
+	PART_BENCH,
+) var part_id: String = PART_RAM
 ## งานบนจอ (part_desktop) — ข้อมูลเครื่อง/ไฟล์/กับดักในขมOS (Resources/Desktop/*.tres) · [Claude 9 ต.ค. 2569]
 @export var desktop_task: DesktopTask
 ## งานโต๊ะหลังเครื่อง (part_bench) — สาย/ช่อง/คีย์บอร์ดสกปรก (Resources/Bench/*.tres) · [Claude 10 ต.ค. 2569]
