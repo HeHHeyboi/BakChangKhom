@@ -79,7 +79,11 @@ func build_ui() -> void:
 		_hang_win = w
 	if task.unsaved_doc != "":
 		var w2 = m.open_window("doc", task.unsaved_doc + " *ยังไม่บันทึก", m.TEX_DOC, Vector2(420, 220))
-		var l2 = m._label("ยอดขาย ข้าวสาร 12 ถุง · น้ำปลา 30 ขวด · …\n(ลูกค้าพิมพ์ค้างไว้ ยังไม่ได้กดบันทึก)", 15, C_INK)
+		var l2 = m._label(
+			"ยอดขาย ข้าวสาร 12 ถุง · น้ำปลา 30 ขวด · …\n(ลูกค้าพิมพ์ค้างไว้ ยังไม่ได้กดบันทึก)",
+			15,
+			C_INK,
+		)
 		l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		w2.body.add_child(l2)
 		var b := Button.new()
@@ -120,12 +124,28 @@ func end_task(p: Dictionary) -> bool:
 		return false
 	match String(p.kind):
 		"system":
-			m._trap(&"kill_system", "kill_" + String(p.name), &"safety", 10, "ปิดโปรแกรมของระบบ (%s) เครื่องจอฟ้า" % p.name)
-			m._show_info("จอฟ้า!", "ปิด \"%s\" แล้วเครื่องค้างจอฟ้า ต้องรีสตาร์ตใหม่\nโปรแกรมของระบบอย่าไปปิดนะ" % p.name, m.TEX_WARN)
+			m._trap(
+				&"kill_system",
+				"kill_" + String(p.name),
+				&"safety",
+				10,
+				"ปิดโปรแกรมของระบบ (%s) เครื่องจอฟ้า" % p.name,
+			)
+			m._show_info(
+				"จอฟ้า!",
+				"ปิด \"%s\" แล้วเครื่องค้างจอฟ้า ต้องรีสตาร์ตใหม่\nโปรแกรมของระบบอย่าไปปิดนะ" % p.name,
+				m.TEX_WARN,
+			)
 			pib_say("อันนั้นของระบบ! ปิดแล้วเครื่องล่มเลย ดูคอลัมน์ประเภทก่อนนะ", PibHint.Mood.WORRY)
 			return false
 		"unsaved":
-			m._trap(&"kill_unsaved", "kill_" + String(p.name), &"listen", 10, "ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % p.name)
+			m._trap(
+				&"kill_unsaved",
+				"kill_" + String(p.name),
+				&"listen",
+				10,
+				"ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % p.name,
+			)
 			m.lost_user_file = true
 			m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 			pib_say("อ๊ะ! อันนั้นลูกค้ายังใช้อยู่ ข้อมูลที่ยังไม่บันทึกหายหมดแล้ว", PibHint.Mood.WORRY)
@@ -166,9 +186,11 @@ func open_task_manager() -> void:
 			b.name = "Tab_" + t[0]
 			b.text = t[1]
 			b.focus_mode = Control.FOCUS_NONE
-			b.pressed.connect(func():
-				_tm_tab = t[0]
-				_refresh_tm())
+			b.pressed.connect(
+				func():
+					_tm_tab = t[0]
+					_refresh_tm(),
+			)
 			tabs.add_child(b)
 		var scroll := ScrollContainer.new()
 		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -193,7 +215,11 @@ func _refresh_tm() -> void:
 			row.name = "Proc_" + String(p.name).validate_node_name()
 			var st := "ไม่ตอบสนอง" if p.kind == "hang" else "กำลังทำงาน"
 			var kind := "ระบบ" if p.kind == "system" else "แอป"
-			var l = m._label("%s\n%s · %s · ซีพียู %d%%" % [p.name, st, kind, int(p.cpu)], 14, C_BAD if p.kind == "hang" else C_INK)
+			var l = m._label(
+				"%s\n%s · %s · ซีพียู %d%%" % [p.name, st, kind, int(p.cpu)],
+				14,
+				C_BAD if p.kind == "hang" else C_INK,
+			)
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(l)
 			var b := Button.new()
@@ -210,13 +236,21 @@ func _refresh_tm() -> void:
 			var row := HBoxContainer.new()
 			row.name = "Start_" + String(p.name).validate_node_name()
 			var impact := "สูง" if int(p.boot_s) >= 6 else ("กลาง" if int(p.boot_s) >= 3 else "ต่ำ")
-			var l = m._label("%s%s\nผลต่อการเปิดเครื่อง: %s · %s" % [p.name, "  (ระบบ)" if p.kind == "system" else "", impact, "เปิดอยู่" if p.startup_on else "ปิดแล้ว"], 14, C_INK)
+			var l = m._label(
+				"%s%s\nผลต่อการเปิดเครื่อง: %s · %s"
+				% [p.name, "  (ระบบ)" if p.kind == "system" else "", impact, "เปิดอยู่" if p.startup_on else "ปิดแล้ว"],
+				14,
+				C_INK,
+			)
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(l)
 			var b := Button.new()
 			b.text = "ปิด" if p.startup_on else "เปิด"
 			b.focus_mode = Control.FOCUS_NONE
-			b.pressed.connect(func(): set_startup(p, not p.startup_on))
+			b.pressed.connect(
+				func():
+					set_startup(p, not p.startup_on),
+			)
 			row.add_child(b)
 			_tm_list.add_child(row)
 
@@ -275,7 +309,10 @@ func print_test() -> String:
 		return "ยังไม่มีเครื่องพิมพ์ในเครื่องเลย"
 	var p := _printer(default_printer)
 	printed_ok = p.get("right", false)
-	return "พิมพ์หน้าทดสอบที่ \"%s\" แล้ว — %s" % [default_printer, "ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…"]
+	return "พิมพ์หน้าทดสอบที่ \"%s\" แล้ว — %s" % [
+		default_printer,
+		"ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…",
+	]
 
 
 func open_printers() -> void:
@@ -308,7 +345,13 @@ func open_printers() -> void:
 		w.body.add_child(row)
 	var res = m._label("", 14, C_DIM)
 	res.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	w.body.add_child(_btn("พิมพ์หน้าทดสอบ", func(): res.text = print_test()))
+	w.body.add_child(
+		_btn(
+			"พิมพ์หน้าทดสอบ",
+			func():
+				res.text = print_test(),
+		)
+	)
 	w.body.add_child(res)
 
 # ---------------------------------------------------------------- เสียง (1-6)
@@ -384,13 +427,21 @@ func open_sound() -> void:
 	sl.custom_minimum_size.x = 260
 	sl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var vl = m._label("%d" % volume, 15, C_INK)
-	sl.value_changed.connect(func(v):
-		set_volume(int(v))
-		vl.text = "%d" % volume)
+	sl.value_changed.connect(
+		func(v):
+			set_volume(int(v))
+			vl.text = "%d" % volume,
+	)
 	row.add_child(sl)
 	row.add_child(vl)
 	var res = m._label("", 15, C_DIM)
-	w.body.add_child(_btn("ทดสอบเสียง", func(): res.text = test_sound()))
+	w.body.add_child(
+		_btn(
+			"ทดสอบเสียง",
+			func():
+				res.text = test_sound(),
+		)
+	)
 	w.body.add_child(res)
 
 # ---------------------------------------------------------------- Wi-Fi (1-7)
@@ -423,13 +474,23 @@ func open_wifi() -> void:
 	var w = m.open_window("wifi", "ตั้งค่า › Wi-Fi", m.TEX_SETTINGS, Vector2(520, 360))
 	for c in w.body.get_children():
 		c.queue_free()
-	w.body.add_child(m._label("เชื่อมต่ออยู่: %s" % (wifi_connected if wifi_connected != "" else "ไม่ได้เชื่อมต่อ"), 16, C_OK if wifi_connected != "" else C_BAD))
+	w.body.add_child(
+		m._label(
+			"เชื่อมต่ออยู่: %s" % (wifi_connected if wifi_connected != "" else "ไม่ได้เชื่อมต่อ"),
+			16,
+			C_OK if wifi_connected != "" else C_BAD,
+		)
+	)
 	var msg = m._label("", 14, C_BAD)
 	for net in task.wifi:
 		var row := HBoxContainer.new()
 		row.name = "Net_" + String(net.name).validate_node_name()
 		var bars := "▮".repeat(clampi(int(net.get("signal", 2)), 1, 3))
-		var l = m._label("%s  %s\n%s" % [net.name, bars, "ต้องใส่รหัส" if net.get("locked", false) else "ไม่มีรหัส (สาธารณะ)"], 14, C_INK)
+		var l = m._label(
+			"%s  %s\n%s" % [net.name, bars, "ต้องใส่รหัส" if net.get("locked", false) else "ไม่มีรหัส (สาธารณะ)"],
+			14,
+			C_INK,
+		)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(l)
 		if net.get("locked", false):
@@ -438,9 +499,21 @@ func open_wifi() -> void:
 			pw.placeholder_text = "รหัสผ่าน"
 			pw.custom_minimum_size.x = 140
 			row.add_child(pw)
-			row.add_child(_btn("เชื่อมต่อ", func(): msg.text = connect_wifi(net.name, pw.text)))
+			row.add_child(
+				_btn(
+					"เชื่อมต่อ",
+					func():
+						msg.text = connect_wifi(net.name, pw.text),
+				)
+			)
 		else:
-			row.add_child(_btn("เชื่อมต่อ", func(): msg.text = connect_wifi(net.name)))
+			row.add_child(
+				_btn(
+					"เชื่อมต่อ",
+					func():
+						msg.text = connect_wifi(net.name),
+				)
+			)
 		w.body.add_child(row)
 	w.body.add_child(msg)
 
@@ -487,8 +560,17 @@ func move_to_usb(f: Dictionary) -> String:
 	if usb_used_mb() + int(f.size_mb) > task.usb_mb:
 		return "USB เต็ม"
 	if f.kind == "user":
-		m._trap(&"move_not_copy", "move_" + String(f.name), &"safety", 10, "\"ย้าย\" รูปลูกค้าออกจากเครื่อง (ควร \"คัดลอก\")")
-		pib_say("ย้าย = ไฟล์ออกจากเครื่องไปอยู่ใน USB อย่างเดียวนะ สำรองต้อง \"คัดลอก\" ให้มีสองที่", PibHint.Mood.WORRY)
+		m._trap(
+			&"move_not_copy",
+			"move_" + String(f.name),
+			&"safety",
+			10,
+			"\"ย้าย\" รูปลูกค้าออกจากเครื่อง (ควร \"คัดลอก\")",
+		)
+		pib_say(
+			"ย้าย = ไฟล์ออกจากเครื่องไปอยู่ใน USB อย่างเดียวนะ สำรองต้อง \"คัดลอก\" ให้มีสองที่",
+			PibHint.Mood.WORRY,
+		)
 	f["moved_from"] = f.folder
 	f.folder = DesktopTask.USB
 	m._refresh_all()
@@ -603,9 +685,14 @@ func open_update() -> void:
 			txt = "อัปเดตล้มเหลว (เครื่องถูกปิดระหว่างติดตั้ง) — ตรวจหาใหม่"
 	w.body.add_child(m._label(txt, 17, C_INK))
 	if update_state in [0, -1]:
-		w.body.add_child(_btn("ตรวจหาอัปเดต", func():
-			update_state = 0
-			check_update()))
+		w.body.add_child(
+			_btn(
+				"ตรวจหาอัปเดต",
+				func():
+					update_state = 0
+					check_update(),
+			)
+		)
 	if update_state == 1:
 		w.body.add_child(_btn("ดาวน์โหลดและติดตั้ง", start_install))
 	if update_state == 2:
@@ -686,13 +773,28 @@ func open_security() -> void:
 	prot.focus_mode = Control.FOCUS_NONE
 	prot.toggled.connect(set_protection)
 	w.body.add_child(prot)
-	w.body.add_child(_btn("สแกนทั้งเครื่อง", func(): scan_now()))
+	w.body.add_child(
+		_btn(
+			"สแกนทั้งเครื่อง",
+			func():
+				scan_now(),
+		)
+	)
 	if scanned:
 		for t in task.threats:
 			var st: String = threat_state.get(String(t.name), "")
 			var row := HBoxContainer.new()
 			row.name = "Threat_" + String(t.name).validate_node_name()
-			var l = m._label("%s\n%s · %s" % [t.name, t.get("where", ""), {"found": "พบ!", "quarantine": "กักกันแล้ว", "allowed": "อนุญาตแล้ว"}.get(st, "")], 14, C_BAD if st != "quarantine" else C_OK)
+			var l = m._label(
+				"%s\n%s · %s"
+				% [
+					t.name,
+					t.get("where", ""),
+					{ "found": "พบ!", "quarantine": "กักกันแล้ว", "allowed": "อนุญาตแล้ว" }.get(st, ""),
+				],
+				14,
+				C_BAD if st != "quarantine" else C_OK,
+			)
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(l)
 			if st == "found":
@@ -700,9 +802,17 @@ func open_security() -> void:
 				row.add_child(_btn("อนุญาต", allow_threat.bind(String(t.name))))
 			w.body.add_child(row)
 	w.body.add_child(HSeparator.new())
-	w.body.add_child(m._label("ไฟล์ชั่วคราว: %s" % ("ล้างแล้ว" if temp_cleaned else m.size_text(task.temp_mb)), 15, C_INK))
+	w.body.add_child(
+		m._label("ไฟล์ชั่วคราว: %s" % ("ล้างแล้ว" if temp_cleaned else m.size_text(task.temp_mb)), 15, C_INK)
+	)
 	if not temp_cleaned and task.temp_mb > 0:
-		w.body.add_child(_btn("ล้างไฟล์ชั่วคราว", func(): clean_temp()))
+		w.body.add_child(
+			_btn(
+				"ล้างไฟล์ชั่วคราว",
+				func():
+					clean_temp(),
+			)
+		)
 
 # ---------------------------------------------------------------- จอภาพ (Lv2)
 
@@ -738,7 +848,10 @@ func set_scale(pct: int) -> void:
 
 
 func display_ok() -> bool:
-	return task.resolutions.is_empty() or (task.resolutions[res_i].get("best", false) and scale_pct == task.display_scale_best)
+	return (
+		task.resolutions.is_empty()
+		or (task.resolutions[res_i].get("best", false) and scale_pct == task.display_scale_best)
+	)
 
 
 ## ไอคอน/ตัวหนังสือบนเดสก์ท็อปใหญ่ตามความละเอียดต่ำ + ขนาด %
@@ -756,7 +869,13 @@ func open_display() -> void:
 	for c in w.body.get_children():
 		c.queue_free()
 	if _pending_res >= 0:
-		w.body.add_child(m._label("จอดับ… \"%s\" — จอนี้แสดงไม่ได้\nจะเก็บค่านี้ไว้ไหม?" % task.resolutions[_pending_res].name, 17, C_BAD))
+		w.body.add_child(
+			m._label(
+				"จอดับ… \"%s\" — จอนี้แสดงไม่ได้\nจะเก็บค่านี้ไว้ไหม?" % task.resolutions[_pending_res].name,
+				17,
+				C_BAD,
+			)
+		)
 		var row := HBoxContainer.new()
 		w.body.add_child(row)
 		row.add_child(_btn("เก็บค่านี้", keep_resolution.bind(true)))
@@ -770,7 +889,10 @@ func open_display() -> void:
 		opt.add_item(String(r.name) + ("  (แนะนำ)" if r.get("best", false) else ""))
 	if not task.resolutions.is_empty():
 		opt.select(res_i)
-	opt.item_selected.connect(func(i): set_resolution(i))
+	opt.item_selected.connect(
+		func(i):
+			set_resolution(i),
+	)
 	w.body.add_child(opt)
 	w.body.add_child(m._label("ขนาดตัวหนังสือและไอคอน", 16, C_INK))
 	var opt2 := OptionButton.new()
@@ -780,7 +902,10 @@ func open_display() -> void:
 	for sc in scales:
 		opt2.add_item("%d%%%s" % [sc, "  (แนะนำ)" if sc == task.display_scale_best else ""])
 	opt2.select(maxi(scales.find(scale_pct), 0))
-	opt2.item_selected.connect(func(i): set_scale(scales[i]))
+	opt2.item_selected.connect(
+		func(i):
+			set_scale(scales[i]),
+	)
 	w.body.add_child(opt2)
 
 # ================================================================ ตรวจงาน

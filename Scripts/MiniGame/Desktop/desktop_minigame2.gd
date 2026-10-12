@@ -1,7 +1,9 @@
-extends Node
+class_name DesktopMinigameV2 extends PartMinigame
 
-var _selected_icon: Control
+@export var Task: DesktopTask
+
 @onready var start_button = %StartMenu
+@onready var screen = %Screen
 @onready var explorer = %Explorer
 @onready var browser = %Browser
 @onready var settings = %Settings
@@ -11,6 +13,8 @@ var _selected_icon: Control
 @onready var clock = %Clock
 @onready var desktop = %Desktop
 
+var os: DesktopOS
+var _selected_icon: Control
 var start_menu: PopupMenu
 
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
@@ -47,7 +51,8 @@ var free_mode = true
 
 
 func _ready() -> void:
-	EventManager.hideUI()
+	super._ready()
+	os = DesktopOS.new()
 	clock.text = EventManager.get_clock_text()
 	start_button.pressed.connect(self._on_start_button)
 
@@ -79,7 +84,10 @@ func _on_start_menu(id: int) -> void:
 	match id:
 		0:
 			# open_explorer("เอกสาร")
-			print("doc")
+			var win = OsWindow.make("doc", "explorer - เอกสาร", TEX_FOLDER, Vector2(300, 300))
+			win.set_anchors_preset(Control.PRESET_CENTER, true)
+			screen.add_child(win)
+			# print("doc")
 		1:
 			# open_explorer("รูปภาพ")
 			print("image")
