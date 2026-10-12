@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://cs8y716tcr6gl"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
-[ext_resource type="Resource" path="res://Resources/Desktop/task_display_director.tres" id="2_task"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" uid="uid://binvenlgj0f48" path="res://Resources/Desktop/task_display_director.tres" id="2_task"]
 
 [resource]
 script = ExtResource("1_case")
@@ -10,12 +10,11 @@ customer = "ครู"
 reason = "เปิดแผนการสอนแล้วอ่านไม่ครบ"
 device = "คอมห้องพักครู"
 symptom = "จอแตก ตัวหนังสือใหญ่ล้นจอ"
-level = 2
 est_slots = 2
 due_shifts = 2
 part_id = "part_desktop"
-job_title = "ปรับความละเอียดจอ"
 desktop_task = ExtResource("2_task")
+job_title = "ปรับความละเอียดจอ"
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_teacher_display.txt"
 thanks_text = "คมชัดอ่านง่ายแล้ว ขอบใจนะขม"
 complain_text = "ตัวหนังสือก็ยังใหญ่อยู่ดีนี่…"
