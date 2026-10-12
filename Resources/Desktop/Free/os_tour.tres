@@ -1,65 +1,84 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://dp5bm8i74w1le"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_n52f7"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="3_bdiii"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_nx2yc"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_7pkvf"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_s0eqb"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_n3jya"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "ไฟล์ทดสอบ.doc"
+script = ExtResource("2_file")
+name = "ไฟล์ทดสอบ.doc"
+note = "ไฟล์ไว้ลองลบ"
+reply = "ลบได้เลย"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "ยินดีต้อนรับ.doc"
+script = ExtResource("2_file")
+name = "ยินดีต้อนรับ.doc"
+folder = 1
+kind = "user"
+note = "เครื่องนี้ขมประกอบเองกับมือ ทุกชิ้นเสียบถูกที่"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "คู่มือขมOS.doc"
+script = ExtResource("2_file")
+name = "คู่มือขมOS.doc"
+folder = 1
+kind = "user"
+size_mb = 2
+note = "ไอคอน = ทางลัด · โฟลเดอร์ = ที่เก็บไฟล์ · ถังขยะ = ที่พักไฟล์ที่ลบ · ตั้งค่า = ปรับเครื่อง/ถอนโปรแกรม"
+
+[sub_resource type="Resource" id="Resource_f4"]
+resource_name = "วอลเปเปอร์ทุ่งนา.jpg"
+script = ExtResource("2_file")
+name = "วอลเปเปอร์ทุ่งนา.jpg"
+folder = 2
+kind = "user"
+size_mb = 3
+note = "ภาพพื้นหลังของเครื่องนี้"
+
+[sub_resource type="Resource" id="Resource_f5"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f6"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
-goal = 0
 title = "ทำความรู้จัก ขมOS"
 pc_name = "คอมพิวเตอร์ที่เพิ่งประกอบ"
 request = "เครื่องเปิดติดแล้ว! ลองใช้ทีละขั้นตามโน้ตนี้"
-files = Array[Dictionary]([{
-"name": "ไฟล์ทดสอบ.doc",
-"size_mb": 1,
-"folder": "เดสก์ท็อป",
-"kind": "junk",
-"note": "ไฟล์ไว้ลองลบ",
-"reply": "ลบได้เลย"
-}, {
-"name": "ยินดีต้อนรับ.doc",
-"size_mb": 1,
-"folder": "เอกสาร",
-"kind": "user",
-"note": "เครื่องนี้ขมประกอบเองกับมือ ทุกชิ้นเสียบถูกที่"
-}, {
-"name": "คู่มือขมOS.doc",
-"size_mb": 2,
-"folder": "เอกสาร",
-"kind": "user",
-"note": "ไอคอน = ทางลัด · โฟลเดอร์ = ที่เก็บไฟล์ · ถังขยะ = ที่พักไฟล์ที่ลบ · ตั้งค่า = ปรับเครื่อง/ถอนโปรแกรม"
-}, {
-"name": "วอลเปเปอร์ทุ่งนา.jpg",
-"size_mb": 3,
-"folder": "รูปภาพ",
-"kind": "user",
-"note": "ภาพพื้นหลังของเครื่องนี้"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3"), SubResource("Resource_f4"), SubResource("Resource_f5"), SubResource("Resource_f6")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
 disk_total_mb = 256000
 disk_free_mb = 200000
-browser_ad = true
 traps = Array[StringName]([])
 ask_options = PackedStringArray("-", "-")
-ask_best = 0
-ask_answer = ""
 explain_options = PackedStringArray("-", "-")
-explain_best = 0
-pib_intro = PackedStringArray("เปิดติดแล้ว! นี่คือขมOS ระบบปฏิบัติการของเครื่อง เป็นตัวกลางให้เราสั่งงานคอมพิวเตอร์ได้", "ทำตามโน้ตสีเหลืองทีละข้อนะ ปิ๊บจะชี้ให้ว่าต้องกดตรงไหน")
+pib_intro = PackedStringArray("เปิดติดแล้ว! นี่คือขมOS ระบบปฏิบัติการของเครื่อง เป็นตัวกลางให้เราสั่งงานคอมได้", "ทำตามโน้ตสีเหลืองทีละข้อนะ ปิ๊บจะชี้ให้ว่าต้องกดตรงไหน")
 pib_lesson = PackedStringArray()

@@ -1,6 +1,83 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://d2gblbl27hfvs"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_k1uok"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="4_proc"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_0ypxe"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_ruy7x"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_1yl0y"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_i4oxq"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "ใบเสร็จเดือนนี้.doc"
+script = ExtResource("2_file")
+name = "ใบเสร็จเดือนนี้.doc"
+folder = 1
+kind = "user"
+size_mb = 2
+note = "ใบเสร็จของร้าน"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_x1"]
+resource_name = "โปรแกรมคิดเงิน"
+script = ExtResource("4_proc")
+name = "โปรแกรมคิดเงิน"
+kind = "hang"
+cpu = 99
+
+[sub_resource type="Resource" id="Resource_x2"]
+resource_name = "ตารางบัญชี"
+script = ExtResource("4_proc")
+name = "ตารางบัญชี"
+kind = "unsaved"
+cpu = 2
+
+[sub_resource type="Resource" id="Resource_x3"]
+resource_name = "ขมOS เดสก์ท็อป"
+script = ExtResource("4_proc")
+name = "ขมOS เดสก์ท็อป"
+kind = "system"
+cpu = 3
+
+[sub_resource type="Resource" id="Resource_x4"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("4_proc")
+name = "ไดรเวอร์เสียง"
+kind = "system"
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "โปรแกรมคิดเงิน"
+script = ExtResource("3_prog")
+name = "โปรแกรมคิดเงิน"
+publisher = "ร้านค้าดี"
+size_mb = 300
+desktop_icon = true
+
+[sub_resource type="Resource" id="Resource_p2"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
@@ -8,61 +85,15 @@ goal = 3
 title = "ปิดโปรแกรมคิดเงินที่ค้าง"
 pc_name = "คอมพิวเตอร์ร้านชำ"
 request = "โปรแกรมคิดเงินค้าง กดอะไรก็ไม่ขยับ ลูกค้ารอจ่ายเงินอยู่"
-files = Array[Dictionary]([{
-"name": "ใบเสร็จเดือนนี้.doc",
-"size_mb": 2,
-"folder": "เอกสาร",
-"kind": "user",
-"note": "ใบเสร็จของร้าน"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "โปรแกรมคิดเงิน",
-"publisher": "ร้านค้าดี",
-"size_mb": 300,
-"desktop_icon": true
-}, {
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
-processes = Array[Dictionary]([{
-"name": "โปรแกรมคิดเงิน",
-"kind": "hang",
-"cpu": 99
-}, {
-"name": "ตารางบัญชี",
-"kind": "unsaved",
-"cpu": 2
-}, {
-"name": "ขมOS เดสก์ท็อป",
-"kind": "system",
-"cpu": 3
-}, {
-"name": "ไดรเวอร์เสียง",
-"kind": "system",
-"cpu": 1
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1"), SubResource("Resource_p2")])
 disk_free_mb = 20000
 browser_ad = false
+ask_note = "ตารางบัญชี ยังไม่บันทึก อย่าปิด!"
+processes = Array[ExtResource("4_proc")]([SubResource("Resource_x1"), SubResource("Resource_x2"), SubResource("Resource_x3"), SubResource("Resource_x4")])
 traps = Array[StringName]([&"kill_system", &"kill_unsaved", &"delete_system", &"delete_user"])
 ask_options = PackedStringArray("ตอนนี้มีงานอะไรเปิดค้างไว้อีกไหมครับ", "ซื้อเครื่องนี้มากี่ปีแล้วครับ", "ลองถอดปลั๊กหรือยังครับ")
-ask_best = 0
 ask_answer = "มีตารางบัญชีที่แม่พิมพ์ค้างไว้ ยังไม่ได้กดบันทึกเลย อันนั้นอย่าปิดนะ"
-ask_note = "ตารางบัญชี ยังไม่บันทึก อย่าปิด!"
 explain_options = PackedStringArray("โปรแกรมค้างให้เปิดตัวจัดการงาน (Ctrl+Shift+Esc) แล้วกดจบงานเฉพาะตัวที่ไม่ตอบสนอง งานอื่นยังอยู่ครบ", "ค้างเมื่อไหร่ถอดปลั๊กเลย เร็วสุด", "ลงโปรแกรมคิดเงินใหม่ทุกครั้งที่ค้าง")
-explain_best = 0
 pib_intro = PackedStringArray("โปรแกรมค้างกดกากบาทไม่ได้ ต้องใช้ตัวจัดการงาน กด Ctrl+Shift+Esc หรือปุ่มเริ่ม แล้วเลือกตัวจัดการงาน", "จบงานเฉพาะตัวที่ขึ้นว่าไม่ตอบสนองนะ ของระบบกับงานที่ลูกค้ายังไม่บันทึกอย่าไปปิด")
 pib_lesson = PackedStringArray("ตัวจัดการงานปิดได้ทีละโปรแกรม ไม่ต้องดับทั้งเครื่อง", "ดูสถานะกับประเภทก่อนกดจบงานเสมอ")

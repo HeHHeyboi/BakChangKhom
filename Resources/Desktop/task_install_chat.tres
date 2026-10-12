@@ -1,49 +1,72 @@
 [gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://iueqh6dxkxn8"]
 
 [ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_tlq85"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="3_gpaj7"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_mbysg"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_hp1q4"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_0kyoi"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_1c7fe"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "รูปหลาน.jpg"
+script = ExtResource("2_file")
+name = "รูปหลาน.jpg"
+kind = "user"
+size_mb = 4
+note = "รูปหลานยิ้มแป้น ยายตั้งไว้หน้าจอ"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "สูตรแกงส้ม.doc"
+script = ExtResource("2_file")
+name = "สูตรแกงส้ม.doc"
+folder = 1
+kind = "user"
+note = "สูตรแกงส้มของยาย พิมพ์เองทีละตัว"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "รูปงานสงกรานต์"
+script = ExtResource("2_file")
+name = "รูปงานสงกรานต์"
+folder = 2
+kind = "user"
+size_mb = 900
+note = "รูปสงกรานต์ปีที่แล้ว ทั้งบ้าน"
+
+[sub_resource type="Resource" id="Resource_f4"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f5"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
 title = "ลงแอปพูดคุยให้ยาย"
 pc_name = "คอมพิวเตอร์ของยาย"
 request = "อยากคุยกับหลานที่กรุงเทพ ให้เห็นหน้ากันด้วย"
-files = Array[Dictionary]([{
-"folder": "เดสก์ท็อป",
-"kind": "user",
-"name": "รูปหลาน.jpg",
-"note": "รูปหลานยิ้มแป้น ยายตั้งไว้หน้าจอ",
-"size_mb": 4
-}, {
-"folder": "เอกสาร",
-"kind": "user",
-"name": "สูตรแกงส้ม.doc",
-"note": "สูตรแกงส้มของยาย พิมพ์เองทีละตัว",
-"size_mb": 1
-}, {
-"folder": "รูปภาพ",
-"kind": "user",
-"name": "รูปงานสงกรานต์",
-"note": "รูปสงกรานต์ปีที่แล้ว ทั้งบ้าน",
-"size_mb": 900
-}, {
-"folder": "ระบบ (C:)",
-"kind": "system",
-"name": "ขมOS",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ",
-"size_mb": 20000
-}, {
-"folder": "ระบบ (C:)",
-"kind": "system",
-"name": "ไฟล์บูตเครื่อง",
-"note": "",
-"size_mb": 300
-}])
-programs = Array[Dictionary]([{
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3"), SubResource("Resource_f4"), SubResource("Resource_f5")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
 ask_options = PackedStringArray("หลานใช้โปรแกรมอะไรคุยกันครับ", "ยายตั้งรหัสผ่านเครื่องไว้ไหมครับ", "ยายอยากได้เกมด้วยไหมครับ")
 ask_answer = "หลานบอกให้ลงแอป \"พูดคุย\" นะ เขาว่าโหลดได้จากเว็บของเขาเอง"
 explain_options = PackedStringArray("ครั้งหน้าจะลงโปรแกรม ให้โหลดจากเว็บของเจ้าของโปรแกรมเท่านั้น อย่ากดปุ่มโฆษณานะ", "ปุ่มดาวน์โหลดอันใหญ่ ๆ สีส้ม ๆ กดได้เลย เร็วดี", "ลงโปรแกรมไว้เยอะ ๆ ก่อน เผื่อได้ใช้")

@@ -1,6 +1,104 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://fog4qorpqcld"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_30pal"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="4_proc"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_524t3"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_i4sii"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_db6nw"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_wd8j5"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "รูปสวนผัก.jpg"
+script = ExtResource("2_file")
+name = "รูปสวนผัก.jpg"
+folder = 2
+kind = "user"
+size_mb = 5
+note = "สวนผักหลังบ้านลุง"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_x1"]
+resource_name = "เกมฟาร์มผัก"
+script = ExtResource("4_proc")
+name = "เกมฟาร์มผัก"
+startup = true
+boot_s = 7
+cpu = 20
+
+[sub_resource type="Resource" id="Resource_x2"]
+resource_name = "โปรแกรมแชตเก่า"
+script = ExtResource("4_proc")
+name = "โปรแกรมแชตเก่า"
+startup = true
+boot_s = 6
+cpu = 5
+
+[sub_resource type="Resource" id="Resource_x3"]
+resource_name = "ตัวอัปเดตเครื่องพิมพ์"
+script = ExtResource("4_proc")
+name = "ตัวอัปเดตเครื่องพิมพ์"
+startup = true
+boot_s = 5
+cpu = 3
+
+[sub_resource type="Resource" id="Resource_x4"]
+resource_name = "ขมการ์ด (แอนตี้ไวรัส)"
+script = ExtResource("4_proc")
+name = "ขมการ์ด (แอนตี้ไวรัส)"
+kind = "system"
+startup = true
+boot_s = 4
+cpu = 2
+
+[sub_resource type="Resource" id="Resource_x5"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("4_proc")
+name = "ไดรเวอร์เสียง"
+kind = "system"
+startup = true
+boot_s = 1
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "เกมฟาร์มผัก"
+script = ExtResource("3_prog")
+name = "เกมฟาร์มผัก"
+publisher = "Farm Studio"
+size_mb = 800
+desktop_icon = true
+
+[sub_resource type="Resource" id="Resource_p2"]
+resource_name = "โปรแกรมแชตเก่า"
+script = ExtResource("3_prog")
+name = "โปรแกรมแชตเก่า"
+publisher = "OldChat"
+size_mb = 200
+
+[sub_resource type="Resource" id="Resource_p3"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
@@ -8,80 +106,16 @@ goal = 8
 title = "ทำให้เปิดเครื่องเร็วขึ้น"
 pc_name = "คอมพิวเตอร์ของลุงอำนวย"
 request = "กดเปิดเครื่องแล้วรอเป็นนาที กว่าจะใช้ได้"
-files = Array[Dictionary]([{
-"name": "รูปสวนผัก.jpg",
-"size_mb": 5,
-"folder": "รูปภาพ",
-"kind": "user",
-"note": "สวนผักหลังบ้านลุง"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "เกมฟาร์มผัก",
-"publisher": "Farm Studio",
-"size_mb": 800,
-"desktop_icon": true
-}, {
-"name": "โปรแกรมแชตเก่า",
-"publisher": "OldChat",
-"size_mb": 200
-}, {
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
-processes = Array[Dictionary]([{
-"name": "เกมฟาร์มผัก",
-"kind": "app",
-"startup": true,
-"boot_s": 7,
-"cpu": 20
-}, {
-"name": "โปรแกรมแชตเก่า",
-"kind": "app",
-"startup": true,
-"boot_s": 6,
-"cpu": 5
-}, {
-"name": "ตัวอัปเดตเครื่องพิมพ์",
-"kind": "app",
-"startup": true,
-"boot_s": 5,
-"cpu": 3
-}, {
-"name": "ขมการ์ด (แอนตี้ไวรัส)",
-"kind": "system",
-"startup": true,
-"boot_s": 4,
-"cpu": 2
-}, {
-"name": "ไดรเวอร์เสียง",
-"kind": "system",
-"startup": true,
-"boot_s": 1,
-"cpu": 1
-}])
-boot_target_s = 16
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")])
 disk_free_mb = 20000
 browser_ad = false
+ask_note = "ลุงไม่ใช้: เกมฟาร์ม · แชตเก่า · เครื่องพิมพ์"
+processes = Array[ExtResource("4_proc")]([SubResource("Resource_x1"), SubResource("Resource_x2"), SubResource("Resource_x3"), SubResource("Resource_x4"), SubResource("Resource_x5")])
+boot_target_s = 16
 traps = Array[StringName]([&"disable_system", &"kill_system", &"delete_system", &"delete_user"])
 ask_options = PackedStringArray("เปิดเครื่องแล้วมีโปรแกรมอะไรเด้งขึ้นมาเองบ้างครับ", "ลุงปลูกผักอะไรบ้างครับ", "ซื้อแรมเพิ่มไหมครับ")
-ask_best = 0
 ask_answer = "ขึ้นเกมฟาร์มผักของหลาน โปรแกรมแชตเก่า แล้วก็อะไรเครื่องพิมพ์ไม่รู้ ลุงไม่ได้ใช้สักอัน"
-ask_note = "ลุงไม่ใช้: เกมฟาร์ม · แชตเก่า · เครื่องพิมพ์"
 explain_options = PackedStringArray("ปิดโปรแกรมที่ไม่ใช้ไม่ให้เปิดพร้อมเครื่อง โปรแกรมยังอยู่ อยากใช้ก็กดเปิดเอง แอนตี้ไวรัสยังเปิดไว้เหมือนเดิม", "ลบโปรแกรมทิ้งหมดแล้วครับ", "ปิดแอนตี้ไวรัสด้วยจะได้เร็วขึ้น")
-explain_best = 0
 pib_intro = PackedStringArray("เปิดเครื่องช้าเพราะโปรแกรมแย่งกันเปิดพร้อมเครื่อง เปิดตัวจัดการงาน แล้วไปแท็บเปิดพร้อมเครื่อง", "ปิดเฉพาะตัวที่ลูกค้าไม่ใช้ แอนตี้ไวรัสกับของระบบต้องเปิดไว้")
 pib_lesson = PackedStringArray("ปิดเปิดพร้อมเครื่อง ไม่ใช่การลบโปรแกรม", "ของระบบกับแอนตี้ไวรัสต้องเปิดพร้อมเครื่องเสมอ")

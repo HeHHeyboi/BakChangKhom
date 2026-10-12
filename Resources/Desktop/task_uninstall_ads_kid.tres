@@ -1,6 +1,73 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://cn1n883b32xgw"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_ouo78"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="3_crf0h"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_0n6q8"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_a0hli"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_6lb5q"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="9_ujn20"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "สูตรโกงเกม.exe"
+script = ExtResource("2_file")
+name = "สูตรโกงเกม.exe"
+size_mb = 3
+note = "ไฟล์นี้แหละที่แอบลงโปรแกรมโฆษณามาด้วย"
+reply = "อันนั้นโหลดมาจากเว็บแปลก ๆ ลบได้เลย"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "งานศิลปะ.png"
+script = ExtResource("2_file")
+name = "งานศิลปะ.png"
+folder = 2
+kind = "user"
+size_mb = 6
+note = "รูปวาดส่งครูศิลปะ"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f4"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "ลดราคาเด้งไว"
+script = ExtResource("3_prog")
+name = "ลดราคาเด้งไว"
+publisher = "Super Deal Co."
+size_mb = 120
+adware = true
+desktop_icon = true
+
+[sub_resource type="Resource" id="Resource_p2"]
+resource_name = "เกมฟาร์มผัก"
+script = ExtResource("3_prog")
+name = "เกมฟาร์มผัก"
+publisher = "Farm Studio"
+size_mb = 800
+desktop_icon = true
+
+[sub_resource type="Resource" id="Resource_p3"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
 
 [resource]
 script = ExtResource("1_task")
@@ -8,55 +75,12 @@ goal = 1
 title = "ถอนโปรแกรมโฆษณาเครื่องเด็ก"
 pc_name = "คอมพิวเตอร์ของเด็กข้างบ้าน"
 request = "มีโฆษณาเด้งตลอดเวลา เล่นเกมไม่ได้เลย"
-files = Array[Dictionary]([{
-"name": "สูตรโกงเกม.exe",
-"size_mb": 3,
-"folder": "เดสก์ท็อป",
-"kind": "junk",
-"note": "ไฟล์นี้แหละที่แอบลงโปรแกรมโฆษณามาด้วย",
-"reply": "อันนั้นโหลดมาจากเว็บแปลก ๆ ลบได้เลย"
-}, {
-"name": "งานศิลปะ.png",
-"size_mb": 6,
-"folder": "รูปภาพ",
-"kind": "user",
-"note": "รูปวาดส่งครูศิลปะ"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "ลดราคาเด้งไว",
-"publisher": "Super Deal Co.",
-"size_mb": 120,
-"adware": true,
-"desktop_icon": true
-}, {
-"name": "เกมฟาร์มผัก",
-"publisher": "Farm Studio",
-"size_mb": 800,
-"desktop_icon": true
-}, {
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3"), SubResource("Resource_f4")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1"), SubResource("Resource_p2"), SubResource("Resource_p3")])
 disk_free_mb = 20000
 traps = Array[StringName]([&"icon_only", &"delete_system", &"click_ad", &"fake_download", &"delete_user"])
-ask_options = PackedStringArray("เริ่มเด้งตั้งแต่ลงอะไรไปครับ", "เล่นเกมวันละกี่ชั่วโมงครับ", "ใครเป็นคนซื้อคอมพิวเตอร์ให้ครับ")
-ask_best = 0
+ask_options = PackedStringArray("เริ่มเด้งตั้งแต่ลงอะไรไปครับ", "เล่นเกมวันละกี่ชั่วโมงครับ", "ใครเป็นคนซื้อคอมให้ครับ")
 ask_answer = "ตั้งแต่โหลดสูตรโกงเกมมาเปิด แล้วมีไอคอนป้ายราคาโผล่มาบนจอ"
 explain_options = PackedStringArray("โปรแกรมโฆษณาต้องถอนในหน้าตั้งค่า ลบแค่ไอคอนไม่หาย และอย่าโหลดสูตรโกงจากเว็บแปลก ๆ อีกนะ", "ปิดหน้าต่างโฆษณาไปเรื่อย ๆ ก็พอ", "ลงโปรแกรมลดราคาอีกตัวมาแก้ทางกัน")
-explain_best = 0
 pib_intro = PackedStringArray("โฆษณาเด้งแบบนี้ เพราะมีโปรแกรมโฆษณาแอบติดอยู่ในเครื่อง", "ลบแค่ไอคอนไม่พอนะ ต้องถอนการติดตั้งในหน้าตั้งค่า แล้วหน้าต่างโฆษณาให้กดกากบาทปิด อย่ากดข้างใน")
 pib_lesson = PackedStringArray("ถอนโปรแกรมต้องทำผ่านหน้าตั้งค่า ไอคอนเป็นแค่ทางลัดเท่านั้น", "ของระบบอย่าถอน ถอนเฉพาะตัวที่รู้แน่ว่าเป็นโฆษณา")

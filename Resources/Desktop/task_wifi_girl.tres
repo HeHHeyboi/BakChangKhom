@@ -1,6 +1,70 @@
-[gd_resource type="Resource" script_class="DesktopTask" format=3]
+[gd_resource type="Resource" script_class="DesktopTask" format=3 uid="uid://cvid86ohm25mb"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://dx8chgv62cel2" path="res://Scripts/Resources/desktop_task.gd" id="1_task"]
+[ext_resource type="Script" uid="uid://bb70yho02g54o" path="res://Scripts/Resources/Desktop/desktop_file.gd" id="2_file"]
+[ext_resource type="Script" uid="uid://doum7s0ow6iuv" path="res://Scripts/Resources/Desktop/desktop_printer.gd" id="2_xmvgt"]
+[ext_resource type="Script" uid="uid://bw54f1wd8q4kl" path="res://Scripts/Resources/Desktop/desktop_program.gd" id="3_prog"]
+[ext_resource type="Script" uid="uid://c70n3d2ppnaiq" path="res://Scripts/Resources/Desktop/desktop_process.gd" id="3_scwif"]
+[ext_resource type="Script" uid="uid://cma6vm8al0hgg" path="res://Scripts/Resources/Desktop/desktop_wifi.gd" id="4_wifi"]
+[ext_resource type="Script" uid="uid://bnd6iaadb5ct4" path="res://Scripts/Resources/Desktop/desktop_resolution.gd" id="5_un1k4"]
+[ext_resource type="Script" uid="uid://1ua5kurpf5qv" path="res://Scripts/Resources/Desktop/desktop_sound_device.gd" id="7_htrxq"]
+[ext_resource type="Script" uid="uid://yv3pqgu5vesa" path="res://Scripts/Resources/Desktop/desktop_threat.gd" id="8_rqcph"]
+
+[sub_resource type="Resource" id="Resource_f1"]
+resource_name = "การบ้านภาษาไทย.doc"
+script = ExtResource("2_file")
+name = "การบ้านภาษาไทย.doc"
+folder = 1
+kind = "user"
+note = "การบ้านที่ต้องส่ง"
+
+[sub_resource type="Resource" id="Resource_f2"]
+resource_name = "ขมOS"
+script = ExtResource("2_file")
+name = "ขมOS"
+folder = 4
+kind = "system"
+size_mb = 20000
+note = "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
+
+[sub_resource type="Resource" id="Resource_f3"]
+resource_name = "ไฟล์บูตเครื่อง"
+script = ExtResource("2_file")
+name = "ไฟล์บูตเครื่อง"
+folder = 4
+kind = "system"
+size_mb = 300
+
+[sub_resource type="Resource" id="Resource_p1"]
+resource_name = "ไดรเวอร์เสียง"
+script = ExtResource("3_prog")
+name = "ไดรเวอร์เสียง"
+publisher = "ขมOS"
+size_mb = 40
+system = true
+
+[sub_resource type="Resource" id="Resource_w1"]
+resource_name = "FREE_WIFI_ฟรี"
+script = ExtResource("4_wifi")
+name = "FREE_WIFI_ฟรี"
+signal_level = 3
+
+[sub_resource type="Resource" id="Resource_w2"]
+resource_name = "บ้านแม่ไก่"
+script = ExtResource("4_wifi")
+name = "บ้านแม่ไก่"
+locked = true
+password = "maikai2569"
+right = true
+signal_level = 3
+
+[sub_resource type="Resource" id="Resource_w3"]
+resource_name = "ร้านกาแฟลุงชิต"
+script = ExtResource("4_wifi")
+name = "ร้านกาแฟลุงชิต"
+locked = true
+password = "chit1234"
+signal_level = 1
 
 [resource]
 script = ExtResource("1_task")
@@ -8,57 +72,15 @@ goal = 6
 title = "ต่อ Wi-Fi บ้านให้"
 pc_name = "คอมพิวเตอร์ของเด็กหญิง"
 request = "เน็ตไม่ได้ ส่งการบ้านออนไลน์ไม่ได้"
-files = Array[Dictionary]([{
-"name": "การบ้านภาษาไทย.doc",
-"size_mb": 1,
-"folder": "เอกสาร",
-"kind": "user",
-"note": "การบ้านที่ต้องส่ง"
-}, {
-"name": "ขมOS",
-"size_mb": 20000,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": "โฟลเดอร์ระบบ เครื่องต้องใช้ตอนเปิด ห้ามลบ"
-}, {
-"name": "ไฟล์บูตเครื่อง",
-"size_mb": 300,
-"folder": "ระบบ (C:)",
-"kind": "system",
-"note": ""
-}])
-programs = Array[Dictionary]([{
-"name": "ไดรเวอร์เสียง",
-"publisher": "ขมOS",
-"size_mb": 40,
-"system": true
-}])
-wifi = Array[Dictionary]([{
-"name": "FREE_WIFI_ฟรี",
-"locked": false,
-"right": false,
-"signal": 3
-}, {
-"name": "บ้านแม่ไก่",
-"locked": true,
-"password": "maikai2569",
-"right": true,
-"signal": 3
-}, {
-"name": "ร้านกาแฟลุงชิต",
-"locked": true,
-"password": "chit1234",
-"right": false,
-"signal": 1
-}])
+files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3")])
+programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
 disk_free_mb = 20000
 browser_ad = false
+ask_note = "Wi-Fi บ้านแม่ไก่ · รหัส maikai2569"
+wifi = Array[ExtResource("4_wifi")]([SubResource("Resource_w1"), SubResource("Resource_w2"), SubResource("Resource_w3")])
 traps = Array[StringName]([&"open_wifi", &"delete_system", &"delete_user"])
 ask_options = PackedStringArray("รหัส Wi-Fi บ้านคืออะไรครับ", "ชอบเรียนวิชาอะไรครับ", "ใช้เน็ตบ้านค่ายไหนครับ")
-ask_best = 0
 ask_answer = "แม่จดไว้ข้างเราเตอร์ว่า maikai2569 ค่ะ"
-ask_note = "Wi-Fi บ้านแม่ไก่ · รหัส maikai2569"
 explain_options = PackedStringArray("ต่อ Wi-Fi บ้านด้วยรหัสแล้ว เน็ตฟรีไม่มีรหัสอย่าต่อนะ คนอื่นแอบดูข้อมูลได้", "เน็ตฟรีเร็วกว่า ใช้อันนั้นแทนก็ได้", "ไม่ต้องใส่รหัสก็ต่อได้ทุกที่")
-explain_best = 0
 pib_intro = PackedStringArray("ต่อเน็ตกดตรงคำว่า Wi-Fi ที่แถบงาน เลือกเครือข่ายบ้านลูกค้าแล้วใส่รหัส", "ถามรหัสจากลูกค้าก่อนนะ เน็ตฟรีไม่มีรหัสอย่าไปต่อ")
 pib_lesson = PackedStringArray("เครือข่ายที่ไม่มีรหัส ใครก็เข้าได้ ข้อมูลเราอาจรั่ว", "ชื่อเครือข่ายต้องตรงกับของบ้านลูกค้า")

@@ -220,20 +220,16 @@ func _resolve_task() -> void:
 func _load_state() -> void:
 	files.clear()
 	for f in task.files:
-		var d: Dictionary = f.duplicate(true)
-		d.merge({ "size_mb": 1, "kind": "junk", "note": "", "dup_of": "" })
-		d.merge({ "trashed": false, "gone": false, "inspected": false, "asked": false }, true)
+		var d: Dictionary = f.to_dict()
+		d.merge({ "trashed": false, "gone": false, "inspected": false, "asked": false })
 		files.append(d)
 	programs.clear()
 	for p in task.programs:
-		var d: Dictionary = p.duplicate(true)
-		d.merge(
-			{ "publisher": "", "size_mb": 100, "adware": false, "system": false, "desktop_icon": false, "app": false }
-		)
+		var d: Dictionary = p.to_dict()
 		d["installed"] = true
-		d["icon"] = bool(d.desktop_icon)
+		d["icon"] = p.desktop_icon
 		programs.append(d)
-		if d.app and d.name == task.install_name:
+		if p.app and p.name == task.install_name:
 			app_installed = true
 	free_mb = task.disk_free_mb
 
