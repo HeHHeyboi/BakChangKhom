@@ -19,8 +19,11 @@ bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
 border_width_top = 2
 border_color = Color(0.5179158, 0.4353445, 0.36556464, 1)
 
-[node name="DesktopWindow" type="Node2D" unique_id=369883786]
+[node name="DesktopWindow" type="Node2D" unique_id=369883786 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_hw1fy")
+pib = NodePath("PibHint")
+dialog_path = "res://Assets/Dialog/MiniGame/Desktop_Pib.txt"
+part_id = &"part_desktop"
 
 [node name="PibHint" parent="." unique_id=917601885 instance=ExtResource("3_xepuo")]
 visible = false
@@ -38,6 +41,7 @@ expand_mode = 1
 metadata/_edit_lock_ = true
 
 [node name="Screen" type="Control" parent="Os" unique_id=193592829]
+unique_name_in_owner = true
 clip_contents = true
 layout_mode = 3
 anchors_preset = 8
@@ -78,6 +82,7 @@ offset_top = -39.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_ycono")
+metadata/_edit_lock_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Os/Screen/Taskbar" unique_id=1889974492]
 layout_mode = 1
@@ -180,6 +185,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 8
+metadata/_edit_lock_ = true
 
 [node name="Doc" parent="Os/Screen/Desktop" unique_id=1339073643 instance=ExtResource("10_dy1v8")]
 unique_name_in_owner = true

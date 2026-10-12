@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://7gwal8dx3d16" path="res://Assets/MiniGame/Desktop/os_icon_folder.png" id="1_72hvm"]
 [ext_resource type="Script" uid="uid://dewg7t6ukhday" path="res://Scripts/MiniGame/Desktop/shortcut.gd" id="2_shortcut"]
+[ext_resource type="Theme" uid="uid://dqmjso4136hff" path="res://Assets/Theme/task_icon.tres" id="3_63bc0"]
 
 [node name="Shortcut" type="Control" unique_id=1339073643]
 custom_minimum_size = Vector2(90, 90)
@@ -11,7 +12,6 @@ anchors_preset = 0
 offset_right = 60.0
 offset_bottom = 60.0
 script = ExtResource("2_shortcut")
-shortcut_name = null
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=2052371351]
 propagate_maximum_size = false
@@ -39,3 +39,14 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 15
 text = "Shortcut"
 horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="." unique_id=467044782]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_63bc0")

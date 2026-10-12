@@ -81,7 +81,10 @@ func _build(p_title: String, icon: Texture2D) -> void:
 	row.add_child(title_label)
 	min_btn = _bar_button("–")
 	min_btn.tooltip_text = "ย่อ"
-	min_btn.pressed.connect(func(): minimize())
+	min_btn.pressed.connect(
+		func():
+			minimize(),
+	)
 	row.add_child(min_btn)
 	close_btn = _bar_button("×")
 	close_btn.tooltip_text = "ปิด"
