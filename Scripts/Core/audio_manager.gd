@@ -77,6 +77,10 @@ func _connect_game() -> void:
 ## ปุ่มทุกปุ่มที่เกิดในเกม → เสียงคลิก
 func _on_node_added(n: Node) -> void:
 	if n is BaseButton and not n.has_meta("no_click"):
+		# [13 ต.ค.] ปุ่มที่ถูกย้ายที่ (reparent เช่น จอบูตขมOS) เข้า tree ซ้ำ → ต่อแล้วไม่ต่อซ้ำ (เดิมขึ้น error "already connected")
+		if n.has_meta("click_sfx"):
+			return
+		n.set_meta("click_sfx", true)
 		(n as BaseButton).pressed.connect(sfx.bind(&"click"))
 
 

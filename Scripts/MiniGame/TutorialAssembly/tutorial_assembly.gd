@@ -214,6 +214,7 @@ func _debug_prepare(phase: int) -> void:
 
 
 func _on_minigame_finished(_score: Dictionary) -> void:
+	GameState.ensure_starter_kit() # [13 ต.ค.] จบหรือกดข้ามบทสอน → ได้ของติดตัวเข้าคลัง
 	Global.in_minigame = false
 	Global.cur_pib = null
 	EventManager.minigame_end()

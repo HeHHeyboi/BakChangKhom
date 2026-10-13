@@ -40,6 +40,7 @@ func _ready() -> void:
 		tabs[i].pressed.connect(_set_filter.bind(kinds[i]))
 	GameState.inventory_changed.connect(_refresh)
 	GameState.item_received.connect(_on_item_received)
+	GameState.inventory_note.connect(show_toast)
 	_refresh()
 
 
@@ -52,7 +53,11 @@ func _on_item_received(item: ItemDef, qty: int) -> void:
 		n = " (%d ครั้ง)" % (item.uses * qty)
 	elif qty > 1:
 		n = " ×%d" % qty
-	toast_text.text = "ได้ %s%s เข้าคลัง · %d/%d ช่อง" % [item.display_name, n, GameState.used_slots(), GameState.storage_slots]
+	show_toast("ได้ %s%s เข้าคลัง · %d/%d ช่อง" % [item.display_name, n, GameState.used_slots(), GameState.storage_slots])
+
+
+func show_toast(text: String) -> void:
+	toast_text.text = text
 	toast.show()
 	toast.modulate.a = 0.0
 	if _toast_tw:

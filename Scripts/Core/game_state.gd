@@ -110,6 +110,19 @@ var village_fund := 0
 signal inventory_changed
 ## [13 ต.ค.] ได้ของเข้าคลัง (ซื้อ · ได้จากเนื้อเรื่อง/บทสอน · ชิ้นเก่าจากงานซ่อม) → Storage โชว์ป้าย "ได้ … เข้าคลัง"
 signal item_received(item: ItemDef, qty: int)
+## ข้อความเด้งรวมหลายชิ้น (เช่น ชุดเริ่มต้น) — Storage โชว์ข้อความนี้แทนป้ายทีละชิ้น
+signal inventory_note(text: String)
+
+## [13 ต.ค.] ของติดตัวหลังจบบทสอนประกอบคอม (เล่นจบหรือกดข้ามก็ได้) — ให้ครั้งเดียวต่อเกม (story_flags.starter_kit)
+## { id ใน Resources/Shop/: จำนวน } · แก้รายการได้ที่นี่
+const STARTER_KIT := {
+	&"ram_ddr3_4gb_used": 1, # แรมจากคอมเครื่องเก่าของขม
+	&"cable_sata": 1,
+	&"ipa90": 1,
+	&"cable_tie": 1,
+}
+## เควสต์หลักขั้นที่ (index) ถัดจากบทสอนประกอบคอม — ไปถึงขั้นนี้แล้ว = ได้ชุดเริ่มต้น
+const STARTER_KIT_AFTER_STEP := 3
 const STORAGE_START := 8
 const SUPPLY_STACK_MAX := 99
 ## ช่องคลังทั้งหมด (อัปเกรดด้วย ItemDef UPGRADE)
@@ -125,6 +138,8 @@ var upgrades: Dictionary = { }
 
 
 func _ready() -> void:
+	if has_node(^"/root/EventManager"):
+		EventManager.sendUpdatedEvent.connect(_on_quest_updated)
 	economy = load(ECONOMY_PATH) as EconomyConfig
 	if economy == null:
 		push_warning("ไม่พบ %s ใช้ค่าเริ่มต้น" % ECONOMY_PATH)
@@ -283,7 +298,7 @@ func can_store(item: ItemDef, qty := 1) -> bool:
 
 
 ## เก็บเข้าคลัง (ไม่หักเงิน) · ช่องไม่พอ = false · force = ยัดเข้าไปเลยแม้ช่องเต็ม (ใช้กับ give_item)
-func add_item(item: ItemDef, qty := 1, force := false) -> bool:
+func add_item(item: ItemDef, qty := 1, force := false, notify := true) -> bool:
 	if item == null or (not force and not can_store(item, qty)):
 		return false
 	match item.kind:
@@ -307,13 +322,14 @@ func add_item(item: ItemDef, qty := 1, force := false) -> bool:
 				inventory.append({ "id": item.id, "path": item.resource_path, "qty": put, "condition": "", "reserved_for": "" })
 				left -= put
 	inventory_changed.emit()
-	item_received.emit(item, qty)
+	if notify:
+		item_received.emit(item, qty)
 	return true
 
 
 ## [13 ต.ค.] ได้ชิ้นส่วนมา (เนื้อเรื่อง · บทสอน · ของแถม · ชิ้นเก่าที่ถอดออก) → ยัดเข้าคลังทันที ไม่สนว่าอยู่ในบทสอน/มินิเกมหรือช่องเต็ม
 ## ช่องเกิน = คลังโชว์ตัวเลขสีแดง และซื้อของเพิ่มไม่ได้จนกว่าจะขาย/ใช้ออก · รับได้ทั้ง ItemDef หรือ id ไฟล์ใน Resources/Shop/
-func give_item(item_or_id: Variant, qty := 1) -> bool:
+func give_item(item_or_id: Variant, qty := 1, notify := true) -> bool:
 	var item: ItemDef = item_or_id as ItemDef if item_or_id is ItemDef else null
 	if item == null:
 		var p := "res://Resources/Shop/%s.tres" % String(item_or_id)
@@ -321,7 +337,28 @@ func give_item(item_or_id: Variant, qty := 1) -> bool:
 	if item == null:
 		push_warning("give_item: ไม่พบของ %s" % str(item_or_id))
 		return false
-	return add_item(item, qty, true)
+	return add_item(item, qty, true, notify)
+
+
+## ให้ชุดเริ่มต้น (ครั้งเดียว) · เรียกจากจบบทสอนประกอบคอม / เควสต์หลักเลยขั้นนั้นไปแล้ว (รวม Debug jump · เซฟเก่า)
+func ensure_starter_kit() -> void:
+	if story_flags.get(&"starter_kit", false):
+		return
+	story_flags[&"starter_kit"] = true
+	var names: Array[String] = []
+	for id in STARTER_KIT:
+		if give_item(id, int(STARTER_KIT[id]), false):
+			var it := load("res://Resources/Shop/%s.tres" % String(id)) as ItemDef
+			names.append(it.display_name.get_slice(" (", 0) if it else String(id))
+	if not names.is_empty():
+		inventory_note.emit("ได้ของติดตัวเข้าคลัง: " + ", ".join(names))
+
+
+func _on_quest_updated(id, event) -> void:
+	if not has_node(^"/root/EventManager") or id != EventManager.EventID.MAIN:
+		return
+	if event == null or event.isDone or int(event.currentTask) >= STARTER_KIT_AFTER_STEP:
+		ensure_starter_kit()
 
 
 ## จำนวนในคลัง (PART = ชิ้น · SUPPLY = ครั้ง)

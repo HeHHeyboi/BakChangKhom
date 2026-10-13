@@ -124,6 +124,8 @@ func _complete_quest(index: int) -> void:
 	if cur and cur.is_in_group("main_menu"):
 		cur.hide() # กดจากเมนูหลัก → ซ่อนเมนู
 	EventManager.complete_step(EventManager.EventID.MAIN, mini(index, ev.totalTask - 1))
+	if index >= GameState.STARTER_KIT_AFTER_STEP - 1:
+		GameState.ensure_starter_kit() # [13 ต.ค.] ข้ามบทสอนประกอบคอมไปแล้ว = ได้ของติดตัว
 	EventManager.showUI()
 	# ขั้นถัดไปอยู่ที่ไหน: คุยกับยาย/ไปร้าน = ในบ้าน · ที่เหลือ (ร้าน) · จบแล้ว = ร้าน (กระดานงาน)
 	var next: int = ev.currentTask
@@ -154,6 +156,7 @@ func _play_quest(index: int) -> void:
 
 
 func _start_shop_loop() -> void:
+	GameState.ensure_starter_kit()
 	DayLoop.force_active = true
 	SceneRouter.go(SceneRouter.ROOM)
 

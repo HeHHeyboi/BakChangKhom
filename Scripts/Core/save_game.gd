@@ -146,6 +146,9 @@ static func load_into() -> int:
 			EventManager.finish_event(EventManager.EventID.MAIN)
 		else:
 			EventManager.jump_event(EventManager.EventID.MAIN, int(q.get("task", 0)))
+		# [13 ต.ค.] เซฟเก่าที่เลยบทสอนประกอบคอมไปแล้ว แต่ยังไม่เคยได้ของติดตัว
+		if bool(q.get("done", false)) or int(q.get("task", 0)) >= GameState.STARTER_KIT_AFTER_STEP:
+			GameState.ensure_starter_kit()
 	var loc := int(d.get("location", SceneRouter.HOME))
 	return loc if SceneRouter.LOCATIONS.has(loc) else SceneRouter.HOME
 

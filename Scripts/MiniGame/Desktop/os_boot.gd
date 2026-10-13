@@ -75,7 +75,7 @@ func _next_stage() -> void:
 		0:
 			_run_logo()
 		1:
-			_run_login() if show_login else _finish()
+			_after_logo()
 		_:
 			_sign_in()
 
@@ -111,7 +111,14 @@ func _run_logo() -> void:
 	_tw = create_tween()
 	_tw.tween_property(logo, "modulate:a", 1.0, 0.35)
 	_tw.tween_interval(logo_seconds)
-	_tw.tween_callback(func(): _run_login() if show_login else _finish())
+	_tw.tween_callback(_after_logo)
+
+
+func _after_logo() -> void:
+	if show_login:
+		_run_login()
+	else:
+		_finish()
 
 
 func _run_login() -> void:
