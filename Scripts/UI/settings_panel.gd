@@ -13,6 +13,7 @@ signal closed
 @onready var fullscreen: CheckButton = %Fullscreen
 @onready var text_speed: HSlider = %TextSpeed
 @onready var text_speed_value: Label = %TextSpeedValue
+@onready var guide_mode: OptionButton = %GuideMode
 
 
 func _ready() -> void:
@@ -34,6 +35,7 @@ func _ready() -> void:
 	text_speed.value_changed.connect(func(v: float):
 		GameSettings.set_value("text_speed", v)
 		_refresh_labels())
+	guide_mode.item_selected.connect(func(i: int): GameSettings.set_value("guide_mode", guide_mode.get_item_id(i)))
 	%ResetButton.pressed.connect(func():
 		GameSettings.reset_defaults()
 		_load_values())
@@ -63,6 +65,7 @@ func _load_values() -> void:
 	sfx.set_value_no_signal(float(GameSettings.get_value("sfx_volume")) * 100.0)
 	fullscreen.set_pressed_no_signal(bool(GameSettings.get_value("fullscreen")))
 	text_speed.set_value_no_signal(float(GameSettings.get_value("text_speed")))
+	guide_mode.select(guide_mode.get_item_index(int(GameSettings.get_value("guide_mode"))))
 	_refresh_labels()
 
 

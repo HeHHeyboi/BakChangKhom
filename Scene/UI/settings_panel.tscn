@@ -30,9 +30,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -330.0
-offset_top = -260.0
+offset_top = -290.0
 offset_right = 330.0
-offset_bottom = 260.0
+offset_bottom = 290.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -157,6 +157,30 @@ custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "ปกติ"
 horizontal_alignment = 2
+
+[node name="GuideRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="Panel/VBox/GuideRow"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+tooltip_text = "อัตโนมัติ = งานที่เคยซ่อมผ่านแล้วจะไม่มีวงกลมชี้ ให้ลองเอง (เปิดสมุดคู่มือได้เสมอ)"
+mouse_filter = 1
+text = "ไกด์ในมินิเกม"
+
+[node name="GuideMode" type="OptionButton" parent="Panel/VBox/GuideRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "อัตโนมัติ (ซ่อมผ่านแล้ว = ปิด)"
+popup/item_0/id = 0
+popup/item_1/text = "เปิดตลอด"
+popup/item_1/id = 1
+popup/item_2/text = "ปิด"
+popup/item_2/id = 2
 
 [node name="Spacer" type="Control" parent="Panel/VBox"]
 layout_mode = 2

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_ram_ddr3_4gb_used.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 0
+emoji = ""
+condition = "used"
+uses = 0
+weekly_stock = 3
+unlock_rank = 0
+storage_slots_to = 0
+display_name = "แรม DDR3 4GB (มือสอง)"
+icon = ExtResource("2_icon")
+price = 250
+description = "ใช้กับเครื่องรุ่นเก่า (DDR3) · ร่องบากคนละตำแหน่งกับ DDR4 ใส่สลับกันไม่ได้"
+id = &"ram_ddr3_4gb_used"

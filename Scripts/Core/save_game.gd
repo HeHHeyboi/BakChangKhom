@@ -60,6 +60,11 @@ static func save() -> bool:
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
 		},
 		"quest": { "task": ev.currentTask if ev else 0, "done": ev.isDone if ev else false },
+		# [13 ต.ค.] คลังของ (STORAGE_SHOP_ECO)
+		"inventory": {
+			"slots": GameState.storage_slots, "items": GameState.inventory, "bought": GameState.shop_bought,
+			"week": GameState.shop_week, "upgrades": GameState.upgrades.keys().map(func(k): return String(k)),
+		},
 		"location": int(SceneRouter.current_id),
 	}
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
@@ -91,6 +96,20 @@ static func load_into() -> int:
 	GameState.debt = int(g.get("debt", 0))
 	GameState.village_fund = int(g.get("village_fund", 0))
 	GameState.ending = StringName(g.get("ending", ""))
+	var inv: Dictionary = d.get("inventory", { })
+	GameState.storage_slots = int(inv.get("slots", GameState.STORAGE_START))
+	for e in inv.get("items", []):
+		if e is Dictionary and ResourceLoader.exists(String(e.get("path", ""))):
+			GameState.inventory.append({
+				"id": StringName(e.get("id", "")), "path": String(e.path), "qty": int(e.get("qty", 1)),
+				"condition": String(e.get("condition", "")), "reserved_for": String(e.get("reserved_for", "")),
+			})
+	for k in inv.get("bought", { }):
+		GameState.shop_bought[StringName(k)] = int(inv.bought[k])
+	GameState.shop_week = int(inv.get("week", 0))
+	for k in inv.get("upgrades", []):
+		GameState.upgrades[StringName(k)] = true
+	GameState.inventory_changed.emit()
 	GameState.money_changed.emit(GameState.money, 0)
 	GameState.reputation_changed.emit(GameState.reputation, 0)
 

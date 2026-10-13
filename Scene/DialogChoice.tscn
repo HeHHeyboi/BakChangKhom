@@ -3,8 +3,11 @@
 [ext_resource type="Script" uid="uid://dqsmcb5pemarj" path="res://Scripts/DialogSystem/dialog_choice.gd" id="1_e2l0x"]
 
 [node name="DialogChoice" type="Button" unique_id=1580161417]
-offset_right = 308.0
-offset_bottom = 47.0
+custom_minimum_size = Vector2(600, 60)
+offset_right = 600.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 26
+autowrap_mode = 3
 script = ExtResource("1_e2l0x")
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

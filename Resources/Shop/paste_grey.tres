@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_paste_grey.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 1
+emoji = ""
+condition = "used"
+uses = 5
+weekly_stock = 0
+unlock_rank = 0
+storage_slots_to = 0
+display_name = "ซิลิโคนเทา (thermal paste)"
+icon = ExtResource("2_icon")
+price = 150
+description = "ทาระหว่างซีพียูกับฮีตซิงก์ ช่วยถ่ายความร้อน · นำความร้อนดีกว่าซิลิโคนขาว"
+id = &"paste_grey"

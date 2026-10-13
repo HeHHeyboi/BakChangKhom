@@ -361,6 +361,14 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 18
 text = "ฟังเสียงบี๊บอีกครั้ง"
 
+[node name="BeepTableButton" type="Button" parent="Quiz/Box"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "ไม่แน่ใจ? เปิดตารางรหัสเสียงบี๊บดู"
+theme_override_font_sizes/font_size = 18
+text = "📖 ดูตารางรหัสบี๊บ"
+
 [node name="Done" type="Button" parent="Quiz/Box"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2

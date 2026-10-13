@@ -83,12 +83,14 @@ const SAY_MORE_LINE := "ที่เหลือปิ๊บจดไว้ใ�
 
 func say(header: String, mood := PibHint.Mood.NORMAL) -> void:
 	var lines: Array = owner.dialog_dict.get(header, [])
-	if SAY_MAX_LINES > 0 and lines.size() > SAY_MAX_LINES and has_meta("rail_box"):
+	# [13 ต.ค.] ไกด์ปิด (เคยซ่อมผ่านแล้ว) → ปิ๊บพูด 1 บรรทัด ที่เหลือจดลงสมุด
+	var max_lines := SAY_MAX_LINES if _guide_on() else 1
+	if max_lines > 0 and lines.size() > max_lines and has_meta("rail_box"):
 		var extra := []
-		for t in lines.slice(SAY_MAX_LINES):
+		for t in lines.slice(max_lines):
 			extra.append(t.dialog if t is DialogToken else str(t))
 		PhaseUI.note(self, extra)
-		var shown := lines.slice(0, SAY_MAX_LINES)
+		var shown := lines.slice(0, max_lines)
 		shown.append(DialogToken.new(PibHint.DEFAULT_SPEAKER, SAY_MORE_LINE))
 		owner.pib.say(shown, mood)
 		return
@@ -115,6 +117,8 @@ func hint(target: Control, text := "คลิกตรงนี้", delay := 4.
 	if target == null:
 		return
 	set_meta("hint_target", target)
+	if not _guide_on(): # [13 ต.ค.] ไม่มีวงกลมชี้ในฉาก — สมุดคู่มือยังวาดวงกลมในภาพตัวอย่างให้
+		return
 	var tok := _hint_token
 	if delay > 0.0:
 		await wait(delay)
@@ -125,6 +129,10 @@ func hint(target: Control, text := "คลิกตรงนี้", delay := 4.
 	_hint_marker = GuideMarker.follow(self, stage(), target, text)
 	if target is Item2D:
 		_hint_marker.flip_below = (target as Item2D).hint_flip
+
+
+func _guide_on() -> bool:
+	return owner == null or not owner.has_method(&"guide_on") or owner.guide_on()
 
 
 func clear_hint() -> void:

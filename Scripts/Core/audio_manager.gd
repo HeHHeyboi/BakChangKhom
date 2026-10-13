@@ -8,7 +8,9 @@ extends Node
 
 const MUSIC := {
 	&"menu": "res://Assets/Audio/Music/bgm_menu.ogg",
-	&"village": "res://Assets/Audio/Music/bgm_village.ogg",
+	# [13 ต.ค.] เพลงหมู่บ้าน/ร้านเปลี่ยนเป็นแคนนำ (gen_audio.py song_khaen) · เพลงเดิม (โปงลาง) อยู่ที่ village_old
+	&"village": "res://Assets/Audio/Music/bgm_village_khaen.ogg",
+	&"village_old": "res://Assets/Audio/Music/bgm_village.ogg",
 	&"work": "res://Assets/Audio/Music/bgm_work.ogg",
 	&"demo_end": "res://Assets/Audio/Music/jingle_demo_end.ogg",
 }

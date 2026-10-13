@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_mouse_basic.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 0
+emoji = ""
+condition = "new"
+uses = 0
+weekly_stock = 3
+unlock_rank = 0
+storage_slots_to = 0
+display_name = "เมาส์ USB"
+icon = ExtResource("2_icon")
+price = 150
+description = "เมาส์ธรรมดา ราคาประหยัด"
+id = &"mouse_basic"

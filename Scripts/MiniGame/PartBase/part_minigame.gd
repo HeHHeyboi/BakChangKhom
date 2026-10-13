@@ -26,6 +26,11 @@ var _skip_btn: Button
 var _skip_armed := false
 ## จบมินิเกมไปแล้ว (กันส่ง minigame_finished ซ้ำ → เควสต์เดิน 2 ขั้น / เงินเข้า 2 ครั้ง)
 var _finished := false
+## [Claude 13 ต.ค. 2569] ปุ่ม "ยอมแพ้งานนี้" (Task Fail) ในงานลูกค้า — ปิดได้ต่อซีนใน Inspector
+@export var allow_give_up := true
+const GIVE_UP_SCENE := preload("res://Scene/MiniGame/PartBase/give_up_layer.tscn")
+## ผู้เล่นกดยอมแพ้ → คะแนน 0 · งานกลับขึ้นกระดานวันถัดไป (DayLoop)
+var gave_up := false
 
 
 func _ready() -> void:
@@ -46,7 +51,14 @@ func _ready() -> void:
 	_build_qte()
 	if skippable and not has_meta("work_order"):
 		_build_skip()
+	# ขมOS (DesktopMinigame) มีปุ่ม "ส่งงานตามสภาพ" ของตัวเอง (can_give_up) → ไม่ใส่ซ้ำ
+	if allow_give_up and has_meta("work_order") and not has_method(&"can_give_up"):
+		var gl := GIVE_UP_SCENE.instantiate()
+		add_child(gl)
+		gl.confirmed.connect(abandon_task)
 	_set_phase(_first_phase())
+	if not guide_on():
+		_say_try_yourself.call_deferred()
 	if OS.is_debug_build():
 		_debug_build_ui()
 
@@ -162,9 +174,42 @@ func skip() -> void:
 	_finish(false)
 
 
+## [13 ต.ค.] ยอมแพ้งานลูกค้า → หยุด phase/QTE · ส่งผล FAIL (คะแนน 0) ให้ GameState · ปิดมินิเกมตามปกติ
+func abandon_task() -> void:
+	if _finished:
+		return
+	gave_up = true
+	if qte:
+		qte.cancel()
+	if _phase_nodes.has(current_phase) and is_instance_valid(_phase_nodes[current_phase]):
+		_phase_nodes[current_phase].abort()
+	if is_instance_valid(pib):
+		pib.hide()
+	_finish(true)
+
+
 func _exit_tree() -> void:
 	if qte:
 		qte.cancel()
+
+
+## [13 ต.ค.] ไกด์ (วงกลมชี้ "คลิกตรงนี้" + ปิ๊บพูดยาว) เปิดไหม — playtest: งาน RAM วน 4–5 รอบแล้วไกด์ซ้ำจนไม่ได้คิดเอง
+## อัตโนมัติ: งานลูกค้าที่เคยซ่อม Part นี้ผ่านแล้ว = ปิด (เปิดสมุดคู่มือดูได้เสมอ) · Tutorial/เควสต์ = เปิด
+func guide_on() -> bool:
+	match int(GameSettings.get_value("guide_mode")):
+		GameSettings.GUIDE_ALWAYS:
+			return true
+		GameSettings.GUIDE_OFF:
+			return false
+	var gs := get_node_or_null(^"/root/GameState")
+	var id := part_id if part_id != &"" else StringName(scene_file_path.get_file().get_basename())
+	return not (has_meta("work_order") and gs and gs.has_cleared(id))
+
+
+func _say_try_yourself() -> void:
+	await get_tree().create_timer(0.6).timeout
+	if is_instance_valid(pib) and not _finished:
+		pib.toast(DialogToken.new(PibHint.DEFAULT_SPEAKER, "งานนี้เคยทำแล้ว ครั้งนี้ลองเองนะ! ติดตรงไหนแตะสมุดคู่มือมุมขวาบน"), 5.0, PibHint.Mood.NORMAL)
 
 
 ## ครั้งแรกที่ซ่อม Part นี้ผ่าน (ยังไม่เคยผ่าน) โซน QTE กว้าง 1.5 เท่า · Docs/CORE_PART_QTE.md ข้อ 1
@@ -193,11 +238,13 @@ func _report_repair() -> void:
 		level = order.level
 		if order.part_id != String(id):
 			push_warning("%s: งานลูกค้า %s เป็น %s แต่มินิเกมนี้คือ %s" % [name, order.id, order.part_id, id])
-	gs.record_repair(id, final_score(), repair_damaged(), fee, level)
+	gs.record_repair(id, final_score(), repair_damaged(), fee, level, gave_up)
 
 
 ## คะแนน 0–100 จาก phase สุดท้าย (SUMMARY มี var total) · ไม่มี = คิดจาก _mistakes
 func final_score() -> int:
+	if gave_up:
+		return 0
 	var last = _phase_nodes.get(_last_phase())
 	if is_instance_valid(last) and "total" in last:
 		return clampi(int(last.total), 0, 100)

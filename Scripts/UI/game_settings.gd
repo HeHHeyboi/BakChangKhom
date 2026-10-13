@@ -11,7 +11,11 @@ const DEFAULTS := {
 	"sfx_volume": 0.8, # 0..1 (บัส SFX)
 	"fullscreen": false,
 	"text_speed": 45.0, # ตัวอักษร/วินาที ของกล่องข้อความปิ๊บ (PibHint)
+	"guide_mode": 0, # [13 ต.ค.] ไกด์ในมินิเกม: 0 อัตโนมัติ (เคยซ่อมผ่านแล้ว = ปิด) · 1 เปิดตลอด · 2 ปิด
 }
+const GUIDE_AUTO := 0
+const GUIDE_ALWAYS := 1
+const GUIDE_OFF := 2
 const TEXT_SPEED_MIN := 15.0
 const TEXT_SPEED_MAX := 120.0
 

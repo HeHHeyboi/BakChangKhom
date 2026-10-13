@@ -49,6 +49,10 @@ func _ready() -> void:
 	psu_switch.pressed.connect(_on_psu)
 	power_button.pressed.connect(_on_power)
 	replay_button.pressed.connect(play_beep)
+	# [13 ต.ค.] ตารางรหัสบี๊บ (Scene/UI/beep_table.tscn) — บางคนไม่รู้ว่าบี๊บแต่ละแบบแปลว่าอะไร
+	var bt := get_node_or_null(^"Quiz/Box/BeepTableButton") as Button
+	if bt:
+		bt.pressed.connect(func(): BeepTable.open_over(self))
 	done_button.pressed.connect(finish)
 	for b in answers.get_children():
 		if b is Button:

@@ -106,6 +106,23 @@ var debt := 0
 ## เงินที่ล้น MONEY_CAP
 var village_fund := 0
 
+# ---- คลังของ (Docs/STORAGE_SHOP_ECO.md ข้อ 1) [Claude 13 ต.ค. 2569]
+signal inventory_changed
+## [13 ต.ค.] ได้ของเข้าคลัง (ซื้อ · ได้จากเนื้อเรื่อง/บทสอน · ชิ้นเก่าจากงานซ่อม) → Storage โชว์ป้าย "ได้ … เข้าคลัง"
+signal item_received(item: ItemDef, qty: int)
+const STORAGE_START := 8
+const SUPPLY_STACK_MAX := 99
+## ช่องคลังทั้งหมด (อัปเกรดด้วย ItemDef UPGRADE)
+var storage_slots := STORAGE_START
+## ของในคลัง 1 รายการ = 1 ช่อง: { id, path, qty, condition, reserved_for }
+##   PART qty = 1 เสมอ · SUPPLY qty = จำนวนครั้งที่เหลือ (≤ SUPPLY_STACK_MAX)
+var inventory: Array[Dictionary] = []
+## ร้านขายไปแล้วกี่ชิ้นในสัปดาห์ shop_week (สต็อกร้าน)
+var shop_bought: Dictionary = { }
+var shop_week := 0
+## อัปเกรดที่ซื้อแล้ว (id → true)
+var upgrades: Dictionary = { }
+
 
 func _ready() -> void:
 	economy = load(ECONOMY_PATH) as EconomyConfig
@@ -126,6 +143,12 @@ func reset() -> void:
 	level_stars.clear()
 	debt = 0
 	village_fund = 0
+	storage_slots = STORAGE_START
+	inventory.clear()
+	shop_bought.clear()
+	shop_week = 0
+	upgrades.clear()
+	inventory_changed.emit()
 	money_changed.emit(money, 0)
 	reputation_changed.emit(reputation, 0)
 
@@ -225,12 +248,192 @@ func level_unlocked(level: int) -> bool:
 func can_afford(cost: int) -> bool:
 	return money >= cost
 
+# ---------------------------------------------------------------- คลังของ + ซื้อของ
+
+
+func used_slots() -> int:
+	return inventory.size()
+
+
+func free_slots() -> int:
+	return maxi(storage_slots - inventory.size(), 0)
+
+
+## ItemDef ของรายการในคลัง
+func item_of(entry: Dictionary) -> ItemDef:
+	var p := String(entry.get("path", ""))
+	return load(p) as ItemDef if p != "" and ResourceLoader.exists(p) else null
+
+
+## ต้องใช้ช่องเพิ่มกี่ช่องถ้าเก็บ item × qty
+func slots_needed(item: ItemDef, qty := 1) -> int:
+	if item == null or item.kind == ItemDef.Kind.UPGRADE:
+		return 0
+	if item.kind == ItemDef.Kind.PART:
+		return qty
+	var add := item.uses * qty
+	for e in inventory:
+		if e.id == item.id:
+			add -= SUPPLY_STACK_MAX - int(e.qty)
+	return maxi(ceili(add / float(SUPPLY_STACK_MAX)), 0)
+
+
+func can_store(item: ItemDef, qty := 1) -> bool:
+	return slots_needed(item, qty) <= free_slots()
+
+
+## เก็บเข้าคลัง (ไม่หักเงิน) · ช่องไม่พอ = false · force = ยัดเข้าไปเลยแม้ช่องเต็ม (ใช้กับ give_item)
+func add_item(item: ItemDef, qty := 1, force := false) -> bool:
+	if item == null or (not force and not can_store(item, qty)):
+		return false
+	match item.kind:
+		ItemDef.Kind.UPGRADE:
+			upgrades[item.id] = true
+			storage_slots = maxi(storage_slots, item.storage_slots_to)
+		ItemDef.Kind.PART:
+			for i in qty:
+				inventory.append({ "id": item.id, "path": item.resource_path, "qty": 1, "condition": item.condition, "reserved_for": "" })
+		ItemDef.Kind.SUPPLY:
+			var left := item.uses * qty
+			for e in inventory:
+				if left <= 0:
+					break
+				if e.id == item.id and int(e.qty) < SUPPLY_STACK_MAX:
+					var put := mini(SUPPLY_STACK_MAX - int(e.qty), left)
+					e.qty = int(e.qty) + put
+					left -= put
+			while left > 0:
+				var put := mini(SUPPLY_STACK_MAX, left)
+				inventory.append({ "id": item.id, "path": item.resource_path, "qty": put, "condition": "", "reserved_for": "" })
+				left -= put
+	inventory_changed.emit()
+	item_received.emit(item, qty)
+	return true
+
+
+## [13 ต.ค.] ได้ชิ้นส่วนมา (เนื้อเรื่อง · บทสอน · ของแถม · ชิ้นเก่าที่ถอดออก) → ยัดเข้าคลังทันที ไม่สนว่าอยู่ในบทสอน/มินิเกมหรือช่องเต็ม
+## ช่องเกิน = คลังโชว์ตัวเลขสีแดง และซื้อของเพิ่มไม่ได้จนกว่าจะขาย/ใช้ออก · รับได้ทั้ง ItemDef หรือ id ไฟล์ใน Resources/Shop/
+func give_item(item_or_id: Variant, qty := 1) -> bool:
+	var item: ItemDef = item_or_id as ItemDef if item_or_id is ItemDef else null
+	if item == null:
+		var p := "res://Resources/Shop/%s.tres" % String(item_or_id)
+		item = load(p) as ItemDef if ResourceLoader.exists(p) else null
+	if item == null:
+		push_warning("give_item: ไม่พบของ %s" % str(item_or_id))
+		return false
+	return add_item(item, qty, true)
+
+
+## จำนวนในคลัง (PART = ชิ้น · SUPPLY = ครั้ง)
+func count_item(id: StringName) -> int:
+	var n := 0
+	for e in inventory:
+		if e.id == id:
+			n += int(e.qty)
+	return n
+
+
+## ใช้/หยิบออก (PART = ชิ้น · SUPPLY = ครั้ง) · ข้ามชิ้นที่จองไว้ให้งานอื่น · ไม่พอ = false (ไม่หักอะไรเลย)
+func take_item(id: StringName, qty := 1) -> bool:
+	var free := 0
+	for e in inventory:
+		if e.id == id and String(e.reserved_for) == "":
+			free += int(e.qty)
+	if free < qty:
+		return false
+	for i in range(inventory.size() - 1, -1, -1):
+		if qty <= 0:
+			break
+		var e: Dictionary = inventory[i]
+		if e.id != id or String(e.reserved_for) != "":
+			continue
+		var t := mini(int(e.qty), qty)
+		e.qty = int(e.qty) - t
+		qty -= t
+		if int(e.qty) <= 0:
+			inventory.remove_at(i)
+	inventory_changed.emit()
+	return true
+
+
+## ราคาขายคืนของช่องนี้ (อะไหล่มือสอง 50% · ใหม่ 80% · ของสิ้นเปลือง 0 = ทิ้งได้อย่างเดียว)
+func sell_price(index: int) -> int:
+	if index < 0 or index >= inventory.size():
+		return 0
+	var e := inventory[index]
+	var it := item_of(e)
+	if it == null or it.kind != ItemDef.Kind.PART:
+		return 0
+	return roundi(it.price * (0.8 if String(e.condition) == "new" else 0.5))
+
+
+## ขายคืน/ทิ้งของในช่อง index · ของที่จองไว้ขายไม่ได้ · คืนเงินที่ได้ (-1 = ทำไม่ได้)
+func sell_back(index: int) -> int:
+	if index < 0 or index >= inventory.size() or String(inventory[index].reserved_for) != "":
+		return -1
+	var got := sell_price(index)
+	inventory.remove_at(index)
+	if got > 0:
+		add_money(got)
+	inventory_changed.emit()
+	return got
+
+
+func _shop_week_now() -> int:
+	var ts = EventManager.time_system if has_node(^"/root/EventManager") else null
+	return ts.week() if ts else 1
+
+
+## ร้านเหลือของชิ้นนี้กี่ชิ้นสัปดาห์นี้ (-1 = ไม่จำกัด)
+func stock_left(item: ItemDef) -> int:
+	if item.weekly_stock <= 0:
+		return -1
+	var w := _shop_week_now()
+	if w != shop_week:
+		shop_week = w
+		shop_bought.clear()
+	return maxi(item.weekly_stock - int(shop_bought.get(item.id, 0)), 0)
+
+
+## ซื้อไม่ได้เพราะอะไร ("" = ซื้อได้)
+func buy_block_reason(item: ItemDef, qty := 1) -> String:
+	if item == null or qty <= 0:
+		return "เลือกจำนวนก่อน"
+	if item.kind == ItemDef.Kind.UPGRADE and (upgrades.has(item.id) or storage_slots >= item.storage_slots_to):
+		return "มีแล้ว"
+	if rank() < item.unlock_rank:
+		var e := economy if economy else EconomyConfig.new()
+		return "ล็อก · ต้องเป็น%s" % e.rank_names[clampi(item.unlock_rank, 0, e.rank_names.size() - 1)]
+	var left := stock_left(item)
+	if left == 0:
+		return "ของหมด (มาใหม่สัปดาห์หน้า)"
+	if left > 0 and qty > left:
+		return "ร้านเหลือแค่ %d" % left
+	if not can_afford(item.price * qty):
+		return "เงินไม่พอ"
+	if not can_store(item, qty):
+		return "คลังเต็ม %d/%d" % [used_slots(), storage_slots]
+	return ""
+
+
+## ซื้อ: หักเงิน + เข้าคลัง · คืนข้อความเหตุผลถ้าซื้อไม่ได้ ("" = สำเร็จ)
+func buy(item: ItemDef, qty := 1) -> String:
+	var why := buy_block_reason(item, qty)
+	if why != "":
+		return why
+	add_money(-item.price * qty)
+	add_item(item, qty)
+	if item.weekly_stock > 0:
+		shop_bought[item.id] = int(shop_bought.get(item.id, 0)) + qty
+	return ""
+
 # ---------------------------------------------------------------- ผลงานซ่อม
 
 
 ## เรียกจาก PartMinigame ตอนจบงานลูกค้า · score 0–100 จากหน้า SUMMARY · damaged = ทำของลูกค้าเสีย · fee −1 = ใช้ค่าจาก economy
 ## level 1–5 = ค่าแรงฐาน/XP ตามระดับ (LEVEL_DESIGN ข้อ 2) · 0 = แบบเดิม (repair_fee ต่อ Part)
-func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1, level := 0) -> Dictionary:
+## gave_up = ผู้เล่นกด "ยอมแพ้งานนี้" (Task Fail · STORAGE_SHOP_ECO 3.4) — ผลเหมือนไม่ผ่าน + DayLoop เอางานกลับขึ้นกระดานวันถัดไป
+func record_repair(part_id: StringName, score: int, damaged := false, fee_override := -1, level := 0, gave_up := false) -> Dictionary:
 	var e := economy
 	if e == null:
 		e = EconomyConfig.new()
@@ -290,6 +493,7 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 		"damaged": damaged,
 		"level": level,
 		"reputation": rep,
+		"gave_up": gave_up,
 	}
 	repair_recorded.emit(result)
 	# [9 ต.ค.] เวลาไม่เดินที่นี่แล้ว — DayLoop เดินนาฬิกาตามช่องของงาน (LEVEL_DESIGN 4.2)

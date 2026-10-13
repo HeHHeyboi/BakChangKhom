@@ -45,8 +45,8 @@ def pluck(freq, dur, bright=0.5, decay=0.996):
     return out * 0.6
 
 
-def khaen(freqs, dur, vol=0.18):
-    """แคน: ลิ้นเสียง (ฮาร์มอนิกคี่ + คู่จาง ๆ) เสียงลมหายใจ ค่อย ๆ ดัง"""
+def khaen(freqs, dur, vol=0.18, att=0.25, rel=0.35):
+    """แคน: ลิ้นเสียง (ฮาร์มอนิกคี่ + คู่จาง ๆ) เสียงลมหายใจ ค่อย ๆ ดัง · att/rel สั้นลง = เป่าเป็นโน้ตทำนอง"""
     n = int(dur * SR)
     t = np.arange(n) / SR
     out = np.zeros(n)
@@ -57,7 +57,7 @@ def khaen(freqs, dur, vol=0.18):
             out += a * np.sin(h * ph) / len(freqs)
     breath = np.convolve(rng.normal(0, 1, n), np.ones(30) / 30, mode="same") * 0.05
     swell = 0.75 + 0.25 * np.sin(2 * math.pi * t / max(dur, 0.1) * 1.0 - math.pi / 2) ** 2
-    return (out + breath) * env_adsr(n, 0.25, 0.1, 0.9, 0.35) * swell * vol
+    return (out + breath) * env_adsr(n, att, 0.1, 0.9, min(rel, dur * 0.4)) * swell * vol
 
 
 def ranat(freq, dur, vol=0.35):
@@ -335,12 +335,68 @@ def beep_set():
         save("Sfx/Beep/beep_" + k, beep_pattern(code, 1 if k == "ok" else 2, 0.9))
 
 
+# ---------------------------------------------------------------- [13 ต.ค.] เพลงหมู่บ้าน/ร้าน "ลายแคนเช้าวันใหม่" — แคนนำทั้งเพลง
+# แบบลายใหญ่/ลายเต้ย: แคนเสียงยืน (โดรน A–E) ตลอด + แคนเป่าทำนองเพนทาโทนิก A C D E G มีลูกสะบัด (ขยิบนิ้วโน้ตสั้นนำ)
+# พิณดีดเบสเดินจังหวะ · กลองยาว + ฉิ่งฉับ · เกราะไม้ · 104 bpm · 16 ห้อง วนลูปได้
+def song_khaen():
+    bpm, bars = 104, 16
+    beat = 60 / bpm
+    L = bars * 4 * beat
+    tail = int(2.5 * SR)
+    buf = np.zeros(int(L * SR) + tail)
+    # โดรนแคน (เสียงยืน) — เปลี่ยนน้ำหนักทุก 4 ห้องให้หายใจ
+    for b in range(0, bars, 4):
+        add(buf, khaen([midi(45), midi(52), midi(57)], 4 * 4 * beat + 0.4, 0.13, att=0.4, rel=0.5), b * 4 * beat)
+    # ทำนองแคน (โน้ต, ความยาวเป็นเขบ็ต 1 ชั้น) · 0 = พักหายใจ · 8 ห้อง แล้วเล่นซ้ำคู่แปดต่ำ+สูงผสม
+    mel = [(69, 1), (72, 1), (74, 2), (76, 2), (74, 1), (72, 1), (74, 4), (0, 4),
+           (76, 1), (79, 1), (81, 2), (79, 1), (76, 1), (74, 2), (76, 4), (0, 4),
+           (72, 1), (74, 1), (76, 1), (74, 1), (72, 2), (69, 2), (67, 2), (69, 2), (72, 4),
+           (74, 2), (72, 1), (69, 1), (67, 2), (64, 2), (69, 8)]
+    for rep in range(2):
+        t = rep * 8 * 4 * beat
+        for n, d in mel:
+            dur = d * beat / 2
+            if n:
+                # ลูกสะบัดแบบแคน: โน้ตเหนือขึ้นไป 1 ขั้นสั้น ๆ ก่อนตัวจริง (เฉพาะโน้ตยาว)
+                if d >= 2:
+                    grace = n + (3 if n % 12 in (9, 4) else 2)
+                    add(buf, khaen([midi(grace)], 0.07, 0.16, att=0.01, rel=0.02), t - 0.05)
+                vol = 0.24 if rep == 0 else 0.2
+                add(buf, khaen([midi(n)], dur + 0.05, vol, att=0.025, rel=0.06), t)
+                if rep == 1:
+                    add(buf, khaen([midi(n - 12)], dur + 0.05, 0.09, att=0.03, rel=0.06), t)
+            t += dur
+    # พิณ: เบสเดิน A–E สลับ (จังหวะ 1 และ 3) + เขี่ยสายเปิดเบา ๆ
+    roots = [45, 45, 43, 45, 45, 45, 43, 40, 45, 45, 43, 45, 48, 47, 45, 45]
+    for b, r in enumerate(roots):
+        add(buf, pluck(midi(r), 0.7, decay=0.994) * 0.9, (b * 4) * beat)
+        add(buf, pluck(midi(r + 7), 0.5, decay=0.993) * 0.6, (b * 4 + 2) * beat)
+        add(buf, pluck(midi(r + 12), 0.3, decay=0.99) * 0.35, (b * 4 + 3.5) * beat)
+    # กลองยาว: ตุ้ม (1) ตุ้ม-ตุ้ม (2.5 3) · ฉิ่ง (2 เปิด · 4 ปิด) · เกราะไม้ขัดจังหวะ
+    for b in range(bars):
+        if b < 1:
+            continue  # ห้องแรกแคนนำเดี่ยว
+        add(buf, drum(0.45, 0.42), (b * 4) * beat)
+        add(buf, drum(0.3, 0.25), (b * 4 + 2.5) * beat)
+        add(buf, drum(0.3, 0.3), (b * 4 + 3) * beat)
+        add(buf, ching(0.9, True, 0.05), (b * 4 + 1) * beat)
+        add(buf, ching(0.2, False, 0.05), (b * 4 + 3) * beat)
+        for k in (0.5, 1.5, 2.5, 3.5):
+            add(buf, wood(0.1, 1200, 0.07), (b * 4 + k) * beat)
+    x = echo(buf, 0.25, 0.25, 0.2)
+    save("Music/bgm_village_khaen", loop_wrap(x, tail), 0.3)
+
+
+if len(sys.argv) > 2 and sys.argv[2] == "khaen":
+    song_khaen()
+    sys.exit()
 if len(sys.argv) > 2 and sys.argv[2] == "beep":
     beep_ram()
     beep_set()
     sys.exit()
 song_menu()
 song_village()
+song_khaen()
 song_work()
 jingle_demo()
 sfx()

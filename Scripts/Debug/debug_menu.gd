@@ -17,8 +17,9 @@ func _ready() -> void:
 	# [Claude 10 ต.ค. 2569] เควสต์หลัก: กดแล้วขั้นนั้น "เสร็จ" (รวมขั้นก่อนหน้า) → ไปขั้นถัดไป · บันทึกเกมให้ด้วย
 	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
 	if ev:
+		# [13 ต.ค.] กดแล้วกระโดดไปเล่นขั้นนั้นเลย: ไปฉากของขั้นนั้น + เปิดบทพูด/มินิเกม/บทสอนของขั้นนั้นทันที (ขั้นก่อนหน้านับว่าเสร็จ)
 		for i in ev.totalTask:
-			jump_points.append({ "label": "✓ เควสต์ %d เสร็จ: %s" % [i + 1, ev._tasks[i].quest_text_th], "call": _complete_quest.bind(i) })
+			jump_points.append({ "label": "▶ เควสต์ %d: %s" % [i + 1, ev._tasks[i].quest_text_th], "call": _play_quest.bind(i) })
 	jump_points.append({ "label": "✓ จบเควสต์หลักทั้งหมด → เริ่มลูปร้าน", "call": _complete_quest.bind(999) })
 	jump_points += [
 		{
@@ -128,6 +129,28 @@ func _complete_quest(index: int) -> void:
 	var next: int = ev.currentTask
 	await SceneRouter.go(SceneRouter.HOME if (not ev.isDone and next <= 1) else SceneRouter.ROOM)
 	SaveGame.save() # บันทึกตรง ๆ (autosave อาจข้ามถ้าลูปร้านเปิดบทพักทันที)
+
+
+## [13 ต.ค.] กระโดดไปขั้น index ของเควสต์หลักแล้วเล่นขั้นนั้นทันที (ไม่ต้องเดินไปกด ! เอง) · จบขั้นแล้วเควสต์เดินต่อตามปกติ
+func _play_quest(index: int) -> void:
+	if Global.isInMinigame() or DialogScene.visible:
+		return
+	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
+	if ev == null:
+		return
+	Global.on_start = false
+	EventManager.tutorial.hide()
+	var cur := get_tree().current_scene
+	if cur and cur.is_in_group("main_menu"):
+		cur.hide()
+	EventManager.jump_event(EventManager.EventID.MAIN, index)
+	# ขั้น 1–2 (คุยกับยาย · ไปร้าน) อยู่ในบ้าน · ที่เหลืออยู่ในร้าน
+	await SceneRouter.go(SceneRouter.HOME if index <= 1 else SceneRouter.ROOM)
+	EventManager.showUI()
+	var step = ev.get_task()
+	if step:
+		EventManager._process_data(EventManager.EventID.MAIN, step)
+	SaveGame.save()
 
 
 func _start_shop_loop() -> void:

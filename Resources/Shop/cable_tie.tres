@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_cable_tie.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 1
+emoji = ""
+condition = "used"
+uses = 20
+weekly_stock = 0
+unlock_rank = 0
+storage_slots_to = 0
+display_name = "เคเบิลไท"
+icon = ExtResource("2_icon")
+price = 20
+description = "มัดสายในเคสให้เรียบร้อย ลมไหลสะดวก"
+id = &"cable_tie"

@@ -92,6 +92,9 @@ var ot_this_week := 0
 var walkouts: PackedStringArray = []
 var _ot_this_shift := false
 var _result_pending := false
+## [13 ต.ค.] งานที่ยอมแพ้ → ขึ้นกระดานใหม่ต้นกะถัดไป · _retried = เคยให้ลองใหม่แล้ว (ให้ครั้งเดียว)
+var retry_cases: Array[CustomerCase] = []
+var _retried: Array[CustomerCase] = []
 var _close_requested := false
 var _parts_seen: Dictionary = { } # part_id → true (ครั้งแรกใช้เวลา +1 ช่อง)
 var _last_bill: Dictionary = { }
@@ -331,6 +334,10 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	forced_case = fc if fc and fc.forced else null
 	if fc and not fc.forced and not _on_board(fc):
 		board.append({ "case": fc, "due_shift": ts.shift + fc.due_shifts, "phone": false })
+	for rc in retry_cases:
+		if rc and not _on_board(rc):
+			board.append({ "case": rc, "due_shift": ts.shift + rc.due_shifts, "phone": false, "retry": true })
+	retry_cases.clear()
 	add_jobs(_econ().month_value(_econ().board_new_per_shift, ts.month()))
 	_board_dirty = true
 	autosave.call_deferred()
@@ -370,6 +377,10 @@ func _on_game_ended() -> void:
 
 func _on_repair_recorded(result: Dictionary) -> void:
 	var c := today_case
+	# [13 ต.ค.] ยอมแพ้งาน → ลูกค้าเอาเครื่องกลับมาให้ลองใหม่วันถัดไป 1 ครั้ง (งานเนื้อเรื่อง forced ไม่วนซ้ำ)
+	if c and result.get("gave_up", false) and not c.forced and not _retried.has(c):
+		_retried.append(c)
+		retry_cases.append(c)
 	if c:
 		var ts := _ts()
 		if ts:
@@ -775,6 +786,8 @@ func _reset_run() -> void:
 	_pending_summary_week = 0
 	week_results.clear()
 	board.clear()
+	retry_cases.clear()
+	_retried.clear()
 	walkouts.clear()
 	_parts_seen.clear()
 	_last_bill = { }
@@ -943,6 +956,9 @@ func _show_card(card: Card) -> void:
 				int(r.get("xp", 0)),
 				quote,
 			]
+			if r.get("gave_up", false):
+				_title.text = "Task Fail · ส่งเครื่องคืนตามสภาพ"
+				_body.text += "\n\nไม่เป็นไรนะ! ลูกค้าจะเอาเครื่องกลับมาให้ลองใหม่วันพรุ่งนี้" if c and not c.forced else ""
 			_primary.text = "กลับกระดานงาน"
 		Card.SHIFT_END:
 			var earned := GameState.money - shift_start_money

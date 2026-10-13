@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_storage_shelf.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 2
+emoji = ""
+condition = "used"
+uses = 0
+weekly_stock = 0
+unlock_rank = 0
+storage_slots_to = 14
+display_name = "ชั้นเหล็กเก็บอะไหล่"
+icon = ExtResource("2_icon")
+price = 800
+description = "ขยายคลังจาก 8 เป็น 14 ช่อง · ซื้อครั้งเดียวใช้ตลอด"
+id = &"storage_shelf"

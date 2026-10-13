@@ -594,6 +594,19 @@ static func open_book(phase: Control) -> void:
 	close.position = Vector2((BOOK_SIZE.x - 160) / 2, BOOK_SIZE.y - 66)
 	close.pressed.connect(root.queue_free)
 	page.add_child(close)
+	# [13 ต.ค.] ปุ่มเปิดตารางรหัสบี๊บจากสมุดคู่มือ (Scene/UI/beep_table.tscn)
+	var beep := Button.new()
+	beep.text = "🔊 ตารางบี๊บ"
+	beep.focus_mode = Control.FOCUS_NONE
+	beep.add_theme_font_size_override("font_size", 18)
+	beep.add_theme_color_override("font_color", COL_PAPER)
+	beep.add_theme_stylebox_override("normal", cb)
+	beep.add_theme_stylebox_override("hover", cb)
+	beep.add_theme_stylebox_override("pressed", cb)
+	beep.size = Vector2(150, 48)
+	beep.position = Vector2(24, BOOK_SIZE.y - 66)
+	beep.pressed.connect(func(): BeepTable.open_over(page))
+	page.add_child(beep)
 	root.modulate.a = 0.0
 	phase.create_tween().tween_property(root, "modulate:a", 1.0, 0.15)
 

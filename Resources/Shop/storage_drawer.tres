@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_storage_drawer.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 2
+emoji = ""
+condition = "used"
+uses = 0
+weekly_stock = 0
+unlock_rank = 1
+storage_slots_to = 24
+display_name = "ตู้ลิ้นชักแยกชิ้น"
+icon = ExtResource("2_icon")
+price = 2000
+description = "ขยายคลังเป็น 24 ช่อง · ปลดเมื่อเป็นช่างฝึกหัด"
+id = &"storage_drawer"

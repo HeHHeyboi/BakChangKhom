@@ -818,73 +818,30 @@ func _build_ui() -> void:
 # ---------------------------------------------------------------- จอบูต (โหนดเดียวกับ OS)
 
 
+## [13 ต.ค.] จอบูตแบบคอมจริง (POST → โลโก้ + จุดหมุน → หน้าลงชื่อเข้าใช้) = โหนด "Boot" ใน desktop_window.tscn
+## (instance ของ Scene/MiniGame/Desktop/os_boot.tscn · Editable Children เปิดไว้ → แก้ข้อความ/ขนาดตัวหนังสือใน Inspector ได้)
+## ตอนเริ่มย้ายเข้าไปอยู่ในจอ (Screen) ให้ย่อตามกรอบจอ · ไม่มีโหนดนี้ = สร้างจากซีนแทน
+const BOOT_SCENE := preload("res://Scene/MiniGame/Desktop/os_boot.tscn")
+
+
 func _build_boot() -> void:
 	is_booting = true
 	if has_node(^"/root/Audio"):
 		get_node(^"/root/Audio").sfx(&"boot")
-	_boot = Control.new()
-	_boot.name = "Boot"
-	_boot.size = SCREEN
-	_boot.mouse_filter = Control.MOUSE_FILTER_STOP
-	_boot.gui_input.connect(func(e: InputEvent):
-		if e is InputEventMouseButton and e.pressed:
-			skip_boot())
-	_ui.add_child(_boot)
-	var black := ColorRect.new()
-	black.color = Color(0.02, 0.02, 0.03)
-	black.size = SCREEN
-	black.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_boot.add_child(black)
-	var post := _label("", 26, Color(0.75, 0.95, 0.75))
-	post.name = "Post"
-	post.position = Vector2(70, 60)
-	_boot.add_child(post)
-	var logo := Control.new()
-	logo.name = "Logo"
-	logo.size = SCREEN
-	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	logo.modulate.a = 0.0
-	_boot.add_child(logo)
-	var icon := TextureRect.new()
-	icon.texture = TEX_START
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size = Vector2(150, 150)
-	icon.position = Vector2((SCREEN.x - 150) / 2.0, 170)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	logo.add_child(icon)
-	var title := _label("ขมOS", 54, Color.WHITE)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.size = Vector2(SCREEN.x, 70)
-	title.position = Vector2(0, 330)
-	logo.add_child(title)
-	var bar_bg := ColorRect.new()
-	bar_bg.color = Color(1, 1, 1, 0.15)
-	bar_bg.size = Vector2(320, 10)
-	bar_bg.position = Vector2((SCREEN.x - 320) / 2.0, 430)
-	bar_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	logo.add_child(bar_bg)
-	var bar := ColorRect.new()
-	bar.name = "Bar"
-	bar.color = Color(1.0, 0.75, 0.35)
-	bar.size = Vector2(0, 10)
-	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar_bg.add_child(bar)
-	var hint := _label("คลิกเพื่อข้าม", 18, Color(1, 1, 1, 0.35))
-	hint.position = Vector2(SCREEN.x - 150, SCREEN.y - 40)
-	_boot.add_child(hint)
-
-	_boot_tw = create_tween()
-	_boot_tw.tween_interval(0.35)
-	for line in BOOT_LINES:
-		_boot_tw.tween_callback(func(): post.text += ("\n" if post.text != "" else "") + line)
-		_boot_tw.tween_interval(0.22)
-	_boot_tw.tween_interval(0.25)
-	_boot_tw.tween_property(post, "modulate:a", 0.0, 0.2)
-	_boot_tw.tween_property(logo, "modulate:a", 1.0, 0.3)
-	_boot_tw.tween_property(bar, "size:x", 320.0, 1.0).set_trans(Tween.TRANS_SINE)
-	_boot_tw.tween_property(_boot, "modulate:a", 0.0, 0.35)
-	_boot_tw.tween_callback(_end_boot)
+	var b := get_node_or_null(^"Boot") as OsBoot
+	if b == null:
+		b = BOOT_SCENE.instantiate() as OsBoot
+		_ui.add_child(b)
+	else:
+		b.reparent(_ui, false)
+	b.position = Vector2.ZERO
+	b.size = SCREEN
+	# tour (หลังประกอบคอมใน Tutorial) / คอมในร้าน = โชว์หน้าลงชื่อเข้าใช้ · งานลูกค้า = ไม่ต้อง (เปิดบ่อย ไม่อยากให้รอนาน)
+	b.show_login = tour_mode or free_mode
+	if not b.finished.is_connected(_end_boot):
+		b.finished.connect(_end_boot)
+	_boot = b
+	b.play()
 
 
 ## ข้ามจอบูต (คลิก หรือเรียกจากเทสต์)
@@ -893,6 +850,8 @@ func skip_boot() -> void:
 		return
 	if _boot_tw and _boot_tw.is_valid():
 		_boot_tw.kill()
+	if is_instance_valid(_boot) and _boot is OsBoot:
+		(_boot as OsBoot).skip_all() # ยิง finished → _end_boot
 	_end_boot()
 
 

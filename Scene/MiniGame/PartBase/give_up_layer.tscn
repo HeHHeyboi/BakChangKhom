@@ -1,0 +1,94 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/MiniGame/PartBase/give_up_layer.gd" id="1_gu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dim"]
+bg_color = Color(0, 0, 0, 0.55)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.99, 0.95, 0.86, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.45, 0.28, 0.16, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 28.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 22.0
+
+[node name="GiveUpLayer" type="CanvasLayer"]
+layer = 36
+script = ExtResource("1_gu")
+
+[node name="GiveUpButton" type="Button" parent="."]
+unique_name_in_owner = true
+offset_left = 920.0
+offset_top = 8.0
+offset_right = 1084.0
+offset_bottom = 48.0
+focus_mode = 0
+tooltip_text = "ทำต่อไม่ได้แล้ว? ส่งเครื่องคืนลูกค้า (งานไม่ผ่าน · ได้ XP บางส่วน)"
+theme_override_font_sizes/font_size = 18
+text = "ยอมแพ้งานนี้"
+
+[node name="Confirm" type="Panel" parent="."]
+unique_name_in_owner = true
+offset_right = 1152.0
+offset_bottom = 648.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dim")
+
+[node name="Card" type="PanelContainer" parent="Confirm"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -130.0
+offset_right = 260.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="Box" type="VBoxContainer" parent="Confirm/Card"]
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Confirm/Card/Box"]
+theme_override_colors/font_color = Color(0.45, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 28
+text = "ยอมแพ้งานนี้?"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Confirm/Card/Box"]
+custom_minimum_size = Vector2(460, 0)
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 19
+text = "ส่งเครื่องคืนลูกค้าตามสภาพ → งานไม่ผ่าน (Task Fail)
+ไม่ได้ค่าแรง · ชื่อเสียง −2 · ยังได้ XP บางส่วน
+ลูกค้าจะเอาเครื่องกลับมาให้ลองใหม่วันพรุ่งนี้ 1 ครั้ง"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Confirm/Card/Box"]
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="No" type="Button" parent="Confirm/Card/Box/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 52)
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "ลองต่ออีกนิด"
+
+[node name="Yes" type="Button" parent="Confirm/Card/Box/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 52)
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "ยอมแพ้ ส่งคืน"

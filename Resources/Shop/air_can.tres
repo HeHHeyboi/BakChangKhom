@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/item_def.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_air_can.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+kind = 1
+emoji = ""
+condition = "used"
+uses = 6
+weekly_stock = 0
+unlock_rank = 0
+storage_slots_to = 0
+display_name = "ลมกระป๋อง"
+icon = ExtResource("2_icon")
+price = 150
+description = "เป่าฝุ่นในเคส · ต้องล็อกใบพัดก่อนเป่า ไม่งั้นพัดลมหมุนเองจนเสีย"
+id = &"air_can"
