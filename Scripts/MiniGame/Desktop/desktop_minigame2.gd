@@ -2,6 +2,7 @@ class_name DesktopMinigameV2 extends PartMinigame
 
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
 const DIR := "res://Assets/MiniGame/Desktop/"
+const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
 const TEX_WALL := preload(DIR + "os_wallpaper.jpg")
 const TEX_START := preload(DIR + "os_start.png")
 const TEX_NOTE := preload(DIR + "os_sticky_note.png")
@@ -27,6 +28,7 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 @export var framed := true
 @export var boot_screen := true
 
+# NOTE: Taskbar icon
 @onready var start_button = %StartMenu
 @onready var screen = %Screen
 @onready var explorer = %Explorer
@@ -38,9 +40,17 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 @onready var clock = %Clock
 @onready var desktop = %Desktop
 
+# NOTE: Desktop icon
+@onready var doc_icon = %Doc as DesktopShortcut
+@onready var pic_icon = %Pic as DesktopShortcut
+@onready var download_icon = %Download as DesktopShortcut
+@onready var trash_icon = %Trash as DesktopShortcut
+@onready var browser_icon = %BrowserIcon as DesktopShortcut
+
 var os: DesktopOS
 var _selected_icon: Control
 var start_menu: PopupMenu
+# var file_menu: PopupMenu
 var customer_name: String
 var _explorer_folder := "เดสก์ท็อป"
 var _explorer_list: ItemList
@@ -80,10 +90,17 @@ func _ready() -> void:
 	start_menu.add_separator()
 	start_menu.add_item("ปิดเครื่อง" if free_mode else "ปิดเครื่อง (งานยังไม่เสร็จ)", 99)
 	start_menu.id_pressed.connect(_on_start_menu)
+	doc_icon.button.pressed.connect(open_explorer.bind("เอกสาร"))
+	pic_icon.button.pressed.connect(open_explorer.bind("รูปภาพ"))
+	download_icon.button.pressed.connect(open_explorer.bind("ดาวน์โหลด"))
+	# file_menu = PopupMenu.new()
+	# file_menu.add_item("เปิด")
+	# file_menu.add_item("ลบ")
+	# file_menu.id_pressed.connect(_on_file_menu)
 	self.add_child(start_menu)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	start_button.disabled = start_menu.visible
 
 
@@ -122,106 +139,100 @@ func _on_start_menu(id: int) -> void:
 			# shut_down()
 
 
-## หน้าต่างไฟล์ (Explorer) — ข้อมูลจาก os.dir_map / os.fs
+func _on_file_menu(id: int) -> void:
+	print("use file menu")
+	pass
+
+
+## หน้าต่างไฟล์ (Explorer) — โครงจาก os_explorer.tscn · ข้อมูลจาก os.dir_map / os.fs
 func open_explorer(folder: String) -> void:
 	_explorer_folder = folder
 	var w := _find_window("explorer")
-	if w != null:
-		w.restore()
-	else:
-		w = OsWindow.make("explorer", "ไฟล์ — " + task.pc_name, TEX_FOLDER, Vector2(640, 380))
+	if w == null:
+		w = EXPLORER_SCENE.instantiate()
+		w.restore(true)
 		w.set_meta("type", os.WinType.Explorer)
+		screen.add_child(w)
 		var n := os.instances.size()
+		w.size = Vector2(450, 350)
 		w.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
 		w.position = w.position.clamp(Vector2.ZERO, (screen.size - w.size).max(Vector2.ZERO))
-		w.closed.connect(os.instances.erase.bind(w))
 		os.add_instance(w)
-		screen.add_child(w)
-		_build_explorer(w)
+		_setup_explorer(w)
+	else:
+		w.restore()
 	_refresh_explorer()
 
 
-func _find_window(key: String) -> OsWindow:
+func _find_window(key: String) -> OsWindow2:
 	for w in os.instances:
 		if is_instance_valid(w) and w.key == key:
 			return w
 	return null
 
 
-func _build_explorer(w: OsWindow) -> void:
-	var row := HBoxContainer.new()
-	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	w.body.add_child(row)
-	var side := VBoxContainer.new()
-	side.custom_minimum_size.x = 140
-	row.add_child(side)
+## ผูกปุ่ม/รายการในฉาก os_explorer.tscn เข้ากับข้อมูล (ปุ่มโฟลเดอร์สร้างจากแม่แบบ Trash)
+func _setup_explorer(w: OsExplorer) -> void:
+	w.set_title("ไฟล์ — " + task.pc_name)
+	_explorer_path = w.get_node("%Path")
+	_explorer_status = w.get_node("%Status")
+	_explorer_list = w.get_node("%FileList")
+	_explorer_list.item_activated.connect(
+		func(_i):
+			_explorer_action("open"),
+	)
+	_explorer_list.gui_input.connect(_on_explorer_key)
+
+	var side: VBoxContainer = w.get_node("%DirList")
+	var trash: Button = w.get_node("%Trash")
 	for fo in os.dir_map.keys():
-		if fo == DesktopTask.USB and not task.usb_drive:
+		if fo == DesktopOS.TRASH or (fo == DesktopTask.USB and not task.usb_drive):
 			continue
-		var b := Button.new()
+		var b: Button = trash.duplicate()
+		b.unique_name_in_owner = false
 		b.name = "Folder_" + fo.validate_node_name()
-		b.text = fo
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.focus_mode = Control.FOCUS_NONE
+		b.text = "  " + fo
 		b.pressed.connect(
 			func():
 				_explorer_folder = fo
 				_refresh_explorer(),
 		)
 		side.add_child(b)
-	var tb := Button.new()
-	tb.text = "ถังขยะ"
-	tb.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	tb.focus_mode = Control.FOCUS_NONE
-	tb.pressed.connect(print.bind("trash")) # open_trash()
-	side.add_child(tb)
-	var right := VBoxContainer.new()
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(right)
-	_explorer_path = _label("", 15, Color(0.35, 0.35, 0.4))
-	right.add_child(_explorer_path)
-	_explorer_list = ItemList.new()
-	_explorer_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_explorer_list.fixed_icon_size = Vector2i(28, 28)
-	_explorer_list.item_activated.connect(
-		func(i):
-			_explorer_action("open"),
+	side.move_child(trash, -1)
+	trash.pressed.connect(
+		func():
+			_explorer_folder = DesktopOS.TRASH
+			_refresh_explorer(),
 	)
-	_explorer_list.gui_input.connect(_on_explorer_key)
-	right.add_child(_explorer_list)
-	var bar := HBoxContainer.new()
-	right.add_child(bar)
-	var acts := (
-		[["เปิด", "open"], ["ลบ", "delete"]]
-		if free_mode
-		else [["เปิด", "open"], ["ถามลูกค้า", "ask"], ["ลบ", "delete"]]
-	)
-	if task.usb_drive:
-		acts.append_array([["คัดลอกไป USB", "copy_usb"], ["ย้ายไป USB", "move_usb"], ["ถอด USB", "eject"]])
-	for a in acts:
-		var b := Button.new()
-		b.text = a[0]
-		b.focus_mode = Control.FOCUS_NONE
-		b.pressed.connect(_explorer_action.bind(a[1]))
-		bar.add_child(b)
-	_explorer_status = _label("", 14, Color(0.35, 0.35, 0.4))
-	_explorer_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_explorer_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	bar.add_child(_explorer_status)
+
+	var acts := {
+		"Open": "open",
+		"Ask": "ask",
+		"Delete": "delete",
+		"CopyUsb": "copy_usb",
+		"MoveUsb": "move_usb",
+		"Eject": "eject",
+	}
+	for btn in acts:
+		w.get_node("%" + btn).pressed.connect(_explorer_action.bind(acts[btn]))
+	w.get_node("%Ask").visible = not free_mode
+	for btn in ["CopyUsb", "MoveUsb", "Eject"]:
+		w.get_node("%" + btn).visible = task.usb_drive
 
 
-func _explorer_selected() -> DesktopFile:
+func _explorer_selected() -> int:
 	if not is_instance_valid(_explorer_list):
-		return null
+		return -1
 	var sel := _explorer_list.get_selected_items()
-	return _explorer_list.get_item_metadata(sel[0]) if not sel.is_empty() else null
+	return _explorer_list.get_item_metadata(sel[0]) if not sel.is_empty() else -1
 
 
 func _explorer_action(what: String) -> void:
 	if what == "eject":
 		print("eject_usb")
 		return
-	var f := _explorer_selected()
+	var idx := _explorer_selected()
+	var f: DesktopFile = os.fs[idx].data if idx >= 0 else null
 	if f == null:
 		_explorer_status.text = "เลือกไฟล์ก่อน"
 		return
@@ -231,7 +242,11 @@ func _explorer_action(what: String) -> void:
 		"ask":
 			print("ask ", f.name) # customer_say(ask_about(f))
 		"delete":
-			print("delete ", f.name) # delete_file(f)
+			if os.move_file(idx, DesktopOS.TRASH):
+				_refresh_explorer()
+				_explorer_status.text = "ย้าย %s ไปถังขยะแล้ว" % f.name
+			else:
+				_explorer_status.text = "%s อยู่ในถังขยะแล้ว" % f.name
 		"copy_usb":
 			print("copy_usb ", f.name)
 		"move_usb":
@@ -253,12 +268,12 @@ func _refresh_explorer() -> void:
 	var count := 0
 	if dir != null:
 		for idx in dir.files:
-			var f := os.fs[idx]
+			var f := os.fs[idx].data
 			var i := _explorer_list.add_item(
 				"%s      %s" % [f.name, DesktopMinigame.size_text(f.size_mb)],
 				_file_tex(f),
 			)
-			_explorer_list.set_item_metadata(i, f)
+			_explorer_list.set_item_metadata(i, idx)
 			if f.kind == DesktopFile.FAKE_INSTALLER:
 				_explorer_list.set_item_custom_fg_color(i, Color(0.8, 0.3, 0.1))
 			count += 1
@@ -281,15 +296,6 @@ func _file_tex(f: DesktopFile) -> Texture2D:
 	return TEX_DOC
 
 
-func _label(t: String, font_size: int, color: Color) -> Label:
-	var l := Label.new()
-	l.text = t
-	l.add_theme_font_size_override("font_size", font_size)
-	l.add_theme_color_override("font_color", color)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
-
-
 func _small(tex: Texture2D) -> Texture2D:
 	var img := tex.get_image()
 	if img == null:
@@ -299,19 +305,6 @@ func _small(tex: Texture2D) -> Texture2D:
 		img.decompress()
 	img.resize(24, 24, Image.INTERPOLATE_LANCZOS)
 	return ImageTexture.create_from_image(img)
-
-
-func _on_wall_input(e: InputEvent) -> void:
-	if e is InputEventMouseButton and e.pressed:
-		_select_icon(null)
-
-
-func _select_icon(ic: Control) -> void:
-	if is_instance_valid(_selected_icon):
-		(_selected_icon.get_meta("style") as StyleBoxFlat).bg_color = Color(1, 1, 1, 0)
-	_selected_icon = ic
-	if is_instance_valid(ic):
-		(ic.get_meta("style") as StyleBoxFlat).bg_color = Color(0.6, 0.8, 1, 0.35)
 
 
 func _resolve_task() -> void:

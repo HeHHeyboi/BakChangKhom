@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c5g4f3rl642v7"]
 
+[ext_resource type="Script" uid="uid://cmmnitfdxqnco" path="res://Scripts/MiniGame/Desktop/desktop_shortcut.gd" id="1_63bc0"]
 [ext_resource type="Texture2D" uid="uid://7gwal8dx3d16" path="res://Assets/MiniGame/Desktop/os_icon_folder.png" id="1_72hvm"]
-[ext_resource type="Script" uid="uid://dewg7t6ukhday" path="res://Scripts/MiniGame/Desktop/shortcut.gd" id="2_shortcut"]
 [ext_resource type="Theme" uid="uid://dqmjso4136hff" path="res://Assets/Theme/task_icon.tres" id="3_63bc0"]
 
 [node name="Shortcut" type="Control" unique_id=1339073643]
@@ -11,7 +11,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 60.0
 offset_bottom = 60.0
-script = ExtResource("2_shortcut")
+script = ExtResource("1_63bc0")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=2052371351]
 propagate_maximum_size = false

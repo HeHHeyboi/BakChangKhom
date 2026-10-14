@@ -13,6 +13,7 @@ class_name DesktopShortcut extends Control
 	set(v):
 		shortcut_name = v
 		_apply()
+@onready var button = $Button
 
 
 func _ready() -> void:

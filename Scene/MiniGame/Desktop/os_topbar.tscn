@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://cbc48qiq737wp"]
+
+[ext_resource type="Texture2D" uid="uid://7gwal8dx3d16" path="res://Assets/MiniGame/Desktop/os_icon_folder.png" id="1_vyh52"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qv00g"]
+bg_color = Color(0.45795733, 0.5623945, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+
+[node name="Topbar" type="PanelContainer" unique_id=193917937]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 21.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qv00g")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=790668433]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="HBoxContainer" unique_id=1195365466]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("1_vyh52")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="HBoxContainer" unique_id=1281458214]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Title"
+
+[node name="Spacer" type="Control" parent="HBoxContainer" unique_id=1757393141]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Close" type="Button" parent="HBoxContainer" unique_id=1499284010]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_constants/outline_size = 2
+text = "   X  "
+flat = true
