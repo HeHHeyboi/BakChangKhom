@@ -213,6 +213,12 @@ layout_mode = 2
 icon = ExtResource("13_80row")
 shortcut_name = "ขยะ"
 
+[node name="BrowserIcon" parent="Os/Screen/Desktop" unique_id=1714566845 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("8_dgdh2")
+shortcut_name = "อินเตอร์เน็ต"
+
 [node name="Boot" type="Panel" parent="Os/Screen" unique_id=263292483]
 visible = false
 layout_mode = 1

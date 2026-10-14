@@ -1,9 +1,180 @@
 [gd_scene format=3 uid="uid://ce82gf0lau4gp"]
 
-[node name="OsExplorer" type="Control" unique_id=11689035]
-layout_mode = 3
+[ext_resource type="PackedScene" uid="uid://cbc48qiq737wp" path="res://Scene/MiniGame/Desktop/os_topbar.tscn" id="1_q5167"]
+[ext_resource type="Theme" uid="uid://wowbtopsggdy" path="res://Assets/Theme/desktop_window.tres" id="2_qrs8u"]
+[ext_resource type="Script" uid="uid://kou80so0ub63" path="res://Scripts/MiniGame/Desktop/os_explorer.gd" id="3_osexp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5167"]
+bg_color = Color(0.96862745, 0.9607843, 0.92941177, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orn6i"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.61960787, 0.58431375, 0.5411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1xt0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57g7j"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d2ead"]
+bg_color = Color(0.92941177, 0.9098039, 0.85882354, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4843256, 0.33975258, 0.27309543, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="OsExplorer" type="Panel" unique_id=1857937811]
+custom_minimum_size = Vector2(300, 150)
+offset_right = 300.0
+offset_bottom = 150.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_q5167")
+script = ExtResource("3_osexp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=28320967]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="Topbar" parent="VBoxContainer" unique_id=193917937 instance=ExtResource("1_q5167")]
+layout_mode = 2
+
+[node name="Body" type="Control" parent="VBoxContainer" unique_id=338907782]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Body" unique_id=95669201]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="Spacer" type="Control" parent="VBoxContainer/Body/HBoxContainer" unique_id=979960478]
+layout_mode = 2
+
+[node name="DirList" type="VBoxContainer" parent="VBoxContainer/Body/HBoxContainer" unique_id=1494944495]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Trash" type="Button" parent="VBoxContainer/Body/HBoxContainer/DirList" unique_id=1730416052]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+text = "  ถังขยะ"
+alignment = 0
+
+[node name="FileSection" type="VBoxContainer" parent="VBoxContainer/Body/HBoxContainer" unique_id=1022980673]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Body/HBoxContainer/FileSection" unique_id=1004281559]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="Path" type="Label" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1631769239]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.35, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = " เครื่องนี้ › เดสก์ท็อป"
+
+[node name="FileList" type="ItemList" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1602268701]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hovered_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hovered_selected_color = Color(0, 0, 0, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_orn6i")
+theme_override_styles/hovered = SubResource("StyleBoxFlat_g1xt0")
+theme_override_styles/selected = SubResource("StyleBoxFlat_57g7j")
+fixed_icon_size = Vector2i(12, 12)
+
+[node name="ActionBar" type="HBoxContainer" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=427378979]
+layout_mode = 2
+
+[node name="Open" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1578144717]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "เปิด"
+
+[node name="Ask" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1183803308]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "ถามลูกค้า"
+
+[node name="Delete" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=552566289]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "ลบ"
+
+[node name="CopyUsb" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=906211347]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "คัดลอกไป USB"
+
+[node name="MoveUsb" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1415872093]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "ย้ายไป USB"
+
+[node name="Eject" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=2087634518]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("2_qrs8u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_d2ead")
+text = "ถอด USB"
+
+[node name="Status" type="Label" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1196402871]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.35, 0.4, 1)
+horizontal_alignment = 2
+
+[node name="Spacer" type="Control" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1841476515]
+layout_mode = 2
+
+[node name="Spacer2" type="Control" parent="VBoxContainer/Body/HBoxContainer" unique_id=1594840714]
+layout_mode = 2
