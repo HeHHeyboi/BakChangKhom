@@ -19,6 +19,42 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
+[sub_resource type="StyleBoxFlat" id="SB_play"]
+bg_color = Color(0.93, 0.55, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.45, 0.25, 0.1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="SB_play_hover"]
+bg_color = Color(1, 0.65, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.45, 0.25, 0.1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="SB_play_pressed"]
+bg_color = Color(0.78, 0.42, 0.13, 1)
+border_width_left = 2
+border_width_top = 3
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.25, 0.1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
 [node name="BeepTable" type="CanvasLayer"]
 layer = 129
 script = ExtResource("1_bt")
@@ -111,11 +147,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_ok" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "ok"
 
@@ -157,11 +202,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_post_err" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "post_err"
 
@@ -203,11 +257,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_ram" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "ram"
 
@@ -249,11 +312,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_timer" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "timer"
 
@@ -295,11 +367,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_cpu" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "cpu"
 
@@ -341,11 +422,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_keyboard" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "keyboard"
 
@@ -387,11 +477,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_vram" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "vram"
 
@@ -433,11 +532,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_video" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "video"
 
@@ -479,11 +587,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_video2" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "video2"
 
@@ -525,11 +642,20 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Play_ram_award" type="Button" parent="Panel/Box/Scroll/Rows"]
-custom_minimum_size = Vector2(56, 40)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 tooltip_text = "ฟังเสียง"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_play")
+theme_override_styles/hover = SubResource("SB_play_hover")
+theme_override_styles/pressed = SubResource("SB_play_pressed")
+theme_override_styles/focus = SubResource("SB_play")
 text = "▶"
 metadata/code = "ram_award"
 
