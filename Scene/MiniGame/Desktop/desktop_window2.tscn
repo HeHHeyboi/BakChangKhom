@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://bvyr35y00rtr1" path="res://Assets/MiniGame/Desktop/os_icon_pictures.png" id="11_km0mo"]
 [ext_resource type="Texture2D" uid="uid://dtd5mebb0wlbp" path="res://Assets/MiniGame/Desktop/os_icon_downloads.png" id="12_475il"]
 [ext_resource type="Texture2D" uid="uid://c0p3q5lw4lii3" path="res://Assets/MiniGame/Desktop/os_icon_trash_empty.png" id="13_80row"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="15_uwad3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycono"]
 bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
@@ -159,17 +160,17 @@ text = "เสียง"
 flat = true
 expand_icon = true
 
-[node name="Disk" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1940721730]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-
 [node name="Clock" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1563288819]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
+
+[node name="Disk" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1940721730]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
 
 [node name="Desktop" type="VFlowContainer" parent="Os/Screen" unique_id=1851269946]
 unique_name_in_owner = true
@@ -219,11 +220,16 @@ layout_mode = 2
 icon = ExtResource("8_dgdh2")
 shortcut_name = "อินเตอร์เน็ต"
 
-[node name="Boot" type="Panel" parent="Os/Screen" unique_id=263292483]
-visible = false
-layout_mode = 1
+[node name="OsBoot" parent="Os" unique_id=1097511002 instance=ExtResource("15_uwad3")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Spinner" parent="Os/OsBoot/Logo" index="1"]
+anchors_preset = 0
+
+[editable path="Os/OsBoot"]
