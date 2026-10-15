@@ -119,8 +119,8 @@ func _ready() -> void:
 	_check(r2.strike and GameState.missed_months == 1 and not GameState.shop_closed, "ก.พ. ไม่ถึงเป้า → พลาด 1/2 ร้านยังเปิด")
 	GameState.money = 100
 	GameState.debt = 0
-	var bill := GameState.pay_month_bill(2, 0)
-	_check(bill.late_fee == 0 and GameState.debt > 0, "บิลเกินเงิน → ค้าง ฿%d (ยังไม่มีค่าปรับ)" % GameState.debt)
+	var bill1 := GameState.pay_month_bill(2, 0)
+	_check(bill1.late_fee == 0 and GameState.debt > 0, "บิลเกินเงิน → ค้าง ฿%d (ยังไม่มีค่าปรับ)" % GameState.debt)
 	var d0 := GameState.debt
 	GameState.money = 0
 	var bill2 := GameState.pay_month_bill(3, 0)
@@ -143,6 +143,11 @@ func _ready() -> void:
 	# ข้อความสรุปเดือนในการ์ด
 	var txt := DayLoop.month_summary_text(r4, { })
 	_check(txt.contains("เกินเป้า") and txt.contains("฿9,500"), "การ์ดสรุปเดือนมีกำไรและผลเป้า")
+	var ms: MonthSummary = DayLoop.month_summary
+	_check(ms != null and ms.get_parent().name == "SummaryLayer" and (ms.get_parent() as CanvasLayer).layer == 108, "หน้าสรุปเดือนอยู่ใน day_loop.tscn → SummaryLayer ชั้น 108")
+	ms.show_report("สิ้นเดือน ก.พ.", "", r4, { "rent": 1500, "power": 320, "water": 100, "internet": 300 }, "ไปต่อ")
+	_check(ms.visible and ms._income_grid.get_child_count() == 2 and ms._income_total.text == "฿9,500" and ms._result.text == "เกินเป้า!", "ตารางรายรับ 1 แถว (฿9,500) · ผล เกินเป้า!")
+	ms.visible = false
 	# ค้างบิล 2 เดือนติด → ร้านปิด
 	GameState.reset()
 	ts.set_shift(21)

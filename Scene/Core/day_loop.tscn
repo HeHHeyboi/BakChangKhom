@@ -32,6 +32,7 @@
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_kid_keyboard.tres" id="b2"]
 [ext_resource type="PackedScene" path="res://Scene/UI/day_skip.tscn" id="ui_dayskip"]
 [ext_resource type="PackedScene" path="res://Scene/UI/month_goal_bar.tscn" id="ui_goal"]
+[ext_resource type="PackedScene" path="res://Scene/UI/month_summary.tscn" id="ui_summary"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
@@ -48,3 +49,8 @@ layer = 110
 layer = 100
 
 [node name="MonthGoalBar" parent="GoalLayer" instance=ExtResource("ui_goal")]
+
+[node name="SummaryLayer" type="CanvasLayer" parent="."]
+layer = 108
+
+[node name="MonthSummary" parent="SummaryLayer" instance=ExtResource("ui_summary")]

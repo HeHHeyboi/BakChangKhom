@@ -1,0 +1,323 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/month_summary.gd" id="1_ms"]
+[ext_resource type="Texture2D" uid="uid://c16rueah2nblt" path="res://Assets/CharacterSprite/char_pib_happy.png" id="2_pib"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+content_margin_left = 22.0
+content_margin_top = 16.0
+content_margin_right = 22.0
+content_margin_bottom = 16.0
+bg_color = Color(0.97, 0.94, 0.87, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_table"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 0.98, 0.93, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.7, 0.55, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_result"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.93, 0.88, 0.78, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.82, 0.76, 0.66, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.95, 0.62, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_hint"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(1, 1, 1, 0.85)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="MonthSummary" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ms")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Card" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -390.0
+offset_top = -20.0
+offset_right = 390.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="VBox" type="VBoxContainer" parent="Card"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Card/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 26
+text = "สิ้นเดือน ก.พ. · สรุปบทที่ 8"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Card/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.38, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "งานที่ซ่อม 0 งาน · ความพอใจเฉลี่ย 0 · ชื่อเสียง 20 · ยศ ช่างมือใหม่"
+horizontal_alignment = 1
+
+[node name="Tables" type="HBoxContainer" parent="Card/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="IncomeTable" type="PanelContainer" parent="Card/VBox/Tables"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_table")
+
+[node name="VBox" type="VBoxContainer" parent="Card/VBox/Tables/IncomeTable"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Head" type="Label" parent="Card/VBox/Tables/IncomeTable/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.55, 0.25, 1)
+theme_override_font_sizes/font_size = 18
+text = "รายรับ"
+
+[node name="IncomeGrid" type="GridContainer" parent="Card/VBox/Tables/IncomeTable/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 2
+columns = 2
+
+[node name="Line" type="HSeparator" parent="Card/VBox/Tables/IncomeTable/VBox"]
+layout_mode = 2
+
+[node name="Total" type="HBoxContainer" parent="Card/VBox/Tables/IncomeTable/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Card/VBox/Tables/IncomeTable/VBox/Total"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.25, 0.17, 0.1, 1)
+theme_override_font_sizes/font_size = 16
+text = "รวมรายรับ"
+
+[node name="IncomeTotal" type="Label" parent="Card/VBox/Tables/IncomeTable/VBox/Total"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.55, 0.25, 1)
+theme_override_font_sizes/font_size = 16
+text = "฿5,150"
+horizontal_alignment = 2
+
+[node name="ExpenseTable" type="PanelContainer" parent="Card/VBox/Tables"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_table")
+
+[node name="VBox" type="VBoxContainer" parent="Card/VBox/Tables/ExpenseTable"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Head" type="Label" parent="Card/VBox/Tables/ExpenseTable/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.2, 0.15, 1)
+theme_override_font_sizes/font_size = 18
+text = "รายจ่าย"
+
+[node name="ExpenseGrid" type="GridContainer" parent="Card/VBox/Tables/ExpenseTable/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 2
+columns = 2
+
+[node name="Line" type="HSeparator" parent="Card/VBox/Tables/ExpenseTable/VBox"]
+layout_mode = 2
+
+[node name="Total" type="HBoxContainer" parent="Card/VBox/Tables/ExpenseTable/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Card/VBox/Tables/ExpenseTable/VBox/Total"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.25, 0.17, 0.1, 1)
+theme_override_font_sizes/font_size = 16
+text = "รวมรายจ่าย"
+
+[node name="ExpenseTotal" type="Label" parent="Card/VBox/Tables/ExpenseTable/VBox/Total"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.2, 0.15, 1)
+theme_override_font_sizes/font_size = 16
+text = "฿3,540"
+horizontal_alignment = 2
+
+[node name="Invest" type="Label" parent="Card/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.38, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "ลงทุนกับร้าน ฿1,200 (ไม่นับในกำไร)"
+horizontal_alignment = 2
+
+[node name="ResultBox" type="PanelContainer" parent="Card/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_result")
+
+[node name="VBox" type="VBoxContainer" parent="Card/VBox/ResultBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Top" type="HBoxContainer" parent="Card/VBox/ResultBox/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="Card/VBox/ResultBox/VBox/Top"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.25, 0.17, 0.1, 1)
+theme_override_font_sizes/font_size = 16
+text = "กำไรเดือนนี้"
+
+[node name="Profit" type="Label" parent="Card/VBox/ResultBox/VBox/Top"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "฿1,610"
+
+[node name="Result" type="Label" parent="Card/VBox/ResultBox/VBox/Top"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 18
+text = "ไม่ถึงเป้า"
+horizontal_alignment = 2
+
+[node name="ProfitBar" type="ProgressBar" parent="Card/VBox/ResultBox/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+max_value = 7000.0
+value = 1610.0
+show_percentage = false
+
+[node name="Bottom" type="HBoxContainer" parent="Card/VBox/ResultBox/VBox"]
+layout_mode = 2
+
+[node name="Target" type="Label" parent="Card/VBox/ResultBox/VBox/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.25, 0.17, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "เป้า ฿7,000"
+
+[node name="Strikes" type="Label" parent="Card/VBox/ResultBox/VBox/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.3, 0.15, 1)
+theme_override_font_sizes/font_size = 14
+text = "พลาดเป้า ●○"
+horizontal_alignment = 2
+
+[node name="PibRow" type="HBoxContainer" parent="Card/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Pib" type="TextureRect" parent="Card/VBox/PibRow"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_pib")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bubble" type="PanelContainer" parent="Card/VBox/PibRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_hint")
+
+[node name="Hint" type="Label" parent="Card/VBox/PibRow/Bubble"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25, 0.17, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "เดือนนี้ต้องชดใช้ของลูกค้าที่เสีย เลือกเครื่องมือให้ถูกและทำตามขั้นตอนจะไม่พลาดนะ"
+autowrap_mode = 3
+
+[node name="Continue" type="Button" parent="Card/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 17
+text = "ไปต่อ (บทที่ 9)"

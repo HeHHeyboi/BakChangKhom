@@ -119,6 +119,9 @@ const DAY_SKIP_SCENE := preload("res://Scene/UI/day_skip.tscn")
 const GOAL_BAR_SCENE := preload("res://Scene/UI/month_goal_bar.tscn")
 ## [0.2.0-D] แถบเป้ากำไรเดือนนี้ (Scene/UI/month_goal_bar.tscn)
 var goal_bar: MonthGoalBar
+## [0.2.0-E] หน้าสรุปสิ้นเดือน (Scene/UI/month_summary.tscn ใน SummaryLayer ชั้น 108)
+const MONTH_SUMMARY_SCENE := preload("res://Scene/UI/month_summary.tscn")
+var month_summary: MonthSummary
 var _day_skip_pending := false
 ## เวลาแอนิเมชันข้ามวัน (วินาที) · 0 = ไม่เล่น (เทสต์ตั้งเองได้)
 @export var day_skip_seconds := 2.4
@@ -385,7 +388,7 @@ func _on_week_ended(week: int) -> void:
 
 
 func _on_month_ended(month: int) -> void:
-	# [0.2.0] ยิงทุกบท (1 บท = 1 เดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
+	# [0.2.0] ยิงทุก 4 บท (สิ้นเดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
 	_last_bill = GameState.pay_month_bill(month, _ts().work_slots_used_this_month() if _ts() else 0)
 	# [0.2.0-E/F] ปิดเดือน: เทียบกำไรกับเป้า · นับพลาดเป้า/ค้างบิล · ร้านปิด → ไปฉากจบ
 	_last_month = GameState.close_month(month)
@@ -618,10 +621,10 @@ func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
 	elif not bool(rep.get("counted", true)):
 		result = "ยังไม่ถึงเป้า (เดือนแรกยังไม่นับ)"
 	else:
-		result = "ไม่ถึงเป้า (พลาดเป้า %d/%d เดือน)" % [int(rep.get("missed_months", 0)), _econ().fail_missed_months]
+		result = "ไม่ถึงเป้า (พลาด %d/%d)" % [int(rep.get("missed_months", 0)), _econ().fail_missed_months]
 	lines.append("กำไร %s / เป้า %s → %s" % [b.call(int(rep.profit)), b.call(int(rep.target)), result])
 	if int(rep.get("debt", 0)) > 0:
-		lines.append("ค้างบิล %s (ค้างติดกัน %d/%d เดือน)" % [b.call(int(rep.debt)), int(rep.get("debt_streak", 0)), _econ().fail_debt_months])
+		lines.append("ค้างบิล %s (ค้าง %d/%d เดือนติด)" % [b.call(int(rep.debt)), int(rep.get("debt_streak", 0)), _econ().fail_debt_months])
 	if bool(rep.get("shop_closed", false)):
 		lines.append("ร้านไปต่อไม่ไหวแล้ว…")
 	lines.append("ปิ๊บ: " + String(rep.get("hint", "")))
@@ -926,7 +929,7 @@ func _process(delta: float) -> void:
 		_cards_tab.text = "📋 กระดานงาน (%d)" % board.size() if want == Card.BOARD else "📋 ดูการ์ดงาน"
 		return
 	_cards_tab.visible = false
-	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible):
+	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible or (month_summary and month_summary.visible)):
 		_show_card(want)
 
 
@@ -1007,6 +1010,8 @@ func _show_card(card: Card) -> void:
 	_board_panel.visible = false
 	_panel.visible = true
 	_secondary.visible = false
+	if month_summary:
+		month_summary.visible = false
 	var ts := _ts()
 	var c := today_case
 	match card:
@@ -1086,6 +1091,10 @@ func _show_card(card: Card) -> void:
 				_title.text = "สิ้นเดือน %s · สรุปบทที่ %d" % [TimeSystem.MONTH_NAME[mi], _pending_summary_week]
 				_body.text = "%s\n\n%s" % [week_line, month_summary_text(_last_month, _last_bill)]
 			_primary.text = ("ร้านไปต่อไม่ไหว… ดูฉากจบ" if GameState.shop_closed else "ดูฉากจบ") if _game_over else "ไปต่อ (บทที่ %d)" % (_pending_summary_week + 1)
+			if not _last_month.is_empty() and month_summary:
+				# สิ้นเดือน → ใช้หน้าสรุปแบบตาราง (ฉากแยก) แทนการ์ดข้อความ
+				_panel.visible = false
+				month_summary.show_report(_title.text, week_line, _last_month, _last_bill, _primary.text)
 		Card.ENDING:
 			_title.text = "จบเกม"
 			_body.text = "%s\n\nเงิน ฿%d · ความพอใจเฉลี่ย %d · ชื่อเสียง %d" % [
@@ -1226,6 +1235,8 @@ func _on_secondary() -> void:
 
 
 func _hide() -> void:
+	if month_summary:
+		month_summary.visible = false
 	_panel.visible = false
 	_board_panel.visible = false
 	_card = Card.NONE
@@ -1257,6 +1268,10 @@ func _build_time_skip() -> void:
 	# [0.2.0] ฉากข้ามวัน + แถบเป้าเดือน วางใน day_loop.tscn (ปรับใน Editor ได้) · DaySkipLayer ชั้น 110 (เหนือ HUD 100 / ปุ่มคลัง 105 ใต้บทพูด 128) · GoalLayer ชั้น 100
 	_day_skip = _ensure_ui(^"DaySkipLayer", 110, DAY_SKIP_SCENE) as DaySkip
 	goal_bar = _ensure_ui(^"GoalLayer", 100, GOAL_BAR_SCENE) as MonthGoalBar
+	# [0.2.0-E] SummaryLayer ชั้น 108 (เหนือ HUD/แถบเป้า 100 · ปุ่มคลัง 105 · ใต้ข้ามวัน 110)
+	month_summary = _ensure_ui(^"SummaryLayer", 108, MONTH_SUMMARY_SCENE) as MonthSummary
+	if not month_summary.continue_pressed.is_connected(_on_primary):
+		month_summary.continue_pressed.connect(_on_primary)
 
 
 ## หาโหนด UI ที่วางไว้ใน day_loop.tscn · ถ้าไม่มี (เช่นฉากเก่า) สร้างชั้น + ฉากให้เอง

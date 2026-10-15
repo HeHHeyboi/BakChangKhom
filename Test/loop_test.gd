@@ -257,7 +257,7 @@ func _ready() -> void:
 	bill = GameState.pay_month_bill(2, 0)
 	_check(int(bill["paid"]) == 100 and GameState.money == 0 and GameState.debt == int(bill["total"]) - 100, "เงินไม่พอ → จ่ายเท่าที่มี ส่วนที่ขาดเป็นยอดค้าง (ค้าง %d)" % GameState.debt)
 	bill = GameState.pay_month_bill(3, 0)
-	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 1500 + 250 + 100 + 300 + int(bill["prev_debt"]), "ยอดค้างเดิมรวมในบิลเดือนถัดไป")
+	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 1500 + 250 + 100 + 300 + int(bill["prev_debt"]) + int(bill["late_fee"]) and int(bill["late_fee"]) == ceili(int(bill["prev_debt"]) * 0.1), "ยอดค้างเดิม + ค่าปรับ 10%% รวมในบิลเดือนถัดไป (ปรับ ฿%d)" % bill["late_fee"])
 	GameState.debt = 0
 
 	print("T DONE fails=", fails)
