@@ -48,11 +48,12 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 @onready var browser_icon = %BrowserIcon as DesktopShortcut
 
 var os: DesktopOS
-var _selected_icon: Control
+# var _selected_icon: Control
 var start_menu: PopupMenu
 # var file_menu: PopupMenu
 var customer_name: String
 var _explorer_folder := "เดสก์ท็อป"
+var _explorer_win: OsExplorer
 var _explorer_list: ItemList
 var _explorer_path: Label
 var _explorer_status: Label
@@ -78,6 +79,8 @@ func _ready() -> void:
 	for file in task.files:
 		os.add_file(file)
 
+	os.disk_total_mb = task.disk_total_mb
+	os.disk_free_mb = task.disk_free_mb
 	clock.text = EventManager.get_clock_text()
 	start_button.pressed.connect(self._on_start_button)
 
@@ -174,6 +177,7 @@ func _find_window(key: String) -> OsWindow2:
 ## ผูกปุ่ม/รายการในฉาก os_explorer.tscn เข้ากับข้อมูล (ปุ่มโฟลเดอร์สร้างจากแม่แบบ Trash)
 func _setup_explorer(w: OsExplorer) -> void:
 	w.set_title("ไฟล์ — " + task.pc_name)
+	_explorer_win = w
 	_explorer_path = w.get_node("%Path")
 	_explorer_status = w.get_node("%Status")
 	_explorer_list = w.get_node("%FileList")
@@ -209,13 +213,13 @@ func _setup_explorer(w: OsExplorer) -> void:
 		"Open": "open",
 		"Ask": "ask",
 		"Delete": "delete",
+		"Restore": "restore",
 		"CopyUsb": "copy_usb",
 		"MoveUsb": "move_usb",
 		"Eject": "eject",
 	}
 	for btn in acts:
 		w.get_node("%" + btn).pressed.connect(_explorer_action.bind(acts[btn]))
-	w.get_node("%Ask").visible = not free_mode
 	for btn in ["CopyUsb", "MoveUsb", "Eject"]:
 		w.get_node("%" + btn).visible = task.usb_drive
 
@@ -244,9 +248,9 @@ func _explorer_action(what: String) -> void:
 		"delete":
 			if os.move_file(idx, DesktopOS.TRASH):
 				_refresh_explorer()
-				_explorer_status.text = "ย้าย %s ไปถังขยะแล้ว" % f.name
-			else:
-				_explorer_status.text = "%s อยู่ในถังขยะแล้ว" % f.name
+		"restore":
+			if os.move_file(idx, os.fs[idx].prev_dir):
+				_refresh_explorer()
 		"copy_usb":
 			print("copy_usb ", f.name)
 		"move_usb":
@@ -264,6 +268,11 @@ func _refresh_explorer() -> void:
 		return
 	_explorer_list.clear()
 	_explorer_path.text = "เครื่องนี้ › " + _explorer_folder
+	_explorer_win.show_action_bar_preset(
+		OsExplorer.TRASH if _explorer_folder == DesktopOS.TRASH else OsExplorer.NORM,
+	)
+	if free_mode:
+		_explorer_win.ask_action.hide()
 	var dir: DesktopOS.Dir = os.dir_map.get(_explorer_folder)
 	var count := 0
 	if dir != null:
@@ -277,7 +286,7 @@ func _refresh_explorer() -> void:
 			if f.kind == DesktopFile.FAKE_INSTALLER:
 				_explorer_list.set_item_custom_fg_color(i, Color(0.8, 0.3, 0.1))
 			count += 1
-	_explorer_status.text = "%d รายการ · เหลือ %s" % [count, DesktopMinigame.size_text(task.disk_free_mb)]
+	_explorer_status.text = "%d รายการ · เหลือ %s" % [count, DesktopMinigame.size_text(os.disk_free_mb)]
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:

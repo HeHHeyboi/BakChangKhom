@@ -18,6 +18,7 @@ class Dir extends RefCounted:
 class File extends RefCounted:
 	var data: DesktopFile
 	var dir: String
+	var prev_dir: String = ""
 
 
 	func _init(src: DesktopFile):
@@ -31,6 +32,8 @@ const TRASH := "ถังขยะ"
 var fs: Array[File] = []
 var dir_map: Dictionary[String, Dir] = { }
 var instances: Array[OsWindow2] = []
+var disk_total_mb: int = 0
+var disk_free_mb: int = 0
 
 
 func _init():
@@ -67,6 +70,7 @@ func move_file(file_index: int, dest: String) -> bool:
 	from.files.remove_at(from.files.find(file_index))
 	to.files.append(file_index)
 	file.dir = dest
+	file.prev_dir = from.dname
 	return true
 
 
