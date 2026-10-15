@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+
+[node name="OsInfo" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(420, 190)
+offset_right = 420.0
+offset_bottom = 190.0
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "ข้อความ"
+
+[node name="Message" type="Label" parent="VBoxContainer/Body/Content" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="Ok" type="Button" parent="VBoxContainer/Body/Content" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 0
+text = "ตกลง"

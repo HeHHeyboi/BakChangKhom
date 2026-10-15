@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="2_icon"]
+
+[node name="OsTaskman" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(600, 380)
+offset_right = 600.0
+offset_bottom = 380.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "ตัวจัดการงาน"
+
+[node name="Tabs" type="HBoxContainer" parent="VBoxContainer/Body/Content" index="0"]
+layout_mode = 2
+
+[node name="TabProc" type="Button" parent="VBoxContainer/Body/Content/Tabs" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "โปรแกรมที่ทำงาน"
+
+[node name="TabStartup" type="Button" parent="VBoxContainer/Body/Content/Tabs" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "เปิดพร้อมเครื่อง"
+
+[node name="Scroll" type="ScrollContainer" parent="VBoxContainer/Body/Content" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="VBoxContainer/Body/Content/Scroll" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3

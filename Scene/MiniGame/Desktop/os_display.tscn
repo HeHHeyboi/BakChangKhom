@@ -1,0 +1,71 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="2_icon"]
+
+[node name="OsDisplay" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(520, 330)
+offset_right = 520.0
+offset_bottom = 330.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "ตั้งค่า › จอภาพ"
+
+[node name="Options" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ResolutionTitle" type="Label" parent="VBoxContainer/Body/Content/Options" index="0"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "ความละเอียดหน้าจอ"
+
+[node name="Resolution" type="OptionButton" parent="VBoxContainer/Body/Content/Options" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="ScaleTitle" type="Label" parent="VBoxContainer/Body/Content/Options" index="2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "ขนาดตัวหนังสือและไอคอน"
+
+[node name="Scale" type="OptionButton" parent="VBoxContainer/Body/Content/Options" index="3"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="Pending" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="1"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PendingMessage" type="Label" parent="VBoxContainer/Body/Content/Pending" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.2, 0.12, 1)
+theme_override_font_sizes/font_size = 17
+text = "จอดับ… จอนี้แสดงไม่ได้
+จะเก็บค่านี้ไว้ไหม?"
+
+[node name="Buttons" type="HBoxContainer" parent="VBoxContainer/Body/Content/Pending" index="1"]
+layout_mode = 2
+
+[node name="Keep" type="Button" parent="VBoxContainer/Body/Content/Pending/Buttons" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+text = "เก็บค่านี้"
+
+[node name="Revert" type="Button" parent="VBoxContainer/Body/Content/Pending/Buttons" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+text = "คืนค่าเดิม"

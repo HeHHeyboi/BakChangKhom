@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[node name="OsNetRow" type="HBoxContainer"]
+
+[node name="Info" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "ชื่อเครือข่าย  ▮▮▮
+ต้องใส่รหัส"
+
+[node name="Password" type="LineEdit" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+placeholder_text = "รหัสผ่าน"
+
+[node name="Connect" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "เชื่อมต่อ"

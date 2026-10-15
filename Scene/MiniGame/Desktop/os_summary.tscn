@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://vl3xii148noc" path="res://Assets/MiniGame/Desktop/os_icon_chat.png" id="2_icon"]
+
+[node name="OsSummary" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(520, 400)
+offset_right = 520.0
+offset_bottom = 400.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "สรุปงาน"
+
+[node name="Close" parent="VBoxContainer/Topbar/HBoxContainer" index="3"]
+visible = false
+
+[node name="Score" type="Label" parent="VBoxContainer/Body/Content" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "คะแนน 0 / 100"
+
+[node name="Details" type="ScrollContainer" parent="VBoxContainer/Body/Content" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Breakdown" type="VBoxContainer" parent="VBoxContainer/Body/Content/Details" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Fix" type="Label" parent="VBoxContainer/Body/Content/Details/Breakdown" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "• ทำงานสำเร็จ  0 / 40"
+
+[node name="Safety" type="Label" parent="VBoxContainer/Body/Content/Details/Breakdown" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "• ปลอดภัย  0 / 30"
+
+[node name="Listen" type="Label" parent="VBoxContainer/Body/Content/Details/Breakdown" index="2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "• ฟังลูกค้า  0 / 20"
+
+[node name="Explain" type="Label" parent="VBoxContainer/Body/Content/Details/Breakdown" index="3"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "• อธิบาย  0 / 10"
+
+[node name="Notes" type="VBoxContainer" parent="VBoxContainer/Body/Content/Details/Breakdown" index="4"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/Body/Content/Details/Breakdown/Notes" index="0"]
+layout_mode = 2
+
+[node name="Finish" type="Button" parent="VBoxContainer/Body/Content" index="2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 42)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ส่งเครื่องคืนลูกค้า"

@@ -1,0 +1,97 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://cvubkb8pycgob" path="res://Assets/MiniGame/Desktop/os_icon_file_exe.png" id="2_icon"]
+
+[node name="OsWizard" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(460, 280)
+offset_right = 460.0
+offset_bottom = 280.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "ติดตั้ง"
+
+[node name="Page0" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="Welcome" type="Label" parent="VBoxContainer/Body/Content/Page0" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ยินดีต้อนรับสู่ตัวติดตั้ง"
+
+[node name="Intro" type="Label" parent="VBoxContainer/Body/Content/Page0" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 15
+text = "ตัวติดตั้งจะพาไปทีละขั้น อ่านทุกหน้าก่อนกดถัดไปนะ"
+
+[node name="Page1" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="1"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ComponentsTitle" type="Label" parent="VBoxContainer/Body/Content/Page1" index="0"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "เลือกส่วนประกอบ"
+
+[node name="CoreCheck" type="CheckBox" parent="VBoxContainer/Body/Content/Page1" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+button_pressed = true
+text = "โปรแกรม (จำเป็น)"
+
+[node name="BundleCheck" type="CheckBox" parent="VBoxContainer/Body/Content/Page1" index="2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+button_pressed = true
+text = "ติดตั้งโปรแกรมแถมด้วย (แนะนำ!) — ผู้สนับสนุน"
+
+[node name="Page2" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="2"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="InstallingTitle" type="Label" parent="VBoxContainer/Body/Content/Page2" index="0"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "กำลังติดตั้ง…"
+
+[node name="Progress" type="ProgressBar" parent="VBoxContainer/Body/Content/Page2" index="1"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+
+[node name="Page3" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="3"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="Done" type="Label" parent="VBoxContainer/Body/Content/Page3" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
+text = "ติดตั้งเสร็จแล้ว"
+
+[node name="Next" type="Button" parent="VBoxContainer/Body/Content" index="4"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ถัดไป ›"

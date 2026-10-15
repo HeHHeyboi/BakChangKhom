@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://cvubkb8pycgob" path="res://Assets/MiniGame/Desktop/os_icon_file_exe.png" id="2_icon"]
+
+[node name="OsHang" instance=ExtResource("1_base")]
+modulate = Color(0.85, 0.85, 0.85, 1)
+custom_minimum_size = Vector2(460, 260)
+offset_right = 460.0
+offset_bottom = 260.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "โปรแกรม (ไม่ตอบสนอง)"
+
+[node name="Close" parent="VBoxContainer/Topbar/HBoxContainer" index="3"]
+disabled = true
+
+[node name="Message" type="Label" parent="VBoxContainer/Body/Content" index="0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.35, 0.3, 1)
+theme_override_font_sizes/font_size = 17
+text = "กำลังทำงาน…
+โปรแกรมนี้ไม่ตอบสนอง กดอะไรก็ไม่ขยับ"
+autowrap_mode = 3

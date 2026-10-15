@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="2_icon"]
+
+[node name="OsSecurity" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(560, 400)
+offset_right = 560.0
+offset_bottom = 400.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "ขมการ์ด — ความปลอดภัย"
+
+[node name="Protection" type="CheckBox" parent="VBoxContainer/Body/Content" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+button_pressed = true
+text = "ป้องกันไวรัสตลอดเวลา (ปิดแล้วเครื่องเร็วขึ้น!?)"
+
+[node name="Scan" type="Button" parent="VBoxContainer/Body/Content" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+text = "สแกนทั้งเครื่อง"
+
+[node name="Threats" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="2"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/Body/Content" index="3"]
+layout_mode = 2
+
+[node name="TempLabel" type="Label" parent="VBoxContainer/Body/Content" index="4"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "ไฟล์ชั่วคราว: "
+
+[node name="CleanTemp" type="Button" parent="VBoxContainer/Body/Content" index="5"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+text = "ล้างไฟล์ชั่วคราว"
