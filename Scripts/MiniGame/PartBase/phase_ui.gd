@@ -644,7 +644,7 @@ static func _book_snapshot(phase: Control, v: Container) -> void:
 	tr.size = Vector2(w, h)
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(tr)
-	var t = phase.get_meta("hint_target", null)
+	var t = phase.get_meta("hint_target") if phase.has_meta("hint_target") else null # get_meta(ชื่อ, null) ยัง error ถ้าไม่มี meta (Godot ถือว่า null = ไม่มีค่าเริ่มต้น)
 	if t is Control and is_instance_valid(t):
 		if st.view_of(t) != st.view_of(st.find_view(st.current_view)):
 			return
