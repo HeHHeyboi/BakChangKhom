@@ -2,6 +2,7 @@ class_name DesktopOS extends RefCounted
 
 enum WinType {
 	Explorer,
+	Browser,
 }
 
 
@@ -72,6 +73,16 @@ func move_file(file_index: int, dest: String) -> bool:
 	file.dir = dest
 	file.prev_dir = from.dname
 	return true
+
+
+func clear_trash() -> void:
+	var trash = dir_map.get(TRASH) as Dir
+	assert(trash != null, "Can't find trash dir")
+	for i in trash.files:
+		var file: File = fs.get(i)
+		disk_free_mb += file.data.size_mb
+		fs.remove_at(i)
+	trash.files.clear()
 
 
 func add_instance(win: OsWindow2) -> void:

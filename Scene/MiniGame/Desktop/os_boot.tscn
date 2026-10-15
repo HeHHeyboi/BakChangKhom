@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://26ebfi5qvxra"]
 
-[ext_resource type="Script" path="res://Scripts/MiniGame/Desktop/os_boot.gd" id="1_boot"]
-[ext_resource type="Script" path="res://Scripts/MiniGame/Desktop/os_spinner.gd" id="2_spin"]
-[ext_resource type="Texture2D" path="res://Assets/MiniGame/Desktop/os_start.png" id="3_logo"]
-[ext_resource type="Texture2D" path="res://Assets/MiniGame/Desktop/os_wallpaper.jpg" id="4_wall"]
+[ext_resource type="Script" uid="uid://cn1m8uneyto7l" path="res://Scripts/MiniGame/Desktop/os_boot.gd" id="1_boot"]
+[ext_resource type="Script" uid="uid://umobyqc62nnh" path="res://Scripts/MiniGame/Desktop/os_spinner.gd" id="2_spin"]
+[ext_resource type="Texture2D" uid="uid://c4gi3n3u3gv1d" path="res://Assets/MiniGame/Desktop/os_start.png" id="3_logo"]
+[ext_resource type="Texture2D" uid="uid://d07dp7a6skaeb" path="res://Assets/MiniGame/Desktop/os_wallpaper.jpg" id="4_wall"]
 
 [sub_resource type="StyleBoxFlat" id="SB_avatar"]
 bg_color = Color(0.85, 0.55, 0.25, 1)
@@ -18,6 +18,8 @@ corner_radius_bottom_right = 48
 corner_radius_bottom_left = 48
 
 [sub_resource type="StyleBoxFlat" id="SB_signin"]
+content_margin_left = 24.0
+content_margin_right = 24.0
 bg_color = Color(1, 1, 1, 0.22)
 border_width_left = 1
 border_width_top = 1
@@ -28,10 +30,10 @@ corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-content_margin_left = 24.0
-content_margin_right = 24.0
 
 [sub_resource type="StyleBoxFlat" id="SB_signin_hover"]
+content_margin_left = 24.0
+content_margin_right = 24.0
 bg_color = Color(1, 1, 1, 0.35)
 border_width_left = 1
 border_width_top = 1
@@ -42,33 +44,30 @@ corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-content_margin_left = 24.0
-content_margin_right = 24.0
 
-[node name="OsBoot" type="Control"]
+[node name="OsBoot" type="Control" unique_id=1599778160]
 visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 script = ExtResource("1_boot")
-autoplay = false
 
-[node name="Black" type="ColorRect" parent="."]
+[node name="Black" type="ColorRect" parent="." unique_id=1859168389]
 layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Post" type="Control" parent="."]
+[node name="Post" type="Control" parent="." unique_id=681445408]
 unique_name_in_owner = true
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 
-[node name="Vendor" type="Label" parent="Post"]
+[node name="Vendor" type="Label" parent="Post" unique_id=251854017]
 layout_mode = 0
 offset_left = 48.0
 offset_top = 32.0
@@ -79,7 +78,7 @@ theme_override_font_sizes/font_size = 16
 text = "ขมBIOS เวอร์ชัน 1.0  ·  เมนบอร์ดร้านขม
 ซีพียู 4 คอร์ @ 3.2 GHz"
 
-[node name="PostText" type="Label" parent="Post"]
+[node name="PostText" type="Label" parent="Post" unique_id=1294259605]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 48.0
@@ -89,7 +88,7 @@ offset_bottom = 520.0
 theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 16
 
-[node name="Keys" type="Label" parent="Post"]
+[node name="Keys" type="Label" parent="Post" unique_id=765329848]
 layout_mode = 0
 offset_left = 48.0
 offset_top = 596.0
@@ -99,7 +98,7 @@ theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "กด DEL เพื่อเข้า BIOS  ·  กด F12 เพื่อเลือกอุปกรณ์บูต"
 
-[node name="Logo" type="Control" parent="."]
+[node name="Logo" type="Control" parent="." unique_id=1043347166]
 unique_name_in_owner = true
 visible = false
 anchors_preset = 0
@@ -107,7 +106,7 @@ offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 
-[node name="Mark" type="TextureRect" parent="Logo"]
+[node name="Mark" type="TextureRect" parent="Logo" unique_id=1411128380]
 layout_mode = 0
 offset_left = 516.0
 offset_top = 190.0
@@ -118,8 +117,8 @@ texture = ExtResource("3_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Spinner" type="Control" parent="Logo"]
-layout_mode = 0
+[node name="Spinner" type="Control" parent="Logo" unique_id=628654315]
+anchors_preset = 0
 offset_left = 556.0
 offset_top = 420.0
 offset_right = 596.0
@@ -127,7 +126,7 @@ offset_bottom = 460.0
 mouse_filter = 2
 script = ExtResource("2_spin")
 
-[node name="Starting" type="Label" parent="Logo"]
+[node name="Starting" type="Label" parent="Logo" unique_id=797269831]
 layout_mode = 0
 offset_top = 478.0
 offset_right = 1152.0
@@ -137,7 +136,7 @@ theme_override_font_sizes/font_size = 16
 text = "กำลังเริ่มต้น…"
 horizontal_alignment = 1
 
-[node name="Login" type="Control" parent="."]
+[node name="Login" type="Control" parent="." unique_id=791595080]
 unique_name_in_owner = true
 visible = false
 anchors_preset = 0
@@ -145,7 +144,7 @@ offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 
-[node name="Wallpaper" type="TextureRect" parent="Login"]
+[node name="Wallpaper" type="TextureRect" parent="Login" unique_id=1766667650]
 layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 648.0
@@ -154,14 +153,14 @@ texture = ExtResource("4_wall")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Shade" type="ColorRect" parent="Login"]
+[node name="Shade" type="ColorRect" parent="Login" unique_id=1507817848]
 layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 color = Color(0.05, 0.08, 0.15, 0.55)
 
-[node name="Clock" type="Label" parent="Login"]
+[node name="Clock" type="Label" parent="Login" unique_id=1974623382]
 unique_name_in_owner = true
 layout_mode = 0
 offset_top = 80.0
@@ -172,7 +171,7 @@ theme_override_font_sizes/font_size = 64
 text = "08:30"
 horizontal_alignment = 1
 
-[node name="Date" type="Label" parent="Login"]
+[node name="Date" type="Label" parent="Login" unique_id=2139249308]
 unique_name_in_owner = true
 layout_mode = 0
 offset_top = 162.0
@@ -183,7 +182,7 @@ theme_override_font_sizes/font_size = 17
 text = "สัปดาห์ที่ 1 · วันที่ 1"
 horizontal_alignment = 1
 
-[node name="Avatar" type="Panel" parent="Login"]
+[node name="Avatar" type="Panel" parent="Login" unique_id=1237336639]
 layout_mode = 0
 offset_left = 528.0
 offset_top = 250.0
@@ -192,7 +191,7 @@ offset_bottom = 346.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("SB_avatar")
 
-[node name="Initial" type="Label" parent="Login/Avatar"]
+[node name="Initial" type="Label" parent="Login/Avatar" unique_id=1528608547]
 layout_mode = 0
 offset_right = 96.0
 offset_bottom = 96.0
@@ -202,7 +201,7 @@ text = "ข"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="UserName" type="Label" parent="Login"]
+[node name="UserName" type="Label" parent="Login" unique_id=106690156]
 layout_mode = 0
 offset_top = 356.0
 offset_right = 1152.0
@@ -212,7 +211,7 @@ theme_override_font_sizes/font_size = 22
 text = "ร้านขม"
 horizontal_alignment = 1
 
-[node name="SignIn" type="Button" parent="Login"]
+[node name="SignIn" type="Button" parent="Login" unique_id=983182203]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 506.0
@@ -221,15 +220,15 @@ offset_right = 646.0
 offset_bottom = 438.0
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("SB_signin")
-theme_override_styles/hover = SubResource("SB_signin_hover")
 theme_override_styles/pressed = SubResource("SB_signin_hover")
+theme_override_styles/hover = SubResource("SB_signin_hover")
 text = "ลงชื่อเข้าใช้"
 
-[node name="Welcome" type="Label" parent="Login"]
+[node name="Welcome" type="Label" parent="Login" unique_id=847259164]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -241,7 +240,7 @@ theme_override_font_sizes/font_size = 18
 text = "ยินดีต้อนรับ"
 horizontal_alignment = 1
 
-[node name="SkipHint" type="Label" parent="."]
+[node name="SkipHint" type="Label" parent="." unique_id=1377440957]
 layout_mode = 0
 offset_left = 952.0
 offset_top = 612.0

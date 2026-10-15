@@ -48,6 +48,7 @@ const USB := "USB (E:)"
 @export_group("ลงโปรแกรม (INSTALL)")
 ## ชื่อโปรแกรมที่ต้องลง (ชื่อในเกม ไม่ใช้ชื่อ/โลโก้ของจริง)
 @export var install_name := "พูดคุย"
+@export_multiline("install description") var install_description: String
 ## เว็บทางการ (โชว์ในแถบที่อยู่ — สอนให้ดูที่อยู่เว็บ)
 @export var install_site := "pudkui.co.th"
 @export var install_size_mb := 350
@@ -116,7 +117,10 @@ const USB := "USB (E:)"
 ## ช่องที่ขาด — CustomerCase.problems() เรียกต่อ
 func problems() -> PackedStringArray:
 	var out := PackedStringArray()
-	if [files, programs, processes, printers, sound_devices, wifi, threats, resolutions].any(func(a): return a.has(null)):
+	if [files, programs, processes, printers, sound_devices, wifi, threats, resolutions].any(
+		func(a):
+			return a.has(null),
+	):
 		out.append("DesktopTask มีช่องว่าง (null) ในรายการ — ใส่ resource หรือลบช่องนั้น")
 		return out
 	if title.strip_edges() == "":
@@ -130,33 +134,58 @@ func problems() -> PackedStringArray:
 			out.append("DesktopTask มีไฟล์ที่ยังไม่ตั้งชื่อ (โฟลเดอร์ %s)" % f.folder_name())
 	match goal:
 		Goal.UNINSTALL:
-			if not programs.any(func(p): return p.adware):
+			if not programs.any(
+				func(p):
+					return p.adware,
+			):
 				out.append("DesktopTask UNINSTALL ต้องมีโปรแกรม adware อย่างน้อย 1")
 		Goal.FREE_SPACE:
 			if free_space_target_mb <= disk_free_mb:
 				out.append("DesktopTask FREE_SPACE: free_space_target_mb ต้องมากกว่า disk_free_mb")
 		Goal.CLOSE_HANG:
-			if not processes.any(func(p): return p.kind == "hang"):
+			if not processes.any(
+				func(p):
+					return p.kind == "hang",
+			):
 				out.append("DesktopTask CLOSE_HANG ต้องมีโปรแกรม kind = hang")
 		Goal.STARTUP:
-			if not processes.any(func(p): return p.startup and p.kind != "system"):
+			if not processes.any(
+				func(p):
+					return p.startup and p.kind != "system",
+			):
 				out.append("DesktopTask STARTUP ต้องมีโปรแกรมเปิดพร้อมเครื่องที่ปิดได้")
 		Goal.PRINTER:
-			if not printers.any(func(p): return p.right):
+			if not printers.any(
+				func(p):
+					return p.right,
+			):
 				out.append("DesktopTask PRINTER ต้องมีเครื่องพิมพ์ right = true")
 		Goal.SOUND:
-			if not sound_devices.any(func(d): return d.works):
+			if not sound_devices.any(
+				func(d):
+					return d.works,
+			):
 				out.append("DesktopTask SOUND ต้องมีอุปกรณ์ works = true")
 		Goal.WIFI:
-			if not wifi.any(func(w): return w.right):
+			if not wifi.any(
+				func(w):
+					return w.right,
+			):
 				out.append("DesktopTask WIFI ต้องมีเครือข่าย right = true")
 		Goal.BACKUP:
-			if not usb_drive or not files.any(func(f): return f.folder_name() == backup_folder and f.kind == "user"):
+			if not usb_drive or not files.any(check_backup):
 				out.append("DesktopTask BACKUP ต้องมี usb_drive และไฟล์ user ใน backup_folder")
 		Goal.VIRUS_SCAN:
 			if threats.is_empty():
 				out.append("DesktopTask VIRUS_SCAN ต้องมี threats")
 		Goal.DISPLAY:
-			if not resolutions.any(func(r): return r.best):
+			if not resolutions.any(
+				func(r):
+					return r.best,
+			):
 				out.append("DesktopTask DISPLAY ต้องมีความละเอียด best = true")
 	return out
+
+
+func check_backup(f):
+	return f.folder_name() == backup_folder and f.kind == "user"

@@ -1,36 +1,38 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bg5fix40lbvo0"]
 
 [ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://vl3xii148noc" path="res://Assets/MiniGame/Desktop/os_icon_chat.png" id="2_icon"]
 
-[node name="OsAsk" instance=ExtResource("1_base")]
+[node name="OsAsk" unique_id=941829299 instance=ExtResource("1_base")]
 custom_minimum_size = Vector2(560, 300)
 offset_right = 560.0
 offset_bottom = 300.0
 
-[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0" unique_id=1195365466]
 texture = ExtResource("2_icon")
 
-[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1" unique_id=1281458214]
 text = "คุยกับลูกค้า"
 
-[node name="Close" parent="VBoxContainer/Topbar/HBoxContainer" index="3"]
+[node name="Close" parent="VBoxContainer/Topbar/HBoxContainer" index="3" unique_id=1499284010]
 visible = false
 
-[node name="Request" type="Label" parent="VBoxContainer/Body/Content" index="0"]
+[node name="Request" type="Label" parent="VBoxContainer/Body/Content" index="0" unique_id=732375902]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "ลูกค้า: \"คำขอของลูกค้า\""
 autowrap_mode = 3
 
-[node name="Hint" type="Label" parent="VBoxContainer/Body/Content" index="1"]
+[node name="Hint" type="Label" parent="VBoxContainer/Body/Content" index="1" unique_id=1793571655]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.35, 0.3, 1)
 theme_override_font_sizes/font_size = 16
 text = "ก่อนลงมือ ถามอะไรลูกค้าก่อนดี?"
 
-[node name="Options" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="2"]
+[node name="Options" type="VBoxContainer" parent="VBoxContainer/Body/Content" index="2" unique_id=1613196550]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 6
+
+[editable path="VBoxContainer/Topbar"]

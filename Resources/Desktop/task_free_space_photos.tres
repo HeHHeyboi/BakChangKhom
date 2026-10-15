@@ -99,6 +99,7 @@ files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("R
 programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
 disk_free_mb = 300
 free_space_target_mb = 2000
+description = null
 traps = Array[StringName]([&"delete_system", &"delete_user", &"click_ad", &"fake_download"])
 ask_options = PackedStringArray("ลุงเก็บรูปไว้ที่ไหนบ้างครับ แล้วอันไหนห้ามหาย", "ลุงซื้อเครื่องนี้มากี่บาทครับ", "ลบทุกอย่างให้เกลี้ยงเลยได้ไหมครับ")
 ask_answer = "รูปงานบวชอยู่ในรูปภาพ ลุงก๊อปไว้หลายรอบกลัวหาย ตัวซ้ำลบได้ แต่ตัวจริงกับบัญชีสวนยางห้ามหายนะ"

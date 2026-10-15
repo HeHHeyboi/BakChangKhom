@@ -1,8 +1,14 @@
 class_name DesktopMinigameV2 extends PartMinigame
 
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
-const DIR := "res://Assets/MiniGame/Desktop/"
+const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
+
+# NOTE: Load app scene
 const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
+const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
+
+# NOTE: Icon Texture
+const DIR := "res://Assets/MiniGame/Desktop/"
 const TEX_WALL := preload(DIR + "os_wallpaper.jpg")
 const TEX_START := preload(DIR + "os_start.png")
 const TEX_NOTE := preload(DIR + "os_sticky_note.png")
@@ -29,11 +35,11 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 @export var boot_screen := true
 
 # NOTE: Taskbar icon
-@onready var start_button = %StartMenu
+@onready var start_button = %StartMenu as Button
 @onready var screen = %Screen
-@onready var explorer = %Explorer
-@onready var browser = %Browser
-@onready var settings = %Settings
+@onready var explorer = %Explorer as Button
+@onready var browser = %Browser as Button
+@onready var settings = %Settings as Button
 @onready var wifi = %Wifi
 @onready var sound = %Sound
 @onready var disk = %Disk
@@ -52,11 +58,16 @@ var os: DesktopOS
 var start_menu: PopupMenu
 # var file_menu: PopupMenu
 var customer_name: String
+# NOTE: Explorer var
 var _explorer_folder := "เดสก์ท็อป"
 var _explorer_win: OsExplorer
 var _explorer_list: ItemList
 var _explorer_path: Label
 var _explorer_status: Label
+
+# NOTE: Browser var
+var _browser_page: VBoxContainer
+var _browser_addr: LineEdit
 
 var items := [
 	["เอกสาร", TEX_FOLDER],
@@ -96,10 +107,10 @@ func _ready() -> void:
 	doc_icon.button.pressed.connect(open_explorer.bind("เอกสาร"))
 	pic_icon.button.pressed.connect(open_explorer.bind("รูปภาพ"))
 	download_icon.button.pressed.connect(open_explorer.bind("ดาวน์โหลด"))
-	# file_menu = PopupMenu.new()
-	# file_menu.add_item("เปิด")
-	# file_menu.add_item("ลบ")
-	# file_menu.id_pressed.connect(_on_file_menu)
+	trash_icon.button.pressed.connect(open_explorer.bind(DesktopOS.TRASH))
+	browser_icon.button.pressed.connect(open_browser)
+	explorer.pressed.connect(open_explorer)
+	browser.pressed.connect(open_browser)
 	self.add_child(start_menu)
 
 
@@ -117,20 +128,19 @@ func _on_start_button() -> void:
 func _on_start_menu(id: int) -> void:
 	match id:
 		0:
-			open_explorer("เอกสาร")
+			open_explorer(DOC_DIR)
 		1:
-			open_explorer("รูปภาพ")
+			open_explorer(PIC_DIR)
 		2:
-			open_explorer("ดาวน์โหลด")
+			open_explorer(DOWNLOAD_DIR)
 		3:
-			# open_browser()
-			print("browser")
+			open_browser()
+			# print("browser")
 		4:
 			# open_settings()
 			print("setting")
 		5:
-			# open_trash()
-			print("trash")
+			open_explorer(TRASH_DIR)
 		6:
 			# extra.open_task_manager()
 			print("task_manager")
@@ -147,8 +157,22 @@ func _on_file_menu(id: int) -> void:
 	pass
 
 
+func _find_window(key: String) -> OsWindow2:
+	for w in os.instances:
+		if is_instance_valid(w) and w.key == key:
+			return w
+	return null
+
+
+# NOTE: Explorer Logic
 ## หน้าต่างไฟล์ (Explorer) — โครงจาก os_explorer.tscn · ข้อมูลจาก os.dir_map / os.fs
-func open_explorer(folder: String) -> void:
+const DOC_DIR = "เอกสาร"
+const DOWNLOAD_DIR = "ดาวน์โหลด"
+const PIC_DIR = "รูปภาพ"
+const TRASH_DIR = DesktopOS.TRASH
+
+
+func open_explorer(folder: String = "เอกสาร") -> void:
 	_explorer_folder = folder
 	var w := _find_window("explorer")
 	if w == null:
@@ -157,7 +181,7 @@ func open_explorer(folder: String) -> void:
 		w.set_meta("type", os.WinType.Explorer)
 		screen.add_child(w)
 		var n := os.instances.size()
-		w.size = Vector2(450, 350)
+		w.size = DEFAULT_WINDOW_SIZE
 		w.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
 		w.position = w.position.clamp(Vector2.ZERO, (screen.size - w.size).max(Vector2.ZERO))
 		os.add_instance(w)
@@ -165,13 +189,6 @@ func open_explorer(folder: String) -> void:
 	else:
 		w.restore()
 	_refresh_explorer()
-
-
-func _find_window(key: String) -> OsWindow2:
-	for w in os.instances:
-		if is_instance_valid(w) and w.key == key:
-			return w
-	return null
 
 
 ## ผูกปุ่ม/รายการในฉาก os_explorer.tscn เข้ากับข้อมูล (ปุ่มโฟลเดอร์สร้างจากแม่แบบ Trash)
@@ -236,6 +253,10 @@ func _explorer_action(what: String) -> void:
 		print("eject_usb")
 		return
 	var idx := _explorer_selected()
+	if what == "delete" && _explorer_folder == DesktopOS.TRASH:
+		os.clear_trash()
+		_refresh_explorer()
+		return
 	var f: DesktopFile = os.fs[idx].data if idx >= 0 else null
 	if f == null:
 		_explorer_status.text = "เลือกไฟล์ก่อน"
@@ -257,20 +278,12 @@ func _explorer_action(what: String) -> void:
 			print("move_usb ", f.name)
 
 
-func _on_explorer_key(e: InputEvent) -> void:
-	if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_DELETE:
-		_explorer_action("delete")
-		_explorer_list.accept_event()
-
-
 func _refresh_explorer() -> void:
 	if not is_instance_valid(_explorer_list):
 		return
 	_explorer_list.clear()
 	_explorer_path.text = "เครื่องนี้ › " + _explorer_folder
-	_explorer_win.show_action_bar_preset(
-		OsExplorer.TRASH if _explorer_folder == DesktopOS.TRASH else OsExplorer.NORM,
-	)
+	_explorer_win.show_action_bar_preset(OsExplorer.TRASH if _explorer_folder == DesktopOS.TRASH else OsExplorer.NORM)
 	if free_mode:
 		_explorer_win.ask_action.hide()
 	var dir: DesktopOS.Dir = os.dir_map.get(_explorer_folder)
@@ -278,15 +291,68 @@ func _refresh_explorer() -> void:
 	if dir != null:
 		for idx in dir.files:
 			var f := os.fs[idx].data
-			var i := _explorer_list.add_item(
-				"%s      %s" % [f.name, DesktopMinigame.size_text(f.size_mb)],
-				_file_tex(f),
-			)
+			var i := _explorer_list.add_item("%s      %s" % [f.name, size_text(f.size_mb)], _file_tex(f))
 			_explorer_list.set_item_metadata(i, idx)
 			if f.kind == DesktopFile.FAKE_INSTALLER:
 				_explorer_list.set_item_custom_fg_color(i, Color(0.8, 0.3, 0.1))
 			count += 1
-	_explorer_status.text = "%d รายการ · เหลือ %s" % [count, DesktopMinigame.size_text(os.disk_free_mb)]
+	_explorer_status.text = "%d รายการ · เหลือ %s" % [count, size_text(os.disk_free_mb)]
+
+
+func _on_explorer_key(e: InputEvent) -> void:
+	if e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_DELETE:
+		_explorer_action("delete")
+		_explorer_list.accept_event()
+
+
+func size_text(mb: int) -> String:
+	if absi(mb) >= 1000:
+		return "%.1f GB" % (mb / 1000.0)
+	return "%d MB" % mb
+
+
+# NOTE: Browser Logic
+const BROWSER_HOME = "home"
+const BROWSER_OFFICIAL = "official"
+const OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
+
+
+func open_browser() -> void:
+	var w := _find_window("browser")
+	if w == null:
+		w = BROWSER_SCENE.instantiate()
+		w.restore(true)
+		w.set_meta("type", os.WinType.Browser)
+		w.size = DEFAULT_WINDOW_SIZE
+		_browser_page = w.get_node("%Page")
+		_browser_addr = w.get_node("%Address")
+		screen.add_child(w)
+	else:
+		w.restore()
+	_browser_show(BROWSER_HOME)
+
+
+func _browser_show(page: String) -> void:
+	if not is_instance_valid(_browser_page):
+		return
+	for c in _browser_page.get_children():
+		c.queue_free()
+	var is_install := task.goal == DesktopTask.Goal.INSTALL and not free_mode
+	if page == BROWSER_OFFICIAL:
+		var p = load(OFFICIAL_SCENE)
+		_browser_addr.text = "🔒 https://" + task.install_site
+		_browser_page.add_child(p)
+		var name: Label = p.get_node("%AppName")
+		var desc: Label = p.get_node("Description")
+		var download: Button = p.get_node("%Download")
+		name.text = task.install_name
+		desc.text = task.install_description
+		download.pressed.connect(
+			func():
+				_pib_toast(&"OFFICIAL_DONE", 3.0),
+			# open_explorer(""),
+		)
+		return
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
@@ -323,3 +389,8 @@ func _resolve_task() -> void:
 	if order is CustomerCase && order.get("desktop_task") is DesktopTask:
 		customer_name = order.customer
 		task = order.desktop_task
+
+
+func _pib_toast(section: StringName, secs := 3.5) -> void:
+	if is_instance_valid(pib) and dialog_dict.has(String(section)):
+		pib.toast(dialog_dict[String(section)][0], secs)
