@@ -52,6 +52,7 @@ static func save() -> bool:
 			"money": GameState.money, "xp": GameState.xp, "reputation": GameState.reputation,
 			"satisfaction": Array(GameState.satisfaction_history), "part_clears": clears, "story_flags": GameState.story_flags,
 			"level_stars": stars, "debt": GameState.debt, "village_fund": GameState.village_fund, "ending": String(GameState.ending),
+			"ledger": GameState.ledger.map(func(e: Dictionary) -> Dictionary: return { "ch": e.ch, "day": e.day, "kind": String(e.kind), "amount": e.amount, "note": e.note }), # [0.2.0-C]
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
@@ -96,6 +97,10 @@ static func load_into() -> int:
 	GameState.debt = int(g.get("debt", 0))
 	GameState.village_fund = int(g.get("village_fund", 0))
 	GameState.ending = StringName(g.get("ending", ""))
+	GameState.ledger.clear()
+	for e in g.get("ledger", []):
+		if e is Dictionary:
+			GameState.ledger.append({ "ch": int(e.get("ch", 0)), "day": int(e.get("day", 0)), "kind": StringName(e.get("kind", "other")), "amount": int(e.get("amount", 0)), "note": String(e.get("note", "")) })
 	var inv: Dictionary = d.get("inventory", { })
 	GameState.storage_slots = int(inv.get("slots", GameState.STORAGE_START))
 	for e in inv.get("items", []):

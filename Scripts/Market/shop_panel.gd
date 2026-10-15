@@ -218,7 +218,7 @@ func buy(it: ShopItem, qty := 1) -> bool:
 	else:
 		if not GameState.can_afford(it.price * qty):
 			return false
-		GameState.add_money(-it.price * qty)
+		GameState.add_money(-it.price * qty, &"buy", "%s ×%d" % [it.display_name, qty])
 	bought.emit(it)
 	_fill()
 	return true

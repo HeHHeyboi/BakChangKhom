@@ -649,7 +649,7 @@ func end_shift() -> void:
 		return
 	var ot := ot_slots_now()
 	if ot > 0:
-		GameState.add_money(-ot * _econ().ot_cost_per_slot)
+		GameState.add_money(-ot * _econ().ot_cost_per_slot, &"ot_power", "ล่วงเวลา %d เทิร์น" % ot)
 	if is_demo_last_shift():
 		demo_over = true
 		_close_requested = false

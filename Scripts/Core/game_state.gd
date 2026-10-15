@@ -163,6 +163,7 @@ func reset() -> void:
 	shop_bought.clear()
 	shop_week = 0
 	upgrades.clear()
+	ledger.clear()
 	inventory_changed.emit()
 	money_changed.emit(money, 0)
 	reputation_changed.emit(reputation, 0)
@@ -170,7 +171,9 @@ func reset() -> void:
 # ---------------------------------------------------------------- เงิน
 
 
-func add_money(delta: int) -> void:
+## เปลี่ยนเงิน + จดลง ledger · kind = หมวด (MONEY_KINDS) · note = ข้อความสั้น เช่น ชื่อของ
+## chapter > 0 = บังคับบทที่จด (ใช้ตอนจ่ายบิล ซึ่งยิงหลัง TimeSystem ขึ้นบทใหม่แล้ว)
+func add_money(delta: int, kind: StringName = &"other", note := "", chapter := 0) -> void:
 	if delta == 0:
 		return
 	money += delta
@@ -178,7 +181,92 @@ func add_money(delta: int) -> void:
 		village_fund += money - MONEY_CAP
 		delta -= money - MONEY_CAP
 		money = MONEY_CAP
+	if delta != 0:
+		var when := _ledger_when()
+		ledger.append({
+			"ch": chapter if chapter > 0 else when.x,
+			"day": when.y if chapter <= 0 else 0,
+			"kind": kind if MONEY_KINDS.has(kind) else &"other",
+			"amount": delta,
+			"note": note,
+		})
 	money_changed.emit(money, delta)
+
+# ---------------------------------------------------------------- [0.2.0-C] บันทึกรายรับ–รายจ่าย (ledger)
+# Docs/ROADMAP_1_0_0.md ข้อ 8.1 C · กำไรของบท = รายรับ − รายจ่าย (ไม่นับหมวด "ลงทุน" = ของที่อยู่ถาวร เช่น ชั้น/ตู้คลัง)
+
+## หมวดเงิน → ชื่อบนจอ
+const MONEY_KINDS := {
+	&"fee": "ค่าแรง",
+	&"tip": "ทิป",
+	&"sell": "ขายของคืน",
+	&"damage": "ชดใช้ของเสียหาย",
+	&"bill": "บิลรายเดือน",
+	&"ot_power": "ค่าไฟล่วงเวลา",
+	&"buy": "ซื้อของ",
+	&"invest": "ลงทุน",
+	&"other": "อื่น ๆ",
+}
+
+## รายการเงินเข้า/ออกทั้งเกม: { ch = บท 1–12 (0 = ไม่รู้บท), day = วันที่ 1–5 ของบท (0 = สิ้นบท), kind, amount (+ เข้า / − ออก), note }
+var ledger: Array[Dictionary] = []
+
+
+func _ledger_when() -> Vector2i:
+	var em := get_node_or_null(^"/root/EventManager")
+	var ts = em.get("time_system") if em else null
+	if not is_instance_valid(ts):
+		return Vector2i.ZERO
+	return Vector2i((ts as TimeSystem).chapter(), (ts as TimeSystem).shift_in_week())
+
+
+## รายการของบท ch
+func chapter_entries(ch: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for e in ledger:
+		if int(e.ch) == ch:
+			out.append(e)
+	return out
+
+
+## ยอดรวมต่อหมวดของบท ch → { kind: amount }
+func chapter_by_kind(ch: int) -> Dictionary:
+	var out := { }
+	for e in chapter_entries(ch):
+		out[e.kind] = int(out.get(e.kind, 0)) + int(e.amount)
+	return out
+
+
+## รายรับของบท (เงินเข้า ไม่นับลงทุน)
+func chapter_income(ch: int) -> int:
+	var n := 0
+	for e in chapter_entries(ch):
+		if int(e.amount) > 0 and e.kind != &"invest":
+			n += int(e.amount)
+	return n
+
+
+## รายจ่ายของบท (เป็นบวก ไม่นับลงทุน)
+func chapter_expense(ch: int) -> int:
+	var n := 0
+	for e in chapter_entries(ch):
+		if int(e.amount) < 0 and e.kind != &"invest":
+			n -= int(e.amount)
+	return n
+
+
+## เงินลงทุนของบท (เป็นบวก)
+func chapter_invest(ch: int) -> int:
+	var n := 0
+	for e in chapter_entries(ch):
+		if e.kind == &"invest":
+			n -= int(e.amount)
+	return n
+
+
+## กำไรของบท = รายรับ − รายจ่าย (ใช้เทียบเป้าเดือน · ไม่นับลงทุน)
+func chapter_profit(ch: int) -> int:
+	return chapter_income(ch) - chapter_expense(ch)
 
 
 func add_reputation(delta: int) -> void:
@@ -204,7 +292,7 @@ func pay_month_bill(month: int, slots_worked := 0) -> Dictionary:
 	}
 	bill["total"] = int(bill["rent"]) + int(bill["power"]) + int(bill["water"]) + int(bill["internet"]) + debt
 	var paid := mini(maxi(money, 0), int(bill["total"]))
-	add_money(-paid)
+	add_money(-paid, &"bill", "บิลบทที่ %d" % month, month)
 	debt = int(bill["total"]) - paid
 	bill["paid"] = paid
 	bill["debt"] = debt
@@ -413,9 +501,11 @@ func sell_back(index: int) -> int:
 	if index < 0 or index >= inventory.size() or String(inventory[index].reserved_for) != "":
 		return -1
 	var got := sell_price(index)
+	var sold := item_of(inventory[index])
+	var it_name := sold.display_name if sold else ""
 	inventory.remove_at(index)
 	if got > 0:
-		add_money(got)
+		add_money(got, &"sell", it_name)
 	inventory_changed.emit()
 	return got
 
@@ -462,7 +552,8 @@ func buy(item: ItemDef, qty := 1) -> String:
 	var why := buy_block_reason(item, qty)
 	if why != "":
 		return why
-	add_money(-item.price * qty)
+	# ของที่อยู่ถาวร (อัปเกรดคลัง) = ลงทุน ไม่นับเป็นค่าใช้จ่ายของเดือน
+	add_money(-item.price * qty, &"invest" if item.kind == ItemDef.Kind.UPGRADE else &"buy", "%s ×%d" % [item.display_name, qty])
 	add_item(item, qty)
 	if item.weekly_stock > 0:
 		shop_bought[item.id] = int(shop_bought.get(item.id, 0)) + qty
@@ -509,7 +600,14 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 			gained = roundi(e.xp_base * e.xp_mult_fail)
 
 	gained = roundi(gained * xp_mult)
-	add_money(delta)
+	# [0.2.0-C] จดแยกหมวด: ค่าแรง · ทิป · ชดใช้ของเสีย (รวมกันเท่ากับ delta เดิม)
+	var tip := e.tip_three_star if grade == Grade.GOOD and score >= e.three_star_score else 0
+	var label := String(part_id)
+	if delta > 0:
+		add_money(delta - tip, &"fee", label)
+		add_money(tip, &"tip", label)
+	elif delta < 0:
+		add_money(delta, &"damage", label)
 	satisfaction_history.append(sat)
 	add_xp(gained)
 	var rep := 0
