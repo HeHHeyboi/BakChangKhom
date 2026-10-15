@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="OsChoiceButton" type="Button"]
+custom_minimum_size = Vector2(0, 44)
+alignment = 0
+text = "ตัวเลือก"
+autowrap_mode = 3

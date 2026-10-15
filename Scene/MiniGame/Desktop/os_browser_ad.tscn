@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ad"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 0.93, 0.6, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(1, 0.45, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="OsBrowserAd" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_ad")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Tag" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.45, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "โฆษณา"
+
+[node name="AdDownload" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn")
+text = "⬇  DOWNLOAD NOW — ฟรี! เร็วกว่า 10 เท่า!!"

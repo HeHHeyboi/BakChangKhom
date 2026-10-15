@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[node name="OsBrowserResult" type="VBoxContainer"]
+
+[node name="Link" type="LinkButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 19
+text = "หัวข้อผลการค้นหา"
+
+[node name="Url" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.5, 0.25, 1)
+theme_override_font_sizes/font_size = 14
+text = "example.com"

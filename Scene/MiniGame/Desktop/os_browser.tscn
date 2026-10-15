@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://vmyermcs0242" path="res://Assets/MiniGame/Desktop/os_icon_browser.png" id="2_icon"]
+
+[node name="OsBrowser" instance=ExtResource("1_base")]
+custom_minimum_size = Vector2(660, 420)
+offset_right = 660.0
+offset_bottom = 420.0
+
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+texture = ExtResource("2_icon")
+
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+text = "เบราว์เซอร์"
+
+[node name="Top" type="HBoxContainer" parent="VBoxContainer/Body/Content" index="0"]
+layout_mode = 2
+
+[node name="Home" type="Button" parent="VBoxContainer/Body/Content/Top" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "⌂"
+
+[node name="Address" type="LineEdit" parent="VBoxContainer/Body/Content/Top" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="Scroll" type="ScrollContainer" parent="VBoxContainer/Body/Content" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Page" type="VBoxContainer" parent="VBoxContainer/Body/Content/Scroll" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
