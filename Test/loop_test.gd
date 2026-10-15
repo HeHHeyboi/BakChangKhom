@@ -78,7 +78,11 @@ func _ready() -> void:
 	await _frames(3)
 	_check(ds.visible and ds.is_playing() and ds._pib.texture != null, "ข้ามวัน → จอปิ๊บ + ปฏิทินขึ้น")
 	await ds.finished
-	_check(not ds.visible and ds._cal_day.text == "1" and ds._cal_month.text == "ก.พ." and ds._say.text.contains("ผ่านไป 7 วัน") and ds._say.text.contains("ของที่สั่งมาถึงแล้ว"), "ปฏิทินพลิกถึง 1 ก.พ. · ปิ๊บบอกผ่านไป 7 วัน + เรื่องที่เกิด (%s)" % ds._say.text.replace("\n", " / "))
+	_check(not ds.visible and ds._page_day.text == "1" and ds._page_month.text == "ก.พ." and ds._passed.text == "ผ่านไป 7 วัน", "ฉีกปฏิทินทีละวันถึง 1 ก.พ. · ป้ายเหนือปฏิทิน \"%s\"" % ds._passed.text)
+	_check(ds._pib.visible and ds._say.text == "ของที่สั่งมาถึงแล้ว" and not ds._say.text.contains("ผ่านไป"), "ปิ๊บพูดแค่เรื่องที่เกิดระหว่างข้ามวัน")
+	ds.play(7, 13, 1, 6, PackedStringArray(), 0.3)
+	await ds.finished
+	_check(not ds._pib.visible and ds._page_day.text == "13" and ds._passed.text == "ผ่านไป 6 วัน", "ไม่มีเรื่องเกิด → ไม่มีปิ๊บ · 7 → 13 ม.ค.")
 
 	# ---------------- B · ระดับงาน
 	DayLoop._reset_run()
