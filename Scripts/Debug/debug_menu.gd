@@ -53,7 +53,10 @@ func _ready() -> void:
 		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → 18:30)", "call": EventManager.advance_period },
 		{ "label": "เวลา: ปิดร้าน → กะถัดไป", "call": DayLoop.end_shift },
 		{ "label": "เวลา: ไป 18:30 กะสุดท้ายของสัปดาห์", "call": _jump_week_end },
-		{ "label": "จบบท: ไปปิดร้านวันสุดท้ายของบทที่ 1 (ศ.)", "call": func() -> void: EventManager.time_system.set_shift(maxi(DayLoop.demo_shifts, 1), TimeSystem.CLOSE) },
+		{ "label": "จบบท: ไปปิดร้านวันสุดท้ายของบทที่ 1 (ศ.) → ฉากยาย", "call": func() -> void: DayLoop.debug_goto(maxi(DayLoop.demo_shifts, 1)) },
+		# [0.2.0] เดโมจบที่บท 1 → ปิดเดโมก่อนถึงจะไปสิ้นเดือน/สิ้นเกมได้
+		{ "label": "ทดสอบเดือน: ปิดเดโม → ไปปิดร้านวันสุดท้ายของ ม.ค. (หน้าสรุปเดือน)", "call": func() -> void: _goto_no_demo(TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH) },
+		{ "label": "ทดสอบจบเกม: ปิดเดโม → ไปปิดร้านวันสุดท้ายของเกม", "call": func() -> void: _goto_no_demo(TimeSystem.TOTAL_SHIFTS) },
 		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ⭐⭐ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()
@@ -103,7 +106,15 @@ func _refresh_buttons() -> void:
 func _jump_week_end() -> void:
 	var ts: TimeSystem = EventManager.time_system
 	var last := (ts.week() - 1) * TimeSystem.SHIFTS_PER_WEEK + TimeSystem.SHIFTS_PER_WEEK
-	ts.set_shift(last, TimeSystem.CLOSE)
+	DayLoop.debug_goto(last) # [0.2.0] เดิม set_shift ตรง ๆ → เวลาถูกแอนิเมชันเขียนทับ
+
+
+func _goto_no_demo(s: int) -> void:
+	DayLoop.demo_shifts = 0
+	DayLoop.demo_over = false
+	DayLoop._demo_ack = false
+	DayLoop.force_active = true
+	DayLoop.debug_goto(s)
 
 
 func _unlock_levels() -> void:

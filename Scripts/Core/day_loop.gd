@@ -113,6 +113,7 @@ var _working := false # กำลังคุยกับลูกค้า / �
 var _shop_time := 0.0
 var _break_done := false
 var _skipping := false # กำลังเล่นแอนิเมชันเวลาหมุน
+var _skip_tw: Tween # [0.2.0] เก็บไว้ให้ debug_goto หยุดได้
 ## [0.2.0] ข้ามวันระหว่างวันที่ได้เล่น (ปิ๊บ + ปฏิทิน) · รอเล่นตอนการ์ดกระดานจะขึ้นครั้งแรกของวัน
 var _day_skip: DaySkip
 const DAY_SKIP_SCENE := preload("res://Scene/UI/day_skip.tscn")
@@ -579,6 +580,7 @@ func time_skip(minutes: int, seconds := 1.0) -> void:
 	_skip_overlay.modulate.a = 0.0
 	_skip_overlay.visible = true
 	var tw := create_tween()
+	_skip_tw = tw
 	tw.tween_property(_skip_overlay, "modulate:a", 1.0, 0.2)
 	tw.tween_method(_skip_step, float(from), float(to), maxf(seconds, 0.05))
 	tw.tween_interval(0.15)
@@ -648,6 +650,32 @@ func _play_day_skip() -> void:
 	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 2 and notes.is_empty() else 1.0)
 	await _day_skip.play(from_day, today.x, today.y, gap, notes, secs)
 	_skipping = false
+
+
+## [0.2.0 · Debug] กระโดดไปกะ s เวลา minute แบบเริ่มวันใหม่จริง (กระดานงาน/ลูกค้าบังคับของวันนั้น)
+## เดิม Debug ใช้ ts.set_shift() เฉย ๆ → แอนิเมชันเวลาหมุนที่ค้างอยู่เขียนเวลากลับเป็น 09:00 และลูกค้าบังคับของวันเดิมโผล่มา
+## ห้ามเรียกตอนบทพูด/มินิเกมเปิดอยู่ (ปิดบทก่อน ไม่งั้น callback ของบทจะทำงานผิดวัน)
+func debug_goto(s: int, minute := TimeSystem.CLOSE) -> bool:
+	var ts := _ts()
+	if ts == null or DialogScene.visible or Global.in_minigame or is_instance_valid(_minigame):
+		push_warning("debug_goto: ปิดบทพูด/มินิเกมก่อน")
+		return false
+	if _skip_tw and _skip_tw.is_valid():
+		_skip_tw.kill()
+	_skip_overlay.visible = false
+	_skipping = false
+	_break_done = true
+	_working = false
+	_result_pending = false
+	_pending_summary_week = 0
+	ts.set_shift(s)
+	_on_shift_started(ts.month(), ts.week(), ts.shift_in_week())
+	_day_skip_pending = false
+	forced_case = null
+	today_case = null
+	ts.set_clock(minute)
+	_board_dirty = true
+	return true
 
 
 func _skip_step(v: float) -> void:
