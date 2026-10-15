@@ -25,6 +25,8 @@ signal xp_changed(value: int, delta: int)
 signal rank_up(rank: int, rank_name: String)
 ## บิลรายเดือน { month, power, grandma, internet, total, paid, debt }
 signal bill_paid(bill: Dictionary)
+## [0.2.0-E] ปิดเดือน: ผลเทียบเป้า (GameState.close_month)
+signal month_closed(report: Dictionary)
 
 ## บทของแต่ละรอบ (index 0 = รอบ 1) · รอบ 1 เล่นผ่านเควสต์หลักแล้ว (main.tres) จึงไม่เปิดซ้ำ
 const CHAPTERS := [
@@ -105,6 +107,14 @@ var level_stars: Dictionary[int, int] = { }
 var debt := 0
 ## เงินที่ล้น MONEY_CAP
 var village_fund := 0
+## [0.2.0-E/F] ผลสิ้นเดือนที่ผ่านมา (month_report + strike/shop_closed)
+var month_results: Array[Dictionary] = []
+## พลาดเป้ากี่เดือน (นับหลังช่วงเรียนรู้) · ค้างบิลติดกันกี่เดือน · ร้านปิดแล้วไหม
+var missed_months := 0
+var debt_streak := 0
+var shop_closed := false
+## โหมดช่วย: เป้าเดือนลดลง (help_target_mult) · ไม่มีค่าปรับค้างชำระ
+var help_mode := false
 
 # ---- คลังของ (Docs/STORAGE_SHOP_ECO.md ข้อ 1) [Claude 13 ต.ค. 2569]
 signal inventory_changed
@@ -164,6 +174,10 @@ func reset() -> void:
 	shop_week = 0
 	upgrades.clear()
 	ledger.clear()
+	month_results.clear()
+	missed_months = 0
+	debt_streak = 0
+	shop_closed = false
 	inventory_changed.emit()
 	money_changed.emit(money, 0)
 	reputation_changed.emit(reputation, 0)
@@ -269,6 +283,56 @@ func chapter_profit(ch: int) -> int:
 	return chapter_income(ch) - chapter_expense(ch)
 
 
+## [0.2.0] เดือนของบท (4 บท = 1 เดือน)
+static func month_of(ch: int) -> int:
+	return floori((maxi(ch, 1) - 1) / float(TimeSystem.WEEKS_PER_MONTH)) + 1
+
+
+## รายการของเดือน m (รวมทุกบทในเดือน)
+func month_entries(m: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for e in ledger:
+		if int(e.ch) > 0 and month_of(int(e.ch)) == m:
+			out.append(e)
+	return out
+
+
+func month_by_kind(m: int) -> Dictionary:
+	var out := { }
+	for e in month_entries(m):
+		out[e.kind] = int(out.get(e.kind, 0)) + int(e.amount)
+	return out
+
+
+func month_income(m: int) -> int:
+	var n := 0
+	for e in month_entries(m):
+		if int(e.amount) > 0 and e.kind != &"invest":
+			n += int(e.amount)
+	return n
+
+
+func month_expense(m: int) -> int:
+	var n := 0
+	for e in month_entries(m):
+		if int(e.amount) < 0 and e.kind != &"invest":
+			n -= int(e.amount)
+	return n
+
+
+func month_invest(m: int) -> int:
+	var n := 0
+	for e in month_entries(m):
+		if e.kind == &"invest":
+			n -= int(e.amount)
+	return n
+
+
+## กำไรของเดือน (เทียบเป้าเดือน · ไม่นับลงทุน)
+func month_profit(m: int) -> int:
+	return month_income(m) - month_expense(m)
+
+
 func add_reputation(delta: int) -> void:
 	if delta == 0:
 		return
@@ -289,15 +353,91 @@ func pay_month_bill(month: int, slots_worked := 0) -> Dictionary:
 		"water": e.bill_water,
 		"internet": e.bill_internet,
 		"prev_debt": debt,
+		# [0.2.0-F] ค้างชำระเดือนก่อน → ค่าปรับ (โหมดช่วยไม่มี)
+		"late_fee": 0 if help_mode or debt <= 0 else ceili(debt * e.late_fee_rate),
 	}
-	bill["total"] = int(bill["rent"]) + int(bill["power"]) + int(bill["water"]) + int(bill["internet"]) + debt
+	bill["total"] = int(bill["rent"]) + int(bill["power"]) + int(bill["water"]) + int(bill["internet"]) + debt + int(bill["late_fee"])
 	var paid := mini(maxi(money, 0), int(bill["total"]))
-	add_money(-paid, &"bill", "บิลบทที่ %d" % month, month)
+	# จดเข้าบทสุดท้ายของเดือนนั้น (บิลจ่ายตอน TimeSystem ขึ้นเดือนใหม่แล้ว)
+	add_money(-paid, &"bill", "บิลเดือนที่ %d" % month, month * TimeSystem.WEEKS_PER_MONTH)
 	debt = int(bill["total"]) - paid
 	bill["paid"] = paid
 	bill["debt"] = debt
 	bill_paid.emit(bill)
 	return bill
+
+
+# ---------------------------------------------------------------- [0.2.0-E/F] ผลสิ้นเดือน
+
+
+## เป้ากำไรของเดือน m (โหมดช่วยลดลง)
+func target_of(m: int) -> int:
+	var e := economy if economy else EconomyConfig.new()
+	var t := e.target_for(m)
+	return roundi(t * e.help_target_mult) if help_mode else t
+
+
+## สรุปเดือน m (ไม่เปลี่ยนสถานะอะไร) — ใช้ทำหน้าสรุปเดือนและแถบเป้า
+## { m, income, expense, invest, profit, target, ratio, reached, over, debt, by_kind, hint }
+func month_report(m: int) -> Dictionary:
+	var e := economy if economy else EconomyConfig.new()
+	var target := maxi(target_of(m), 1)
+	var profit := month_profit(m)
+	var rep := {
+		"m": m,
+		"income": month_income(m),
+		"expense": month_expense(m),
+		"invest": month_invest(m),
+		"profit": profit,
+		"target": target,
+		"ratio": float(profit) / target,
+		"reached": profit >= target,
+		"over": profit >= roundi(target * e.over_target_ratio),
+		"debt": debt,
+		"by_kind": month_by_kind(m),
+	}
+	rep["hint"] = _month_hint(rep)
+	return rep
+
+
+## ปิดเดือน m (เรียกหลังจ่ายบิล): นับพลาดเป้า/ค้างบิล → ร้านปิดไหม · เก็บผลไว้ใน month_results
+func close_month(m: int) -> Dictionary:
+	var e := economy if economy else EconomyConfig.new()
+	var rep := month_report(m)
+	var counted := m > e.grace_months
+	rep["counted"] = counted
+	rep["strike"] = counted and not bool(rep.reached)
+	if rep.strike:
+		missed_months += 1
+	debt_streak = debt_streak + 1 if debt > 0 else 0
+	shop_closed = shop_closed or missed_months >= e.fail_missed_months or debt_streak >= e.fail_debt_months
+	rep["missed_months"] = missed_months
+	rep["debt_streak"] = debt_streak
+	rep["shop_closed"] = shop_closed
+	if bool(rep.reached):
+		add_reputation(e.rep_month_goal)
+	month_results.append(rep)
+	month_closed.emit(rep)
+	return rep
+
+
+## ปิ๊บบอกสาเหตุ 1 ข้อ
+func _month_hint(rep: Dictionary) -> String:
+	var by: Dictionary = rep.by_kind
+	var income := maxi(int(rep.income), 1)
+	if int(rep.debt) > 0:
+		return "เงินไม่พอจ่ายบิล ยอดที่ค้างจะโดนค่าปรับเดือนหน้า เก็บเงินไว้จ่ายบิลก่อนซื้อของที่ยังไม่จำเป็นนะ"
+	if bool(rep.over):
+		return "เกินเป้าไปเยอะเลย! ลองเก็บเงินส่วนหนึ่งไว้ลงทุนกับร้านดูไหม"
+	if bool(rep.reached):
+		return "ถึงเป้าแล้ว เดือนหน้าเป้าจะสูงขึ้น รับงานที่ยากขึ้นได้แล้วนะ"
+	if -int(by.get(&"damage", 0)) > 0:
+		return "เดือนนี้ต้องชดใช้ของลูกค้าที่เสีย เลือกเครื่องมือให้ถูกและทำตามขั้นตอนจะไม่พลาดนะ"
+	if -int(by.get(&"buy", 0)) > income * 0.3:
+		return "เดือนนี้ซื้อของเยอะ ลองซื้อเฉพาะที่ต้องใช้กับงานก่อนนะ"
+	if -int(by.get(&"ot_power", 0)) > income * 0.1:
+		return "ทำงานล่วงเวลาบ่อย ค่าไฟเลยแพง ลองเลือกงานให้พอดีกับเวลาในวันนะ"
+	return "รายได้ยังน้อย ลองรับงานให้มากขึ้น หรือทำให้ได้ 3 ดาวจะได้ทิปด้วยนะ"
 
 
 ## ยศช่าง 0–4 จาก XP
@@ -670,7 +810,7 @@ func finish_game() -> void:
 
 ## ฉากจบตาม GAME_LOOP §6 · ยศช่างยังไม่มี จึงใช้ XP แทนชั่วคราว
 func decide_ending() -> StringName:
-	if average_satisfaction() < 40.0 or money < 0 or debt > 0:
+	if shop_closed or average_satisfaction() < 40.0 or money < 0 or debt > 0:
 		return &"failure"
 	match story_flags.get(&"ch11_choice", &"stay"):
 		&"city":

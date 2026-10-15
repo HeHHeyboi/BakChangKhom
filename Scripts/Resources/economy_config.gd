@@ -64,7 +64,7 @@ class_name EconomyConfig extends Resource
 @export_group("กระดานงาน (LEVEL_DESIGN ข้อ 5)")
 ## งานใหม่ขึ้นกระดานตอนเปิดร้าน ต่อกะ (ช่อง 0 = บท/เดือน 1 … ช่อง 11 = บท 12)
 ## [0.2.0] ขยายจาก 3 ช่อง (เดือนละ 4 บทแบบเดิม) เป็น 12 ช่อง — ค่าเดิมเดือน 1/2/3 = บท 1–4 / 5–8 / 9–12 · กระดานจะถูกแทนด้วยลูกค้าหน้าร้านใน 0.3.0
-@export var board_new_per_shift: PackedInt32Array = [5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3]
+@export var board_new_per_shift: PackedInt32Array = [5, 4, 3]
 ## งานโทรเข้าตอนพักบ่าย 15:30
 @export var board_phone_jobs := 1
 ## กระดานแสดงได้มากสุดกี่ใบ
@@ -84,16 +84,36 @@ class_name EconomyConfig extends Resource
 @export var rep_reject := -1
 @export var rep_walkout := -3
 
-@export_group("บิลรายเดือน = ทุกบท (Docs/ROADMAP_1_0_0.md ข้อ 5.1)")
-## [0.2.0] 1 บท = 1 เดือนที่เปิดร้านแค่ 5 วัน → บิลคิดต่อบท ตัวเลขจึงเล็กกว่าเดิม (เดิม ไฟ 500–900 + บ้านยาย 1,500 + เน็ต 300 ทุก 4 บท)
-## ค่าเช่าที่หน้าบ้านยาย ต่อบท (ช่อง 0 = บท 1) · บท 1 ยายยกให้ · ร้านโตขึ้นใช้พื้นที่มากขึ้น
-@export var bill_rent: PackedInt32Array = [0, 300, 300, 300, 500, 500, 500, 500, 700, 700, 700, 700]
-## ค่าไฟฐานต่อบท · บท 8 เป็นต้นไป +50 (หน้าร้อน/ค่าไฟขึ้น)
-@export var power_base: PackedInt32Array = [100, 100, 100, 100, 100, 100, 100, 150, 150, 150, 150, 150]
-## ค่าไฟต่อเทิร์นที่ทำงานจริงในบทนั้น (TimeSystem.work_slots_used_this_month) · ค่าไฟล่วงเวลา (ot_cost_per_slot) จ่ายทันทีตอนปิดร้านแยกต่างหาก
+@export_group("บิลรายเดือน (ทุก 4 บท · Docs/ROADMAP_1_0_0.md ข้อ 5.1)")
+## [0.2.0] 1 บท = 1 สัปดาห์ · 1 เดือน = 4 บท = 20 วันทำการ · ช่อง 0 = เดือน 1 (ม.ค.)
+## ค่าเช่าที่หน้าบ้านยาย ต่อเดือน
+@export var bill_rent: PackedInt32Array = [1500, 1500, 1500]
+## ค่าไฟฐานต่อเดือน · มี.ค. หน้าร้อนแพงขึ้น
+@export var power_base: PackedInt32Array = [200, 200, 250]
+## ค่าไฟต่อเทิร์นที่ทำงานจริงในเดือนนั้น (TimeSystem.work_slots_used_this_month) · ค่าไฟล่วงเวลา (ot_cost_per_slot) จ่ายทันทีตอนปิดร้านแยกต่างหาก
 @export var power_per_slot := 4
-@export var bill_water := 50
-@export var bill_internet := 150
+@export var bill_water := 100
+@export var bill_internet := 300
+
+@export_group("เป้ากำไรรายเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.2 · 8.1 D)")
+## [0.2.0-D] กำไรขั้นต่ำต่อเดือน (ช่อง 0 = ม.ค.) · กำไร = รายรับ − รายจ่าย ไม่นับเงินลงทุน (GameState.month_profit) · ค่าทดลอง ≈ 70–75% ของกำไรเมื่อเล่นปกติ
+@export var month_target: PackedInt32Array = [2000, 7000, 10000]
+
+@export_group("ผลสิ้นเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.3 · 8.1 E–F)")
+## ค่าปรับยอดค้างชำระ (สัดส่วนของยอดค้าง) บวกในบิลเดือนถัดไป · โหมดช่วยไม่มีค่าปรับ
+@export var late_fee_rate := 0.1
+## กี่เดือนแรกที่ไม่นับว่าพลาดเป้า (ช่วงเรียนรู้)
+@export var grace_months := 1
+## พลาดเป้ากี่เดือน (หลังช่วงเรียนรู้) → ร้านปิด
+@export var fail_missed_months := 2
+## ค้างบิลกี่เดือนติดกัน → ร้านปิด
+@export var fail_debt_months := 2
+## กำไร ≥ เป้า × ค่านี้ = "เกินเป้า"
+@export var over_target_ratio := 1.3
+## ชื่อเสียงที่ได้เมื่อถึงเป้าเดือน
+@export var rep_month_goal := 3
+## โหมดช่วย: เป้าเหลือกี่เท่า
+@export var help_target_mult := 0.7
 
 @export_group("ยศช่าง (GAME_REDESIGN 10.1)")
 @export var rank_xp: PackedInt32Array = [0, 500, 1500, 3500, 7000]
@@ -110,6 +130,11 @@ func xp_mult_for_level(level: int) -> float:
 
 func avg_slots_for_level(level: int) -> float:
 	return level_avg_slots[clampi(level, 1, level_avg_slots.size()) - 1] if not level_avg_slots.is_empty() else 3.0
+
+
+## [0.2.0-D] เป้ากำไรของเดือน m (1–3)
+func target_for(m: int) -> int:
+	return month_value(month_target, m)
 
 
 func month_value(arr: PackedInt32Array, month: int) -> int:

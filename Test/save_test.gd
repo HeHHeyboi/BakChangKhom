@@ -53,7 +53,7 @@ func _ready() -> void:
 	add_child(start)
 	await get_tree().process_frame
 	var cont: Button = start.get_node("Menu/Continue_Button")
-	_check(cont.visible and cont.text.contains("วันที่ 4"), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
+	_check(cont.visible and cont.text.contains("บทที่ 1 · พฤ. 7 ม.ค."), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
 	start._on_start_button_pressed()
 	_check(SaveGame.exists() and start.get_node("Menu/Start_Button").text.contains("อีกครั้ง"), "มีเซฟ → เริ่มเกมใหม่ต้องกดยืนยันอีกครั้ง")
 	start._on_start_button_pressed()
@@ -89,6 +89,32 @@ func _ready() -> void:
 	PauseMenu.open()
 	_check(PauseMenu.save_now() and PauseMenu.get_node("%SaveButton").text.contains("บันทึกแล้ว"), "ปุ่มบันทึกเกม → บันทึกแล้ว ✓")
 	PauseMenu.resume()
+
+	# [0.2.0-G] ผลสิ้นเดือนเซฟ/โหลดได้
+	GameState.missed_months = 1
+	GameState.debt_streak = 1
+	GameState.help_mode = true
+	GameState.month_results.clear()
+	GameState.month_results.append({ "m": 1, "profit": 1500, "reached": false, "by_kind": { &"fee": 1500 } })
+	_check(SaveGame.save(), "บันทึกผลสิ้นเดือน")
+	GameState.missed_months = 0
+	GameState.debt_streak = 0
+	GameState.help_mode = false
+	GameState.month_results.clear()
+	_check(SaveGame.load_into() >= 0 and GameState.missed_months == 1 and GameState.debt_streak == 1 and GameState.help_mode and GameState.month_results.size() == 1 and int(GameState.month_results[0].profit) == 1500, "โหลด → ผลสิ้นเดือน พลาดเป้า ค้างบิล โหมดช่วย ครบ")
+	GameState.help_mode = false
+	_check(not SaveGame.is_old_version(), "เซฟปัจจุบันไม่ใช่เวอร์ชันเก่า")
+	# เซฟเวอร์ชัน 1 (0.1.x) → โหลดไม่ได้ · เมนูบอกให้เริ่มใหม่
+	var old := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
+	old.store_string(JSON.stringify({ "version": 1, "game": { "shift": 3, "money": 99 } }))
+	old.close()
+	_check(SaveGame.is_old_version() and SaveGame.info().is_empty(), "เซฟ v1 → is_old_version() · info ว่าง")
+	var start2: Control = load("res://Scene/Start_Scene.tscn").instantiate()
+	add_child(start2)
+	await get_tree().process_frame
+	var cont2: Button = start2.get_node("Menu/Continue_Button")
+	_check(cont2.visible and cont2.disabled and cont2.text.contains("เวอร์ชันเก่า"), "เมนู: %s (กดไม่ได้)" % cont2.text)
+	start2.queue_free()
 
 	# คืนเซฟเดิมของผู้เล่น
 	if backup != "":

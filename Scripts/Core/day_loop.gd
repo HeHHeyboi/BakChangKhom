@@ -98,6 +98,8 @@ var _retried: Array[CustomerCase] = []
 var _close_requested := false
 var _parts_seen: Dictionary = { } # part_id → true (ครั้งแรกใช้เวลา +1 ช่อง)
 var _last_bill: Dictionary = { }
+## [0.2.0-E] ผลสิ้นเดือนล่าสุด (GameState.close_month) — แสดงในการ์ดสรุปบทที่เป็นสิ้นเดือน
+var _last_month: Dictionary = { }
 var _pending_summary_week := 0
 var _game_over := false
 ## จบเดโมแล้ว (ครบ demo_shifts กะ) · _demo_ack = กดกลับบ้านแล้ว (โชว์ป้ายแทนการ์ด)
@@ -113,9 +115,15 @@ var _break_done := false
 var _skipping := false # กำลังเล่นแอนิเมชันเวลาหมุน
 ## [0.2.0] ข้ามวันระหว่างวันที่ได้เล่น (ปิ๊บ + ปฏิทิน) · รอเล่นตอนการ์ดกระดานจะขึ้นครั้งแรกของวัน
 var _day_skip: DaySkip
+const DAY_SKIP_SCENE := preload("res://Scene/UI/day_skip.tscn")
+const GOAL_BAR_SCENE := preload("res://Scene/UI/month_goal_bar.tscn")
+## [0.2.0-D] แถบเป้ากำไรเดือนนี้ (Scene/UI/month_goal_bar.tscn)
+var goal_bar: MonthGoalBar
 var _day_skip_pending := false
 ## เวลาแอนิเมชันข้ามวัน (วินาที) · 0 = ไม่เล่น (เทสต์ตั้งเองได้)
 @export var day_skip_seconds := 2.4
+## วันธรรมดา (ข้าม 1 วัน ไม่มีเรื่องเกิด) ใช้เวลากี่เท่าของ day_skip_seconds
+@export_range(0.1, 1.0) var day_skip_short_ratio := 0.5
 ## เรื่องที่เกิดระหว่างข้ามวัน (ระบบอื่นใส่ก่อนเปิดร้าน เช่น ของมาถึง · ลูกค้ามารับเครื่อง) — ล้างหลังแสดง
 var day_skip_notes := PackedStringArray()
 var _pending_cb := Callable() # callback ที่รอ DialogScene.on_dialog_finish อยู่ (ถอดได้ถ้าบทไม่ขึ้น)
@@ -379,6 +387,10 @@ func _on_week_ended(week: int) -> void:
 func _on_month_ended(month: int) -> void:
 	# [0.2.0] ยิงทุกบท (1 บท = 1 เดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
 	_last_bill = GameState.pay_month_bill(month, _ts().work_slots_used_this_month() if _ts() else 0)
+	# [0.2.0-E/F] ปิดเดือน: เทียบกำไรกับเป้า · นับพลาดเป้า/ค้างบิล · ร้านปิด → ไปฉากจบ
+	_last_month = GameState.close_month(month)
+	if bool(_last_month.get("shop_closed", false)):
+		_game_over = true
 
 
 func _on_game_ended() -> void:
@@ -575,6 +587,47 @@ func time_skip(minutes: int, seconds := 1.0) -> void:
 	_skipping = false
 
 
+## [0.2.0-E] ข้อความสรุปเดือน (ใช้ในการ์ดสรุปบทที่เป็นสิ้นเดือน)
+func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
+	var by: Dictionary = rep.get("by_kind", { })
+	var b := func(n: int) -> String: return MonthGoalBar._baht(n)
+	var parts_in := PackedStringArray()
+	var parts_out := PackedStringArray()
+	for k in [&"fee", &"tip", &"sell", &"other"]:
+		if int(by.get(k, 0)) > 0:
+			parts_in.append("%s %s" % [GameState.MONEY_KINDS[k], b.call(int(by[k]))])
+	for k in [&"bill", &"buy", &"ot_power", &"damage", &"other"]:
+		if int(by.get(k, 0)) < 0:
+			parts_out.append("%s %s" % [GameState.MONEY_KINDS[k], b.call(-int(by[k]))])
+	var lines := PackedStringArray()
+	lines.append("รายรับ %s%s" % [b.call(int(rep.income)), (" (" + " · ".join(parts_in) + ")") if not parts_in.is_empty() else ""])
+	lines.append("รายจ่าย %s%s" % [b.call(int(rep.expense)), (" (" + " · ".join(parts_out) + ")") if not parts_out.is_empty() else ""])
+	if not bill.is_empty():
+		lines.append("   บิล: ค่าเช่าที่ %s · ไฟ %s · น้ำ %s · เน็ต %s%s%s" % [
+			b.call(int(bill.get("rent", 0))), b.call(int(bill.get("power", 0))), b.call(int(bill.get("water", 0))), b.call(int(bill.get("internet", 0))),
+			(" · ยอดค้างเดิม " + b.call(int(bill.prev_debt))) if int(bill.get("prev_debt", 0)) > 0 else "",
+			(" · ค่าปรับ " + b.call(int(bill.late_fee))) if int(bill.get("late_fee", 0)) > 0 else "",
+		])
+	if int(rep.invest) > 0:
+		lines.append("ลงทุน %s (ไม่นับในกำไร)" % b.call(int(rep.invest)))
+	var result := ""
+	if bool(rep.get("over", false)):
+		result = "เกินเป้า!"
+	elif bool(rep.reached):
+		result = "ถึงเป้าแล้ว!"
+	elif not bool(rep.get("counted", true)):
+		result = "ยังไม่ถึงเป้า (เดือนแรกยังไม่นับ)"
+	else:
+		result = "ไม่ถึงเป้า (พลาดเป้า %d/%d เดือน)" % [int(rep.get("missed_months", 0)), _econ().fail_missed_months]
+	lines.append("กำไร %s / เป้า %s → %s" % [b.call(int(rep.profit)), b.call(int(rep.target)), result])
+	if int(rep.get("debt", 0)) > 0:
+		lines.append("ค้างบิล %s (ค้างติดกัน %d/%d เดือน)" % [b.call(int(rep.debt)), int(rep.get("debt_streak", 0)), _econ().fail_debt_months])
+	if bool(rep.get("shop_closed", false)):
+		lines.append("ร้านไปต่อไม่ไหวแล้ว…")
+	lines.append("ปิ๊บ: " + String(rep.get("hint", "")))
+	return "\n".join(lines)
+
+
 func _play_day_skip() -> void:
 	var ts := _ts()
 	if ts == null or _day_skip == null:
@@ -582,13 +635,15 @@ func _play_day_skip() -> void:
 	_skipping = true
 	_hide()
 	var gap := ts.days_since_last_play()
-	var to_day := ts.calendar_day()
-	var from_day := to_day - gap
+	var today := ts.calendar_date()
+	var from_day := today.x - gap
 	if from_day < 1:
-		from_day += TimeSystem.days_in_month(ts.month() - 1 if ts.month() > 1 else 12)
+		from_day += TimeSystem.days_in_month(today.y - 1 if today.y > 1 else 12)
 	var notes := day_skip_notes.duplicate()
 	day_skip_notes.clear()
-	await _day_skip.play(from_day, to_day, ts.month(), gap, notes, day_skip_seconds)
+	# วันธรรมดา (ข้าม 1 วัน) เล่นสั้นกว่า · ศุกร์ → จันทร์ (ข้ามเสาร์–อาทิตย์) เล่นเต็ม
+	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 1 and notes.is_empty() else 1.0)
+	await _day_skip.play(from_day, today.x, today.y, gap, notes, secs)
 	_skipping = false
 
 
@@ -794,6 +849,7 @@ func _continue_after_summary() -> void:
 	_pending_summary_week = 0
 	week_results.clear()
 	_last_bill = { }
+	_last_month = { }
 	week_start_money = GameState.money
 	if _game_over:
 		GameState.finish_game()
@@ -1018,30 +1074,18 @@ func _show_card(card: Card) -> void:
 				sat += float(r.get("satisfaction", 0))
 			sat = sat / week_results.size() if not week_results.is_empty() else 0.0
 			sat = sat if is_finite(sat) else 0.0
-			var bill := ""
-			if not _last_bill.is_empty():
-				bill = "\n\nบิลเดือนนี้: ค่าเช่าที่ ฿%d · ไฟ ฿%d · น้ำ ฿%d · เน็ต ฿%d%s\nจ่ายแล้ว ฿%d%s" % [
-					int(_last_bill.get("rent", 0)),
-					int(_last_bill.get("power", 0)),
-					int(_last_bill.get("water", 0)),
-					int(_last_bill.get("internet", 0)),
-					(" · ยอดค้างเดิม ฿%d" % int(_last_bill.get("prev_debt", 0))) if int(_last_bill.get("prev_debt", 0)) > 0 else "",
-					int(_last_bill.get("paid", 0)),
-					(" · ค้าง ฿%d" % int(_last_bill.get("debt", 0))) if int(_last_bill.get("debt", 0)) > 0 else "",
-				]
-			var mi := clampi(_pending_summary_week, 1, TimeSystem.MONTH_NAME.size()) - 1
-			_title.text = "สรุปเดือน %s · บทที่ %d" % [TimeSystem.MONTH_NAME[mi], _pending_summary_week]
-			_body.text = "งานที่ซ่อม %d งาน\nเงินเพิ่ม/ลดเดือนนี้ (หลังจ่ายบิล) %s฿%d\nความพอใจเฉลี่ย %d · ชื่อเสียง %d\nยศ %s · XP %d%s" % [
-				week_results.size(),
-				"+" if earned >= 0 else "−",
-				absi(earned),
-				roundi(sat),
-				GameState.reputation,
-				GameState.rank_name(),
-				GameState.xp,
-				bill,
+			var mi := clampi(GameState.month_of(_pending_summary_week), 1, TimeSystem.MONTH_NAME.size()) - 1
+			var week_line := "งานที่ซ่อม %d งาน · ความพอใจเฉลี่ย %d · ชื่อเสียง %d · ยศ %s (XP %d)" % [
+				week_results.size(), roundi(sat), GameState.reputation, GameState.rank_name(), GameState.xp,
 			]
-			_primary.text = "ดูฉากจบ" if _game_over else "ไปต่อ (บทที่ %d)" % (_pending_summary_week + 1)
+			if _last_month.is_empty():
+				_title.text = "สรุปบทที่ %d (สัปดาห์ที่ %d ของ %s)" % [_pending_summary_week, (_pending_summary_week - 1) % TimeSystem.WEEKS_PER_MONTH + 1, TimeSystem.MONTH_NAME[mi]]
+				_body.text = "%s\nเงินเพิ่ม/ลดสัปดาห์นี้ %s%s" % [week_line, "+" if earned >= 0 else "", MonthGoalBar._baht(earned)]
+			else:
+				# [0.2.0-E] สิ้นเดือน: รายรับ/รายจ่ายแยกหมวด · ลงทุน · กำไรเทียบเป้า · ผล · ปิ๊บบอกสาเหตุ
+				_title.text = "สิ้นเดือน %s · สรุปบทที่ %d" % [TimeSystem.MONTH_NAME[mi], _pending_summary_week]
+				_body.text = "%s\n\n%s" % [week_line, month_summary_text(_last_month, _last_bill)]
+			_primary.text = ("ร้านไปต่อไม่ไหว… ดูฉากจบ" if GameState.shop_closed else "ดูฉากจบ") if _game_over else "ไปต่อ (บทที่ %d)" % (_pending_summary_week + 1)
 		Card.ENDING:
 			_title.text = "จบเกม"
 			_body.text = "%s\n\nเงิน ฿%d · ความพอใจเฉลี่ย %d · ชื่อเสียง %d" % [
@@ -1210,14 +1254,24 @@ func _build_time_skip() -> void:
 	_skip_caption.position = Vector2(0, 340)
 	_skip_caption.size = Vector2(1152, 48)
 	_skip_overlay.add_child(_skip_caption)
-	# ชั้นของตัวเอง 110: อยู่เหนือ HUD (100) และปุ่มคลัง (105) แต่ใต้บทพูด/เมนูพัก (128)
-	var skip_layer := CanvasLayer.new()
-	skip_layer.name = "DaySkipLayer"
-	skip_layer.layer = 110
-	add_child(skip_layer)
-	_day_skip = DaySkip.new()
-	_day_skip.name = "DaySkip"
-	skip_layer.add_child(_day_skip)
+	# [0.2.0] ฉากข้ามวัน + แถบเป้าเดือน วางใน day_loop.tscn (ปรับใน Editor ได้) · DaySkipLayer ชั้น 110 (เหนือ HUD 100 / ปุ่มคลัง 105 ใต้บทพูด 128) · GoalLayer ชั้น 100
+	_day_skip = _ensure_ui(^"DaySkipLayer", 110, DAY_SKIP_SCENE) as DaySkip
+	goal_bar = _ensure_ui(^"GoalLayer", 100, GOAL_BAR_SCENE) as MonthGoalBar
+
+
+## หาโหนด UI ที่วางไว้ใน day_loop.tscn · ถ้าไม่มี (เช่นฉากเก่า) สร้างชั้น + ฉากให้เอง
+func _ensure_ui(layer_name: NodePath, layer_no: int, scene: PackedScene) -> Node:
+	var layer := get_node_or_null(layer_name) as CanvasLayer
+	if layer == null:
+		layer = CanvasLayer.new()
+		layer.name = String(layer_name)
+		layer.layer = layer_no
+		add_child(layer)
+	if layer.get_child_count() > 0:
+		return layer.get_child(0)
+	var n := scene.instantiate()
+	layer.add_child(n)
+	return n
 
 
 func _card_style() -> StyleBoxFlat:

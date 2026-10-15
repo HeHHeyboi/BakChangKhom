@@ -6,7 +6,8 @@ class_name SaveGame extends RefCounted
 ## โหลด: ปุ่ม "เล่นต่อ" ในเมนูหลัก · เริ่มเกมใหม่ = ลบเซฟเดิม
 
 const PATH := "user://save.json"
-const VERSION := 1
+## [0.2.0-G] 2 = เวลาแบบสัปดาห์ + ledger + ผลสิ้นเดือน · เซฟ 1 (0.1.x) ใช้ไม่ได้ → เมนูบอกให้เริ่มใหม่
+const VERSION := 2
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
 static var allow_in_tests := false
 
@@ -21,6 +22,26 @@ static func clear() -> void:
 
 
 ## ข้อมูลย่อสำหรับปุ่มเล่นต่อ { shift, money, rank } · ไม่มีเซฟ = {}
+## [0.2.0-G] มีเซฟแต่เป็นเวอร์ชันเก่า (โหลดไม่ได้)
+static func is_old_version() -> bool:
+	if not exists():
+		return false
+	var d = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+	return d is Dictionary and int(d.get("version", 0)) != VERSION
+
+
+## Dictionary ที่มี StringName/ค่าแปลก → ค่าธรรมดาสำหรับ JSON
+static func _plain(v: Variant) -> Variant:
+	if v is Dictionary:
+		var out := { }
+		for k in v:
+			out[String(k)] = _plain(v[k])
+		return out
+	if v is StringName:
+		return String(v)
+	return v
+
+
 static func info() -> Dictionary:
 	var d := _read()
 	if d.is_empty():
@@ -52,6 +73,8 @@ static func save() -> bool:
 			"money": GameState.money, "xp": GameState.xp, "reputation": GameState.reputation,
 			"satisfaction": Array(GameState.satisfaction_history), "part_clears": clears, "story_flags": GameState.story_flags,
 			"level_stars": stars, "debt": GameState.debt, "village_fund": GameState.village_fund, "ending": String(GameState.ending),
+			"month_results": GameState.month_results.map(func(r: Dictionary) -> Dictionary: return _plain(r)), # [0.2.0-G]
+			"missed_months": GameState.missed_months, "debt_streak": GameState.debt_streak, "shop_closed": GameState.shop_closed, "help_mode": GameState.help_mode,
 			"ledger": GameState.ledger.map(func(e: Dictionary) -> Dictionary: return { "ch": e.ch, "day": e.day, "kind": String(e.kind), "amount": e.amount, "note": e.note }), # [0.2.0-C]
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
@@ -97,6 +120,14 @@ static func load_into() -> int:
 	GameState.debt = int(g.get("debt", 0))
 	GameState.village_fund = int(g.get("village_fund", 0))
 	GameState.ending = StringName(g.get("ending", ""))
+	GameState.month_results.clear()
+	for r in g.get("month_results", []):
+		if r is Dictionary:
+			GameState.month_results.append(r)
+	GameState.missed_months = int(g.get("missed_months", 0))
+	GameState.debt_streak = int(g.get("debt_streak", 0))
+	GameState.shop_closed = bool(g.get("shop_closed", false))
+	GameState.help_mode = bool(g.get("help_mode", false))
 	GameState.ledger.clear()
 	for e in g.get("ledger", []):
 		if e is Dictionary:

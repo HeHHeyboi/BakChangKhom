@@ -50,39 +50,47 @@ func _ready() -> void:
 		ts.end_shift()
 	_check(_weeks.is_empty() and ts.shift_in_week() == 5, "4 กะยังไม่จบสัปดาห์")
 	ts.end_shift()
-	# [0.2.0] 1 บท = 1 เดือน = 5 วัน → จบบทยิงทั้ง week_ended และ month_ended
-	_check(_weeks == [1] and _months == [1] and ts.week() == 2 and ts.month() == 2 and ts.chapter() == 2 and ts.shift_in_week() == 1, "ครบ 5 วัน → จบบท 1 = จบเดือน ม.ค. (week_ended + month_ended) · บท 2")
+	# [0.2.0 ตัดสินใหม่] 1 บท = 1 สัปดาห์ (จ.–ศ.) · 4 บท = 1 เดือน
+	_check(_weeks == [1] and _months.is_empty() and ts.week() == 2 and ts.chapter() == 2 and ts.month() == 1 and ts.shift_in_week() == 1, "ครบ 5 วัน → จบบท 1 (สัปดาห์ 1) · ยังเป็น ม.ค.")
 	ts.updateTime()
-	_check(ts.dateText.text.contains("บทที่ 2") and ts.dateText.text.contains("ก.พ."), "HUD บอกบทและชื่อเดือน (%s)" % ts.dateText.text.replace("\n", " | "))
-	ts.set_shift(55)
+	_check(ts.dateText.text.contains("จันทร์ 11 ม.ค.") and ts.dateText.text.contains("บทที่ 2 · สัปดาห์ที่ 2 ของ ม.ค.") and not ts.dateText.text.contains("จบบท"), "HUD บอกวัน + บท (%s)" % ts.dateText.text.replace("\n", " | "))
+	ts.set_shift(20)
 	ts.end_shift()
-	_check(_months.back() == 11 and ts.month() == 12 and TimeSystem.MONTH_NAME[ts.month() - 1] == "ธ.ค.", "ครบ 55 วัน → month_ended(11) · บท 12 = ธ.ค.")
-	_check(ts.work_slots_per_month() == 80, "เทิร์นงานต่อบท = 16 × 5 = 80")
+	_check(_months == [1] and ts.month() == 2 and ts.chapter() == 5, "ครบ 20 วัน (4 บท) → month_ended(1) · บท 5 = ก.พ.")
+	_check(ts.work_slots_per_month() == 320, "เทิร์นงานต่อเดือน = 16 × 5 × 4 = 320")
 	ts.set_shift(60)
 	ts.end_shift()
-	_check(_ended and ts.finished and _months.back() == 12, "ครบ 60 วัน → month_ended(12) + game_ended")
+	_check(_ended and ts.finished and _months.back() == 3, "ครบ 60 วัน (12 บท) → month_ended(3) + game_ended")
 	_weeks.clear()
 	_months.clear()
 
-	# ---------------- A2 · [0.2.0] วันที่ได้เล่น + ข้ามวัน (ปิ๊บ + ปฏิทิน)
-	ts.set_shift(2)
-	_check(ts.calendar_day() == 7 and ts.date_text() == "7 ม.ค." and ts.days_since_last_play() == 6, "วันที่ 2 ของบท 1 = 7 ม.ค. · ผ่านไป 6 วัน")
-	ts.set_shift(6)
-	_check(ts.date_text() == "1 ก.พ." and ts.days_since_last_play() == 7, "วันแรกบท 2 = 1 ก.พ. · ข้ามจาก 25 ม.ค. = 7 วัน (%d)" % ts.days_since_last_play())
-	ts.set_shift(11)
-	_check(ts.date_text() == "1 มี.ค." and ts.days_since_last_play() == 4, "1 มี.ค. ข้ามจาก 25 ก.พ. (28 วัน) = 4 วัน")
+	# ---------------- A2 · [0.2.0] ปฏิทินจริง 2570 · วันเดินทีละวัน · ศุกร์ → จันทร์ ข้ามเสาร์–อาทิตย์
 	ts.set_shift(1)
-	_check(ts.days_since_last_play() == 0, "วันแรกของเกมไม่มีข้ามวัน")
+	_check(ts.date_text() == "จ. 4 ม.ค." and ts.days_since_last_play() == 0, "วันแรกของเกม = จ. 4 ม.ค. ไม่มีข้ามวัน")
+	ts.set_shift(2)
+	_check(ts.date_text() == "อ. 5 ม.ค." and ts.days_since_last_play() == 1, "วันที่ 2 = อ. 5 ม.ค. · ผ่านไป 1 วัน")
+	ts.set_shift(5)
+	_check(ts.date_text() == "ศ. 8 ม.ค.", "วันที่ 5 = ศ. 8 ม.ค.")
+	ts.set_shift(6)
+	_check(ts.date_text() == "จ. 11 ม.ค." and ts.days_since_last_play() == 3, "บท 2 เริ่ม จ. 11 ม.ค. · ข้ามเสาร์–อาทิตย์ = 3 วัน")
+	ts.set_shift(21)
+	_check(ts.date_text() == "จ. 1 ก.พ." and ts.month() == 2, "บท 5 = จ. 1 ก.พ. (เดือนลงตัว 4 สัปดาห์)")
+	ts.set_shift(41)
+	_check(ts.date_text() == "จ. 1 มี.ค." and ts.month() == 3, "บท 9 = จ. 1 มี.ค.")
+	ts.set_shift(60)
+	_check(ts.date_text() == "ศ. 26 มี.ค." and ts.days_left_in_month() == 0, "วันสุดท้ายของเกม = ศ. 26 มี.ค.")
+	ts.set_shift(1)
+	_check(ts.days_left_in_month() == 19 and TimeSystem.weekday_of(9, 1) == 5 and TimeSystem.weekday_of(10, 1) == 6, "เหลือ 19 วันทำการใน ม.ค. · 9–10 ม.ค. = เสาร์–อาทิตย์")
 	var ds: DaySkip = DayLoop._day_skip
-	ds.play(25, 1, 2, 7, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
+	ds.play(29, 1, 2, 3, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
 	await _frames(3)
 	_check(ds.visible and ds.is_playing() and ds._pib.texture != null, "ข้ามวัน → จอปิ๊บ + ปฏิทินขึ้น")
 	await ds.finished
-	_check(not ds.visible and ds._page_day.text == "1" and ds._page_month.text == "ก.พ." and ds._passed.text == "ผ่านไป 7 วัน", "ฉีกปฏิทินทีละวันถึง 1 ก.พ. · ป้ายเหนือปฏิทิน \"%s\"" % ds._passed.text)
+	_check(not ds.visible and ds._page_day.text == "1" and ds._page_month.text == "ก.พ." and ds._page_wd.text == "จันทร์" and ds._passed.text.begins_with("ผ่านไป 3 วัน") and ds._passed.text.contains("หยุดเสาร์–อาทิตย์"), "ศ. 29 ม.ค. → จ. 1 ก.พ. · ป้าย \"%s\"" % ds._passed.text)
 	_check(ds._pib.visible and ds._say.text == "ของที่สั่งมาถึงแล้ว" and not ds._say.text.contains("ผ่านไป"), "ปิ๊บพูดแค่เรื่องที่เกิดระหว่างข้ามวัน")
-	ds.play(7, 13, 1, 6, PackedStringArray(), 0.3)
+	ds.play(4, 5, 1, 1, PackedStringArray(), 0.3)
 	await ds.finished
-	_check(not ds._pib.visible and ds._page_day.text == "13" and ds._passed.text == "ผ่านไป 6 วัน", "ไม่มีเรื่องเกิด → ไม่มีปิ๊บ · 7 → 13 ม.ค.")
+	_check(not ds._pib.visible and ds._page_day.text == "5" and ds._page_wd.text == "อังคาร" and ds._passed.text == "ผ่านไป 1 วัน", "วันธรรมดา จ. 4 → อ. 5 ม.ค. · ไม่มีปิ๊บ · ไม่มีป้ายวันหยุด")
 
 	# ---------------- B · ระดับงาน
 	DayLoop._reset_run()
@@ -237,19 +245,19 @@ func _ready() -> void:
 	DayLoop._reset_run()
 	_check(not DayLoop.demo_over and not DayLoop._demo_banner.visible and ts.shift == 1, "เริ่มใหม่ → ล้างสถานะเดโม")
 
-	# บิลรายเดือน [0.2.0] = ทุกบท · ค่าเช่า (บท 1 = 0) + ไฟ (ฐาน + 4/เทิร์น) + น้ำ 50 + เน็ต 150
+	# บิลรายเดือน [0.2.0] ทุก 4 บท · ค่าเช่า 1,500 + ไฟ (ฐาน + 4/เทิร์น) + น้ำ 100 + เน็ต 300
 	GameState.debt = 0
 	GameState.money = 5000
 	var m0 := GameState.money
-	var bill := GameState.pay_month_bill(1, 20)
-	_check(int(bill["total"]) == 0 + (100 + 4 * 20) + 50 + 150 and GameState.money == m0 - int(bill["paid"]) and GameState.debt == 0, "บิลบท 1 (ทำงาน 20 เทิร์น) = ฿380 (จ่าย %d)" % bill["paid"])
-	bill = GameState.pay_month_bill(9, 60)
-	_check(int(bill["rent"]) == 700 and int(bill["power"]) == 150 + 240 and int(bill["total"]) == 700 + 390 + 50 + 150, "บิลบท 9 = เช่า 700 + ไฟ 390 + น้ำ 50 + เน็ต 150 (= %d)" % bill["total"])
+	var bill := GameState.pay_month_bill(1, 100)
+	_check(int(bill["total"]) == 1500 + (200 + 400) + 100 + 300 and GameState.money == m0 - int(bill["paid"]) and GameState.debt == 0, "บิล ม.ค. (ทำงาน 100 เทิร์น) = ฿2,500 (จ่าย %d)" % bill["paid"])
+	bill = GameState.pay_month_bill(3, 0)
+	_check(int(bill["power"]) == 250 and int(bill["total"]) == 1500 + 250 + 100 + 300, "บิล มี.ค. ไฟฐาน 250 (หน้าร้อน) = %d" % bill["total"])
 	GameState.money = 100
 	bill = GameState.pay_month_bill(2, 0)
 	_check(int(bill["paid"]) == 100 and GameState.money == 0 and GameState.debt == int(bill["total"]) - 100, "เงินไม่พอ → จ่ายเท่าที่มี ส่วนที่ขาดเป็นยอดค้าง (ค้าง %d)" % GameState.debt)
 	bill = GameState.pay_month_bill(3, 0)
-	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 300 + 100 + 50 + 150 + int(bill["prev_debt"]), "ยอดค้างเดิมรวมในบิลบทถัดไป")
+	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 1500 + 250 + 100 + 300 + int(bill["prev_debt"]), "ยอดค้างเดิมรวมในบิลเดือนถัดไป")
 	GameState.debt = 0
 
 	print("T DONE fails=", fails)

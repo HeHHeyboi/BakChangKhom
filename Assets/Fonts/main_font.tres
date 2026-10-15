@@ -1,0 +1,8 @@
+[gd_resource type="FontVariation" format=3]
+
+[ext_resource type="FontFile" path="res://Assets/Fonts/supermarket.ttf" id="1_sm"]
+[ext_resource type="FontFile" path="res://Assets/Fonts/Sarabun-Regular.ttf" id="2_sb"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_sb")])
+base_font = ExtResource("1_sm")

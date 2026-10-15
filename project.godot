@@ -46,7 +46,7 @@ project/assembly_name="BakChangKhom"
 
 [gui]
 
-theme/custom_font="res://Assets/Fonts/Sarabun-Regular.ttf"
+theme/custom_font="res://Assets/Fonts/main_font.tres"
 
 [input]
 

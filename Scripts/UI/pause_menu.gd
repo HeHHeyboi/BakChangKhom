@@ -81,7 +81,7 @@ func _on_resume_pressed() -> void:
 func save_now() -> bool:
 	var ok := DayLoop.autosave()
 	var info := SaveGame.info()
-	%SaveButton.text = ("บันทึกแล้ว ✓ วันที่ %d" % info.shift) if ok and not info.is_empty() else "บันทึกตอนนี้ไม่ได้"
+	%SaveButton.text = ("บันทึกแล้ว ✓ %s" % TimeSystem.shift_label(int(info.shift))) if ok and not info.is_empty() else "บันทึกตอนนี้ไม่ได้"
 	return ok
 
 

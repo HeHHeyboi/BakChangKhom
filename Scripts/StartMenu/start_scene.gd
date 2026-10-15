@@ -19,13 +19,19 @@ func _ready() -> void:
 	var info := SaveGame.info()
 	$Menu/Continue_Button.visible = not info.is_empty()
 	if not info.is_empty():
-		$Menu/Continue_Button.text = "เล่นต่อ (วันที่ %d · ฿%d)" % [info.shift, info.money]
+		$Menu/Continue_Button.text = "เล่นต่อ (%s · ฿%d)" % [TimeSystem.shift_label(int(info.shift)), info.money]
+	elif SaveGame.is_old_version():
+		# [0.2.0-G] เซฟจาก 0.1.x ใช้ไม่ได้ (ระบบเวลาเปลี่ยน) → บอกแทนการซ่อนเงียบ ๆ
+		$Menu/Continue_Button.visible = true
+		$Menu/Continue_Button.disabled = true
+		$Menu/Continue_Button.text = "เซฟเวอร์ชันเก่าใช้ไม่ได้ · เริ่มใหม่"
+		$Menu/Continue_Button.tooltip_text = "ระบบเวลาในเกมเปลี่ยนแล้ว เซฟจากเวอร์ชัน 0.1.x จึงโหลดไม่ได้"
 	for b in $Menu.get_children():
 		if b is Button:
 			_hover_bounce(b)
 	_idle_bob($Khom, 0.0)
 	_idle_bob($Grandma, 0.6)
-	($Menu/Continue_Button if $Menu/Continue_Button.visible else $Menu/Start_Button).grab_focus.call_deferred()
+	($Menu/Continue_Button if $Menu/Continue_Button.visible and not $Menu/Continue_Button.disabled else $Menu/Start_Button).grab_focus.call_deferred()
 
 
 func dialog_end():
