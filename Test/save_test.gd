@@ -53,7 +53,7 @@ func _ready() -> void:
 	add_child(start)
 	await get_tree().process_frame
 	var cont: Button = start.get_node("Menu/Continue_Button")
-	_check(cont.visible and cont.text.contains("บทที่ 1 · พฤ. 7 ม.ค."), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
+	_check(cont.visible and cont.text.contains("บทที่ 2 · จ. 11 ม.ค."), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
 	start._on_start_button_pressed()
 	_check(SaveGame.exists() and start.get_node("Menu/Start_Button").text.contains("อีกครั้ง"), "มีเซฟ → เริ่มเกมใหม่ต้องกดยืนยันอีกครั้ง")
 	start._on_start_button_pressed()
@@ -104,6 +104,19 @@ func _ready() -> void:
 	_check(SaveGame.load_into() >= 0 and GameState.missed_months == 1 and GameState.debt_streak == 1 and GameState.help_mode and GameState.month_results.size() == 1 and int(GameState.month_results[0].profit) == 1500, "โหลด → ผลสิ้นเดือน พลาดเป้า ค้างบิล โหมดช่วย ครบ")
 	GameState.help_mode = false
 	_check(not SaveGame.is_old_version(), "เซฟปัจจุบันไม่ใช่เวอร์ชันเก่า")
+	# [0.2.0] เซฟตอนการ์ดสรุปเดือนยังค้าง → โหลดแล้วการ์ดกลับมา (เดิมหาย + บทเนื้อเรื่องไม่เล่น)
+	DayLoop._pending_summary_week = 4
+	DayLoop._last_month = GameState.month_results.back()
+	DayLoop._last_bill = { "rent": 1500, "power": 260, "water": 100, "internet": 300, "debt": 0 }
+	_check(SaveGame.save(), "บันทึกตอนการ์ดสรุปเดือนค้าง")
+	DayLoop._pending_summary_week = 0
+	DayLoop._last_month = { }
+	DayLoop._last_bill = { }
+	_check(SaveGame.load_into() >= 0 and DayLoop._pending_summary_week == 4 and int(DayLoop._last_month.get("profit", 0)) == 1500 and int(DayLoop._last_bill.get("rent", 0)) == 1500, "โหลด → การ์ดสรุปบท 4 + ข้อมูลเดือนกลับมา")
+	_check(DayLoop._decide_card() == DayLoop.Card.WEEK_SUMMARY or DayLoop._working or Global.in_minigame or DialogScene.visible, "โหลดแล้วการ์ดที่ต้องขึ้น = สรุปบท")
+	DayLoop._pending_summary_week = 0
+	DayLoop._last_month = { }
+	DayLoop._last_bill = { }
 	# เซฟเวอร์ชัน 1 (0.1.x) → โหลดไม่ได้ · เมนูบอกให้เริ่มใหม่
 	var old := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
 	old.store_string(JSON.stringify({ "version": 1, "game": { "shift": 3, "money": 99 } }))

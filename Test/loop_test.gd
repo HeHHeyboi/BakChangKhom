@@ -16,7 +16,7 @@ func _ready() -> void:
 	get_parent().remove_child(self)
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
-	DayLoop.demo_shifts = 7 # [10 ต.ค.] เกมจริงจบบทที่ 1 ที่กะ 5 — เทสต์นี้เลื่อนไป 7 เพื่อทดสอบสรุปสัปดาห์ด้วย
+	DayLoop.demo_shifts = 5 # [0.2.0] เกมจริงจบบทที่ 1 ที่กะ 3 (จ. พ. ศ.) — เทสต์นี้เลื่อนไป 5 เพื่อทดสอบสรุปสัปดาห์ด้วย
 	DayLoop.day_skip_seconds = 0.0 # [0.2.0] ปิดแอนิเมชันข้ามวันระหว่างเดินลูป (ทดสอบแยกในหัวข้อ A2)
 	ts.break_started.connect(func(k: StringName) -> void: _breaks.append(k))
 	ts.week_ended.connect(func(w: int) -> void: _weeks.append(w))
@@ -46,21 +46,21 @@ func _ready() -> void:
 	ts.advance_minutes(120)
 	_check(ts.current_minute == TimeSystem.OT_LIMIT, "ล่วงเวลา → หยุด 19:30")
 	ts.set_shift(1)
-	for i in 4:
+	for i in 2:
 		ts.end_shift()
-	_check(_weeks.is_empty() and ts.shift_in_week() == 5, "4 กะยังไม่จบสัปดาห์")
+	_check(_weeks.is_empty() and ts.shift_in_week() == 3, "2 กะยังไม่จบสัปดาห์")
 	ts.end_shift()
-	# [0.2.0 ตัดสินใหม่] 1 บท = 1 สัปดาห์ (จ.–ศ.) · 4 บท = 1 เดือน
-	_check(_weeks == [1] and _months.is_empty() and ts.week() == 2 and ts.chapter() == 2 and ts.month() == 1 and ts.shift_in_week() == 1, "ครบ 5 วัน → จบบท 1 (สัปดาห์ 1) · ยังเป็น ม.ค.")
+	# [0.2.0 ตัดสินใหม่] 1 บท = 1 สัปดาห์ (เปิด จ. พ. ศ.) · 4 บท = 1 เดือน
+	_check(_weeks == [1] and _months.is_empty() and ts.week() == 2 and ts.chapter() == 2 and ts.month() == 1 and ts.shift_in_week() == 1, "ครบ 3 วัน → จบบท 1 (สัปดาห์ 1) · ยังเป็น ม.ค.")
 	ts.updateTime()
 	_check(ts.dateText.text.contains("จันทร์ 11 ม.ค.") and ts.dateText.text.contains("บทที่ 2 · สัปดาห์ที่ 2 ของ ม.ค.") and not ts.dateText.text.contains("จบบท"), "HUD บอกวัน + บท (%s)" % ts.dateText.text.replace("\n", " | "))
-	ts.set_shift(20)
+	ts.set_shift(12)
 	ts.end_shift()
-	_check(_months == [1] and ts.month() == 2 and ts.chapter() == 5, "ครบ 20 วัน (4 บท) → month_ended(1) · บท 5 = ก.พ.")
-	_check(ts.work_slots_per_month() == 320, "เทิร์นงานต่อเดือน = 16 × 5 × 4 = 320")
-	ts.set_shift(60)
+	_check(_months == [1] and ts.month() == 2 and ts.chapter() == 5, "ครบ 12 วัน (4 บท) → month_ended(1) · บท 5 = ก.พ.")
+	_check(ts.work_slots_per_month() == 192 and TimeSystem.TOTAL_SHIFTS == 36, "เทิร์นงานต่อเดือน = 16 × 3 × 4 = 192 · ทั้งเกม 36 วัน")
+	ts.set_shift(36)
 	ts.end_shift()
-	_check(_ended and ts.finished and _months.back() == 3, "ครบ 60 วัน (12 บท) → month_ended(3) + game_ended")
+	_check(_ended and ts.finished and _months.back() == 3, "ครบ 36 วัน (12 บท) → month_ended(3) + game_ended")
 	_weeks.clear()
 	_months.clear()
 
@@ -68,19 +68,19 @@ func _ready() -> void:
 	ts.set_shift(1)
 	_check(ts.date_text() == "จ. 4 ม.ค." and ts.days_since_last_play() == 0, "วันแรกของเกม = จ. 4 ม.ค. ไม่มีข้ามวัน")
 	ts.set_shift(2)
-	_check(ts.date_text() == "อ. 5 ม.ค." and ts.days_since_last_play() == 1, "วันที่ 2 = อ. 5 ม.ค. · ผ่านไป 1 วัน")
-	ts.set_shift(5)
-	_check(ts.date_text() == "ศ. 8 ม.ค.", "วันที่ 5 = ศ. 8 ม.ค.")
-	ts.set_shift(6)
+	_check(ts.date_text() == "พ. 6 ม.ค." and ts.days_since_last_play() == 2, "วันที่ 2 = พ. 6 ม.ค. · ผ่านไป 2 วัน (อังคารร้านปิด)")
+	ts.set_shift(3)
+	_check(ts.date_text() == "ศ. 8 ม.ค." and ts.days_since_last_play() == 2, "วันที่ 3 = ศ. 8 ม.ค.")
+	ts.set_shift(4)
 	_check(ts.date_text() == "จ. 11 ม.ค." and ts.days_since_last_play() == 3, "บท 2 เริ่ม จ. 11 ม.ค. · ข้ามเสาร์–อาทิตย์ = 3 วัน")
-	ts.set_shift(21)
+	ts.set_shift(13)
 	_check(ts.date_text() == "จ. 1 ก.พ." and ts.month() == 2, "บท 5 = จ. 1 ก.พ. (เดือนลงตัว 4 สัปดาห์)")
-	ts.set_shift(41)
+	ts.set_shift(25)
 	_check(ts.date_text() == "จ. 1 มี.ค." and ts.month() == 3, "บท 9 = จ. 1 มี.ค.")
-	ts.set_shift(60)
-	_check(ts.date_text() == "ศ. 26 มี.ค." and ts.days_left_in_month() == 0, "วันสุดท้ายของเกม = ศ. 26 มี.ค.")
+	ts.set_shift(36)
+	_check(ts.date_text() == "ศ. 26 มี.ค." and ts.days_left_in_month() == 0 and TimeSystem.shift_label(36) == "บทที่ 12 · ศ. 26 มี.ค.", "วันสุดท้ายของเกม = ศ. 26 มี.ค.")
 	ts.set_shift(1)
-	_check(ts.days_left_in_month() == 19 and TimeSystem.weekday_of(9, 1) == 5 and TimeSystem.weekday_of(10, 1) == 6, "เหลือ 19 วันทำการใน ม.ค. · 9–10 ม.ค. = เสาร์–อาทิตย์")
+	_check(ts.days_left_in_month() == 11 and TimeSystem.weekday_of(9, 1) == 5 and TimeSystem.weekday_of(10, 1) == 6, "เหลือ 11 วันทำการใน ม.ค. · 9–10 ม.ค. = เสาร์–อาทิตย์")
 	var ds: DaySkip = DayLoop._day_skip
 	ds.play(29, 1, 2, 3, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
 	await _frames(3)
@@ -88,9 +88,9 @@ func _ready() -> void:
 	await ds.finished
 	_check(not ds.visible and ds._page_day.text == "1" and ds._page_month.text == "ก.พ." and ds._page_wd.text == "จันทร์" and ds._passed.text.begins_with("ผ่านไป 3 วัน") and ds._passed.text.contains("หยุดเสาร์–อาทิตย์"), "ศ. 29 ม.ค. → จ. 1 ก.พ. · ป้าย \"%s\"" % ds._passed.text)
 	_check(ds._pib.visible and ds._say.text == "ของที่สั่งมาถึงแล้ว" and not ds._say.text.contains("ผ่านไป"), "ปิ๊บพูดแค่เรื่องที่เกิดระหว่างข้ามวัน")
-	ds.play(4, 5, 1, 1, PackedStringArray(), 0.3)
+	ds.play(4, 6, 1, 2, PackedStringArray(), 0.3)
 	await ds.finished
-	_check(not ds._pib.visible and ds._page_day.text == "5" and ds._page_wd.text == "อังคาร" and ds._passed.text == "ผ่านไป 1 วัน", "วันธรรมดา จ. 4 → อ. 5 ม.ค. · ไม่มีปิ๊บ · ไม่มีป้ายวันหยุด")
+	_check(not ds._pib.visible and ds._page_day.text == "6" and ds._page_wd.text == "พุธ" and ds._passed.text == "ผ่านไป 2 วัน · ร้านปิด ขมไปช่วยยาย", "จ. 4 → พ. 6 ม.ค. · ไม่มีปิ๊บ · บอกว่าอังคารร้านปิด (%s)" % ds._passed.text)
 
 	# ---------------- B · ระดับงาน
 	DayLoop._reset_run()
@@ -200,14 +200,14 @@ func _ready() -> void:
 	await _frames(3)
 	_check(DayLoop._board_panel.visible and not DayLoop._cards_tab.visible, "กดแถบ → กระดานงานกลับมา")
 
-	# กะ 2–5: ปิดร้านเลย · งานหมดเขตต้องเดินออก
-	for s in range(2, 6):
+	# กะ 2–3: ปิดร้านเลย · งานหมดเขตต้องเดินออก
+	for s in range(2, 4):
 		ts.set_clock(TimeSystem.CLOSE)
 		await _frames(3)
 		_check(DayLoop._card == DayLoop.Card.SHIFT_END, "กะ %d ปิดร้าน" % s)
 		DayLoop._on_primary()
 		await _frames(3)
-	_check(_weeks == [1] and DayLoop._card == DayLoop.Card.WEEK_SUMMARY, "ครบ 5 กะ → สรุปสัปดาห์ 1")
+	_check(_weeks == [1] and DayLoop._card == DayLoop.Card.WEEK_SUMMARY, "ครบ 3 กะ → สรุปสัปดาห์ 1")
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
 	_check(GameState.reputation < rep, "ลูกค้าที่รอนานเกินเดินออก → ชื่อเสียงลด (%d → %d)" % [rep, GameState.reputation])
 	DayLoop._on_primary()
@@ -219,16 +219,16 @@ func _ready() -> void:
 	_check(DayLoop.effective_weights(2)[2] > 0.0, "สัปดาห์ 2 มีสัดส่วน Lv3 แล้ว (%s)" % DayLoop.effective_weights(2))
 
 	# [10 ต.ค.] จบบท (demo_shifts): ปิดร้านกะสุดท้าย → การ์ดจบบท → กลับบ้าน → บทยาย → ป้าย "กำลังพัฒนา"
-	# (เกมจริงจบที่กะ 5 = จบบทที่ 1 · เทสต์นี้ตั้ง 7 เพื่อทดสอบสรุปสัปดาห์ + Chapter 2 ก่อน)
-	for s in [6, 7]:
+	# (เกมจริงจบที่กะ 3 = จบบทที่ 1 · เทสต์นี้ตั้ง 5 เพื่อทดสอบสรุปสัปดาห์ + Chapter 2 ก่อน)
+	for s in [4, 5]:
 		ts.set_clock(TimeSystem.CLOSE)
 		await _frames(3)
 		_check(DayLoop._card == DayLoop.Card.SHIFT_END and ts.shift == s, "กะ %d ปิดร้าน" % s)
-		if s == 7:
-			_check(DayLoop._primary.text.contains("จบบทที่"), "กะ 7 ปุ่มปิดร้าน = จบบท (%s)" % DayLoop._primary.text)
+		if s == 5:
+			_check(DayLoop._primary.text.contains("จบบทที่"), "กะ 5 ปุ่มปิดร้าน = จบบท (%s)" % DayLoop._primary.text)
 		DayLoop._on_primary()
 		await _frames(3)
-	_check(DayLoop.demo_over and ts.shift == 7 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 7 กะ → การ์ดสิ้นสุดการเล่นเดโม")
+	_check(DayLoop.demo_over and ts.shift == 5 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 5 กะ → การ์ดสิ้นสุดการเล่นเดโม")
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
 	_check(DayLoop._title.text.contains("จบบทที่ 1") and DayLoop._body.text.contains("ยศช่าง"), "การ์ดจบบทมียศช่าง")
 	DayLoop._on_primary()

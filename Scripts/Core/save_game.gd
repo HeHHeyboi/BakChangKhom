@@ -82,6 +82,9 @@ static func save() -> bool:
 			"board": board, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
 			"break_done": DayLoop._break_done, "demo_over": DayLoop.demo_over, "demo_ack": DayLoop._demo_ack,
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
+			# [0.2.0] การ์ดสรุปบท/เดือนที่ยังไม่ได้กด (บันทึกอัตโนมัติตอนเริ่มกะใหม่เกิดก่อนผู้เล่นกด "ไปต่อ")
+			"pending_summary": DayLoop._pending_summary_week, "summary_month_end": not DayLoop._last_month.is_empty(),
+			"last_bill": _plain(DayLoop._last_bill),
 		},
 		"quest": { "task": ev.currentTask if ev else 0, "done": ev.isDone if ev else false },
 		# [13 ต.ค.] คลังของ (STORAGE_SHOP_ECO)
@@ -170,6 +173,11 @@ static func load_into() -> int:
 	DayLoop.week_start_money = int(l.get("week_start_money", GameState.money))
 	DayLoop.shift_start_money = GameState.money
 	DayLoop.force_active = bool(l.get("force_active", false))
+	# [0.2.0] โหลดตอนการ์ดสรุปยังค้าง → ขึ้นการ์ดสรุปอีกครั้ง แล้วเล่นบทเนื้อเรื่องต่อได้ (เดิมหายทั้งการ์ดและบทเนื้อเรื่อง)
+	DayLoop._pending_summary_week = int(l.get("pending_summary", 0))
+	DayLoop._last_bill = l.get("last_bill", { }) if l.get("last_bill") is Dictionary else { }
+	DayLoop._last_month = GameState.month_results.back() if bool(l.get("summary_month_end", false)) and not GameState.month_results.is_empty() else { }
+	DayLoop._game_over = GameState.shop_closed
 	DayLoop._board_dirty = true
 	if DayLoop._demo_ack:
 		DayLoop._show_demo_banner(true)

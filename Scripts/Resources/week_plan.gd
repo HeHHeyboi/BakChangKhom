@@ -1,6 +1,6 @@
 @tool
 class_name WeekPlan extends Resource
-## งานของ 1 สัปดาห์ (5 กะ = 1 Chapter) ตาม Docs/LEVEL_DESIGN.md ข้อ 6
+## งานของ 1 สัปดาห์ (3 กะ จ. พ. ศ. = 1 Chapter) ตาม Docs/LEVEL_DESIGN.md ข้อ 6
 ## แก้ใน Inspector: ดับเบิลคลิก Resources/Week/weekN.tres
 ##   shifts        — งานบังคับรายกะ (ช่อง 0 = กะ 1) ช่องว่าง = ไม่มีงานบังคับ · ลูกค้า forced เดินเข้ามาเอง
 ##   level_weights — สัดส่วนงานใหม่บนกระดาน Lv1–Lv5 (%) · ว่าง = ใช้ตาราง DayLoop.DEFAULT_WEIGHTS

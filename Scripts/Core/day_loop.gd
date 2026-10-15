@@ -6,7 +6,7 @@ extends CanvasLayer
 ##   เลือกรับ/ปฏิเสธ · การ์ดบอกแค่อาการ ไม่บอก Part · รับงาน → บทลูกค้า → มินิเกม → นาฬิกาเดินตามช่องของงาน → การ์ดผลงาน
 ##   พักบ่าย 15:30 มีงานโทรเข้า · 18:30 ปิดร้าน (ล่วงเวลาได้ ≤ 2 ช่อง · ≤ 2 กะ/สัปดาห์) → กะถัดไป
 ## งานหมดเขต (due_shifts) = ลูกค้าเดินออก ชื่อเสียงลด · งาน Lv n+1 ขึ้นกระดานเมื่อได้ ⭐⭐ ใน Lv n ครบ 2 งาน
-## ครบ 5 กะ = สรุปสัปดาห์ (+ บิลรายเดือนทุก 4 สัปดาห์) → บท Chapter ถัดไป · ครบ 60 กะ = Epilogue + ฉากจบ
+## ครบ 3 กะ (จ. พ. ศ.) = สรุปสัปดาห์ (+ บิลรายเดือนทุก 4 สัปดาห์) → บท Chapter ถัดไป · ครบ 36 กะ = Epilogue + ฉากจบ
 ## งานบังคับรายกะ (WeekPlan.shifts) ที่เป็น forced: ลูกค้าเดินเข้ามาเอง ปฏิเสธไม่ได้ (กะแรก = ลุงอำนวย หลังบทพัก Tutorial)
 ## เริ่มทำงานหลังเควสต์หลัก (main.tres) จบ — งานในเควสต์ไม่นับเป็นงานลูกค้า · UI เป็น placeholder สร้างจากโค้ด
 
@@ -34,7 +34,7 @@ extends CanvasLayer
 
 @export_group("เดโม")
 ## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
-@export var demo_shifts := 5 ## [10 ต.ค.] 5 = จบบทที่ 1 (ครบ 1 สัปดาห์)
+@export var demo_shifts := 3 ## [0.2.0] 3 = จบบทที่ 1 (ครบ 1 สัปดาห์ = เปิดร้าน จ. พ. ศ.)
 @export var demo_banner_title := "จบบทที่ 1"
 @export_multiline var demo_banner_text := "ขอบคุณที่เล่นบทแรกของร้านบักช่างขมนะ!\nบทที่ 2 กำลังพัฒนาให้ครบลูป\nแล้วพบกันเร็ว ๆ นี้"
 ## บทปิดท้ายเมื่อกลับถึงบ้าน (ว่าง = ข้าม)
@@ -644,8 +644,8 @@ func _play_day_skip() -> void:
 		from_day += TimeSystem.days_in_month(today.y - 1 if today.y > 1 else 12)
 	var notes := day_skip_notes.duplicate()
 	day_skip_notes.clear()
-	# วันธรรมดา (ข้าม 1 วัน) เล่นสั้นกว่า · ศุกร์ → จันทร์ (ข้ามเสาร์–อาทิตย์) เล่นเต็ม
-	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 1 and notes.is_empty() else 1.0)
+	# กลางสัปดาห์ (จ.→พ. · พ.→ศ.) เล่นสั้นกว่า · ศุกร์ → จันทร์ (ข้ามเสาร์–อาทิตย์) เล่นเต็ม
+	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 2 and notes.is_empty() else 1.0)
 	await _day_skip.play(from_day, today.x, today.y, gap, notes, secs)
 	_skipping = false
 
@@ -877,6 +877,7 @@ func _reset_run() -> void:
 	walkouts.clear()
 	_parts_seen.clear()
 	_last_bill = { }
+	_last_month = { }
 	ot_this_week = 0
 	last_result = { }
 	current_job = { }

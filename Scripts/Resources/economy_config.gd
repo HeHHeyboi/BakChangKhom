@@ -72,7 +72,7 @@ class_name EconomyConfig extends Resource
 
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")
 @export var ot_cost_per_slot := 30
-## ล่วงเวลาได้กี่วันต่อบท ([0.2.0] 1 บท = 5 วัน เท่าสัปดาห์เดิม)
+## ล่วงเวลาได้กี่วันต่อบท ([0.2.0] 1 บท = 1 สัปดาห์ เปิดร้าน 3 วัน)
 @export var ot_max_per_week := 2
 
 @export_group("ชื่อเสียง (GAME_REDESIGN 7.3)")
@@ -97,7 +97,7 @@ class_name EconomyConfig extends Resource
 
 @export_group("เป้ากำไรรายเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.2 · 8.1 D)")
 ## [0.2.0-D] กำไรขั้นต่ำต่อเดือน (ช่อง 0 = ม.ค.) · กำไร = รายรับ − รายจ่าย ไม่นับเงินลงทุน (GameState.month_profit) · ค่าทดลอง ≈ 70–75% ของกำไรเมื่อเล่นปกติ
-@export var month_target: PackedInt32Array = [2000, 7000, 10000]
+@export var month_target: PackedInt32Array = [1200, 4200, 6000] # [0.2.0] เปิด 3 วัน/สัปดาห์ → ×0.6 จากชุดเดิม 2,000/7,000/10,000
 
 @export_group("ผลสิ้นเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.3 · 8.1 E–F)")
 ## ค่าปรับยอดค้างชำระ (สัดส่วนของยอดค้าง) บวกในบิลเดือนถัดไป · โหมดช่วยไม่มีค่าปรับ

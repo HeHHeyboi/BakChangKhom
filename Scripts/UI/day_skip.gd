@@ -38,6 +38,8 @@ signal finished
 @onready var _page_wd: Label = _page.get_node(^"Weekday")
 ## ข้อความต่อท้ายป้ายเมื่อข้ามเสาร์–อาทิตย์
 @export var weekend_note := "หยุดเสาร์–อาทิตย์"
+## [0.2.0] ข้อความต่อท้ายเมื่อข้ามวันธรรมดาที่ร้านปิด (อ. · พฤ.)
+@export var closed_note := "ร้านปิด ขมไปช่วยยาย"
 
 var _page_pos: Vector2
 var _pib_pos: Vector2
@@ -64,6 +66,7 @@ func play(from_day: int, to_day: int, month: int, gap_days: int, notes: PackedSt
 	_set_page(_page_month, _page_day, from_month, from_day, _page_wd)
 	_set_page(_cal_month, _cal_day, from_month, from_day, _cal_wd)
 	var weekend := false
+	var closed := false
 	_reset_page()
 	_passed.text = ""
 	_say.text = "\n".join(notes)
@@ -80,7 +83,9 @@ func play(from_day: int, to_day: int, month: int, gap_days: int, notes: PackedSt
 	_tw.tween_property(self, "modulate:a", 1.0, 0.2)
 	for i in gap_days:
 		var d := _day_after(from_day, from_month, i + 1)
-		weekend = weekend or TimeSystem.weekday_of(d.x, d.y) >= 5
+		var wd_i := TimeSystem.weekday_of(d.x, d.y)
+		weekend = weekend or wd_i >= 5
+		closed = closed or (i < gap_days - 1 and wd_i < 5) # วันธรรมดาที่ข้ามไป (ไม่ใช่วันนี้)
 		_tw.tween_callback(_set_page.bind(_cal_month, _cal_day, d.y, d.x, _cal_wd))
 		_tw.tween_property(_page, "position", _page_pos + tear_offset, step).set_ease(Tween.EASE_IN)
 		_tw.parallel().tween_property(_page, "rotation", tear_rotation, step)
@@ -88,6 +93,8 @@ func play(from_day: int, to_day: int, month: int, gap_days: int, notes: PackedSt
 		_tw.tween_callback(_after_tear.bind(d.y, d.x, i + 1))
 	if weekend and weekend_note != "":
 		_tw.tween_callback(func() -> void: _passed.text += " · " + weekend_note)
+	elif closed and closed_note != "":
+		_tw.tween_callback(func() -> void: _passed.text += " · " + closed_note)
 	_tw.tween_callback(func() -> void:
 		if has_node(^"/root/Audio"):
 			get_node(^"/root/Audio").sfx(&"success")
