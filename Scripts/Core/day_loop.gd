@@ -111,6 +111,13 @@ var _working := false # กำลังคุยกับลูกค้า / �
 var _shop_time := 0.0
 var _break_done := false
 var _skipping := false # กำลังเล่นแอนิเมชันเวลาหมุน
+## [0.2.0] ข้ามวันระหว่างวันที่ได้เล่น (ปิ๊บ + ปฏิทิน) · รอเล่นตอนการ์ดกระดานจะขึ้นครั้งแรกของวัน
+var _day_skip: DaySkip
+var _day_skip_pending := false
+## เวลาแอนิเมชันข้ามวัน (วินาที) · 0 = ไม่เล่น (เทสต์ตั้งเองได้)
+@export var day_skip_seconds := 2.4
+## เรื่องที่เกิดระหว่างข้ามวัน (ระบบอื่นใส่ก่อนเปิดร้าน เช่น ของมาถึง · ลูกค้ามารับเครื่อง) — ล้างหลังแสดง
+var day_skip_notes := PackedStringArray()
 var _pending_cb := Callable() # callback ที่รอ DialogScene.on_dialog_finish อยู่ (ถอดได้ถ้าบทไม่ขึ้น)
 var _minigame: Node # มินิเกมงานลูกค้าที่เปิดอยู่
 var _stuck_time := 0.0 # watchdog: _working ค้างโดยไม่มีบท/มินิเกม
@@ -173,6 +180,7 @@ func _connect() -> void:
 			(l[0] as Signal).connect(l[1])
 	week_start_money = GameState.money
 	_on_shift_started(ts.month(), ts.week(), ts.shift_in_week())
+	_day_skip_pending = false # เริ่มเกม/โหลดเซฟ ไม่ต้องเล่นข้ามวัน
 
 
 ## เตือนใน Output ถ้าลูกค้าคนไหนกรอกไม่ครบ (เช่น ไม่มีเหตุผลที่มาร้าน)
@@ -323,6 +331,7 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	_shop_time = 0.0
 	shift_results.clear()
 	shift_start_money = GameState.money
+	_day_skip_pending = ts.shift > 1 and day_skip_seconds > 0.0
 	# งานหมดเขต = ลูกค้าเดินออก
 	walkouts.clear()
 	for j in board.duplicate():
@@ -563,6 +572,23 @@ func time_skip(minutes: int, seconds := 1.0) -> void:
 	if is_instance_valid(ts):
 		ts.set_clock(to)
 	_skip_overlay.visible = false
+	_skipping = false
+
+
+func _play_day_skip() -> void:
+	var ts := _ts()
+	if ts == null or _day_skip == null:
+		return
+	_skipping = true
+	_hide()
+	var gap := ts.days_since_last_play()
+	var to_day := ts.calendar_day()
+	var from_day := to_day - gap
+	if from_day < 1:
+		from_day += TimeSystem.days_in_month(ts.month() - 1 if ts.month() > 1 else 12)
+	var notes := day_skip_notes.duplicate()
+	day_skip_notes.clear()
+	await _day_skip.play(from_day, to_day, ts.month(), gap, notes, day_skip_seconds)
 	_skipping = false
 
 
@@ -815,6 +841,11 @@ func _process(delta: float) -> void:
 		_demo_layer.visible = not (DialogScene.visible or Global.in_minigame or PauseMenu.visible)
 	_watchdog(delta)
 	var want := _decide_card()
+	# [0.2.0] วันใหม่: ปิ๊บบอก "ผ่านไป n วัน" ก่อนการ์ดแรกของวัน (หลังสรุปเดือน/บทเนื้อเรื่องจบแล้ว)
+	if _day_skip_pending and want in [Card.BOARD, Card.JOB_FORCED, Card.SHIFT_END]:
+		_day_skip_pending = false
+		_play_day_skip()
+		return
 	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
 	if want == Card.JOB_FORCED and not arrived_today and not _break_done and break_dialog != "":
 		_play_break()
@@ -1179,6 +1210,14 @@ func _build_time_skip() -> void:
 	_skip_caption.position = Vector2(0, 340)
 	_skip_caption.size = Vector2(1152, 48)
 	_skip_overlay.add_child(_skip_caption)
+	# ชั้นของตัวเอง 110: อยู่เหนือ HUD (100) และปุ่มคลัง (105) แต่ใต้บทพูด/เมนูพัก (128)
+	var skip_layer := CanvasLayer.new()
+	skip_layer.name = "DaySkipLayer"
+	skip_layer.layer = 110
+	add_child(skip_layer)
+	_day_skip = DaySkip.new()
+	_day_skip.name = "DaySkip"
+	skip_layer.add_child(_day_skip)
 
 
 func _card_style() -> StyleBoxFlat:

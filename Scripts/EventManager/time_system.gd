@@ -18,6 +18,9 @@ const WEEKS_PER_MONTH := 1 # [0.2.0] 1 บท = 1 เดือน (เดิม 
 const MONTHS := 12 # [0.2.0] 12 บท (เดิม 3)
 const TOTAL_SHIFTS := SHIFTS_PER_WEEK * WEEKS_PER_MONTH * MONTHS # 60
 const WORK_SLOTS_PER_SHIFT := 16
+## [0.2.0] วันที่ได้เล่นในเดือน (วันที่ 1–5 ของบท → วันที่ในปฏิทิน) · ห่างกัน 6 วัน · Docs/ROADMAP_1_0_0.md ข้อ 1.1
+const PLAY_DAYS := [1, 7, 13, 19, 25]
+const MONTH_DAYS := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 enum TIME {
 	MORNING, # ช่วงเช้า 09:00
@@ -161,6 +164,30 @@ func chapter() -> int:
 ## เหลืออีกกี่วันจบบท (วันนี้ไม่นับ)
 func days_left_in_chapter() -> int:
 	return SHIFTS_PER_WEEK - shift_in_week()
+
+
+## [0.2.0] วันที่ในปฏิทินของวันที่เล่นวันนี้ (1 · 7 · 13 · 19 · 25)
+func calendar_day() -> int:
+	return PLAY_DAYS[clampi(shift_in_week(), 1, PLAY_DAYS.size()) - 1]
+
+
+## [0.2.0] "7 ม.ค."
+func date_text() -> String:
+	return "%d %s" % [calendar_day(), MONTH_NAME[clampi(month(), 1, MONTH_NAME.size()) - 1]]
+
+
+## [0.2.0] ผ่านไปกี่วันในปฏิทินจากวันที่เล่นครั้งก่อน (วันแรกของบท = นับจากวันที่ 25 ของเดือนก่อน)
+func days_since_last_play() -> int:
+	if shift <= 1:
+		return 0
+	var i := shift_in_week()
+	if i > 1:
+		return PLAY_DAYS[i - 1] - PLAY_DAYS[i - 2]
+	return days_in_month(month() - 1 if month() > 1 else 12) - PLAY_DAYS[PLAY_DAYS.size() - 1] + PLAY_DAYS[0]
+
+
+static func days_in_month(m: int) -> int:
+	return MONTH_DAYS[clampi(m, 1, 12) - 1]
 
 
 static func work_minutes_between(a: int, b: int) -> int:
@@ -369,7 +396,7 @@ func updateTime() -> void:
 	)
 
 
-## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "บทที่ 1 · ม.ค. · วันที่ 2/5 · อีก 3 วันจบบท" ([0.2.0] เพิ่มชื่อเดือน)
+## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "บทที่ 1 · 7 ม.ค. · วันที่ 2/5 · อีก 3 วันจบบท" ([0.2.0] เพิ่มวันที่ในปฏิทิน)
 func _update_turns() -> void:
 	var br := in_break()
 	var n := turns_left()
@@ -388,7 +415,7 @@ func _update_turns() -> void:
 	var left := days_left_in_chapter()
 	dateText.text = "บทที่ %d · %s · วันที่ %d/%d\n%s" % [
 		chapter(),
-		MONTH_NAME[clampi(month(), 1, MONTH_NAME.size()) - 1],
+		date_text(),
 		shift_in_week(),
 		SHIFTS_PER_WEEK,
 		("อีก %d วันจบบท" % left) if left > 0 else "วันสุดท้ายของบท",

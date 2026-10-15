@@ -17,6 +17,7 @@ func _ready() -> void:
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
 	DayLoop.demo_shifts = 7 # [10 ต.ค.] เกมจริงจบบทที่ 1 ที่กะ 5 — เทสต์นี้เลื่อนไป 7 เพื่อทดสอบสรุปสัปดาห์ด้วย
+	DayLoop.day_skip_seconds = 0.0 # [0.2.0] ปิดแอนิเมชันข้ามวันระหว่างเดินลูป (ทดสอบแยกในหัวข้อ A2)
 	ts.break_started.connect(func(k: StringName) -> void: _breaks.append(k))
 	ts.week_ended.connect(func(w: int) -> void: _weeks.append(w))
 	ts.month_ended.connect(func(m: int) -> void: _months.append(m))
@@ -62,6 +63,22 @@ func _ready() -> void:
 	_check(_ended and ts.finished and _months.back() == 12, "ครบ 60 วัน → month_ended(12) + game_ended")
 	_weeks.clear()
 	_months.clear()
+
+	# ---------------- A2 · [0.2.0] วันที่ได้เล่น + ข้ามวัน (ปิ๊บ + ปฏิทิน)
+	ts.set_shift(2)
+	_check(ts.calendar_day() == 7 and ts.date_text() == "7 ม.ค." and ts.days_since_last_play() == 6, "วันที่ 2 ของบท 1 = 7 ม.ค. · ผ่านไป 6 วัน")
+	ts.set_shift(6)
+	_check(ts.date_text() == "1 ก.พ." and ts.days_since_last_play() == 7, "วันแรกบท 2 = 1 ก.พ. · ข้ามจาก 25 ม.ค. = 7 วัน (%d)" % ts.days_since_last_play())
+	ts.set_shift(11)
+	_check(ts.date_text() == "1 มี.ค." and ts.days_since_last_play() == 4, "1 มี.ค. ข้ามจาก 25 ก.พ. (28 วัน) = 4 วัน")
+	ts.set_shift(1)
+	_check(ts.days_since_last_play() == 0, "วันแรกของเกมไม่มีข้ามวัน")
+	var ds: DaySkip = DayLoop._day_skip
+	ds.play(25, 1, 2, 7, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
+	await _frames(3)
+	_check(ds.visible and ds.is_playing() and ds._pib.texture != null, "ข้ามวัน → จอปิ๊บ + ปฏิทินขึ้น")
+	await ds.finished
+	_check(not ds.visible and ds._cal_day.text == "1" and ds._cal_month.text == "ก.พ." and ds._say.text.contains("ผ่านไป 7 วัน") and ds._say.text.contains("ของที่สั่งมาถึงแล้ว"), "ปฏิทินพลิกถึง 1 ก.พ. · ปิ๊บบอกผ่านไป 7 วัน + เรื่องที่เกิด (%s)" % ds._say.text.replace("\n", " / "))
 
 	# ---------------- B · ระดับงาน
 	DayLoop._reset_run()

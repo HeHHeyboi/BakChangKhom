@@ -46,7 +46,7 @@ func _ready() -> void:
 	await _frames(1)
 	ts.set_shift(2, TimeSystem.OPEN)
 	ts.updateTime()
-	_check(not ts.show_clock and ts.timeText.text == "16 เทิร์น" and ts.dateText.text.contains("บทที่ 1 · ม.ค. · วันที่ 2/5") and ts.dateText.text.contains("อีก 3 วัน"), "HUD บอกเทิร์น (%s | %s)" % [ts.timeText.text, ts.dateText.text.replace("\n", " / ")])
+	_check(not ts.show_clock and ts.timeText.text == "16 เทิร์น" and ts.dateText.text.contains("บทที่ 1 · 7 ม.ค. · วันที่ 2/5") and ts.dateText.text.contains("อีก 3 วัน"), "HUD บอกเทิร์น (%s | %s)" % [ts.timeText.text, ts.dateText.text.replace("\n", " / ")])
 	ts.set_clock(TimeSystem.CLOSE - 90)
 	ts.updateTime()
 	_check(ts.timeText.text == "3 เทิร์น", "เหลือ 1½ ชม. = 3 เทิร์น (%s)" % ts.timeText.text)
