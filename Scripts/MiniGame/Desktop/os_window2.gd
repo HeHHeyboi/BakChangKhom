@@ -6,6 +6,18 @@ var _drag := false
 var _drag_off := Vector2.ZERO
 const TITLE_H := 21
 
+@export var _topbar: PanelContainer
+
+
+func _ready() -> void:
+	var row := _topbar.get_node("HBoxContainer")
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in row.get_children():
+		if c is Control and c is not BaseButton:
+			c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_topbar.gui_input.connect(_on_bar_input)
+	_topbar.get_node("%Close").pressed.connect(close)
+
 
 func close() -> void:
 	closed.emit()

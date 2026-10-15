@@ -1,17 +1,17 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bvkh4u8ccntqc"]
 
 [ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="1_icon"]
 
-[node name="OsAppRow" type="HBoxContainer"]
+[node name="OsAppRow" type="HBoxContainer" unique_id=1409546038]
 
-[node name="Icon" type="TextureRect" parent="."]
+[node name="Icon" type="TextureRect" parent="." unique_id=1252501213]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 texture = ExtResource("1_icon")
 expand_mode = 1
 
-[node name="Info" type="Label" parent="."]
+[node name="Info" type="Label" parent="." unique_id=443860973]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -19,7 +19,7 @@ theme_override_font_sizes/font_size = 14
 text = "ชื่อแอป
 ผู้พัฒนา · ขนาด"
 
-[node name="Uninstall" type="Button" parent="."]
+[node name="Uninstall" type="Button" parent="." unique_id=856545866]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0

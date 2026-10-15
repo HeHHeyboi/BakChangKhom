@@ -20,15 +20,15 @@ border_width_bottom = 1
 border_color = Color(0.61960787, 0.58431375, 0.5411765, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1xt0"]
+bg_color = Color(0.48235294, 0.5764706, 0.91764706, 0.6392157)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57g7j"]
-
-[node name="OsExplorer" type="Panel" unique_id=1857937811]
+[node name="OsExplorer" type="Panel" unique_id=1857937811 node_paths=PackedStringArray("_topbar")]
 custom_minimum_size = Vector2(300, 150)
 offset_right = 300.0
 offset_bottom = 150.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_q5167")
 script = ExtResource("3_osexp")
+_topbar = NodePath("VBoxContainer/Topbar")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=28320967]
 layout_mode = 1
@@ -68,7 +68,7 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "  ถังขยะ"
 alignment = 0
 
@@ -86,7 +86,7 @@ theme_override_constants/separation = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.35, 0.4, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = " เครื่องนี้ › เดสก์ท็อป"
 
 [node name="FileList" type="ItemList" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1602268701]
@@ -96,10 +96,13 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_hovered_color = Color(0, 0, 0, 1)
 theme_override_colors/font_hovered_selected_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_selected_color = Color(0, 0, 0, 1)
+theme_override_constants/v_separation = 4
+theme_override_font_sizes/font_size = 16
 theme_override_styles/panel = SubResource("StyleBoxFlat_orn6i")
 theme_override_styles/hovered = SubResource("StyleBoxFlat_g1xt0")
-theme_override_styles/selected = SubResource("StyleBoxFlat_57g7j")
+theme_override_styles/hovered_selected = SubResource("StyleBoxFlat_g1xt0")
+theme_override_styles/selected = SubResource("StyleBoxFlat_g1xt0")
 fixed_icon_size = Vector2i(12, 12)
 
 [node name="ActionBar" type="HBoxContainer" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=427378979]
@@ -111,7 +114,7 @@ visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 15
 text = "เปิด"
 
 [node name="Ask" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1183803308]
@@ -120,7 +123,7 @@ visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 15
 text = "ถามลูกค้า"
 
 [node name="Restore" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=824999304]
@@ -128,15 +131,15 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
-text = "คืนไฟล์"
+theme_override_font_sizes/font_size = 15
+text = "กู้คืน"
 
 [node name="Delete" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=552566289]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 15
 text = "ลบ"
 
 [node name="CopyUsb" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=906211347]
@@ -145,7 +148,7 @@ visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 15
 text = "คัดลอกไป USB"
 
 [node name="MoveUsb" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1415872093]
@@ -154,7 +157,7 @@ visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 15
 text = "ย้ายไป USB"
 
 [node name="Eject" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=2087634518]
@@ -163,7 +166,7 @@ visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 15
 text = "ถอด USB"
 
 [node name="Status" type="Label" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1196402871]

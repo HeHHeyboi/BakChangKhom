@@ -67,6 +67,7 @@ pc_name = "คอมของยาย"
 request = "อยากคุยกับหลานที่กรุงเทพ ให้เห็นหน้ากันด้วย"
 files = Array[ExtResource("2_file")]([SubResource("Resource_f1"), SubResource("Resource_f2"), SubResource("Resource_f3"), SubResource("Resource_f4"), SubResource("Resource_f5")])
 programs = Array[ExtResource("3_prog")]([SubResource("Resource_p1")])
+install_description = "โปรแกรมคุยกับครอบครัวและเพื่อน ส่งข้อความ โทรเห็นหน้า ฟรีเว็บนี้เป็นของผู้พัฒนาเอง"
 ask_options = PackedStringArray("หลานใช้โปรแกรมอะไรคุยกันครับ", "ยายตั้งรหัสผ่านเครื่องไว้ไหมครับ", "ยายอยากได้เกมด้วยไหมครับ")
 ask_answer = "หลานบอกให้ลงแอป \"พูดคุย\" นะ เขาว่าโหลดได้จากเว็บของเขาเอง"
 explain_options = PackedStringArray("ครั้งหน้าจะลงโปรแกรม ให้โหลดจากเว็บของเจ้าของโปรแกรมเท่านั้น อย่ากดปุ่มโฆษณานะ", "ปุ่มดาวน์โหลดอันใหญ่ ๆ สีส้ม ๆ กดได้เลย เร็วดี", "ลงโปรแกรมไว้เยอะ ๆ ก่อน เผื่อได้ใช้")

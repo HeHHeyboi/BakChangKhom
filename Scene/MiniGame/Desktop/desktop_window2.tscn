@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://bvyr35y00rtr1" path="res://Assets/MiniGame/Desktop/os_icon_pictures.png" id="11_km0mo"]
 [ext_resource type="Texture2D" uid="uid://dtd5mebb0wlbp" path="res://Assets/MiniGame/Desktop/os_icon_downloads.png" id="12_475il"]
 [ext_resource type="Texture2D" uid="uid://c0p3q5lw4lii3" path="res://Assets/MiniGame/Desktop/os_icon_trash_empty.png" id="13_80row"]
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="15_uwad3"]
+[ext_resource type="PackedScene" uid="uid://26ebfi5qvxra" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="15_uwad3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycono"]
 bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
@@ -74,8 +74,57 @@ expand_mode = 1
 stretch_mode = 6
 metadata/_edit_lock_ = true
 
+[node name="Desktop" type="VFlowContainer" parent="Os/Screen" unique_id=1851269946]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -481.0
+offset_top = -265.0
+offset_right = 478.0
+offset_bottom = 234.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+metadata/_edit_lock_ = true
+
+[node name="Doc" parent="Os/Screen/Desktop" unique_id=1339073643 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("7_7dyty")
+shortcut_name = "เอกสาร"
+
+[node name="Pic" parent="Os/Screen/Desktop" unique_id=1590854319 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("11_km0mo")
+shortcut_name = "รูปภาพ"
+
+[node name="Download" parent="Os/Screen/Desktop" unique_id=836239472 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("12_475il")
+shortcut_name = "ดาวน์โหลด"
+
+[node name="Trash" parent="Os/Screen/Desktop" unique_id=1669530300 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("13_80row")
+shortcut_name = "ขยะ"
+
+[node name="BrowserIcon" parent="Os/Screen/Desktop" unique_id=1714566845 instance=ExtResource("10_dy1v8")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("8_dgdh2")
+shortcut_name = "อินเตอร์เน็ต"
+
 [node name="Taskbar" type="Panel" parent="Os/Screen" unique_id=759739448]
 unique_name_in_owner = true
+z_index = 5
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -172,54 +221,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 
-[node name="Desktop" type="VFlowContainer" parent="Os/Screen" unique_id=1851269946]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -481.0
-offset_top = -265.0
-offset_right = 478.0
-offset_bottom = 234.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 8
-metadata/_edit_lock_ = true
-
-[node name="Doc" parent="Os/Screen/Desktop" unique_id=1339073643 instance=ExtResource("10_dy1v8")]
-unique_name_in_owner = true
-layout_mode = 2
-icon = ExtResource("7_7dyty")
-shortcut_name = "เอกสาร"
-
-[node name="Pic" parent="Os/Screen/Desktop" unique_id=1590854319 instance=ExtResource("10_dy1v8")]
-unique_name_in_owner = true
-layout_mode = 2
-icon = ExtResource("11_km0mo")
-shortcut_name = "รูปภาพ"
-
-[node name="Download" parent="Os/Screen/Desktop" unique_id=836239472 instance=ExtResource("10_dy1v8")]
-unique_name_in_owner = true
-layout_mode = 2
-icon = ExtResource("12_475il")
-shortcut_name = "ดาวน์โหลด"
-
-[node name="Trash" parent="Os/Screen/Desktop" unique_id=1669530300 instance=ExtResource("10_dy1v8")]
-unique_name_in_owner = true
-layout_mode = 2
-icon = ExtResource("13_80row")
-shortcut_name = "ขยะ"
-
-[node name="BrowserIcon" parent="Os/Screen/Desktop" unique_id=1714566845 instance=ExtResource("10_dy1v8")]
-unique_name_in_owner = true
-layout_mode = 2
-icon = ExtResource("8_dgdh2")
-shortcut_name = "อินเตอร์เน็ต"
-
 [node name="OsBoot" parent="Os" unique_id=1097511002 instance=ExtResource("15_uwad3")]
 anchors_preset = 15
 anchor_right = 1.0
@@ -228,8 +229,5 @@ offset_right = 0.0
 offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Spinner" parent="Os/OsBoot/Logo" index="1"]
-anchors_preset = 0
 
 [editable path="Os/OsBoot"]
