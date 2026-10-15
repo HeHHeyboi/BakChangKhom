@@ -190,15 +190,19 @@ func add_reputation(delta: int) -> void:
 
 
 ## จ่ายบิลรายเดือน (TimeSystem.month_ended) · เงินไม่พอ = จ่ายเท่าที่มี ส่วนที่เหลือเป็นหนี้
-func pay_month_bill(month: int) -> Dictionary:
+## [0.2.0] บิลสิ้นบท (1 บท = 1 เดือน) · slots_worked = เทิร์นที่ทำงานในบทนี้ (ใช้คิดค่าไฟ)
+## คืน { month, rent, power, water, internet, prev_debt, total, paid, debt }
+func pay_month_bill(month: int, slots_worked := 0) -> Dictionary:
 	var e := economy if economy else EconomyConfig.new()
 	var bill := {
 		"month": month,
-		"power": e.month_value(e.bill_power, month),
-		"grandma": e.bill_grandma,
+		"rent": e.month_value(e.bill_rent, month),
+		"power": e.month_value(e.power_base, month) + e.power_per_slot * maxi(slots_worked, 0),
+		"water": e.bill_water,
 		"internet": e.bill_internet,
+		"prev_debt": debt,
 	}
-	bill["total"] = int(bill["power"]) + int(bill["grandma"]) + int(bill["internet"]) + debt
+	bill["total"] = int(bill["rent"]) + int(bill["power"]) + int(bill["water"]) + int(bill["internet"]) + debt
 	var paid := mini(maxi(money, 0), int(bill["total"]))
 	add_money(-paid)
 	debt = int(bill["total"]) - paid

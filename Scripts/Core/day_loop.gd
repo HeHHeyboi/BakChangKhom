@@ -368,7 +368,8 @@ func _on_week_ended(week: int) -> void:
 
 
 func _on_month_ended(month: int) -> void:
-	_last_bill = GameState.pay_month_bill(month)
+	# [0.2.0] ยิงทุกบท (1 บท = 1 เดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
+	_last_bill = GameState.pay_month_bill(month, _ts().work_slots_used_this_month() if _ts() else 0)
 
 
 func _on_game_ended() -> void:
@@ -988,15 +989,18 @@ func _show_card(card: Card) -> void:
 			sat = sat if is_finite(sat) else 0.0
 			var bill := ""
 			if not _last_bill.is_empty():
-				bill = "\n\nบิลเดือนนี้: ไฟ ฿%d · ช่วยบ้านยาย ฿%d · เน็ต ฿%d\nจ่ายแล้ว ฿%d%s" % [
+				bill = "\n\nบิลเดือนนี้: ค่าเช่าที่ ฿%d · ไฟ ฿%d · น้ำ ฿%d · เน็ต ฿%d%s\nจ่ายแล้ว ฿%d%s" % [
+					int(_last_bill.get("rent", 0)),
 					int(_last_bill.get("power", 0)),
-					int(_last_bill.get("grandma", 0)),
+					int(_last_bill.get("water", 0)),
 					int(_last_bill.get("internet", 0)),
+					(" · ยอดค้างเดิม ฿%d" % int(_last_bill.get("prev_debt", 0))) if int(_last_bill.get("prev_debt", 0)) > 0 else "",
 					int(_last_bill.get("paid", 0)),
 					(" · ค้าง ฿%d" % int(_last_bill.get("debt", 0))) if int(_last_bill.get("debt", 0)) > 0 else "",
 				]
-			_title.text = "สรุปสัปดาห์ %d" % _pending_summary_week
-			_body.text = "งานที่ซ่อม %d งาน\nรายได้สัปดาห์นี้ %s฿%d\nความพอใจเฉลี่ย %d · ชื่อเสียง %d\nยศ %s · XP %d%s" % [
+			var mi := clampi(_pending_summary_week, 1, TimeSystem.MONTH_NAME.size()) - 1
+			_title.text = "สรุปเดือน %s · บทที่ %d" % [TimeSystem.MONTH_NAME[mi], _pending_summary_week]
+			_body.text = "งานที่ซ่อม %d งาน\nเงินเพิ่ม/ลดเดือนนี้ (หลังจ่ายบิล) %s฿%d\nความพอใจเฉลี่ย %d · ชื่อเสียง %d\nยศ %s · XP %d%s" % [
 				week_results.size(),
 				"+" if earned >= 0 else "−",
 				absi(earned),
@@ -1006,7 +1010,7 @@ func _show_card(card: Card) -> void:
 				GameState.xp,
 				bill,
 			]
-			_primary.text = "ดูฉากจบ" if _game_over else "ไปต่อ (บท Chapter %d)" % (_pending_summary_week + 1)
+			_primary.text = "ดูฉากจบ" if _game_over else "ไปต่อ (บทที่ %d)" % (_pending_summary_week + 1)
 		Card.ENDING:
 			_title.text = "จบเกม"
 			_body.text = "%s\n\nเงิน ฿%d · ความพอใจเฉลี่ย %d · ชื่อเสียง %d" % [

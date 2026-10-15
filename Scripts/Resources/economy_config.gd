@@ -62,8 +62,9 @@ class_name EconomyConfig extends Resource
 @export var first_time_extra_slots := 1
 
 @export_group("กระดานงาน (LEVEL_DESIGN ข้อ 5)")
-## งานใหม่ขึ้นกระดานตอนเปิดร้าน ต่อกะ (ช่อง 0 = เดือน 1) — คิดจากจำนวนงานต่อเดือน × 1.3 ÷ 20 กะ
-@export var board_new_per_shift: PackedInt32Array = [5, 4, 3]
+## งานใหม่ขึ้นกระดานตอนเปิดร้าน ต่อกะ (ช่อง 0 = บท/เดือน 1 … ช่อง 11 = บท 12)
+## [0.2.0] ขยายจาก 3 ช่อง (เดือนละ 4 บทแบบเดิม) เป็น 12 ช่อง — ค่าเดิมเดือน 1/2/3 = บท 1–4 / 5–8 / 9–12 · กระดานจะถูกแทนด้วยลูกค้าหน้าร้านใน 0.3.0
+@export var board_new_per_shift: PackedInt32Array = [5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3]
 ## งานโทรเข้าตอนพักบ่าย 15:30
 @export var board_phone_jobs := 1
 ## กระดานแสดงได้มากสุดกี่ใบ
@@ -71,7 +72,7 @@ class_name EconomyConfig extends Resource
 
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")
 @export var ot_cost_per_slot := 30
-## ล่วงเวลาได้กี่กะต่อสัปดาห์
+## ล่วงเวลาได้กี่วันต่อบท ([0.2.0] 1 บท = 5 วัน เท่าสัปดาห์เดิม)
 @export var ot_max_per_week := 2
 
 @export_group("ชื่อเสียง (GAME_REDESIGN 7.3)")
@@ -83,11 +84,16 @@ class_name EconomyConfig extends Resource
 @export var rep_reject := -1
 @export var rep_walkout := -3
 
-@export_group("บิลรายเดือน (ECONOMY_ENERGY 1.3)")
-## ค่าไฟร้าน (ช่อง 0 = เดือน 1)
-@export var bill_power: PackedInt32Array = [500, 700, 900]
-@export var bill_grandma := 1500
-@export var bill_internet := 300
+@export_group("บิลรายเดือน = ทุกบท (Docs/ROADMAP_1_0_0.md ข้อ 5.1)")
+## [0.2.0] 1 บท = 1 เดือนที่เปิดร้านแค่ 5 วัน → บิลคิดต่อบท ตัวเลขจึงเล็กกว่าเดิม (เดิม ไฟ 500–900 + บ้านยาย 1,500 + เน็ต 300 ทุก 4 บท)
+## ค่าเช่าที่หน้าบ้านยาย ต่อบท (ช่อง 0 = บท 1) · บท 1 ยายยกให้ · ร้านโตขึ้นใช้พื้นที่มากขึ้น
+@export var bill_rent: PackedInt32Array = [0, 300, 300, 300, 500, 500, 500, 500, 700, 700, 700, 700]
+## ค่าไฟฐานต่อบท · บท 8 เป็นต้นไป +50 (หน้าร้อน/ค่าไฟขึ้น)
+@export var power_base: PackedInt32Array = [100, 100, 100, 100, 100, 100, 100, 150, 150, 150, 150, 150]
+## ค่าไฟต่อเทิร์นที่ทำงานจริงในบทนั้น (TimeSystem.work_slots_used_this_month) · ค่าไฟล่วงเวลา (ot_cost_per_slot) จ่ายทันทีตอนปิดร้านแยกต่างหาก
+@export var power_per_slot := 4
+@export var bill_water := 50
+@export var bill_internet := 150
 
 @export_group("ยศช่าง (GAME_REDESIGN 10.1)")
 @export var rank_xp: PackedInt32Array = [0, 500, 1500, 3500, 7000]

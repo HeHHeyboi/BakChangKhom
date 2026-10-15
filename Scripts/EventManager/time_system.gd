@@ -1,7 +1,8 @@
 class_name TimeSystem extends CanvasLayer
 ## เวลาในเกม — กะ · สัปดาห์ · เดือน ตาม Docs/LEVEL_DESIGN.md ข้อ 4 · 7.1
 ## 1 กะ = 08:30–18:30 (ช่อง 30 นาที · ทำงานได้ 16 ช่อง) · พัก 12:00–13:00 และ 15:30–16:00
-## 1 สัปดาห์ = 5 กะ (= 1 Chapter) · 1 เดือน = 4 สัปดาห์ = 20 กะ · ทั้งเกม = 3 เดือน = 60 กะ
+## [15 ต.ค. 2569 · 0.2.0] ตามเล่มรายงานข้อ 1.3.3: 1 บท (Chapter) = 1 เดือน = เปิดร้าน 5 วัน (กะ) · 12 บท = ม.ค.–ธ.ค. = 60 กะ
+##   (เดิม 1 บท = 1 สัปดาห์ · 4 สัปดาห์ = 1 เดือน · 3 เดือน) — week() = month() = chapter() ใช้แทนกันได้ · ดู Docs/ROADMAP_1_0_0.md ข้อ 1 · 7.1
 ## นาฬิกาเดินตามการกระทำเท่านั้น (advance_minutes) ไม่เดินเอง
 ## [Claude 9 ต.ค. 2569] เขียนใหม่จาก "วันที่ 1, 2, 3…" — commit 3a1375b ลบ week_ended ไป ตอนนี้กลับมาในรูปกะ/สัปดาห์
 
@@ -13,8 +14,8 @@ const OT_LIMIT := 19 * 60 + 30 # 19:30 (ล่วงเวลาได้ ≤ 2 
 ## [เริ่ม, จบ, ชื่อ] — ช่วงพัก ไม่นับเวลางาน · งานที่ทำค้างข้ามพักต่อหลังพักเอง
 const BREAKS := [[12 * 60, 13 * 60, &"lunch"], [15 * 60 + 30, 16 * 60, &"afternoon"]]
 const SHIFTS_PER_WEEK := 5
-const WEEKS_PER_MONTH := 4
-const MONTHS := 3
+const WEEKS_PER_MONTH := 1 # [0.2.0] 1 บท = 1 เดือน (เดิม 4)
+const MONTHS := 12 # [0.2.0] 12 บท (เดิม 3)
 const TOTAL_SHIFTS := SHIFTS_PER_WEEK * WEEKS_PER_MONTH * MONTHS # 60
 const WORK_SLOTS_PER_SHIFT := 16
 
@@ -25,13 +26,13 @@ enum TIME {
 }
 const PERIOD_START := { TIME.MORNING: 9 * 60, TIME.NOON: 13 * 60, TIME.EVENING: 16 * 60 }
 const PERIOD_NAME := { TIME.MORNING: "ช่วงเช้า", TIME.NOON: "ช่วงบ่าย", TIME.EVENING: "ช่วงเย็น" }
-const MONTH_NAME := ["ม.ค.", "ก.พ.", "มี.ค."] # [Claude 10 ต.ค. 2569] เกมเริ่มเดือนมกราคม
+const MONTH_NAME := ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."] # เกมเริ่มเดือนมกราคม · บทที่ n = เดือนที่ n
 
 ## ช่วงเวลาเปลี่ยน (เช้า → บ่าย → เย็น)
 signal period_changed(period: TIME)
 ## นาฬิกาเปลี่ยน
 signal clock_changed(minute: int)
-## เริ่มกะใหม่ (หลังปิดร้านกะก่อน) · month 1–3 · week 1–12 · shift_in_week 1–5
+## เริ่มกะใหม่ (หลังปิดร้านกะก่อน) · month = week = บท 1–12 · shift_in_week = วันที่ 1–5 ของบท
 signal shift_started(month: int, week: int, shift_in_week: int)
 ## เดินเวลาข้ามช่วงพัก · kind = &"lunch" / &"afternoon"
 signal break_started(kind: StringName)
@@ -39,7 +40,7 @@ signal break_started(kind: StringName)
 signal shift_closed
 ## ครบ 5 กะ (ยิงก่อน shift_started ของสัปดาห์ถัดไป) · DayLoop ใช้ทำสรุปสัปดาห์ + Chapter
 signal week_ended(week: int)
-## ครบ 20 กะ · GameState จ่ายบิลรายเดือน
+## ครบ 1 บท (5 กะ) · ยิงต่อจาก week_ended · DayLoop จ่ายบิลรายเดือน (GameState.pay_month_bill)
 signal month_ended(month: int)
 ## ครบ 60 กะ → ฉากจบ
 signal game_ended
@@ -51,7 +52,7 @@ signal game_ended
 ## กะที่เท่าไรของทั้งเกม 1–60 (ไม่โชว์ผู้เล่น)
 var shift := 1
 ## [Claude 10 ต.ค. 2569] true = HUD/การ์ดบอกเวลาเป็นนาฬิกา (แบบเดิม) · false = บอกเป็น "เทิร์น" แบบ Volcano Princess
-## 1 เทิร์น = 1 ช่อง 30 นาที (SLOT_MIN) · วันหนึ่งมี 16 เทิร์น · 1 บท = 1 สัปดาห์ (5 วัน)
+## 1 เทิร์น = 1 ช่อง 30 นาที (SLOT_MIN) · วันหนึ่งมี 16 เทิร์น · 1 บท = 1 เดือน (เปิดร้าน 5 วัน)
 @export var show_clock := false
 
 var current_minute := OPEN
@@ -152,7 +153,7 @@ static func turns_text(n: int) -> String:
 	return "%d เทิร์น" % n
 
 
-## บทที่ (1 บท = 1 สัปดาห์)
+## บทที่ 1–12 (1 บท = 1 เดือน)
 func chapter() -> int:
 	return week()
 
@@ -368,7 +369,7 @@ func updateTime() -> void:
 	)
 
 
-## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "บทที่ 1 · วันที่ 2/5 · อีก 3 วันจบบท"
+## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "บทที่ 1 · ม.ค. · วันที่ 2/5 · อีก 3 วันจบบท" ([0.2.0] เพิ่มชื่อเดือน)
 func _update_turns() -> void:
 	var br := in_break()
 	var n := turns_left()
@@ -385,8 +386,9 @@ func _update_turns() -> void:
 	timeText.add_theme_color_override("font_color", col)
 	timeText.text = txt
 	var left := days_left_in_chapter()
-	dateText.text = "บทที่ %d · วันที่ %d/%d\n%s" % [
+	dateText.text = "บทที่ %d · %s · วันที่ %d/%d\n%s" % [
 		chapter(),
+		MONTH_NAME[clampi(month(), 1, MONTH_NAME.size()) - 1],
 		shift_in_week(),
 		SHIFTS_PER_WEEK,
 		("อีก %d วันจบบท" % left) if left > 0 else "วันสุดท้ายของบท",
