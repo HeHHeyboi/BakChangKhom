@@ -37,7 +37,8 @@ func _ready() -> void:
 	_check(stalls.size() == 3, "ตลาดมี 3 แผง")
 	stalls[0].pressed.emit()
 	var sp: ShopPanel = market.get_node("ShopPanel")
-	_check(sp.visible and sp.title.text == "ร้านอะไหล่คอม" and sp.empty.visible and sp.empty.text.contains("ยังไม่มีของขาย"), "กดแผง → หน้าต่างร้านค้า (ยังไม่มีของขาย)")
+	# [15 ต.ค.] ตั้งแต่ 0.1.2 แผงมีของขายจริง (Market.tscn MarketStall.items) — เดิมเช็กว่า "ยังไม่มีของขาย"
+	_check(sp.visible and sp.title.text == "ร้านอะไหล่คอม" and not sp.empty.visible and sp.grid.get_child_count() == stalls[0].items.size(), "กดแผง → หน้าต่างร้านค้า มีของ %d ชิ้น" % stalls[0].items.size())
 	await get_tree().create_timer(0.6).timeout
 	await _shot("shop")
 	var it := ShopItem.new()
@@ -45,7 +46,9 @@ func _ready() -> void:
 	it.price = 50
 	sp.open("ทดสอบ", [it] as Array[ShopItem])
 	var m0 := GameState.money
-	_check(not sp.empty.visible and sp.list.get_child_count() == 1 and sp.buy(it) and GameState.money == m0 - 50, "มีของ → ซื้อได้ หักเงิน")
+	_check(not sp.empty.visible and sp.grid.get_child_count() == 1 and sp.buy(it) and GameState.money == m0 - 50, "ของแบบ ShopItem → ซื้อได้ หักเงิน")
+	sp.open("ทดสอบ", [] as Array[ShopItem])
+	_check(sp.empty.visible and sp.empty.text.contains("ยังไม่มีของขาย"), "ร้านไม่มีของ → ป้ายยังไม่มีของขาย")
 	GameState.add_money(50)
 	sp.close_button.pressed.emit()
 	_check(not sp.visible, "ออกจากร้าน → ปิดหน้าต่าง")
