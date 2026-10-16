@@ -411,8 +411,8 @@ func _browser_show(page: String) -> void:
 		desc.text = task.install_description
 		download.pressed.connect(
 			func():
-				download_official()
-				_pib_toast(&"OFFICIAL_DONE", 3.0)
+				if download_official():
+					_pib_toast(&"OFFICIAL_DONE", 3.0)
 				open_explorer(DOWNLOAD_DIR),
 		)
 		return
@@ -454,27 +454,35 @@ func _browser_show(page: String) -> void:
 		_browser_page.add_child(weather)
 
 
-func click_download_ad():
-	_trap(&"fake_download", "ad_button", &"safety", 10, "กดปุ่มดาวน์โหลดที่เป็นโฆษณา")
+## คืน true ถ้าดาวน์โหลดไฟล์ใหม่ · false ถ้ามีไฟล์ชื่อนี้ในโฟลเดอร์ดาวน์โหลดอยู่แล้ว (ปิ๊บบอกแล้ว ไม่โหลดซ้ำ ไม่หักคะแนนซ้ำ)
+func click_download_ad() -> bool:
 	var fname := "DOWNLOAD_NOW_ฟรี.exe"
-	var dup := os.count_dup(fname)
+	if os.find_file(fname, DOWNLOAD_DIR):
+		_pib_toast(&"ALREADY_DOWNLOADED", 3.0)
+		return false
+	_trap(&"fake_download", "ad_button", &"safety", 10, "กดปุ่มดาวน์โหลดที่เป็นโฆษณา")
 	var f := DesktopFile.new()
-	f.name = fname if dup == 0 else "%s (%d).exe" % [fname.get_basename(), dup]
+	f.name = fname
 	f.size_mb = 3
 	f.kind = DesktopFile.FAKE_INSTALLER
 	f.folder = DesktopFile.Folder.DOWNLOADS
 	os.add_file(f)
+	return true
 
 
-func download_official():
+## คืน true ถ้าดาวน์โหลดไฟล์ใหม่ · false ถ้ามีไฟล์ชื่อนี้ในโฟลเดอร์ดาวน์โหลดอยู่แล้ว
+func download_official() -> bool:
 	var fname := "setup_%s.exe" % task.install_name
-	var dup := os.count_dup(fname)
+	if os.find_file(fname, DOWNLOAD_DIR):
+		_pib_toast(&"ALREADY_DOWNLOADED", 3.0)
+		return false
 	var f := DesktopFile.new()
-	f.name = fname if dup == 0 else "%s (%d).exe" % [fname.get_basename(), dup]
+	f.name = fname
 	f.size_mb = 95
 	f.kind = DesktopFile.INSTALLER
 	f.folder = DesktopFile.Folder.DOWNLOADS
 	os.add_file(f)
+	return true
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
