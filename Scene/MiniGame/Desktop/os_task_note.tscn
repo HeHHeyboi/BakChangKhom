@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://d27c01wjestrb"]
 
 [ext_resource type="Texture2D" uid="uid://vkmptlex2mww" path="res://Assets/MiniGame/Desktop/os_sticky_note.png" id="1_note"]
-[ext_resource type="Theme" path="res://Assets/Theme/os_theme.tres" id="2_theme"]
+[ext_resource type="Theme" uid="uid://5t51h6h682na" path="res://Assets/Theme/os_theme.tres" id="2_theme"]
 
-[node name="OsTaskNote" type="Control"]
+[node name="OsTaskNote" type="Control" unique_id=442420618]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,17 +13,19 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="StickyNote" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = 860.0
-offset_top = 14.0
-offset_right = 1140.0
-offset_bottom = 234.0
+[node name="StickyNote" type="TextureRect" parent="." unique_id=1121460027]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_bottom = 220.0
+grow_horizontal = 0
 mouse_filter = 2
 texture = ExtResource("1_note")
 expand_mode = 1
 
-[node name="Box" type="VBoxContainer" parent="StickyNote"]
+[node name="Box" type="VBoxContainer" parent="StickyNote" unique_id=635415781]
 layout_mode = 0
 offset_left = 26.0
 offset_top = 26.0
@@ -31,14 +33,14 @@ offset_right = 258.0
 offset_bottom = 206.0
 theme_override_constants/separation = 2
 
-[node name="Title" type="Label" parent="StickyNote/Box"]
+[node name="Title" type="Label" parent="StickyNote/Box" unique_id=423652929]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "ชื่องาน"
 autowrap_mode = 3
 
-[node name="Request" type="Label" parent="StickyNote/Box"]
+[node name="Request" type="Label" parent="StickyNote/Box" unique_id=1920770712]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.3, 0.2, 1)
@@ -46,59 +48,66 @@ theme_override_font_sizes/font_size = 13
 text = "คำขอของลูกค้า"
 autowrap_mode = 3
 
-[node name="AskNote" type="Label" parent="StickyNote/Box"]
+[node name="AskNote" type="Label" parent="StickyNote/Box" unique_id=550821928]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.2, 0.1, 1)
 theme_override_font_sizes/font_size = 14
 
-[node name="Checklist" type="VBoxContainer" parent="StickyNote/Box"]
+[node name="Checklist" type="VBoxContainer" parent="StickyNote/Box" unique_id=1782315740]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Step1" type="Label" parent="StickyNote/Box/Checklist"]
+[node name="Step1" type="Label" parent="StickyNote/Box/Checklist" unique_id=985196900]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "☐ ฟังลูกค้า"
 
-[node name="Step2" type="Label" parent="StickyNote/Box/Checklist"]
+[node name="Step2" type="Label" parent="StickyNote/Box/Checklist" unique_id=1860596563]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "☐ ดูอาการ + ลงมือ"
 
-[node name="Step3" type="Label" parent="StickyNote/Box/Checklist"]
+[node name="Step3" type="Label" parent="StickyNote/Box/Checklist" unique_id=1809941600]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "☐ ลองใช้ให้ลูกค้าดู"
 
-[node name="Step4" type="Label" parent="StickyNote/Box/Checklist"]
+[node name="Step4" type="Label" parent="StickyNote/Box/Checklist" unique_id=161171145]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "☐ อธิบายให้ลูกค้าฟัง"
 
-[node name="CheckButton" type="Button" parent="."]
+[node name="CheckButton" type="Button" parent="." unique_id=1627918159]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(210, 40)
-layout_mode = 0
-offset_left = 900.0
-offset_top = 240.0
-offset_right = 1110.0
-offset_bottom = 280.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -253.0
+offset_top = 220.0
+offset_right = -43.0
+offset_bottom = 260.0
+grow_horizontal = 0
 focus_mode = 0
 theme_override_font_sizes/font_size = 17
 text = "✔ ลองใช้ให้ลูกค้าดู"
 
-[node name="GiveUpButton" type="Button" parent="."]
+[node name="GiveUpButton" type="Button" parent="." unique_id=424085797]
 unique_name_in_owner = true
-visible = false
 custom_minimum_size = Vector2(210, 32)
-layout_mode = 0
-offset_left = 900.0
-offset_top = 286.0
-offset_right = 1110.0
-offset_bottom = 318.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -253.0
+offset_top = 274.0
+offset_right = -43.0
+offset_bottom = 306.0
+grow_horizontal = 0
 tooltip_text = "ทำต่อไม่ได้แล้ว? ส่งเครื่องคืนตามสภาพ (งานไม่ผ่าน)"
 focus_mode = 0
 theme_override_font_sizes/font_size = 14

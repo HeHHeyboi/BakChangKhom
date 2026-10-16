@@ -19,7 +19,6 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [node name="OsCustomerBubble" type="PanelContainer" unique_id=796627260]
-visible = false
 custom_minimum_size = Vector2(430, 0)
 offset_left = 700.0
 offset_top = 440.0
