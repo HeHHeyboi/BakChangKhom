@@ -58,6 +58,20 @@ func add_file(src: DesktopFile) -> int:
 	return index
 
 
+## นับไฟล์ใน fs ที่ชื่อซ้ำกับ fname (ทุกโฟลเดอร์ รวมถังขยะ)
+## นับทั้งชื่อตรงกัน และชื่อที่ถูกต่อเลขแล้ว เช่น "setup.exe" กับ "setup (1).exe"
+func count_dup(fname: String) -> int:
+	var base := fname.get_basename()
+	var ext := fname.get_extension()
+	var suffix := ")." + ext if ext != "" else ")"
+	var count := 0
+	for file in fs:
+		var n := file.data.name
+		if n == fname or (n.begins_with(base + " (") and n.ends_with(suffix)):
+			count += 1
+	return count
+
+
 ## ย้ายไฟล์ไปโฟลเดอร์ dest แล้วอัปเดต File.dir
 ## คืน false ถ้าไม่มีไฟล์/โฟลเดอร์ปลายทาง หรือไฟล์อยู่ในโฟลเดอร์นั้นอยู่แล้ว
 func move_file(file_index: int, dest: String) -> bool:
@@ -78,11 +92,17 @@ func move_file(file_index: int, dest: String) -> bool:
 func clear_trash() -> void:
 	var trash = dir_map.get(TRASH) as Dir
 	assert(trash != null, "Can't find trash dir")
-	for i in trash.files:
-		var file: File = fs.get(i)
-		disk_free_mb += file.data.size_mb
-		fs.remove_at(i)
-	trash.files.clear()
+	# NOTE: Dir.files เก็บ index ของ fs — ลบไฟล์แล้ว index เลื่อน จึงสร้าง fs ใหม่แล้วเติม Dir.files ใหม่ตาม File.dir
+	for d in dir_map.values():
+		d.files.clear()
+	var kept: Array[File] = []
+	for file in fs:
+		if file.dir == TRASH:
+			disk_free_mb += file.data.size_mb
+		else:
+			dir_map[file.dir].files.append(kept.size())
+			kept.append(file)
+	fs = kept
 
 
 func add_instance(win: OsWindow2) -> void:
