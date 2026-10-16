@@ -145,7 +145,6 @@ func _on_start_menu(id: int) -> void:
 			open_explorer(DOWNLOAD_DIR)
 		3:
 			open_browser()
-			# print("browser")
 		4:
 			# open_settings()
 			print("setting")
@@ -455,12 +454,27 @@ func _browser_show(page: String) -> void:
 		_browser_page.add_child(weather)
 
 
-func click_download_ad() -> Dictionary:
-	return { }
+func click_download_ad():
+	_trap(&"fake_download", "ad_button", &"safety", 10, "กดปุ่มดาวน์โหลดที่เป็นโฆษณา")
+	var fname := "DOWNLOAD_NOW_ฟรี.exe"
+	var dup := os.count_dup(fname)
+	var f := DesktopFile.new()
+	f.name = fname if dup == 0 else "%s (%d).exe" % [fname.get_basename(), dup]
+	f.size_mb = 3
+	f.kind = DesktopFile.FAKE_INSTALLER
+	f.folder = DesktopFile.Folder.DOWNLOADS
+	os.add_file(f)
 
 
-func download_official() -> Dictionary:
-	return { }
+func download_official():
+	var fname := "setup_%s.exe" % task.install_name
+	var dup := os.count_dup(fname)
+	var f := DesktopFile.new()
+	f.name = fname if dup == 0 else "%s (%d).exe" % [fname.get_basename(), dup]
+	f.size_mb = 95
+	f.kind = DesktopFile.INSTALLER
+	f.folder = DesktopFile.Folder.DOWNLOADS
+	os.add_file(f)
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
