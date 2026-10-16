@@ -58,18 +58,25 @@ func add_file(src: DesktopFile) -> int:
 	return index
 
 
-## นับไฟล์ใน fs ที่ชื่อซ้ำกับ fname (ทุกโฟลเดอร์ รวมถังขยะ)
-## นับทั้งชื่อตรงกัน และชื่อที่ถูกต่อเลขแล้ว เช่น "setup.exe" กับ "setup (1).exe"
-func count_dup(fname: String) -> int:
-	var base := fname.get_basename()
-	var ext := fname.get_extension()
-	var suffix := ")." + ext if ext != "" else ")"
-	var count := 0
-	for file in fs:
-		var n := file.data.name
-		if n == fname or (n.begins_with(base + " (") and n.ends_with(suffix)):
-			count += 1
-	return count
+## คืนไฟล์ในโฟลเดอร์ dir · dir ว่าง = ทุกไฟล์ใน fs (รวมถังขยะ) · ไม่มีโฟลเดอร์นั้นคืน []
+func list_dir(dir: String) -> Array[File]:
+	if dir == "":
+		return fs.duplicate()
+	var result: Array[File] = []
+	var d := dir_map.get(dir) as Dir
+	if d == null:
+		return result
+	for idx in d.files:
+		result.append(fs[idx])
+	return result
+
+
+## มีไฟล์ชื่อ fname ในโฟลเดอร์ dir ไหม · dir ว่าง = หาทุกโฟลเดอร์
+func find_file(fname: String, dir: String) -> bool:
+	for file in list_dir(dir):
+		if file.data.name == fname:
+			return true
+	return false
 
 
 ## ย้ายไฟล์ไปโฟลเดอร์ dest แล้วอัปเดต File.dir
