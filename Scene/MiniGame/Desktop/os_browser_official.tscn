@@ -1,22 +1,22 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dqhmd4843qnik"]
 
-[node name="OsBrowserOfficial" type="VBoxContainer"]
+[node name="OsBrowserOfficial" type="VBoxContainer" unique_id=614956669]
 theme_override_constants/separation = 10
 
-[node name="AppName" type="Label" parent="."]
+[node name="AppName" type="Label" parent="." unique_id=2024560598]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.55, 0.35, 1)
 theme_override_font_sizes/font_size = 30
 text = "ชื่อโปรแกรม"
 
-[node name="Description" type="Label" parent="."]
+[node name="Description" type="Label" parent="." unique_id=1812732708]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "โปรแกรมคุยกับครอบครัวและเพื่อน ส่งข้อความ โทรเห็นหน้า ฟรี
 เว็บนี้เป็นของผู้พัฒนาเอง"
 
-[node name="Download" type="Button" parent="."]
+[node name="Download" type="Button" parent="." unique_id=1233732122]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 46)
 layout_mode = 2

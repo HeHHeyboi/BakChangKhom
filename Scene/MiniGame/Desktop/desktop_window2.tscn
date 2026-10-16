@@ -14,7 +14,9 @@
 [ext_resource type="Texture2D" uid="uid://bvyr35y00rtr1" path="res://Assets/MiniGame/Desktop/os_icon_pictures.png" id="11_km0mo"]
 [ext_resource type="Texture2D" uid="uid://dtd5mebb0wlbp" path="res://Assets/MiniGame/Desktop/os_icon_downloads.png" id="12_475il"]
 [ext_resource type="Texture2D" uid="uid://c0p3q5lw4lii3" path="res://Assets/MiniGame/Desktop/os_icon_trash_empty.png" id="13_80row"]
+[ext_resource type="PackedScene" uid="uid://d27c01wjestrb" path="res://Scene/MiniGame/Desktop/os_task_note.tscn" id="15_esb47"]
 [ext_resource type="PackedScene" uid="uid://26ebfi5qvxra" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="15_uwad3"]
+[ext_resource type="PackedScene" uid="uid://ctvnpo4gkvxw4" path="res://Scene/MiniGame/Desktop/os_customer_bubble.tscn" id="16_mp0gt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycono"]
 bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
@@ -221,6 +223,28 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 
+[node name="Note" parent="Os/Screen" unique_id=442420618 instance=ExtResource("15_esb47")]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 1
+
+[node name="CustomerBubble" parent="Os/Screen" unique_id=796627260 instance=ExtResource("16_mp0gt")]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -432.0
+offset_top = -123.00003
+offset_right = -2.0
+offset_bottom = -49.0
+grow_horizontal = 0
+grow_vertical = 0
+
 [node name="OsBoot" parent="Os" unique_id=1097511002 instance=ExtResource("15_uwad3")]
 anchors_preset = 15
 anchor_right = 1.0
@@ -230,4 +254,6 @@ offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[editable path="Os/Screen/Note"]
+[editable path="Os/Screen/CustomerBubble"]
 [editable path="Os/OsBoot"]
