@@ -268,7 +268,7 @@ func _explorer_action(what: String) -> void:
 		return
 	var f: DesktopFile = os.fs[idx].data if idx >= 0 else null
 	if f == null:
-		_pib_toast(&"SELECT_FIRST", 2.5)
+		_pib_toast(MinigameHeader.SELECT_FIRST, 2.5)
 		return
 	match what:
 		"open":
@@ -412,7 +412,7 @@ func _browser_show(page: String) -> void:
 		download.pressed.connect(
 			func():
 				if download_official():
-					_pib_toast(&"OFFICIAL_DONE", 3.0)
+					_pib_toast(MinigameHeader.OFFICIAL_DONE, 3.0)
 				open_explorer(DOWNLOAD_DIR),
 		)
 		return
@@ -458,7 +458,7 @@ func _browser_show(page: String) -> void:
 func click_download_ad() -> bool:
 	var fname := "DOWNLOAD_NOW_ฟรี.exe"
 	if os.find_file(fname, DOWNLOAD_DIR):
-		_pib_toast(&"ALREADY_DOWNLOADED", 3.0)
+		_pib_toast(MinigameHeader.ALREADY_DOWNLOADED, 3.0)
 		return false
 	_trap(&"fake_download", "ad_button", &"safety", 10, "กดปุ่มดาวน์โหลดที่เป็นโฆษณา")
 	var f := DesktopFile.new()
@@ -474,7 +474,7 @@ func click_download_ad() -> bool:
 func download_official() -> bool:
 	var fname := "setup_%s.exe" % task.install_name
 	if os.find_file(fname, DOWNLOAD_DIR):
-		_pib_toast(&"ALREADY_DOWNLOADED", 3.0)
+		_pib_toast(MinigameHeader.ALREADY_DOWNLOADED, 3.0)
 		return false
 	var f := DesktopFile.new()
 	f.name = fname
@@ -521,9 +521,9 @@ func _resolve_task() -> void:
 		task = order.desktop_task
 
 
-func _pib_toast(section: StringName, secs := 3.5) -> void:
-	if is_instance_valid(pib) and dialog_dict.has(String(section)):
-		pib.toast(dialog_dict[String(section)][0], secs)
+func _pib_toast(section: String, secs := 3.5) -> void:
+	if is_instance_valid(pib) and dialog_dict.has(section):
+		pib.toast(dialog_dict[section][0], secs)
 
 
 func _pib(section: StringName, mood := PibHint.Mood.NORMAL) -> void:
