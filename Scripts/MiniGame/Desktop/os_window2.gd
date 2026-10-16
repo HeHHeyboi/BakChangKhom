@@ -8,6 +8,13 @@ const TITLE_H := 21
 
 @export var _topbar: PanelContainer
 
+func set_title(title:String):
+	var t = _topbar.get_node("%Title") as Label
+	t.text = title
+	
+func set_icon(icon: Texture2D):
+	var i = _topbar.get_node("%Icon") as TextureRect
+	i.texture = icon
 
 func _ready() -> void:
 	var row := _topbar.get_node("HBoxContainer")

@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dpwi71hsbm2xb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ad"]
 content_margin_left = 8.0
@@ -14,19 +14,19 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="OsBrowserAd" type="PanelContainer"]
+[node name="OsBrowserAd" type="PanelContainer" unique_id=1709829053]
 theme_override_styles/panel = SubResource("StyleBoxFlat_ad")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=579234481]
 layout_mode = 2
 
-[node name="Tag" type="Label" parent="VBoxContainer"]
+[node name="Tag" type="Label" parent="VBoxContainer" unique_id=932651829]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.45, 0.3, 1)
 theme_override_font_sizes/font_size = 11
 text = "โฆษณา"
 
-[node name="AdDownload" type="Button" parent="VBoxContainer"]
+[node name="AdDownload" type="Button" parent="VBoxContainer" unique_id=585042559]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2

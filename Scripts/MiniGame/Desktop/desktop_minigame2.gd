@@ -6,6 +6,8 @@ const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
 # NOTE: Load app scene
 const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
 const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
+const WINDOW_BASE := preload("res://Scene/MiniGame/Desktop/os_window_base.tscn")
+const INFO_WINDOW := preload("res://Scene/MiniGame/Desktop/os_info.tscn")
 
 # NOTE: Icon Texture
 const DIR := "res://Assets/MiniGame/Desktop/"
@@ -25,6 +27,8 @@ const TEX_EXE := preload(DIR + "os_icon_file_exe.png")
 const TEX_IMAGE := preload(DIR + "os_icon_file_image.png")
 const TEX_DOC := preload(DIR + "os_icon_file_doc.png")
 const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
+
+const CAP := { &"fix": 40, &"safety": 30, &"listen": 20, &"explain": 10 }
 
 @export var task: DesktopTask
 @export var popup_every := 7.0
@@ -53,6 +57,10 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 @onready var trash_icon = %Trash as DesktopShortcut
 @onready var browser_icon = %BrowserIcon as DesktopShortcut
 
+# NOTE: Minigame Node
+@onready var msg_bubble = %CustomerBubble
+@onready var note = %Note
+
 var os: DesktopOS
 # var _selected_icon: Control
 var start_menu: PopupMenu
@@ -64,6 +72,8 @@ var _explorer_win: OsExplorer
 var _explorer_list: ItemList
 var _explorer_path: Label
 var _explorer_status: Label
+var notes: PackedStringArray = []
+var _bubble_tw: Tween
 
 # NOTE: Browser var
 var _browser_page: VBoxContainer
@@ -177,13 +187,13 @@ func open_explorer(folder: String = "เอกสาร") -> void:
 	var w := _find_window("explorer")
 	if w == null:
 		w = EXPLORER_SCENE.instantiate()
-		w.restore(true)
 		w.set_meta("type", os.WinType.Explorer)
-		screen.add_child(w)
-		var n := os.instances.size()
+		# var n := os.instances.size()
 		w.size = DEFAULT_WINDOW_SIZE
-		w.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
-		w.position = w.position.clamp(Vector2.ZERO, (screen.size - w.size).max(Vector2.ZERO))
+		# w.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
+		# w.position = w.position.clamp(Vector2.ZERO, (screen.size - w.size).max(Vector2.ZERO))
+		w.restore(true)
+		screen.add_child(w)
 		os.add_instance(w)
 		_setup_explorer(w)
 	else:
@@ -259,13 +269,23 @@ func _explorer_action(what: String) -> void:
 		return
 	var f: DesktopFile = os.fs[idx].data if idx >= 0 else null
 	if f == null:
-		_explorer_status.text = "เลือกไฟล์ก่อน"
+		_pib_toast(&"SELECT_FIRST", 2.5)
 		return
 	match what:
 		"open":
-			print("open ", f.name) # _open_file_ui(f)
+			_open_file(f)
 		"ask":
-			print("ask ", f.name) # customer_say(ask_about(f))
+			match f.kind:
+				DesktopFile.USER:
+					customer_say("อันนั้นอย่าลบนะ! ของสำคัญเลย")
+				DesktopFile.DUP:
+					customer_say("อันนั้นก๊อปไว้ซ้ำแหละ ลบได้เลย")
+				DesktopFile.SYSTEM:
+					customer_say("ไม่รู้เหมือนกัน มันมีมากับเครื่อง")
+				DesktopFile.JUNK:
+					customer_say("ไม่รู้จักเลย ไม่เคยใช้")
+				_:
+					customer_say("อันนั้นโหลดมาเอง")
 		"delete":
 			if os.move_file(idx, DesktopOS.TRASH):
 				_refresh_explorer()
@@ -276,6 +296,47 @@ func _explorer_action(what: String) -> void:
 			print("copy_usb ", f.name)
 		"move_usb":
 			print("move_usb ", f.name)
+
+
+func _open_file(f: DesktopFile):
+	var msg: String = ""
+	match f.kind:
+		DesktopFile.USER:
+			msg = f.note if f.note != "" else "ไฟล์ของลูกค้า"
+		DesktopFile.FAKE_INSTALLER:
+			_trap(&"fake_download", "run_fake", &"safety", 5, "เปิดไฟล์จากปุ่มโฆษณา")
+			# WARN: need to implement
+			# install_adware()
+			_pib(&"FAKE_RUN", PibHint.Mood.WORRY)
+			msg = "กำลังติดตั้ง… (ไม่มีหน้าให้เลือกอะไรเลย!)"
+		DesktopFile.INSTALLER:
+			pass
+		DesktopFile.DUP:
+			msg = f.note if f.note != "" else "เปิดดูแล้ว — เหมือนกับ \"%s\" ทุกอย่าง" % f.dup_of
+		DesktopFile.SYSTEM:
+			msg = f.note if f.note != "" else "ไฟล์ระบบของขมOS — เครื่องต้องใช้ตอนเปิด"
+	if msg != "":
+		var w = INFO_WINDOW.instantiate() as OsWindow2
+		if w == null:
+			push_error("w is OsWindow2")
+			return
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred(),
+		)
+		w.restore(true)
+		w.set_title("เปิด %s" % [f.name])
+		w.set_icon(self._file_tex(f))
+		var label = w.get_node("%Message") as Label
+		label.text = msg
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+		var ok := w.get_node("%Ok") as Button
+		ok.text = "ตกลง"
+		ok.size_flags_horizontal = Control.SIZE_SHRINK_END
+		ok.pressed.connect(w.close)
+		screen.add_child(w)
 
 
 func _refresh_explorer() -> void:
@@ -314,7 +375,9 @@ func size_text(mb: int) -> String:
 # NOTE: Browser Logic
 const BROWSER_HOME = "home"
 const BROWSER_OFFICIAL = "official"
-const OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
+const BROWSER_OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
+const BROWSER_RESULT_SCENE = "res://Scene/MiniGame/Desktop/os_browser_result.tscn"
+const BROWSER_AD_SCENE = "res://Scene/MiniGame/Desktop/os_browser_ad.tscn"
 
 
 func open_browser() -> void:
@@ -339,20 +402,65 @@ func _browser_show(page: String) -> void:
 		c.queue_free()
 	var is_install := task.goal == DesktopTask.Goal.INSTALL and not free_mode
 	if page == BROWSER_OFFICIAL:
-		var p = load(OFFICIAL_SCENE)
+		var p = load(BROWSER_OFFICIAL_SCENE).instantiate()
 		_browser_addr.text = "🔒 https://" + task.install_site
 		_browser_page.add_child(p)
-		var name: Label = p.get_node("%AppName")
+		var app_name: Label = p.get_node("%AppName")
 		var desc: Label = p.get_node("Description")
 		var download: Button = p.get_node("%Download")
-		name.text = task.install_name
+		app_name.text = task.install_name
 		desc.text = task.install_description
 		download.pressed.connect(
 			func():
-				_pib_toast(&"OFFICIAL_DONE", 3.0),
-			# open_explorer(""),
+				download_official()
+				_pib_toast(&"OFFICIAL_DONE", 3.0)
+				open_explorer(DOWNLOAD_DIR),
 		)
 		return
+	if task.browser_ad:
+		var ad = load(BROWSER_AD_SCENE).instantiate()
+		var btn = ad.get_node("%AdDownload") as Button
+		btn.pressed.connect(
+			func():
+				click_download_ad()
+				open_explorer(DOWNLOAD_DIR),
+		)
+		_browser_page.add_child(ad)
+	if is_install:
+		var result = load(BROWSER_RESULT_SCENE).instantiate() as Control
+		var link = result.get_node("%Link") as LinkButton
+		var url = result.get_node("%Url") as Label
+		link.text = "%s — ดาวน์โหลดโปรแกรม (เว็บทางการ)" % task.install_name
+		link.pressed.connect(self._browser_show.bind(BROWSER_OFFICIAL))
+		url.text = task.install_site
+		_browser_page.add_child(result)
+
+		result = load(BROWSER_RESULT_SCENE).instantiate() as Control
+		link = result.get_node("%Link") as LinkButton
+		url = result.get_node("%Url") as Label
+		link.text = "รวมโปรแกรมฟรี 2569 โหลดได้ทุกตัว!!"
+		link.pressed.connect(
+			func():
+				click_download_ad()
+				open_explorer(DOWNLOAD_DIR),
+		)
+		url.text = "freeprogram-zz.biz/โหลดฟรี"
+		_browser_page.add_child(result)
+	else:
+		var news = Label.new()
+		var weather = Label.new()
+		news.text = "ข่าววันนี้: ตลาดนัดหน้าวัดเลื่อนเป็นวันเสาร์"
+		weather.text = "พยากรณ์อากาศ: ฝนตกบ่าย ๆ เก็บผ้าด้วย"
+		_browser_page.add_child(news)
+		_browser_page.add_child(weather)
+
+
+func click_download_ad() -> Dictionary:
+	return { }
+
+
+func download_official() -> Dictionary:
+	return { }
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
@@ -394,3 +502,41 @@ func _resolve_task() -> void:
 func _pib_toast(section: StringName, secs := 3.5) -> void:
 	if is_instance_valid(pib) and dialog_dict.has(String(section)):
 		pib.toast(dialog_dict[String(section)][0], secs)
+
+
+func _pib(section: StringName, mood := PibHint.Mood.NORMAL) -> void:
+	if is_instance_valid(pib) and dialog_dict.has(String(section)):
+		pib.say(dialog_dict[String(section)], mood)
+
+
+func _trap(id: StringName, key: String, cat: StringName, pts: int, note: String) -> void:
+	if task == null or not task.traps.has(id):
+		return
+	lose(cat, pts, note)
+
+
+func lose(cat: StringName, pts: int, note := "") -> void:
+	var cur: int = _mistakes.get(cat, 0)
+	var add := mini(pts, int(CAP.get(cat, 100)) - cur)
+	if add > 0:
+		_on_mistake(cat, add)
+	if note != "" and not notes.has(note):
+		notes.append(note)
+
+
+func customer_say(text: String, secs := 3.0) -> void:
+	if not is_instance_valid(msg_bubble) or text == "":
+		return
+	var c_name := msg_bubble.get_node("%Name") as Label
+	var msg := msg_bubble.get_node("%Text") as Label
+	c_name.text = customer_name
+	msg.text = text
+	msg_bubble.show()
+	msg_bubble.modulate.a = 1.0
+	if _bubble_tw:
+		_bubble_tw.kill()
+
+	_bubble_tw = create_tween()
+	_bubble_tw.tween_interval(secs)
+	_bubble_tw.tween_property(msg_bubble, "modulate:a", 0.0, 0.4)
+	_bubble_tw.tween_callback(msg_bubble.hide)
