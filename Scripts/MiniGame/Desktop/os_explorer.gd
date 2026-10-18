@@ -16,7 +16,6 @@ const NORM = 2
 
 func _ready() -> void:
 	super._ready()
-	key = "explorer"
 
 
 func set_title(t: String) -> void:

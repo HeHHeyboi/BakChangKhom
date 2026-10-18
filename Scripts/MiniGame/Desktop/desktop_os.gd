@@ -3,6 +3,7 @@ class_name DesktopOS extends RefCounted
 enum WinType {
 	Explorer,
 	Browser,
+	Settings,
 }
 
 
@@ -55,6 +56,7 @@ func add_file(src: DesktopFile) -> int:
 	var index := fs.size()
 	dir.files.append(index)
 	fs.append(file)
+	disk_free_mb += src.size_mb
 	return index
 
 
