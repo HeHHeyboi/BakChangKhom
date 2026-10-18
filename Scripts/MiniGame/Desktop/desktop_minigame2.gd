@@ -6,8 +6,26 @@ const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
 # NOTE: Load app scene
 const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
 const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
+const SETTING_SCENE := preload("res://Scene/MiniGame/Desktop/os_settings.tscn")
 const WINDOW_BASE := preload("res://Scene/MiniGame/Desktop/os_window_base.tscn")
 const INFO_WINDOW := preload("res://Scene/MiniGame/Desktop/os_info.tscn")
+
+
+# NOTE: Explorer constant
+## หน้าต่างไฟล์ (Explorer) — โครงจาก os_explorer.tscn · ข้อมูลจาก os.dir_map / os.fs
+const DOC_DIR = "เอกสาร"
+const DOWNLOAD_DIR = "ดาวน์โหลด"
+const PIC_DIR = "รูปภาพ"
+const TRASH_DIR = DesktopOS.TRASH
+
+# NOTE: Browser constant
+const BROWSER_HOME = "home"
+const BROWSER_OFFICIAL = "official"
+const BROWSER_OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
+const BROWSER_RESULT_SCENE = "res://Scene/MiniGame/Desktop/os_browser_result.tscn"
+const BROWSER_AD_SCENE = "res://Scene/MiniGame/Desktop/os_browser_ad.tscn"
+
+# NOTE: Setting constant
 
 # NOTE: Icon Texture
 const DIR := "res://Assets/MiniGame/Desktop/"
@@ -79,6 +97,9 @@ var _bubble_tw: Tween
 var _browser_page: VBoxContainer
 var _browser_addr: LineEdit
 
+# NOTE: Setting var
+var _settings_installed_list: VBoxContainer
+
 var items := [
 	["เอกสาร", TEX_FOLDER],
 	["รูปภาพ", TEX_PICTURES],
@@ -121,6 +142,7 @@ func _ready() -> void:
 	browser_icon.button.pressed.connect(open_browser)
 	explorer.pressed.connect(open_explorer)
 	browser.pressed.connect(open_browser)
+	settings.pressed.connect(open_settings)
 	self.add_child(start_menu)
 
 
@@ -146,8 +168,8 @@ func _on_start_menu(id: int) -> void:
 		3:
 			open_browser()
 		4:
-			# open_settings()
-			print("setting")
+			open_settings()
+			# print("setting")
 		5:
 			open_explorer(TRASH_DIR)
 		6:
@@ -166,31 +188,24 @@ func _on_file_menu(id: int) -> void:
 	pass
 
 
-func _find_window(key: String) -> OsWindow2:
-	for w in os.instances:
-		if is_instance_valid(w) and w.key == key:
+func _find_window(type: DesktopOS.WinType) -> OsWindow2:
+	for w: OsWindow2 in os.instances:
+		if !w.has_meta("type"):
+			continue
+		if w.get_meta("type") == type:
 			return w
 	return null
 
-
 # NOTE: Explorer Logic
-## หน้าต่างไฟล์ (Explorer) — โครงจาก os_explorer.tscn · ข้อมูลจาก os.dir_map / os.fs
-const DOC_DIR = "เอกสาร"
-const DOWNLOAD_DIR = "ดาวน์โหลด"
-const PIC_DIR = "รูปภาพ"
-const TRASH_DIR = DesktopOS.TRASH
 
 
 func open_explorer(folder: String = "เอกสาร") -> void:
 	_explorer_folder = folder
-	var w := _find_window("explorer")
+	var w := _find_window(DesktopOS.WinType.Explorer)
 	if w == null:
 		w = EXPLORER_SCENE.instantiate()
 		w.set_meta("type", os.WinType.Explorer)
-		# var n := os.instances.size()
 		w.size = DEFAULT_WINDOW_SIZE
-		# w.position = Vector2(130 + (n % 5) * 34, 40 + (n % 5) * 28)
-		# w.position = w.position.clamp(Vector2.ZERO, (screen.size - w.size).max(Vector2.ZERO))
 		w.restore(true)
 		screen.add_child(w)
 		os.add_instance(w)
@@ -372,15 +387,8 @@ func size_text(mb: int) -> String:
 
 
 # NOTE: Browser Logic
-const BROWSER_HOME = "home"
-const BROWSER_OFFICIAL = "official"
-const BROWSER_OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
-const BROWSER_RESULT_SCENE = "res://Scene/MiniGame/Desktop/os_browser_result.tscn"
-const BROWSER_AD_SCENE = "res://Scene/MiniGame/Desktop/os_browser_ad.tscn"
-
-
 func open_browser() -> void:
-	var w := _find_window("browser")
+	var w := _find_window(DesktopOS.WinType.Browser)
 	if w == null:
 		w = BROWSER_SCENE.instantiate()
 		w.restore(true)
@@ -483,6 +491,29 @@ func download_official() -> bool:
 	f.folder = DesktopFile.Folder.DOWNLOADS
 	os.add_file(f)
 	return true
+
+
+# NOTE: Setting Logic
+func open_settings() -> void:
+	var w = _find_window(DesktopOS.WinType.Settings)
+	if w == null:
+		w = SETTING_SCENE.instantiate()
+		w.set_meta("type", DesktopOS.WinType.Settings)
+		var progress_bar = w.get_node("%DiskBar") as ProgressBar
+		progress_bar.max_value = os.disk_total_mb
+		progress_bar.value = os.disk_free_mb
+
+		var disk_label = w.get_node("%DiskLabel") as Label
+		disk_label.text = "%s / %s" % [size_text(os.disk_free_mb), size_text(os.disk_total_mb)]
+		w.restore(true)
+		screen.add_child(w)
+	else:
+		w.restore()
+	_refresh_setting()
+
+
+func _refresh_setting() -> void:
+	pass
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:

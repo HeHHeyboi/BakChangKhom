@@ -12,3 +12,4 @@ Claude outputs/
 # ไฟล์ที่ export ออกมา (ไม่ต้องเข้า git)
 *.exe
 *.pck
+.vscode/
