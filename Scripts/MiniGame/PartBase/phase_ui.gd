@@ -587,6 +587,8 @@ static func open_book(phase: Control) -> void:
 	cb.border_color = COL_EDGE
 	cb.set_border_width_all(3)
 	cb.set_corner_radius_all(12)
+	cb.content_margin_left = 14
+	cb.content_margin_right = 14
 	close.add_theme_stylebox_override("normal", cb)
 	close.add_theme_stylebox_override("hover", cb)
 	close.add_theme_stylebox_override("pressed", cb)
@@ -599,12 +601,12 @@ static func open_book(phase: Control) -> void:
 	beep.text = "ตารางบี๊บ"
 	beep.focus_mode = Control.FOCUS_NONE
 	beep.add_theme_font_size_override("font_size", 18)
-	Icons.on_button(beep, &"speaker", 22) # [20 ต.ค.] แทนอีโมจิ 🔊
+	Icons.on_button(beep, &"speaker", 20) # [20 ต.ค.] แทนอีโมจิ 🔊
 	beep.add_theme_color_override("font_color", COL_PAPER)
 	beep.add_theme_stylebox_override("normal", cb)
 	beep.add_theme_stylebox_override("hover", cb)
 	beep.add_theme_stylebox_override("pressed", cb)
-	beep.size = Vector2(150, 48)
+	beep.size = Vector2(0, 48) # [20 ต.ค.] กว้างเท่าไอคอน+ข้อความ (เดิม 150)
 	beep.position = Vector2(24, BOOK_SIZE.y - 66)
 	beep.pressed.connect(func(): BeepTable.open_over(page))
 	page.add_child(beep)

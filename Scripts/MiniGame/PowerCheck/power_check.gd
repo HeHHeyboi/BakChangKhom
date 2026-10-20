@@ -52,6 +52,7 @@ func _ready() -> void:
 	# [13 ต.ค.] ตารางรหัสบี๊บ (Scene/UI/beep_table.tscn) — บางคนไม่รู้ว่าบี๊บแต่ละแบบแปลว่าอะไร
 	var bt := get_node_or_null(^"Quiz/Box/BeepTableButton") as Button
 	if bt:
+		Icons.on_button(bt, &"book", 22) # [20 ต.ค.] แทนอีโมจิ 📖
 		bt.pressed.connect(func(): BeepTable.open_over(self))
 	done_button.pressed.connect(finish)
 	for b in answers.get_children():

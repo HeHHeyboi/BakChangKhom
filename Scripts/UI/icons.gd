@@ -16,20 +16,39 @@ static func tex(id: StringName) -> Texture2D:
 	return load(path(id)) as Texture2D
 
 
+static var _cache: Dictionary = { } # "id@px" -> ImageTexture
+
+
+## ภาพย่อเหลือ px×px จริง (ไม่ใช่แค่วาดย่อ) → ปุ่มไม่ขยายตามภาพ 64px และภาพเล็กคมกว่า
+static func sized(id: StringName, px: int) -> Texture2D:
+	var key := "%s@%d" % [id, px]
+	if _cache.has(key):
+		return _cache[key]
+	var img := tex(id).get_image()
+	if img.is_compressed():
+		img.decompress()
+	img.resize(px, px, Image.INTERPOLATE_LANCZOS)
+	var t := ImageTexture.create_from_image(img)
+	_cache[key] = t
+	return t
+
+
 ## ใส่ไอคอนหน้าข้อความของปุ่ม · px <= 0 = ใช้ขนาดฟอนต์ของปุ่ม
 static func on_button(b: Button, id: StringName, px: int = 0) -> Button:
 	if px <= 0:
 		px = b.get_theme_font_size(&"font_size") + 2
-	b.icon = tex(id)
+	b.icon = sized(id, px)
 	b.expand_icon = false
-	b.add_theme_constant_override(&"icon_max_width", px)
+	b.add_theme_constant_override(&"h_separation", 6)
+	# ไอคอนชิดซ้ายเสมอ (Godot) → ให้ข้อความชิดตามไอคอน ไม่ลอยไปกลางปุ่ม
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	return b
 
 
 ## TextureRect สี่เหลี่ยม px×px ไว้วางหน้า Label ใน HBoxContainer
 static func rect(id: StringName, px: int) -> TextureRect:
 	var r := TextureRect.new()
-	r.texture = tex(id)
+	r.texture = sized(id, px)
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	r.custom_minimum_size = Vector2(px, px)
