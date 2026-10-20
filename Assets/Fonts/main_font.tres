@@ -2,7 +2,9 @@
 
 [ext_resource type="FontFile" path="res://Assets/Fonts/supermarket.ttf" id="1_sm"]
 [ext_resource type="FontFile" path="res://Assets/Fonts/Sarabun-Regular.ttf" id="2_sb"]
+[ext_resource type="FontFile" path="res://Assets/Fonts/symbols_dejavu.ttf" id="3_sym"]
+[ext_resource type="FontFile" path="res://Assets/Fonts/symbols_emoji.ttf" id="4_emo"]
 
 [resource]
-fallbacks = Array[Font]([ExtResource("2_sb")])
+fallbacks = Array[Font]([ExtResource("2_sb"), ExtResource("3_sym"), ExtResource("4_emo")])
 base_font = ExtResource("1_sm")

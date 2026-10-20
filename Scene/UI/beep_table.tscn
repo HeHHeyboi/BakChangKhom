@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/UI/beep_table.gd" id="1_bt"]
 [ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/icon_speaker.png" id="3_spk"]
 
 [sub_resource type="StyleBoxFlat" id="SB_panel"]
 content_margin_left = 24.0
@@ -76,11 +77,25 @@ theme_override_styles/panel = SubResource("SB_panel")
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Panel/Box"]
+[node name="TitleRow" type="HBoxContainer" parent="Panel/Box"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Panel/Box/TitleRow"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_spk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Panel/Box/TitleRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.22, 0.05, 1)
 theme_override_font_sizes/font_size = 28
-text = "🔊 ตารางรหัสเสียงบี๊บ (BIOS)"
+text = "ตารางรหัสเสียงบี๊บ (BIOS)"
 horizontal_alignment = 1
 
 [node name="Note" type="Label" parent="Panel/Box"]

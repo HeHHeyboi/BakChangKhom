@@ -57,7 +57,7 @@ func _ready() -> void:
 		# [0.2.0] เดโมจบที่บท 1 → ปิดเดโมก่อนถึงจะไปสิ้นเดือน/สิ้นเกมได้
 		{ "label": "ทดสอบเดือน: ปิดเดโม → ไปปิดร้านวันสุดท้ายของ ม.ค. (หน้าสรุปเดือน)", "call": func() -> void: _goto_no_demo(TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH) },
 		{ "label": "ทดสอบจบเกม: ปิดเดโม → ไปปิดร้านวันสุดท้ายของเกม", "call": func() -> void: _goto_no_demo(TimeSystem.TOTAL_SHIFTS) },
-		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ⭐⭐ ครบ)", "call": _unlock_levels },
+		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ★★ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()
 

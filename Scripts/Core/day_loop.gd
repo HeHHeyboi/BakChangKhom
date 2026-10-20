@@ -706,7 +706,7 @@ func _now_text() -> String:
 	var ts := _ts()
 	if ts == null:
 		return ""
-	return ("🕘 " + TimeSystem.clock_text(ts.current_minute)) if ts.show_clock else ("เหลือ " + TimeSystem.turns_text(ts.turns_left()))
+	return (TimeSystem.clock_text(ts.current_minute) + " น.") if ts.show_clock else ("เหลือ " + TimeSystem.turns_text(ts.turns_left()))
 
 
 func _ts() -> TimeSystem:
@@ -955,7 +955,7 @@ func _process(delta: float) -> void:
 		_panel.visible = false
 		_board_panel.visible = false
 		_cards_tab.visible = true
-		_cards_tab.text = "📋 กระดานงาน (%d)" % board.size() if want == Card.BOARD else "📋 ดูการ์ดงาน"
+		_cards_tab.text = "กระดานงาน (%d)" % board.size() if want == Card.BOARD else "ดูการ์ดงาน"
 		return
 	_cards_tab.visible = false
 	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible or (month_summary and month_summary.visible)):
@@ -1085,7 +1085,7 @@ func _show_card(card: Card) -> void:
 		Card.SHIFT_END:
 			var earned := GameState.money - shift_start_money
 			var ot := ot_slots_now()
-			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · 🕘 " + TimeSystem.clock_text(ts.current_minute)) if ts.show_clock else ""]
+			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · " + TimeSystem.clock_text(ts.current_minute) + " น.") if ts.show_clock else ""]
 			_body.text = "งานเสร็จวันนี้ %d งาน · รายได้ %s฿%d\nงานค้างบนกระดาน %d ใบ (ต่อพรุ่งนี้)%s\nชื่อเสียง %d · %s" % [
 				shift_results.size(),
 				"+" if earned >= 0 else "−",
@@ -1156,7 +1156,7 @@ func _fill_board() -> void:
 		_board_list.remove_child(n)
 		n.queue_free()
 	if ts.show_clock:
-		_board_title.text = "กระดานงาน · กะ %d/%d · 🕘 %s · เหลือ %s" % [
+		_board_title.text = "กระดานงาน · กะ %d/%d · %s น. · เหลือ %s" % [
 			ts.shift_in_week(),
 			TimeSystem.SHIFTS_PER_WEEK,
 			TimeSystem.clock_text(ts.current_minute),
@@ -1193,10 +1193,14 @@ func _fill_board() -> void:
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.add_child(text)
 		var head := Label.new()
-		head.text = "%s%s · %s %s" % ["📞 " if job["phone"] else "", c.customer, c.level_name(), _stars(c.level)]
+		head.text = "%s · %s %s" % [c.customer, c.level_name(), _stars(c.level)]
 		head.add_theme_font_size_override("font_size", 17)
 		head.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
-		text.add_child(head)
+		# [20 ต.ค.] ไอคอนโทรศัพท์วาดเอง แทนอีโมจิ 📞 (เว็บไม่มีฟอนต์อีโมจิ)
+		if job["phone"]:
+			text.add_child(Icons.row(&"phone", head, 18))
+		else:
+			text.add_child(head)
 		var due: int = int(job["due_shift"]) - ts.shift
 		var body := Label.new()
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1420,6 +1424,7 @@ func _build_ui() -> void:
 	_cards_tab.position = Vector2(930, 100)
 	_cards_tab.custom_minimum_size = Vector2(206, 44)
 	_cards_tab.add_theme_font_size_override("font_size", 18)
+	Icons.on_button(_cards_tab, &"clipboard", 22) # [20 ต.ค.] แทนอีโมจิ 📋
 	_cards_tab.add_theme_stylebox_override("normal", _card_style())
 	_cards_tab.add_theme_stylebox_override("hover", _card_style())
 	_cards_tab.add_theme_stylebox_override("pressed", _card_style())

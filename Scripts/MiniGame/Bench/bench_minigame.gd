@@ -604,8 +604,16 @@ func _open_explain() -> void:
 func _open_summary() -> void:
 	var score := final_score()
 	var w := _modal_window("สรุปงาน — " + task.title, Vector2(520, 400))
-	var grade := "⭐⭐⭐" if score >= 90 else ("⭐⭐" if score >= 75 else ("⭐" if score >= 60 else "ไม่ผ่าน"))
-	w.body.add_child(_label("คะแนน %d / 100   %s" % [score, grade], 24, C_INK))
+	# [20 ต.ค.] ดาวเป็นไอคอนวาดเอง (Icons) แทนอีโมจิ ⭐ ที่ขึ้นเป็นกล่องบนเว็บ
+	var n_star := 3 if score >= 90 else (2 if score >= 75 else (1 if score >= 60 else 0))
+	var grade_row := HBoxContainer.new()
+	grade_row.add_theme_constant_override("separation", 12)
+	grade_row.add_child(_label("คะแนน %d / 100" % score, 24, C_INK))
+	if n_star > 0:
+		grade_row.add_child(Icons.stars(n_star, 26))
+	else:
+		grade_row.add_child(_label("ไม่ผ่าน", 24, C_INK))
+	w.body.add_child(grade_row)
 	for cat in [&"fix", &"safety", &"listen", &"explain"]:
 		w.body.add_child(_label("• %s  %d / %d" % [CAT_NAMES[cat], score_of(cat), CAP[cat]], 17, C_INK))
 	for n in notes:

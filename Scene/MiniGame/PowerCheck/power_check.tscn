@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/MiniGame/PowerCheck/power_check.gd" id="s"]
 [ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="th"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/icon_book.png" id="ic_book"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/power_bg.jpg" id="bg"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/pc_back.png" id="back"]
 [ext_resource type="Texture2D" path="res://Assets/MiniGame/PowerCheck/fan.png" id="fan"]
@@ -366,8 +367,10 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "ไม่แน่ใจ? เปิดตารางรหัสเสียงบี๊บดู"
+theme_override_constants/icon_max_width = 22
 theme_override_font_sizes/font_size = 18
-text = "📖 ดูตารางรหัสบี๊บ"
+text = "ดูตารางรหัสบี๊บ"
+icon = ExtResource("ic_book")
 
 [node name="Done" type="Button" parent="Quiz/Box"]
 custom_minimum_size = Vector2(0, 52)

@@ -596,9 +596,10 @@ static func open_book(phase: Control) -> void:
 	page.add_child(close)
 	# [13 ต.ค.] ปุ่มเปิดตารางรหัสบี๊บจากสมุดคู่มือ (Scene/UI/beep_table.tscn)
 	var beep := Button.new()
-	beep.text = "🔊 ตารางบี๊บ"
+	beep.text = "ตารางบี๊บ"
 	beep.focus_mode = Control.FOCUS_NONE
 	beep.add_theme_font_size_override("font_size", 18)
+	Icons.on_button(beep, &"speaker", 22) # [20 ต.ค.] แทนอีโมจิ 🔊
 	beep.add_theme_color_override("font_color", COL_PAPER)
 	beep.add_theme_stylebox_override("normal", cb)
 	beep.add_theme_stylebox_override("hover", cb)

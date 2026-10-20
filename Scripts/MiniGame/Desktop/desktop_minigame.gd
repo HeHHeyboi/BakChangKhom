@@ -131,6 +131,7 @@ var _explorer_path: Label
 var _explorer_status: Label
 var _trash_list: ItemList
 var _browser_addr: LineEdit
+var _browser_lock: TextureRect # [20 ต.ค.] ไอคอนกุญแจหน้าแถบที่อยู่ (แทนอีโมจิ 🔒) · ขึ้นเฉพาะเว็บจริง
 var _browser_page: VBoxContainer
 var _settings_rows: VBoxContainer
 var _settings_disk: ProgressBar
@@ -1584,6 +1585,9 @@ func open_browser() -> void:
 		_browser_addr = LineEdit.new()
 		_browser_addr.editable = false
 		_browser_addr.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_browser_lock = Icons.rect(&"lock", 20)
+		_browser_lock.visible = false
+		top.add_child(_browser_lock)
 		top.add_child(_browser_addr)
 		var scroll := ScrollContainer.new()
 		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -1601,9 +1605,11 @@ func _browser_show(page: String) -> void:
 		return
 	for c in _browser_page.get_children():
 		c.queue_free()
+	if is_instance_valid(_browser_lock):
+		_browser_lock.visible = page == "official"
 	var is_install := task.goal == DesktopTask.Goal.INSTALL and not free_mode
 	if page == "official":
-		_browser_addr.text = "🔒 https://" + task.install_site
+		_browser_addr.text = "https://" + task.install_site
 		_browser_page.add_child(_label(task.install_name, 30, Color(0.2, 0.55, 0.35)))
 		var d := _label("โปรแกรมคุยกับครอบครัวและเพื่อน ส่งข้อความ โทรเห็นหน้า ฟรี\nเว็บนี้เป็นของผู้พัฒนาเอง", 16, C_INK)
 		_browser_page.add_child(d)
@@ -1630,9 +1636,10 @@ func _browser_show(page: String) -> void:
 		col.add_child(_label("โฆษณา", 11, Color(0.5, 0.45, 0.3)))
 		var big := Button.new()
 		big.name = "AdDownload"
-		big.text = "⬇  DOWNLOAD NOW — ฟรี! เร็วกว่า 10 เท่า!!"
+		big.text = "DOWNLOAD NOW — ฟรี! เร็วกว่า 10 เท่า!!"
 		big.custom_minimum_size = Vector2(0, 58)
 		big.add_theme_font_size_override("font_size", 22)
+		Icons.on_button(big, &"download", 28) # [20 ต.ค.] แทนอีโมจิ ⬇
 		big.add_theme_color_override("font_color", Color.WHITE)
 		var bs := StyleBoxFlat.new()
 		bs.bg_color = C_AD
@@ -1900,10 +1907,20 @@ func _open_explain() -> void:
 func _open_summary() -> void:
 	var score := final_score()
 	var w := _modal_window("สรุปงาน — " + task.title, Vector2(520, 400))
-	var grade := "⭐⭐⭐" if score >= 90 else ("⭐⭐" if score >= 75 else ("⭐" if score >= 60 else "ไม่ผ่าน"))
+	# [20 ต.ค.] ดาวเป็นไอคอนวาดเอง (Icons) แทนอีโมจิ ⭐ ที่ขึ้นเป็นกล่องบนเว็บ
+	var n_star := 3 if score >= 90 else (2 if score >= 75 else (1 if score >= 60 else 0))
+	var fail_text := "ไม่ผ่าน"
 	if lost_user_file:
-		grade = "ไม่ผ่าน (ของลูกค้าหาย)"
-	w.body.add_child(_label("คะแนน %d / 100   %s" % [score, grade], 24, C_INK))
+		n_star = 0
+		fail_text = "ไม่ผ่าน (ของลูกค้าหาย)"
+	var grade_row := HBoxContainer.new()
+	grade_row.add_theme_constant_override("separation", 12)
+	grade_row.add_child(_label("คะแนน %d / 100" % score, 24, C_INK))
+	if n_star > 0:
+		grade_row.add_child(Icons.stars(n_star, 26))
+	else:
+		grade_row.add_child(_label(fail_text, 24, C_INK))
+	w.body.add_child(grade_row)
 	# [13 ต.ค.] รายละเอียดอยู่ในกล่องเลื่อนได้ — เดิมถ้าทำพลาดเยอะ ข้อความยาวจนดันปุ่ม "ส่งเครื่องคืน" ตกขอบหน้าต่าง กดต่อไม่ได้
 	var scroll := ScrollContainer.new()
 	scroll.name = "Details"

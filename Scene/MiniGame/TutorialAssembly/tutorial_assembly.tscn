@@ -358,7 +358,7 @@ offset_bottom = 282.35297
 mouse_filter = 2
 script = ExtResource("g3")
 target_view = &"Tray"
-label_text = "  ชิ้นส่วน"
+label_text = "←  ชิ้นส่วน"
 
 [node name="Monitor" type="Control" parent="Stage/Views" index="3" unique_id=412086770]
 visible = false
