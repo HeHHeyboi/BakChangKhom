@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 4
 title = "เพิ่มเครื่องพิมพ์ให้ครู"
-pc_name = "คอมของครู"
+pc_name = "คอมพิวเตอร์ของครู"
 request = "สั่งพิมพ์ใบงานแล้วไม่ออกเลย พรุ่งนี้ต้องใช้สอน"
 files = Array[Dictionary]([{
 "name": "ใบงานวิทย์ ป.5.doc",

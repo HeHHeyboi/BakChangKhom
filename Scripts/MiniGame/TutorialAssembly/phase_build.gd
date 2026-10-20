@@ -59,7 +59,7 @@ var _queue: Array = [] # [[Item2D, Socket2D], ...]
 func init():
 	if not _built:
 		_built = true
-		var rail := PhaseUI.make_frame(self, "ประกอบคอม — ขั้นที่ 2/4 · ประกอบ")
+		var rail := PhaseUI.make_frame(self, "ประกอบคอมพิวเตอร์ — ขั้นที่ 2/4 · ประกอบ")
 		PhaseUI.label(rail, "ลำดับการประกอบ", 20, PhaseUI.COL_OK)
 		for p in owner.parts():
 			_checks[p] = PhaseUI.check_item(rail, "วาง" + p.data.display_name)

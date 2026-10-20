@@ -32,7 +32,7 @@ signal month_closed(report: Dictionary)
 const CHAPTERS := [
 	{ "title": "กลับบ้าน", "file": "res://Assets/Dialog/Chapter1ReturnHome.txt", "bg": "" },
 	{
-		"title": "คอมเก่าของขม",
+		"title": "คอมพิวเตอร์เก่าของขม",
 		"file": "res://Assets/Dialog/Chapter2Rest.txt",
 		"bg": "res://Assets/Background/Chapter2_bg.jpg",
 	},
@@ -57,7 +57,7 @@ const CHAPTERS := [
 		"bg": "res://Assets/Background/bg_shop_busy.jpg",
 	},
 	{
-		"title": "สอนคอมพื้นฐาน",
+		"title": "สอนคอมพิวเตอร์พื้นฐาน",
 		"file": "res://Assets/Dialog/Chapter7Teaching.txt",
 		"bg": "res://Assets/Background/bg_shop_open.jpg",
 	},

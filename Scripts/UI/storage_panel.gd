@@ -167,7 +167,7 @@ func _refresh_detail() -> void:
 	if _sel < 0 or _sel >= GameState.inventory.size():
 		_sel = -1
 		detail_name.text = "คลังของร้าน"
-		detail_text.text = "อะไหล่ 1 ชิ้นใช้ 1 ช่อง · ของสิ้นเปลืองชนิดเดียวกันซ้อนในช่องเดียว · ช่องเต็มแล้วซื้อของเพิ่มไม่ได้\nขยายคลังได้ที่ร้านอะไหล่คอมในตลาด"
+		detail_text.text = "อะไหล่ 1 ชิ้นใช้ 1 ช่อง · ของสิ้นเปลืองชนิดเดียวกันซ้อนในช่องเดียว · ช่องเต็มแล้วซื้อของเพิ่มไม่ได้\nขยายคลังได้ที่ร้านอะไหล่คอมพิวเตอร์ในตลาด"
 		sell_button.visible = false
 		return
 	var e: Dictionary = GameState.inventory[_sel]

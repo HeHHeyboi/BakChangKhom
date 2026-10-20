@@ -278,7 +278,7 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.5, 0.4, 0.3, 1)
 theme_override_font_sizes/font_size = 20
 text = "ยังไม่มีของหมวดนี้ในคลัง
-ซื้อได้ที่ร้านอะไหล่คอมในตลาด"
+ซื้อได้ที่ร้านอะไหล่คอมพิวเตอร์ในตลาด"
 horizontal_alignment = 1
 vertical_alignment = 1
 

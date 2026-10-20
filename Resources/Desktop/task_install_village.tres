@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 0
 title = "ลงแอปพูดคุยที่ศาลาหมู่บ้าน"
-pc_name = "คอมศาลาหมู่บ้าน"
+pc_name = "คอมพิวเตอร์ศาลาหมู่บ้าน"
 request = "อยากลงโปรแกรมพูดคุย ไว้ประกาศข่าวในกลุ่มหมู่บ้าน"
 files = Array[Dictionary]([{
 "name": "ประกาศงานวัด.doc",

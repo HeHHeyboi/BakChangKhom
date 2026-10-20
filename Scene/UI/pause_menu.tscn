@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ba2n3e34b57lb" path="res://Scripts/UI/pause_menu.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://c7vkktysn6avj" path="res://Assets/UI/menu_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://Scene/UI/settings_panel.tscn" id="3_settings"]
+[ext_resource type="Script" path="res://Scripts/UI/version_label.gd" id="4_ver"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1525908581]
 process_mode = 3
@@ -86,6 +87,28 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(340, 72)
 layout_mode = 2
 text = "ออกจากเกม"
+
+[node name="VersionTag" type="Label" parent="Root" unique_id=1739205582]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -30.0
+offset_right = -14.0
+offset_bottom = -6.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 0.55)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0.04, 0.8)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "v0.2.1"
+horizontal_alignment = 2
+script = ExtResource("4_ver")
 
 [node name="Settings" parent="Root" unique_id=912488018 instance=ExtResource("3_settings")]
 unique_name_in_owner = true

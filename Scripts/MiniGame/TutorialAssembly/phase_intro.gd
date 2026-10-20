@@ -10,8 +10,8 @@ var _done := false
 func init():
 	if not _built:
 		_built = true
-		var rail := PhaseUI.make_frame(self, "ประกอบคอม — ขั้นที่ 1/4 · รู้จักชิ้นส่วน")
-		PhaseUI.label(rail, "ชิ้นส่วนในคอม", 20, PhaseUI.COL_OK)
+		var rail := PhaseUI.make_frame(self, "ประกอบคอมพิวเตอร์ — ขั้นที่ 1/4 · รู้จักชิ้นส่วน")
+		PhaseUI.label(rail, "ชิ้นส่วนในคอมพิวเตอร์", 20, PhaseUI.COL_OK)
 		for p in owner.parts():
 			_checks[p] = PhaseUI.check_item(rail, p.data.display_name)
 	_done = false

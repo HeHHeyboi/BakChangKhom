@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 11
 title = "แก้จอแตก ตัวหนังสือใหญ่"
-pc_name = "คอมห้องพักครู"
+pc_name = "คอมพิวเตอร์ห้องพักครู"
 request = "จอดูแตก ๆ ตัวหนังสือใหญ่จนล้นจอ เปิดเอกสารดูไม่ครบ"
 files = Array[Dictionary]([{
 "name": "แผนงานโรงเรียน.doc",
@@ -52,7 +52,7 @@ display_scale_best = 100
 disk_free_mb = 20000
 browser_ad = false
 traps = Array[StringName]([&"bad_resolution", &"delete_system", &"delete_user"])
-ask_options = PackedStringArray("จอเริ่มเป็นแบบนี้ตั้งแต่เมื่อไหร่ครับ", "โรงเรียนมีนักเรียนกี่คนครับ", "ใช้คอมทำอะไรบ่อยสุดครับ")
+ask_options = PackedStringArray("จอเริ่มเป็นแบบนี้ตั้งแต่เมื่อไหร่ครับ", "โรงเรียนมีนักเรียนกี่คนครับ", "ใช้คอมพิวเตอร์ทำอะไรบ่อยสุดครับ")
 ask_best = 0
 ask_answer = "ตั้งแต่ภารโรงย้ายจอมาใหม่ แล้วลองกดตั้งค่าอะไรไปก็ไม่รู้"
 ask_note = "ย้ายจอ + มีคนกดตั้งค่ามั่ว"

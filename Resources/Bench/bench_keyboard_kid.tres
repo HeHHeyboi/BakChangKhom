@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 2
 title = "ทำความสะอาดคีย์บอร์ด"
-pc_name = "คอมของเด็ก"
+pc_name = "คอมพิวเตอร์ของเด็ก"
 request = "ขนมตกใส่คีย์บอร์ด ปุ่มติด ๆ กดไม่ลง"
 start_plugs = {
 "keyboard": "usb1",

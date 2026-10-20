@@ -83,7 +83,7 @@ offset_left = 790.0
 offset_top = 392.0
 offset_right = 980.0
 offset_bottom = 597.0
-tooltip_text = "ไปร้านซ่อมคอมขม"
+tooltip_text = "ไปร้านซ่อมคอมพิวเตอร์ขม"
 mouse_default_cursor_shape = 2
 texture_normal = ExtResource("3_sign")
 texture_hover = ExtResource("4_signh")
@@ -91,7 +91,7 @@ ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("7_c1wnw")
 target = 1
-label_text = "ไปร้านซ่อมคอม"
+label_text = "ไปร้านซ่อมคอมพิวเตอร์"
 label_below = true
 
 [node name="Label" type="Label" parent="ShopSign" unique_id=1209763701]
@@ -103,7 +103,7 @@ offset_bottom = 100.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
 theme_override_font_sizes/font_size = 17
-text = "ร้านซ่อมคอมขม"
+text = "ร้านซ่อมคอมพิวเตอร์ขม"
 horizontal_alignment = 1
 vertical_alignment = 1
 

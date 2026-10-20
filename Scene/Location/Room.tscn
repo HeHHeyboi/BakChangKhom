@@ -33,7 +33,7 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 ignore_texture_size = true
 script = ExtResource("9_pc")
-label_text = "ใช้คอมของขม"
+label_text = "ใช้คอมพิวเตอร์ของขม"
 
 [node name="Door" type="TextureButton" parent="." unique_id=2032888040]
 layout_mode = 0

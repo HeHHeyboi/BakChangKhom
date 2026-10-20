@@ -7,8 +7,8 @@
 script = ExtResource("1_case")
 id = &"lv1_yai_backup"
 customer = "ยาย"
-reason = "ได้ข่าวว่าคอมบ้านป้าเสียแล้วรูปหายหมด"
-device = "คอมของยาย"
+reason = "ได้ข่าวว่าคอมพิวเตอร์บ้านป้าเสียแล้วรูปหายหมด"
+device = "คอมพิวเตอร์ของยาย"
 symptom = "อยากเก็บรูปไว้ในแฟลชไดรฟ์อีกที่"
 level = 1
 est_slots = 2

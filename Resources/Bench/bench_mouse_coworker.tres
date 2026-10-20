@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 0
 title = "เมาส์ไม่ทำงาน"
-pc_name = "คอมของเพื่อนร่วมงาน"
+pc_name = "คอมพิวเตอร์ของเพื่อนร่วมงาน"
 request = "ขยับเมาส์แล้วลูกศรไม่ขยับเลย ซื้อเมาส์ใหม่มาก็ไม่หาย"
 start_plugs = {
 "keyboard": "usb1",

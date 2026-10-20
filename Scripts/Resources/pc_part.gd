@@ -7,7 +7,7 @@ enum Face { NONE, TOP, SIDE_X, SIDE_Z }
 
 @export var id: StringName # &"ram_stick"
 @export var display_name: String # "แรม (RAM)"
-@export_multiline var role: String # "ที่พักงานชั่วคราวของคอม"
+@export_multiline var role: String # "ที่พักงานชั่วคราวของคอมพิวเตอร์"
 @export var icon: Texture2D # รูปบนถาด/การ์ด (2D)
 
 @export_group("Model")

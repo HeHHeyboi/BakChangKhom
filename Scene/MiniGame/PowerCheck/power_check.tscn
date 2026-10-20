@@ -162,7 +162,7 @@ offset_left = 560.0
 offset_top = 575.0
 offset_right = 650.0
 offset_bottom = 635.0
-tooltip_text = "ปลั๊กไฟของคอม"
+tooltip_text = "ปลั๊กไฟของคอมพิวเตอร์"
 mouse_default_cursor_shape = 2
 texture_normal = ExtResource("plug")
 

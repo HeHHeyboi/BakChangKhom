@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 0
 title = "ทำความรู้จัก ขมOS"
-pc_name = "คอมที่เพิ่งประกอบ"
+pc_name = "คอมพิวเตอร์ที่เพิ่งประกอบ"
 request = "เครื่องเปิดติดแล้ว! ลองใช้ทีละขั้นตามโน้ตนี้"
 files = Array[Dictionary]([{
 "name": "ไฟล์ทดสอบ.doc",
@@ -61,5 +61,5 @@ ask_best = 0
 ask_answer = ""
 explain_options = PackedStringArray("-", "-")
 explain_best = 0
-pib_intro = PackedStringArray("เปิดติดแล้ว! นี่คือขมOS ระบบปฏิบัติการของเครื่อง เป็นตัวกลางให้เราสั่งงานคอมได้", "ทำตามโน้ตสีเหลืองทีละข้อนะ ปิ๊บจะชี้ให้ว่าต้องกดตรงไหน")
+pib_intro = PackedStringArray("เปิดติดแล้ว! นี่คือขมOS ระบบปฏิบัติการของเครื่อง เป็นตัวกลางให้เราสั่งงานคอมพิวเตอร์ได้", "ทำตามโน้ตสีเหลืองทีละข้อนะ ปิ๊บจะชี้ให้ว่าต้องกดตรงไหน")
 pib_lesson = PackedStringArray()

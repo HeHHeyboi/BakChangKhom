@@ -22,7 +22,7 @@ const PLUGS := { "keyboard": "usb", "mouse": "usb", "monitor": "hdmi", "power": 
 @export_group("งาน")
 @export var goal: Goal = Goal.USB_DEVICE
 @export var title := ""
-@export var pc_name := "คอมของลูกค้า"
+@export var pc_name := "คอมพิวเตอร์ของลูกค้า"
 @export_multiline var request := ""
 
 @export_group("เครื่อง")

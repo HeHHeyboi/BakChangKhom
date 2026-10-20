@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://qwywwguxnpwl" path="res://Assets/Background/tutorial.jpg" id="6_pqbye"]
 [ext_resource type="PackedScene" path="res://Scene/UI/settings_panel.tscn" id="7_settings"]
 [ext_resource type="Texture2D" uid="uid://ixt1lu8y4pvt" path="res://Assets/Logo/logo_horizontal.png" id="8_logo"]
+[ext_resource type="Script" path="res://Scripts/UI/version_label.gd" id="9_ver"]
 
 [sub_resource type="Gradient" id="Gradient_shade"]
 offsets = PackedFloat32Array(0, 0.45, 1)
@@ -103,7 +104,7 @@ theme_override_colors/font_color = Color(1, 0.86, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0.3, 0.14, 0.05, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 30
-text = "ร้านซ่อมคอมเล็ก ๆ ของขมกับยาย"
+text = "ร้านซ่อมคอมพิวเตอร์เล็ก ๆ ของขมกับยาย"
 
 [node name="Logo" type="TextureRect" parent="." unique_id=399136177]
 layout_mode = 0
@@ -166,6 +167,28 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 16
 text = "ระหว่างเล่น กด Esc เพื่อพักเกม / ตั้งค่า"
 horizontal_alignment = 2
+
+[node name="VersionTag" type="Label" parent="." unique_id=1739205581]
+layout_mode = 1
+anchors_preset = 2
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -30.0
+offset_right = 320.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 0.55)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0.04, 0.8)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "v0.2.1"
+horizontal_alignment = 0
+script = ExtResource("9_ver")
 
 [node name="Tutorial" type="TextureRect" parent="." unique_id=2040344244]
 visible = false

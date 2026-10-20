@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 6
 title = "ต่อ Wi-Fi บ้านให้"
-pc_name = "คอมของเด็กหญิง"
+pc_name = "คอมพิวเตอร์ของเด็กหญิง"
 request = "เน็ตไม่ได้ ส่งการบ้านออนไลน์ไม่ได้"
 files = Array[Dictionary]([{
 "name": "การบ้านภาษาไทย.doc",

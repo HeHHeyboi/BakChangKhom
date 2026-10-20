@@ -12,7 +12,7 @@ var _rail_checks: Array = []
 func init():
 	if not _built:
 		_built = true
-		var rail := PhaseUI.make_frame(self, "ประกอบคอม — ขั้นที่ 3/4 · เปิดเครื่อง")
+		var rail := PhaseUI.make_frame(self, "ประกอบคอมพิวเตอร์ — ขั้นที่ 3/4 · เปิดเครื่อง")
 		_rail_checks.append(PhaseUI.check_item(rail, "กดปุ่มเปิดเครื่องหน้าเคส"))
 		_rail_checks.append(PhaseUI.check_item(rail, "ทำความรู้จัก ขมOS"))
 	_stage = Stage.WAIT_POWER

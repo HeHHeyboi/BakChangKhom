@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 8
 title = "ทำให้เปิดเครื่องเร็วขึ้น"
-pc_name = "คอมของลุงอำนวย"
+pc_name = "คอมพิวเตอร์ของลุงอำนวย"
 request = "กดเปิดเครื่องแล้วรอเป็นนาที กว่าจะใช้ได้"
 files = Array[Dictionary]([{
 "name": "รูปสวนผัก.jpg",

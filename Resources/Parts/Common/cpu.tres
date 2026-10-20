@@ -7,7 +7,7 @@
 script = ExtResource("1_part")
 id = &"cpu"
 display_name = "ซีพียู (CPU)"
-role = "สมองของคอม คิดและคำนวณทุกอย่าง ชิ้นเล็กแต่สำคัญที่สุด"
+role = "สมองของคอมพิวเตอร์ คิดและคำนวณทุกอย่าง ชิ้นเล็กแต่สำคัญที่สุด"
 size = Vector3(0.375, 0.03, 0.375)
 color = Color(0.75, 0.72, 0.62, 1)
 texture = ExtResource("2_tex")

@@ -88,7 +88,7 @@ offset_bottom = 305.0
 mouse_filter = 2
 script = ExtResource("g3")
 target_view = &"Monitor"
-label_text = "จอ/คอม"
+label_text = "จอ/คอมพิวเตอร์"
 
 [node name="ToTray" type="Control" parent="Stage/Views/Overview" index="2" unique_id=323984530]
 anchors_preset = 0
@@ -371,7 +371,7 @@ mouse_filter = 2
 script = ExtResource("g2")
 background = ExtResource("g24")
 bg_scale = 0.5
-label = "จอ/คอม"
+label = "จอ/คอมพิวเตอร์"
 aliases = PackedStringArray("Front")
 focus_x = 560.0
 

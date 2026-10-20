@@ -41,7 +41,7 @@ func dialog_end():
 
 
 func tutorial_end():
-	EventManager.show_dialog("ออฟฟิส", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
+	EventManager.show_dialog("ออฟฟิศ", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
 	Global.on_start = false
 	showTutorial = false
 	EventManager.showUI()

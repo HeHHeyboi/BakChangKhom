@@ -142,7 +142,7 @@ offset_bottom = 455.0
 title = "ร้านช่างขม"
 location = 1
 thumbnail = ExtResource("t2")
-hint = "ร้านซ่อมคอมของเรา ลูกค้ามารอที่นี่ เปิดคอมของขมก็ได้"
+hint = "ร้านซ่อมคอมพิวเตอร์ของเรา ลูกค้ามารอที่นี่ เปิดคอมพิวเตอร์ของขมก็ได้"
 
 [node name="Market" parent="Root/Cards" unique_id=218879047 instance=ExtResource("2_card")]
 layout_mode = 0

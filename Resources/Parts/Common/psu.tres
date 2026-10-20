@@ -6,7 +6,7 @@
 script = ExtResource("1_part")
 id = &"psu"
 display_name = "พาวเวอร์ซัพพลาย (PSU)"
-role = "แปลงไฟบ้านเป็นไฟที่คอมใช้ จ่ายให้ทุกชิ้น"
+role = "แปลงไฟบ้านเป็นไฟที่คอมพิวเตอร์ใช้ จ่ายให้ทุกชิ้น"
 size = Vector3(1.46, 0.86, 0.86)
 color = Color(0.07, 0.07, 0.08, 1)
 texture_face = 0

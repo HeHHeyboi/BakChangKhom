@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 1
 title = "ถอนโปรแกรมโฆษณาเครื่องเด็ก"
-pc_name = "คอมของเด็กข้างบ้าน"
+pc_name = "คอมพิวเตอร์ของเด็กข้างบ้าน"
 request = "มีโฆษณาเด้งตลอดเวลา เล่นเกมไม่ได้เลย"
 files = Array[Dictionary]([{
 "name": "สูตรโกงเกม.exe",
@@ -53,7 +53,7 @@ programs = Array[Dictionary]([{
 }])
 disk_free_mb = 20000
 traps = Array[StringName]([&"icon_only", &"delete_system", &"click_ad", &"fake_download", &"delete_user"])
-ask_options = PackedStringArray("เริ่มเด้งตั้งแต่ลงอะไรไปครับ", "เล่นเกมวันละกี่ชั่วโมงครับ", "ใครเป็นคนซื้อคอมให้ครับ")
+ask_options = PackedStringArray("เริ่มเด้งตั้งแต่ลงอะไรไปครับ", "เล่นเกมวันละกี่ชั่วโมงครับ", "ใครเป็นคนซื้อคอมพิวเตอร์ให้ครับ")
 ask_best = 0
 ask_answer = "ตั้งแต่โหลดสูตรโกงเกมมาเปิด แล้วมีไอคอนป้ายราคาโผล่มาบนจอ"
 explain_options = PackedStringArray("โปรแกรมโฆษณาต้องถอนในหน้าตั้งค่า ลบแค่ไอคอนไม่หาย และอย่าโหลดสูตรโกงจากเว็บแปลก ๆ อีกนะ", "ปิดหน้าต่างโฆษณาไปเรื่อย ๆ ก็พอ", "ลงโปรแกรมลดราคาอีกตัวมาแก้ทางกัน")

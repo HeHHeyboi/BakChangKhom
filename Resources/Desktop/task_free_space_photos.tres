@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 2
 title = "ทำที่ว่างให้เครื่องลุงอำนวย"
-pc_name = "คอมของลุงอำนวย"
+pc_name = "คอมพิวเตอร์ของลุงอำนวย"
 request = "เครื่องเต็ม เซฟรูปงานบวชหลานไม่ได้"
 files = Array[Dictionary]([{
 "name": "รูปงานบวช",

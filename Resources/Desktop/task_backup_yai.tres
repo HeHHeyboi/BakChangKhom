@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 7
 title = "สำรองรูปลง USB"
-pc_name = "คอมของยาย"
+pc_name = "คอมพิวเตอร์ของยาย"
 request = "กลัวรูปหลานหาย อยากเก็บไว้ใน USB อีกที่"
 files = Array[Dictionary]([{
 "name": "รูปงานบวชหลาน.jpg",
@@ -57,7 +57,7 @@ backup_folder = "รูปภาพ"
 disk_free_mb = 20000
 browser_ad = false
 traps = Array[StringName]([&"move_not_copy", &"delete_user", &"delete_system"])
-ask_options = PackedStringArray("อยากสำรองรูปไหนบ้างครับ", "ยายใช้คอมวันละกี่ชั่วโมงครับ", "USB ซื้อมาเท่าไหร่ครับ")
+ask_options = PackedStringArray("อยากสำรองรูปไหนบ้างครับ", "ยายใช้คอมพิวเตอร์วันละกี่ชั่วโมงครับ", "USB ซื้อมาเท่าไหร่ครับ")
 ask_best = 0
 ask_answer = "รูปในโฟลเดอร์รูปภาพทั้งหมดเลยจ้ะ ในเครื่องก็ต้องอยู่นะ ยายดูทุกวัน"
 ask_note = "รูปภาพทั้งหมด · ในเครื่องต้องอยู่ด้วย"

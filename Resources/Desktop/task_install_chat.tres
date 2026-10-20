@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_task")
 title = "ลงแอปพูดคุยให้ยาย"
-pc_name = "คอมของยาย"
+pc_name = "คอมพิวเตอร์ของยาย"
 request = "อยากคุยกับหลานที่กรุงเทพ ให้เห็นหน้ากันด้วย"
 files = Array[Dictionary]([{
 "folder": "เดสก์ท็อป",

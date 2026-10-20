@@ -145,9 +145,9 @@ offset_right = 330.0
 offset_bottom = 610.0
 ignore_texture_size = true
 script = ExtResource("4_stall")
-message = "มาซื้ออะไหล่ไปซ่อมคอมได้ที่นี่"
+message = "มาซื้ออะไหล่ไปซ่อมคอมพิวเตอร์ได้ที่นี่"
 items = Array[ExtResource("10_si")]([ExtResource("it_ram_ddr4_8gb_used"), ExtResource("it_ram_ddr4_8gb_new"), ExtResource("it_ram_ddr3_4gb_used"), ExtResource("it_cable_sata"), ExtResource("it_cable_hdmi"), ExtResource("it_mouse_basic"), ExtResource("it_keyboard_basic"), ExtResource("it_ipa90"), ExtResource("it_paste_grey"), ExtResource("it_air_can"), ExtResource("it_storage_shelf"), ExtResource("it_storage_drawer")])
-label_text = "ร้านอะไหล่คอม"
+label_text = "ร้านอะไหล่คอมพิวเตอร์"
 
 [node name="StallSnack" type="TextureButton" parent="."]
 layout_mode = 0

@@ -17,7 +17,7 @@ script = ExtResource("1_naor1")
 title = "ห้องของขม"
 dialog_file = "res://Assets/Dialog/MainQuest/GoToRoom.txt"
 bg_name = "uid://x1g63kx30mw6"
-quest_text_th = "ไปร้านซ่อมคอม ดูคอมเครื่องเก่า"
+quest_text_th = "ไปร้านซ่อมคอมพิวเตอร์ ดูคอมพิวเตอร์เครื่องเก่า"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_asm01"]
@@ -25,7 +25,7 @@ script = ExtResource("1_naor1")
 action = 1
 emitType = 1
 scene_path = "res://Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn"
-quest_text_th = "เรียนประกอบคอมกับปิ๊บ (กด ! ที่คอมในห้อง)"
+quest_text_th = "เรียนประกอบคอมพิวเตอร์กับปิ๊บ (กด ! ที่คอมพิวเตอร์ในห้อง)"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_ur0up"]
@@ -33,7 +33,7 @@ script = ExtResource("1_naor1")
 action = 1
 emitType = 2
 scene_path = "res://Scene/MiniGame/PowerCheck/power_check.tscn"
-quest_text_th = "ตรวจคอมเก่า ทำไมเปิดไม่ติด"
+quest_text_th = "ตรวจคอมพิวเตอร์เก่า ทำไมเปิดไม่ติด"
 metadata/_custom_type_script = "uid://b8ve2y18gu4uw"
 
 [sub_resource type="Resource" id="Resource_xrra5"]

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_task")
 goal = 0
-title = "คอมของขม"
-pc_name = "คอมของขม"
+title = "คอมพิวเตอร์ของขม"
+pc_name = "คอมพิวเตอร์ของขม"
 request = "ไม่มีลูกค้ารอ ใช้ได้ตามสบาย ฝึกมือไว้ก่อน"
 files = Array[Dictionary]([{
 "name": "อะไหล่ที่ต้องสั่ง.doc",
@@ -89,5 +89,5 @@ ask_best = 0
 ask_answer = ""
 explain_options = PackedStringArray("-", "-")
 explain_best = 0
-pib_intro = PackedStringArray("นี่คอมของขมเอง ใช้ได้ตามสบายเลยนะ", "ลองฝึกเปิดไฟล์ ลบไฟล์ ถอนโปรแกรมไว้ เวลาลูกค้ามาจะได้คล่อง ปิดเครื่องได้ที่ปุ่มเริ่ม")
+pib_intro = PackedStringArray("นี่คอมพิวเตอร์ของขมเอง ใช้ได้ตามสบายเลยนะ", "ลองฝึกเปิดไฟล์ ลบไฟล์ ถอนโปรแกรมไว้ เวลาลูกค้ามาจะได้คล่อง ปิดเครื่องได้ที่ปุ่มเริ่ม")
 pib_lesson = PackedStringArray()

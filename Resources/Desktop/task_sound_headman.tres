@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 5
 title = "แก้เสียงไม่ออก"
-pc_name = "คอมที่ทำการผู้ใหญ่บ้าน"
+pc_name = "คอมพิวเตอร์ที่ทำการผู้ใหญ่บ้าน"
 request = "จะเปิดเสียงประกาศหมู่บ้าน แต่ลำโพงเงียบ"
 files = Array[Dictionary]([{
 "name": "ประกาศงานวัด.mp3",

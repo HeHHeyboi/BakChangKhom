@@ -6,7 +6,7 @@
 script = ExtResource("1_task")
 goal = 1
 title = "ถอนโปรแกรมโฆษณาห้องธุรการ"
-pc_name = "คอมห้องธุรการโรงเรียน"
+pc_name = "คอมพิวเตอร์ห้องธุรการโรงเรียน"
 request = "ประชุมออนไลน์ทีไร โฆษณาเด้งขึ้นจอให้อายครู"
 files = Array[Dictionary]([{
 "name": "ตารางสอน.doc",
