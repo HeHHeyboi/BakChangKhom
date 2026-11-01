@@ -4,6 +4,7 @@ enum WinType {
 	Explorer,
 	Browser,
 	Settings,
+	TaskManager,
 }
 
 
@@ -28,12 +29,24 @@ class File extends RefCounted:
 		dir = src.folder_name()
 
 
+class App extends RefCounted:
+	var data: DesktopProgram
+	var icon: Texture2D
+
+
+	func _init(src: DesktopProgram, app_icon: Texture2D) -> void:
+		self.data = src
+		self.icon = app_icon
+
+
 ## ชื่อโฟลเดอร์ถังขยะ — ลบไฟล์ = ย้ายมาที่นี่
 const TRASH := "ถังขยะ"
 
 var fs: Array[File] = []
 var dir_map: Dictionary[String, Dir] = { }
 var instances: Array[OsWindow2] = []
+var installed_programs: Dictionary[String, App] = { }
+var process: Array = []
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
 
@@ -116,3 +129,21 @@ func clear_trash() -> void:
 
 func add_instance(win: OsWindow2) -> void:
 	instances.append(win)
+
+
+func installed(program: DesktopProgram, app_icon: Texture2D = null):
+	print(program.name)
+	var app = App.new(program, app_icon)
+	self.installed_programs.set(program.name, app)
+	self.disk_free_mb -= program.size_mb
+
+
+func uninstalled(name: String) -> bool:
+	print(name)
+	var p = self.installed_programs.get(name) as App
+	if p == null:
+		print("find nothing")
+		return false
+	self.disk_free_mb += p.data.size_mb
+	self.installed_programs.erase(name)
+	return true
