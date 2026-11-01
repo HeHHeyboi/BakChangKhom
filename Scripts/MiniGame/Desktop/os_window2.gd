@@ -18,6 +18,11 @@ func set_icon(icon: Texture2D):
 	i.texture = icon
 
 
+## ปิดปุ่ม ✕ ชั่วคราว (เช่น ระหว่างวิซาร์ดกำลังติดตั้ง)
+func set_closable(on: bool) -> void:
+	(_topbar.get_node("%Close") as BaseButton).disabled = not on
+
+
 func _ready() -> void:
 	var row := _topbar.get_node("HBoxContainer")
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE

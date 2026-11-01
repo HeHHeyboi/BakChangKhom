@@ -9,6 +9,9 @@ const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
 const SETTING_SCENE := preload("res://Scene/MiniGame/Desktop/os_settings.tscn")
 const WINDOW_BASE := preload("res://Scene/MiniGame/Desktop/os_window_base.tscn")
 const INFO_WINDOW := preload("res://Scene/MiniGame/Desktop/os_info.tscn")
+const TASKMANAGER_SCENE := preload("res://Scene/MiniGame/Desktop/os_taskman.tscn")
+const WIZARD_SCENE := preload("res://Scene/MiniGame/Desktop/os_wizard.tscn")
+const AD_POPUP := preload("res://Scene/MiniGame/Desktop/os_popup_ad.tscn")
 
 
 # NOTE: Explorer constant
@@ -26,6 +29,7 @@ const BROWSER_RESULT_SCENE = "res://Scene/MiniGame/Desktop/os_browser_result.tsc
 const BROWSER_AD_SCENE = "res://Scene/MiniGame/Desktop/os_browser_ad.tscn"
 
 # NOTE: Setting constant
+const INSTALLED_APP = preload("res://Scene/MiniGame/Desktop/os_app_row.tscn")
 
 # NOTE: Icon Texture
 const DIR := "res://Assets/MiniGame/Desktop/"
@@ -47,6 +51,7 @@ const TEX_DOC := preload(DIR + "os_icon_file_doc.png")
 const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 
 const CAP := { &"fix": 40, &"safety": 30, &"listen": 20, &"explain": 10 }
+const ADWARE_SIZE_MB := 120
 
 @export var task: DesktopTask
 @export var popup_every := 7.0
@@ -84,6 +89,7 @@ var os: DesktopOS
 var start_menu: PopupMenu
 # var file_menu: PopupMenu
 var customer_name: String
+var _popup_timer := Timer.new()
 # NOTE: Explorer var
 var _explorer_folder := "เดสก์ท็อป"
 var _explorer_win: OsExplorer
@@ -97,8 +103,14 @@ var _bubble_tw: Tween
 var _browser_page: VBoxContainer
 var _browser_addr: LineEdit
 
+# NOTE: Task Manager var
+var _proc_panel: Control
+var _autostart_panel: Control
+
 # NOTE: Setting var
 var _settings_installed_list: VBoxContainer
+var _settings_progress_bar: ProgressBar
+var _settings_disk_label: Label
 
 var items := [
 	["เอกสาร", TEX_FOLDER],
@@ -120,9 +132,17 @@ func _ready() -> void:
 		os.create_dir(dir)
 	for file in task.files:
 		os.add_file(file)
+	for p in task.programs:
+		var icon: Texture2D = null
+		if p.system:
+			icon = TEX_SETTINGS
+		elif p.adware:
+			icon = TEX_ADWARE
+		os.installed(p, icon)
 
 	os.disk_total_mb = task.disk_total_mb
 	os.disk_free_mb = task.disk_free_mb
+
 	clock.text = EventManager.get_clock_text()
 	start_button.pressed.connect(self._on_start_button)
 
@@ -143,7 +163,42 @@ func _ready() -> void:
 	explorer.pressed.connect(open_explorer)
 	browser.pressed.connect(open_browser)
 	settings.pressed.connect(open_settings)
+
+	_popup_timer.wait_time = popup_every
+	_popup_timer.timeout.connect(
+		func():
+			if has_adware():
+				_spawn_popup()
+			pass,
+	)
 	self.add_child(start_menu)
+
+
+func has_adware() -> bool:
+	for pname in os.installed_programs:
+		var p = os.installed_programs.get(pname) as DesktopOS.App
+		if p.data.adware:
+			return true
+	return false
+
+
+func _spawn_popup():
+	var w = AD_POPUP.instantiate() as OsWindow2
+	w.restore(true)
+	w.closed.connect(
+		func():
+			w.queue_free.call_deferred(),
+	)
+	var btn := w.get_node("%Claim")
+	btn.pressed.connect(
+		func():
+			w.close()
+			_trap(&"click_ad", "click_ad", &"safety", 5, "คลิกในหน้าต่างโฆษณา")
+			_pib_toast(&"CLICK_AD")
+			_spawn_popup(),
+	)
+	screen.add_child(w)
+	pass
 
 
 func _process(_delta: float) -> void:
@@ -247,7 +302,7 @@ func _setup_explorer(w: OsExplorer) -> void:
 	trash.pressed.connect(
 		func():
 			_explorer_folder = DesktopOS.TRASH
-			_refresh_explorer(),
+			_refresh_all(),
 	)
 
 	var acts := {
@@ -319,12 +374,12 @@ func _open_file(f: DesktopFile):
 			msg = f.note if f.note != "" else "ไฟล์ของลูกค้า"
 		DesktopFile.FAKE_INSTALLER:
 			_trap(&"fake_download", "run_fake", &"safety", 5, "เปิดไฟล์จากปุ่มโฆษณา")
-			# WARN: need to implement
-			# install_adware()
+			install_adware()
+			_refresh_all()
 			_pib(&"FAKE_RUN", PibHint.Mood.WORRY)
 			msg = "กำลังติดตั้ง… (ไม่มีหน้าให้เลือกอะไรเลย!)"
 		DesktopFile.INSTALLER:
-			pass
+			_open_wizard()
 		DesktopFile.DUP:
 			msg = f.note if f.note != "" else "เปิดดูแล้ว — เหมือนกับ \"%s\" ทุกอย่าง" % f.dup_of
 		DesktopFile.SYSTEM:
@@ -397,6 +452,7 @@ func open_browser() -> void:
 		_browser_page = w.get_node("%Page")
 		_browser_addr = w.get_node("%Address")
 		screen.add_child(w)
+		os.add_instance(w)
 	else:
 		w.restore()
 	_browser_show(BROWSER_HOME)
@@ -493,27 +549,162 @@ func download_official() -> bool:
 	return true
 
 
+## วิซาร์ดติดตั้ง (เปิดจากไฟล์ setup_*.exe) — หน้า Page0..Page3 วางไว้ใน os_wizard.tscn แล้ว
+func _open_wizard() -> void:
+	var w := WIZARD_SCENE.instantiate() as OsWindow2
+	w.set_title("ติดตั้ง " + task.install_name)
+	w.closed.connect(
+		func():
+			w.queue_free.call_deferred(),
+	)
+	w.restore(true)
+	screen.add_child(w)
+	_wizard_page(w, 0, true)
+
+
+## โชว์หน้า page (ซ่อนหน้าอื่น) แล้วผูกปุ่ม %Next ใหม่ · bundle = ยังติ๊กโปรแกรมแถมอยู่
+func _wizard_page(w: OsWindow2, page: int, bundle: bool) -> void:
+	if !is_instance_valid(w):
+		return
+	for i in 4:
+		w.get_node("%%Page%d" % i).visible = i == page
+	var next := w.get_node("%Next") as Button
+	for c in next.pressed.get_connections():
+		next.pressed.disconnect(c.callable)
+	next.show()
+	match page:
+		0:
+			(w.get_node("%Welcome") as Label).text = "ยินดีต้อนรับสู่ตัวติดตั้ง %s" % task.install_name
+			next.text = "ถัดไป ›"
+			next.pressed.connect(self._wizard_page.bind(w, 1, bundle))
+		1:
+			(w.get_node("%CoreCheck") as CheckBox).text = "%s (จำเป็น)" % task.install_name
+			var check := w.get_node("%BundleCheck") as CheckBox
+			check.text = "ติดตั้ง \"%s\" ด้วย (แนะนำ!) — ผู้สนับสนุน" % task.bundle_name
+			check.button_pressed = bundle
+			next.text = "ติดตั้ง"
+			next.pressed.connect(
+				func():
+					_wizard_page(w, 2, check.button_pressed),
+			)
+		2:
+			next.hide()
+			w.set_closable(false)
+			var bar := w.get_node("%Progress") as ProgressBar
+			bar.value = 0.0
+			# NOTE: tween ผูกกับหน้าต่าง — หน้าต่างหายไป tween ก็หยุดด้วย
+			var tw := w.create_tween()
+			tw.tween_property(bar, "value", 100.0, 1.2)
+			tw.tween_callback(
+				func():
+					install_app(bundle)
+					w.set_closable(true)
+					_wizard_page(w, 3, bundle),
+			)
+		3:
+			(w.get_node("%Done") as Label).text = "ติดตั้ง %s เสร็จแล้ว" % task.install_name
+			next.text = "เสร็จ"
+			next.pressed.connect(w.close)
+
+
+## วิซาร์ดติดตั้งจบ · with_bundle = ไม่ได้เอาติ๊กโปรแกรมแถมออก
+func install_app(with_bundle: bool) -> void:
+	if not os.installed_programs.has(task.install_name):
+		var p := DesktopProgram.new()
+		p.name = task.install_name
+		p.publisher = task.install_site
+		p.size_mb = task.install_size_mb
+		p.desktop_icon = true
+		p.app = true
+		os.installed(p, TEX_CHAT)
+	if with_bundle:
+		_trap(&"bundle", "bundle", &"safety", 10, "ลืมเอาติ๊กโปรแกรมแถมออกตอนติดตั้ง")
+		install_adware()
+	_refresh_all()
+
+
+## ลงโปรแกรมโฆษณา (จากโปรแกรมแถมในวิซาร์ด หรือเปิดไฟล์ปลอมจากโฆษณา)
+func install_adware() -> void:
+	if os.installed_programs.has(task.bundle_name):
+		return
+	var p := DesktopProgram.new()
+	p.name = task.bundle_name
+	p.publisher = "Super Deal Co."
+	p.size_mb = ADWARE_SIZE_MB
+	p.adware = true
+	p.desktop_icon = true
+	os.installed(p, TEX_ADWARE)
+
+
 # NOTE: Setting Logic
 func open_settings() -> void:
 	var w = _find_window(DesktopOS.WinType.Settings)
 	if w == null:
 		w = SETTING_SCENE.instantiate()
 		w.set_meta("type", DesktopOS.WinType.Settings)
-		var progress_bar = w.get_node("%DiskBar") as ProgressBar
-		progress_bar.max_value = os.disk_total_mb
-		progress_bar.value = os.disk_free_mb
+		_settings_progress_bar = w.get_node("%DiskBar") as ProgressBar
+		_settings_progress_bar.max_value = os.disk_total_mb
+		_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
 
-		var disk_label = w.get_node("%DiskLabel") as Label
-		disk_label.text = "%s / %s" % [size_text(os.disk_free_mb), size_text(os.disk_total_mb)]
+		_settings_disk_label = w.get_node("%DiskLabel") as Label
+		_settings_disk_label.text = "%s / %s" % [
+			size_text(os.disk_total_mb - os.disk_free_mb),
+			size_text(os.disk_total_mb),
+		]
 		w.restore(true)
+		_settings_installed_list = w.get_node("%Apps")
 		screen.add_child(w)
+		os.add_instance(w)
 	else:
 		w.restore()
 	_refresh_setting()
 
 
 func _refresh_setting() -> void:
+	# NOTE: ยังไม่เคยเปิดหน้าต่างตั้งค่า — ไม่มีอะไรให้รีเฟรช
+	if not is_instance_valid(_settings_installed_list):
+		return
+	_settings_progress_bar.max_value = os.disk_total_mb
+	_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
+	_settings_disk_label.text = "%s / %s" % [size_text(os.disk_total_mb - os.disk_free_mb), size_text(os.disk_total_mb)]
+	for c in _settings_installed_list.get_children():
+		c.queue_free()
+	for pname in os.installed_programs:
+		var app = INSTALLED_APP.instantiate()
+		var p = os.installed_programs.get(pname)
+		if p == null:
+			continue
+		var icon = app.get_node("%Icon") as TextureRect
+		var pinfo = app.get_node("%Info") as Label
+		var btn = app.get_node("%Uninstall") as Button
+		icon.texture = p.icon
+		pinfo.text = "%s \n %s, %d mb" % [pname, p.data.publisher, p.data.size_mb]
+		btn.pressed.connect(
+			func():
+				if os.uninstalled(pname):
+					_pib_toast("UNINSTALLED", 2)
+					_refresh_all(),
+		)
+		_settings_installed_list.add_child(app)
+
+
+# NOTE: Task Manager Logic
+func open_task_manager():
+	var w = _find_window(DesktopOS.WinType.TaskManager)
+	if w == null:
+		w = TASKMANAGER_SCENE.instantiate()
+		w.set_meta("type", DesktopOS.WinType.TaskManager)
+		screen.add_child(w)
+		os.add_instance(w)
+
+
+func _refresh_task_manager():
 	pass
+
+
+func _refresh_all():
+	_refresh_explorer()
+	_refresh_setting()
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:

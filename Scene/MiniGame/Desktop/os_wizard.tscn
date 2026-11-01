@@ -94,6 +94,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
 size_flags_horizontal = 8
-text = "ถัดไป ›"
+text = "ถัดไป >"
 
 [editable path="VBoxContainer/Topbar"]

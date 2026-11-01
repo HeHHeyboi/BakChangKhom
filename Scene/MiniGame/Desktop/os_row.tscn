@@ -1,21 +1,25 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://de85xtiii1usa"]
 
-[node name="OsRow" type="HBoxContainer"]
+[ext_resource type="Theme" uid="uid://wowbtopsggdy" path="res://Assets/Theme/desktop_window.tres" id="1_7ywku"]
 
-[node name="Info" type="Label" parent="."]
+[node name="OsRow" type="HBoxContainer" unique_id=1664025595]
+theme = ExtResource("1_7ywku")
+
+[node name="Info" type="Label" parent="." unique_id=64695414]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "ชื่อ\nรายละเอียด"
+text = "ชื่อ
+รายละเอียด"
 
-[node name="Primary" type="Button" parent="."]
+[node name="Primary" type="Button" parent="." unique_id=1399988635]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "ปุ่ม"
 
-[node name="Secondary" type="Button" parent="."]
+[node name="Secondary" type="Button" parent="." unique_id=1410377605]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
