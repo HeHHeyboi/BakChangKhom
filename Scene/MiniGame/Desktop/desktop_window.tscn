@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://co4hwpau3u8kn"]
 
 [ext_resource type="Script" uid="uid://bf3wmt7xtdq11" path="res://Scripts/MiniGame/Desktop/desktop_minigame.gd" id="1_desk"]
-[ext_resource type="Resource" uid="uid://mxeq22mljeab" path="res://Resources/Desktop/task_free_space_photos.tres" id="2_3ckdj"]
+[ext_resource type="Resource" uid="uid://d2gblbl27hfvs" path="res://Resources/Desktop/task_close_hang_shop.tres" id="2_jt1u3"]
 [ext_resource type="PackedScene" uid="uid://bdf1p3qywimo3" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="2_pib"]
 [ext_resource type="PackedScene" uid="uid://26ebfi5qvxra" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="4_boot"]
 
 [node name="DesktopWindow" type="Node2D" unique_id=369883786 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_desk")
-task = ExtResource("2_3ckdj")
+task = ExtResource("2_jt1u3")
 pib = NodePath("PibHint")
 dialog_path = "res://Assets/Dialog/MiniGame/Desktop_Pib.txt"
 part_id = &"part_desktop"

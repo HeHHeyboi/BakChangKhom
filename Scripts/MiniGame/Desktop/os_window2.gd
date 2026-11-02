@@ -23,6 +23,15 @@ func set_closable(on: bool) -> void:
 	(_topbar.get_node("%Close") as BaseButton).disabled = not on
 
 
+func set_bg_color(color: Color) -> void:
+	var s = self.get_theme_stylebox("panel").duplicate()
+	s.bg_color = color
+	self.add_theme_stylebox_override("panel", s)
+	# print(self.theme.has_stylebox("bg_color", "Panel"))
+	# var s = StyleBoxFlat.new()
+	# s.bg_color = color
+
+
 func _ready() -> void:
 	var row := _topbar.get_node("HBoxContainer")
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE

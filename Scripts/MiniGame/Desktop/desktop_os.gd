@@ -39,6 +39,19 @@ class App extends RefCounted:
 		self.icon = app_icon
 
 
+## process ตอนเล่น — instance = หน้าต่างที่ผู้ใช้เปิด (null = process จาก DesktopTask.processes ไม่มีหน้าต่าง)
+class Process extends RefCounted:
+	var data: DesktopProcess
+	var id: int
+	var status: String
+	var kind: String
+	var instance: OsWindow2 = null
+
+
+## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
+signal process_changed
+
+
 ## ชื่อโฟลเดอร์ถังขยะ — ลบไฟล์ = ย้ายมาที่นี่
 const TRASH := "ถังขยะ"
 
@@ -46,9 +59,10 @@ var fs: Array[File] = []
 var dir_map: Dictionary[String, Dir] = { }
 var instances: Array[OsWindow2] = []
 var installed_programs: Dictionary[String, App] = { }
-var process: Array = []
+var process_map: Dictionary[int, Process] = { }
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
+var current_id = 0
 
 
 func _init():
@@ -147,3 +161,44 @@ func uninstalled(name: String) -> bool:
 	self.disk_free_mb += p.data.size_mb
 	self.installed_programs.erase(name)
 	return true
+
+
+## instance = หน้าต่างที่ผู้ใช้เปิด — ผูก pid ไว้ที่ meta "pid" ของหน้าต่าง · ปิดหน้าต่างเอง (✕) = process จบด้วย
+func spawn_process(proc: DesktopProcess, instance: OsWindow2 = null) -> int:
+	var id = current_id
+	current_id += 1
+	var p = Process.new()
+	p.data = proc
+	p.id = id
+	p.status = "ไม่ตอบสนอง" if proc.kind == "hang" else "กำลังทำงาน"
+	p.kind = "ระบบ" if proc.kind == "system" else "แอป"
+	if instance != null:
+		p.instance = instance
+		instance.set_meta("pid", id)
+		instance.closed.connect(_on_instance_closed.bind(id), CONNECT_ONE_SHOT)
+	process_map.set(id, p)
+	process_changed.emit()
+	return id
+
+
+## process ที่มีหน้าต่าง — สั่ง close() ให้หน้าต่างจัดการปิดตัวเอง (closed → _on_instance_closed ลบ process)
+## process ที่ไม่มีหน้าต่าง (จาก DesktopTask) — ลบออกจาก process_map ตรง ๆ
+func kill_process(proc_id: int) -> bool:
+	var p := process_map.get(proc_id) as Process
+	if p == null:
+		return false
+	if is_instance_valid(p.instance):
+		p.instance.close()
+	if p.data.kind == "system":
+		return false
+	if process_map.erase(proc_id):
+		process_changed.emit()
+	return true
+
+
+func _on_instance_closed(proc_id: int) -> void:
+	var p := process_map.get(proc_id) as Process
+	if p != null and is_instance_valid(p.instance):
+		p.instance.remove_meta("pid")
+	if process_map.erase(proc_id):
+		process_changed.emit()
