@@ -3,6 +3,9 @@ class_name DesktopMinigameV2 extends PartMinigame
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
 const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
 
+const C_INK := Color(0.23, 0.16, 0.11)
+const C_BAD := Color(0.75, 0.2, 0.12)
+const C_DIM := Color(0.4, 0.35, 0.3)
 # NOTE: Load app scene
 const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
 const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
@@ -27,9 +30,11 @@ const BROWSER_OFFICIAL = "official"
 const BROWSER_OFFICIAL_SCENE = "res://Scene/MiniGame/Desktop/os_browser_official.tscn"
 const BROWSER_RESULT_SCENE = "res://Scene/MiniGame/Desktop/os_browser_result.tscn"
 const BROWSER_AD_SCENE = "res://Scene/MiniGame/Desktop/os_browser_ad.tscn"
+const INFO_ROW = "res://Scene/MiniGame/Desktop/os_row.tscn"
 
 # NOTE: Setting constant
-const INSTALLED_APP = preload("res://Scene/MiniGame/Desktop/os_app_row.tscn")
+const INSTALLED_APP = "res://Scene/MiniGame/Desktop/os_app_row.tscn"
+
 
 # NOTE: Icon Texture
 const DIR := "res://Assets/MiniGame/Desktop/"
@@ -140,6 +145,23 @@ func _ready() -> void:
 			icon = TEX_ADWARE
 		os.installed(p, icon)
 
+	for p in task.processes:
+		var w: OsWindow2 = null
+		if p.kind == "hang":
+			w = WINDOW_BASE.instantiate() as OsWindow2
+			var body = w.get_node("%Content") as Control
+			w.set_title(p.name + " (ไม่ตอบสนอง)")
+			w.set_icon(TEX_EXE)
+			w.set_closable(false)
+			w.set_bg_color(C_DIM)
+			w.restore(true)
+			var msg = Label.new()
+			msg.text = "กำลังทำงาน...\nโปรแกรมนี้ไม่ตอบสนอง"
+			body.add_child(msg)
+			screen.add_child(w)
+		os.spawn_process(p, w)
+	os.process_changed.connect(_refresh_task_manager)
+
 	os.disk_total_mb = task.disk_total_mb
 	os.disk_free_mb = task.disk_free_mb
 
@@ -171,6 +193,8 @@ func _ready() -> void:
 				_spawn_popup()
 			pass,
 	)
+	_popup_timer.autostart = true
+	self.add_child(_popup_timer)
 	self.add_child(start_menu)
 
 
@@ -203,6 +227,10 @@ func _spawn_popup():
 
 func _process(_delta: float) -> void:
 	start_button.disabled = start_menu.visible
+	if !os.dir_map[os.TRASH].files.is_empty():
+		trash_icon.icon = TEX_TRASH_FULL
+	else:
+		trash_icon.icon = TEX_TRASH
 
 
 func _on_start_button() -> void:
@@ -228,8 +256,7 @@ func _on_start_menu(id: int) -> void:
 		5:
 			open_explorer(TRASH_DIR)
 		6:
-			# extra.open_task_manager()
-			print("task_manager")
+			open_task_manager()
 		7:
 			# extra.open_security()
 			print("security")
@@ -251,6 +278,15 @@ func _find_window(type: DesktopOS.WinType) -> OsWindow2:
 			return w
 	return null
 
+
+## หน้าต่างที่ผู้ใช้เปิด — ยังไม่มี pid (เปิดครั้งแรก หรือเคยปิดไปแล้ว) ก็สร้าง process ผูกกับหน้าต่างนี้
+func _ensure_process(w: OsWindow2, pname: String) -> void:
+	if w.has_meta("pid"):
+		return
+	var proc := DesktopProcess.new()
+	proc.name = pname
+	os.spawn_process(proc, w)
+
 # NOTE: Explorer Logic
 
 
@@ -267,6 +303,7 @@ func open_explorer(folder: String = "เอกสาร") -> void:
 		_setup_explorer(w)
 	else:
 		w.restore()
+	_ensure_process(w, "ไฟล์")
 	_refresh_explorer()
 
 
@@ -455,6 +492,7 @@ func open_browser() -> void:
 		os.add_instance(w)
 	else:
 		w.restore()
+	_ensure_process(w, "เบราว์เซอร์")
 	_browser_show(BROWSER_HOME)
 
 
@@ -559,6 +597,7 @@ func _open_wizard() -> void:
 	)
 	w.restore(true)
 	screen.add_child(w)
+	_ensure_process(w, "installer")
 	_wizard_page(w, 0, true)
 
 
@@ -657,6 +696,7 @@ func open_settings() -> void:
 		os.add_instance(w)
 	else:
 		w.restore()
+	_ensure_process(w, "ตั้งค่า")
 	_refresh_setting()
 
 
@@ -669,8 +709,9 @@ func _refresh_setting() -> void:
 	_settings_disk_label.text = "%s / %s" % [size_text(os.disk_total_mb - os.disk_free_mb), size_text(os.disk_total_mb)]
 	for c in _settings_installed_list.get_children():
 		c.queue_free()
+	var install_app = load(INSTALLED_APP)
 	for pname in os.installed_programs:
-		var app = INSTALLED_APP.instantiate()
+		var app = install_app.instantiate()
 		var p = os.installed_programs.get(pname)
 		if p == null:
 			continue
@@ -694,12 +735,87 @@ func open_task_manager():
 	if w == null:
 		w = TASKMANAGER_SCENE.instantiate()
 		w.set_meta("type", DesktopOS.WinType.TaskManager)
+		_proc_panel = w.get_node("%Proc")
+		_autostart_panel = w.get_node("%AutoStart")
+		var tab_proc = w.get_node("%TabProc") as Button
+		var tab_autostart = w.get_node("%TabStartup") as Button
+		tab_proc.pressed.connect(
+			func():
+				_proc_panel.show()
+				_autostart_panel.hide()
+				tab_proc.disabled = true
+				tab_autostart.disabled = false,
+		)
+		tab_autostart.pressed.connect(
+			func():
+				_proc_panel.hide()
+				_autostart_panel.show()
+				tab_proc.disabled = false
+				tab_autostart.disabled = true,
+		)
 		screen.add_child(w)
 		os.add_instance(w)
+	else:
+		w.restore()
+	_ensure_process(w, "ตัวจัดการงาน")
+	_refresh_task_manager()
 
 
 func _refresh_task_manager():
-	pass
+	# NOTE: ยังไม่เคยเปิดตัวจัดการงาน — ไม่มีอะไรให้รีเฟรช
+	if not is_instance_valid(_proc_panel):
+		return
+	var list := _proc_panel.get_node("List") as VBoxContainer
+	for c in list.get_children():
+		c.queue_free()
+	var info_row = load(INFO_ROW)
+	for pid in os.process_map:
+		var proc = os.process_map[pid] as DesktopOS.Process
+		var node = info_row.instantiate() as Control
+		var info = node.get_node("%Info") as Label
+		var btn = node.get_node("%Primary") as Button
+		info.text = "%s\n%s · %s · ซีพียู %d%%" % [proc.data.name, proc.status, proc.kind, int(proc.data.cpu)]
+		info.add_theme_color_override("font_color", C_BAD if proc.data.kind == "hang" else C_INK)
+		btn.text = "จบการทำงาน"
+		# NOTE: kill_process ยิง process_changed → รีเฟรชรายการเอง
+		btn.pressed.connect(
+			func():
+				if _check_process(pid):
+					os.kill_process(pid),
+		)
+		list.add_child(node)
+	list = _autostart_panel.get_node("List") as VBoxContainer
+
+
+func _check_process(pid: int) -> bool:
+	var p = os.process_map[pid]
+	var proc = p.data
+	match String(proc.kind):
+		"system":
+			_trap(
+				&"kill_system",
+				"kill_" + String(proc.name),
+				&"safety",
+				10,
+				"ปิดโปรแกรมของระบบ (%s) เครื่องจอฟ้า" % proc.name,
+			)
+			_pib_say("อันนั้นของระบบ! ปิดแล้วเครื่องล่มเลย ดูคอลัมน์ประเภทก่อนนะ", PibHint.Mood.WORRY)
+			return false
+		"unsaved":
+			_trap(
+				&"kill_unsaved",
+				"kill_" + String(proc.name),
+				&"listen",
+				10,
+				"ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % proc.name,
+			)
+			# m.lost_user_file = true
+			# m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
+			_pib_say("อ๊ะ! อันนั้นลูกค้ายังใช้อยู่ ข้อมูลที่ยังไม่บันทึกหายหมดแล้ว", PibHint.Mood.WORRY)
+			return true
+	if p.kind == "hang" and is_instance_valid(p.instance):
+		_pib_say("ปิดได้แล้ว เปิดโปรแกรมใหม่ก็ใช้ได้ปกติ")
+	return true
 
 
 func _refresh_all():
@@ -746,6 +862,11 @@ func _resolve_task() -> void:
 func _pib_toast(section: String, secs := 3.5) -> void:
 	if is_instance_valid(pib) and dialog_dict.has(section):
 		pib.toast(dialog_dict[section][0], secs)
+
+
+func _pib_say(text: String, mood := PibHint.Mood.NORMAL, secs := 4.0) -> void:
+	if is_instance_valid(pib):
+		pib.toast(DialogToken.new(PibHint.DEFAULT_SPEAKER, text), secs, mood)
 
 
 func _pib(section: StringName, mood := PibHint.Mood.NORMAL) -> void:
