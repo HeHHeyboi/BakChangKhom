@@ -5,6 +5,7 @@ enum WinType {
 	Browser,
 	Settings,
 	TaskManager,
+	Printer,
 }
 
 

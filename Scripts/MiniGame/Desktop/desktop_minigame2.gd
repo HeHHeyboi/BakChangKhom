@@ -893,22 +893,27 @@ func _refresh_setting() -> void:
 
 # NOTE: Printer's Setting Logic
 func _open_printer() -> void:
-	var w = load(PRINTERS_SETTING).instantiate() as OsWindow2
-	w.restore(true)
-	w.closed.connect(
-		func():
-			w.queue_free.call_deferred(),
-	)
-	_printer_install_list = w.get_node("%Installed")
-	_printer_found_list = w.get_node("%Found")
-	_print_test_result = w.get_node("%Result")
-	_printer_test_btn = w.get_node("%PrintTest")
-	_printer_empty_text = w.get_node("%Empty")
-	_printer_test_btn.pressed.connect(
-		func():
-			_print_test_result.text = os.print_test(),
-	)
-	screen.add_child(w)
+	var w = _find_window(DesktopOS.WinType.Printer)
+	if w == null:
+		w = load(PRINTERS_SETTING).instantiate() as OsWindow2
+		w.restore(true)
+		w.set_meta("type", DesktopOS.WinType.Printer)
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred(),
+		)
+		_printer_install_list = w.get_node("%Installed")
+		_printer_found_list = w.get_node("%Found")
+		_print_test_result = w.get_node("%Result")
+		_printer_test_btn = w.get_node("%PrintTest")
+		_printer_empty_text = w.get_node("%Empty")
+		_printer_test_btn.pressed.connect(
+			func():
+				_print_test_result.text = os.print_test(),
+		)
+		screen.add_child(w)
+	else:
+		w.restore()
 	_refresh_printer()
 
 
