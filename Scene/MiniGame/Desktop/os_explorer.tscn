@@ -6,6 +6,12 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5167"]
 bg_color = Color(0.96862745, 0.9607843, 0.92941177, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+border_blend = true
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -87,7 +93,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.35, 0.4, 1)
 theme_override_font_sizes/font_size = 16
-text = " เครื่องนี้ › เดสก์ท็อป"
+text = " เครื่องนี้ > เดสก์ท็อป"
 
 [node name="FileList" type="ItemList" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1602268701]
 unique_name_in_owner = true

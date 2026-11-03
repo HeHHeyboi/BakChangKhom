@@ -34,6 +34,11 @@ const INFO_ROW = "res://Scene/MiniGame/Desktop/os_row.tscn"
 
 # NOTE: Setting constant
 const INSTALLED_APP = "res://Scene/MiniGame/Desktop/os_app_row.tscn"
+const PRINTERS_SETTING = "res://Scene/MiniGame/Desktop/os_printers.tscn"
+const UPDATED_SETTING = "res://Scene/MiniGame/Desktop/os_update.tscn"
+const SECURITY_SETTING = "res://Scene/MiniGame/Desktop/os_security.tscn"
+const DISPLAY_SETTING = "res://Scene/MiniGame/Desktop/os_display.tscn"
+const WIFI_SETTING = "res://Scene/MiniGame/Desktop/os_wifi.tscn"
 
 
 # NOTE: Icon Texture
@@ -117,6 +122,13 @@ var _settings_installed_list: VBoxContainer
 var _settings_progress_bar: ProgressBar
 var _settings_disk_label: Label
 
+# NOTE: Printer var
+var _printer_install_list: VBoxContainer
+var _printer_empty_text: Label
+var _printer_test_btn: Button
+var _printer_found_list: VBoxContainer
+var _print_test_result: Label
+
 var items := [
 	["เอกสาร", TEX_FOLDER],
 	["รูปภาพ", TEX_PICTURES],
@@ -144,6 +156,8 @@ func _ready() -> void:
 		elif p.adware:
 			icon = TEX_ADWARE
 		os.installed(p, icon)
+	for p in task.printers:
+		os.add_printer(p)
 
 	for p in task.processes:
 		var w: OsWindow2 = null
@@ -287,9 +301,8 @@ func _ensure_process(w: OsWindow2, pname: String) -> void:
 	proc.name = pname
 	os.spawn_process(proc, w)
 
+
 # NOTE: Explorer Logic
-
-
 func open_explorer(folder: String = "เอกสาร") -> void:
 	_explorer_folder = folder
 	var w := _find_window(DesktopOS.WinType.Explorer)
@@ -675,66 +688,13 @@ func install_adware() -> void:
 	os.installed(p, TEX_ADWARE)
 
 
-# NOTE: Setting Logic
-func open_settings() -> void:
-	var w = _find_window(DesktopOS.WinType.Settings)
-	if w == null:
-		w = SETTING_SCENE.instantiate()
-		w.set_meta("type", DesktopOS.WinType.Settings)
-		_settings_progress_bar = w.get_node("%DiskBar") as ProgressBar
-		_settings_progress_bar.max_value = os.disk_total_mb
-		_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
-
-		_settings_disk_label = w.get_node("%DiskLabel") as Label
-		_settings_disk_label.text = "%s / %s" % [
-			size_text(os.disk_total_mb - os.disk_free_mb),
-			size_text(os.disk_total_mb),
-		]
-		w.restore(true)
-		_settings_installed_list = w.get_node("%Apps")
-		screen.add_child(w)
-		os.add_instance(w)
-	else:
-		w.restore()
-	_ensure_process(w, "ตั้งค่า")
-	_refresh_setting()
-
-
-func _refresh_setting() -> void:
-	# NOTE: ยังไม่เคยเปิดหน้าต่างตั้งค่า — ไม่มีอะไรให้รีเฟรช
-	if not is_instance_valid(_settings_installed_list):
-		return
-	_settings_progress_bar.max_value = os.disk_total_mb
-	_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
-	_settings_disk_label.text = "%s / %s" % [size_text(os.disk_total_mb - os.disk_free_mb), size_text(os.disk_total_mb)]
-	for c in _settings_installed_list.get_children():
-		c.queue_free()
-	var install_app = load(INSTALLED_APP)
-	for pname in os.installed_programs:
-		var app = install_app.instantiate()
-		var p = os.installed_programs.get(pname)
-		if p == null:
-			continue
-		var icon = app.get_node("%Icon") as TextureRect
-		var pinfo = app.get_node("%Info") as Label
-		var btn = app.get_node("%Uninstall") as Button
-		icon.texture = p.icon
-		pinfo.text = "%s \n %s, %d mb" % [pname, p.data.publisher, p.data.size_mb]
-		btn.pressed.connect(
-			func():
-				if os.uninstalled(pname):
-					_pib_toast("UNINSTALLED", 2)
-					_refresh_all(),
-		)
-		_settings_installed_list.add_child(app)
-
-
 # NOTE: Task Manager Logic
 func open_task_manager():
 	var w = _find_window(DesktopOS.WinType.TaskManager)
 	if w == null:
-		w = TASKMANAGER_SCENE.instantiate()
+		w = TASKMANAGER_SCENE.instantiate() as OsWindow2
 		w.set_meta("type", DesktopOS.WinType.TaskManager)
+		w.restore(true)
 		_proc_panel = w.get_node("%Proc")
 		_autostart_panel = w.get_node("%AutoStart")
 		var tab_proc = w.get_node("%TabProc") as Button
@@ -826,7 +786,6 @@ func _refresh_task_manager():
 
 func _set_autostart(pid: int, enable: bool) -> bool:
 	var p = os.process_map.get(pid) as DesktopOS.Process
-	print(p.data.name)
 	if p == null:
 		return false
 	if !enable && p.data.kind == "system":
@@ -874,6 +833,135 @@ func _check_process(pid: int) -> bool:
 	if p.kind == "hang" and is_instance_valid(p.instance):
 		_pib_say("ปิดได้แล้ว เปิดโปรแกรมใหม่ก็ใช้ได้ปกติ")
 	return true
+
+
+# NOTE: Setting Logic
+func open_settings() -> void:
+	var w = _find_window(DesktopOS.WinType.Settings)
+	if w == null:
+		w = SETTING_SCENE.instantiate()
+		w.set_meta("type", DesktopOS.WinType.Settings)
+		_settings_progress_bar = w.get_node("%DiskBar") as ProgressBar
+		_settings_progress_bar.max_value = os.disk_total_mb
+		_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
+
+		_settings_disk_label = w.get_node("%DiskLabel") as Label
+		_settings_disk_label.text = "%s / %s" % [
+			size_text(os.disk_total_mb - os.disk_free_mb),
+			size_text(os.disk_total_mb),
+		]
+		w.restore(true)
+		_settings_installed_list = w.get_node("%Apps")
+		var printer_btn = w.get_node("%SecPrinters") as Button
+		printer_btn.pressed.connect(self._open_printer)
+		screen.add_child(w)
+		os.add_instance(w)
+	else:
+		w.restore()
+	_ensure_process(w, "ตั้งค่า")
+	_refresh_setting()
+
+
+func _refresh_setting() -> void:
+	# NOTE: ยังไม่เคยเปิดหน้าต่างตั้งค่า — ไม่มีอะไรให้รีเฟรช
+	if not is_instance_valid(_settings_installed_list):
+		return
+	_settings_progress_bar.max_value = os.disk_total_mb
+	_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
+	_settings_disk_label.text = "%s / %s" % [size_text(os.disk_total_mb - os.disk_free_mb), size_text(os.disk_total_mb)]
+	for c in _settings_installed_list.get_children():
+		c.queue_free()
+	var app_node = load(INSTALLED_APP)
+	for pname in os.installed_programs:
+		var app = app_node.instantiate()
+		var p = os.installed_programs.get(pname)
+		if p == null:
+			continue
+		var icon = app.get_node("%Icon") as TextureRect
+		var pinfo = app.get_node("%Info") as Label
+		var btn = app.get_node("%Uninstall") as Button
+		icon.texture = p.icon
+		pinfo.text = "%s \n %s, %d mb" % [pname, p.data.publisher, p.data.size_mb]
+		btn.pressed.connect(
+			func():
+				if os.uninstalled(pname):
+					_pib_toast("UNINSTALLED", 2)
+					_refresh_all(),
+		)
+		_settings_installed_list.add_child(app)
+
+
+# NOTE: Printer's Setting Logic
+func _open_printer() -> void:
+	var w = load(PRINTERS_SETTING).instantiate() as OsWindow2
+	w.restore(true)
+	w.closed.connect(
+		func():
+			w.queue_free.call_deferred(),
+	)
+	_printer_install_list = w.get_node("%Installed")
+	_printer_found_list = w.get_node("%Found")
+	_print_test_result = w.get_node("%Result")
+	_printer_test_btn = w.get_node("%PrintTest")
+	_printer_empty_text = w.get_node("%Empty")
+	_printer_test_btn.pressed.connect(
+		func():
+			_print_test_result.text = os.print_test(),
+	)
+	screen.add_child(w)
+	_refresh_printer()
+
+
+func _refresh_printer() -> void:
+	var info_node = load(INFO_ROW)
+	for c in _printer_install_list.get_children():
+		c.queue_free()
+	for c in _printer_found_list.get_children():
+		c.queue_free()
+
+	for id in os.printer_map:
+		var printer = os.printer_map.get(id) as DesktopOS.Printer
+		var node = info_node.instantiate()
+		var info = node.get_node("%Info") as Label
+		var btn1 = node.get_node("%Primary") as Button
+		var btn2 = node.get_node("%Secondary") as Button
+		if printer.is_install:
+			info.text = printer.data.name
+			if os.printer_default_index == id:
+				info.text += "  ✓ ค่าเริ่มต้น"
+			btn1.text = "ตั้งเป็นค่าเริ่มต้น"
+			btn1.pressed.connect(
+				func():
+					if !os.set_default_printer(id):
+						return
+					_refresh_printer(),
+			)
+			btn2.text = "ลบ"
+			btn2.show()
+			btn2.pressed.connect(
+				func():
+					os.remove_printer(id)
+					_refresh_printer(),
+			)
+			_printer_install_list.add_child(node)
+		else:
+			info.text = "%s\n%s" % [printer.data.name, printer.data.note]
+			btn1.text = "เพิ่ม"
+			btn1.pressed.connect(
+				func():
+					var ok := os.include_printer(id)
+					if !ok:
+						_trap(
+							&"wrong_printer",
+							"printer_" + String(printer.data.name),
+							&"fix",
+							10,
+							"เพิ่มเครื่องพิมพ์ผิดเครื่อง (%s)" % printer.data.name,
+						)
+						_pib_say("เครื่องนั้นไม่ใช่ของห้องนี้นะ ดูชื่อให้ตรงกับที่ลูกค้าบอก", PibHint.Mood.WORRY)
+					_refresh_printer(),
+			)
+			_printer_found_list.add_child(node)
 
 
 func _refresh_all():

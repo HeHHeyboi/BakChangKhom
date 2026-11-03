@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://co4hwpau3u8kn"]
 
 [ext_resource type="Script" uid="uid://bf3wmt7xtdq11" path="res://Scripts/MiniGame/Desktop/desktop_minigame.gd" id="1_desk"]
-[ext_resource type="Resource" uid="uid://fog4qorpqcld" path="res://Resources/Desktop/task_startup_amnuay.tres" id="2_jt1u3"]
+[ext_resource type="Resource" uid="uid://dosc2n4fqx2cy" path="res://Resources/Desktop/task_printer_teacher.tres" id="2_jt1u3"]
 [ext_resource type="PackedScene" uid="uid://bdf1p3qywimo3" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="2_pib"]
 [ext_resource type="PackedScene" uid="uid://26ebfi5qvxra" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="4_boot"]
 
