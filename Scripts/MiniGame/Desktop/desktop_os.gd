@@ -42,11 +42,15 @@ class App extends RefCounted:
 ## process ตอนเล่น — instance = หน้าต่างที่ผู้ใช้เปิด (null = process จาก DesktopTask.processes ไม่มีหน้าต่าง)
 class Process extends RefCounted:
 	var data: DesktopProcess
-	var id: int
 	var status: String
 	var kind: String
 	var autostart: bool
 	var instance: OsWindow2 = null
+
+
+class Printer extends RefCounted:
+	var data: DesktopPrinter
+	var is_install: bool
 
 
 ## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
@@ -62,6 +66,8 @@ var instances: Array[OsWindow2] = []
 var installed_programs: Dictionary[String, App] = { }
 var process_map: Dictionary[int, Process] = { }
 var autostart_map: Dictionary[int, Process] = { }
+var printer_map: Dictionary[int, Printer] = { }
+var printer_default_index: int = -1
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
 var current_id = 0
@@ -148,17 +154,14 @@ func add_instance(win: OsWindow2) -> void:
 
 
 func installed(program: DesktopProgram, app_icon: Texture2D = null):
-	print(program.name)
 	var app = App.new(program, app_icon)
 	self.installed_programs.set(program.name, app)
 	self.disk_free_mb -= program.size_mb
 
 
 func uninstalled(name: String) -> bool:
-	print(name)
 	var p = self.installed_programs.get(name) as App
 	if p == null:
-		print("find nothing")
 		return false
 	self.disk_free_mb += p.data.size_mb
 	self.installed_programs.erase(name)
@@ -171,7 +174,6 @@ func spawn_process(proc: DesktopProcess, instance: OsWindow2 = null) -> int:
 	current_id += 1
 	var p = Process.new()
 	p.data = proc
-	p.id = id
 	p.status = "ไม่ตอบสนอง" if proc.kind == "hang" else "กำลังทำงาน"
 	p.kind = "ระบบ" if proc.kind == "system" else "แอป"
 	if instance != null:
@@ -209,6 +211,61 @@ func boot_time() -> int:
 			continue
 		result += p.data.boot_s
 	return result
+
+
+func add_printer(data: DesktopPrinter) -> void:
+	var printer = Printer.new()
+	printer.data = data
+	printer.is_install = false
+	var id = printer_map.size()
+	printer_map.set(id, printer)
+
+
+func include_printer(id: int) -> bool:
+	var printer = printer_map.get(id) as Printer
+	if printer == null:
+		return false
+	if printer_default_index < 0:
+		printer_default_index = id
+	printer.is_install = true
+	if !printer.data.right:
+		return false
+	return true
+
+
+func remove_printer(id: int) -> bool:
+	var printer = printer_map.get(id) as Printer
+	if printer == null:
+		return false
+	printer.is_install = false
+
+	if printer_default_index < 0:
+		return true
+	printer_default_index = -1
+	for index in printer_map:
+		printer = printer_map.get(index) as Printer
+		if printer.is_install:
+			printer_default_index = id
+			break
+	return true
+
+
+func set_default_printer(id: int) -> bool:
+	if printer_default_index == id:
+		return false
+	printer_default_index = id
+	return true
+
+
+func print_test() -> String:
+	if printer_default_index < 0:
+		return "ยังไม่มีเครื่องพิมพ์ในเครื่องเลย"
+	var p = printer_map.get(printer_default_index) as DesktopOS.Printer
+	var printed_ok = p != null and p.data.right
+	return "พิมพ์หน้าทดสอบที่ \"%s\" แล้ว — %s" % [
+		p.data.name,
+		"ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…",
+	]
 
 
 func _on_instance_closed(proc_id: int) -> void:
