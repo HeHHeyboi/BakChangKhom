@@ -45,6 +45,7 @@ class Process extends RefCounted:
 	var id: int
 	var status: String
 	var kind: String
+	var autostart: bool
 	var instance: OsWindow2 = null
 
 
@@ -60,6 +61,7 @@ var dir_map: Dictionary[String, Dir] = { }
 var instances: Array[OsWindow2] = []
 var installed_programs: Dictionary[String, App] = { }
 var process_map: Dictionary[int, Process] = { }
+var autostart_map: Dictionary[int, Process] = { }
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
 var current_id = 0
@@ -177,6 +179,9 @@ func spawn_process(proc: DesktopProcess, instance: OsWindow2 = null) -> int:
 		instance.set_meta("pid", id)
 		instance.closed.connect(_on_instance_closed.bind(id), CONNECT_ONE_SHOT)
 	process_map.set(id, p)
+	if proc.startup:
+		p.autostart = true
+		autostart_map.set(id, p)
 	process_changed.emit()
 	return id
 
@@ -194,6 +199,16 @@ func kill_process(proc_id: int) -> bool:
 	if process_map.erase(proc_id):
 		process_changed.emit()
 	return true
+
+
+func boot_time() -> int:
+	var result = 0
+	for pid in autostart_map:
+		var p = autostart_map.get(pid) as Process
+		if p == null || !p.autostart:
+			continue
+		result += p.data.boot_s
+	return result
 
 
 func _on_instance_closed(proc_id: int) -> void:

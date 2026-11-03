@@ -785,11 +785,7 @@ func open_security() -> void:
 			row.name = "Threat_" + String(t.name).validate_node_name()
 			var l = m._label(
 				"%s\n%s · %s"
-				% [
-					t.name,
-					t.where,
-					{ "found": "พบ!", "quarantine": "กักกันแล้ว", "allowed": "อนุญาตแล้ว" }.get(st, ""),
-				],
+				% [t.name, t.where, { "found": "พบ!", "quarantine": "กักกันแล้ว", "allowed": "อนุญาตแล้ว" }.get(st, "")],
 				14,
 				C_BAD if st != "quarantine" else C_OK,
 			)
@@ -846,10 +842,7 @@ func set_scale(pct: int) -> void:
 
 
 func display_ok() -> bool:
-	return (
-		task.resolutions.is_empty()
-		or (task.resolutions[res_i].best and scale_pct == task.display_scale_best)
-	)
+	return (task.resolutions.is_empty() or (task.resolutions[res_i].best and scale_pct == task.display_scale_best))
 
 
 ## ไอคอน/ตัวหนังสือบนเดสก์ท็อปใหญ่ตามความละเอียดต่ำ + ขนาด %

@@ -744,14 +744,16 @@ func open_task_manager():
 				_proc_panel.show()
 				_autostart_panel.hide()
 				tab_proc.disabled = true
-				tab_autostart.disabled = false,
+				tab_autostart.disabled = false
+				_refresh_task_manager(),
 		)
 		tab_autostart.pressed.connect(
 			func():
 				_proc_panel.hide()
 				_autostart_panel.show()
 				tab_proc.disabled = false
-				tab_autostart.disabled = true,
+				tab_autostart.disabled = true
+				_refresh_task_manager(),
 		)
 		screen.add_child(w)
 		os.add_instance(w)
@@ -765,49 +767,105 @@ func _refresh_task_manager():
 	# NOTE: ยังไม่เคยเปิดตัวจัดการงาน — ไม่มีอะไรให้รีเฟรช
 	if not is_instance_valid(_proc_panel):
 		return
-	var list := _proc_panel.get_node("List") as VBoxContainer
-	for c in list.get_children():
-		c.queue_free()
 	var info_row = load(INFO_ROW)
-	for pid in os.process_map:
-		var proc = os.process_map[pid] as DesktopOS.Process
-		var node = info_row.instantiate() as Control
-		var info = node.get_node("%Info") as Label
-		var btn = node.get_node("%Primary") as Button
-		info.text = "%s\n%s · %s · ซีพียู %d%%" % [proc.data.name, proc.status, proc.kind, int(proc.data.cpu)]
-		info.add_theme_color_override("font_color", C_BAD if proc.data.kind == "hang" else C_INK)
-		btn.text = "จบการทำงาน"
-		# NOTE: kill_process ยิง process_changed → รีเฟรชรายการเอง
-		btn.pressed.connect(
-			func():
-				if _check_process(pid):
-					os.kill_process(pid),
+	if _proc_panel.visible:
+		var list := _proc_panel.get_node("List") as VBoxContainer
+		for c in list.get_children():
+			c.queue_free()
+		for pid in os.process_map:
+			var proc = os.process_map[pid] as DesktopOS.Process
+			var node = info_row.instantiate() as Control
+			var info = node.get_node("%Info") as Label
+			var btn = node.get_node("%Primary") as Button
+			info.text = "%s\n%s · %s · ซีพียู %d%%" % [proc.data.name, proc.status, proc.kind, int(proc.data.cpu)]
+			info.add_theme_color_override("font_color", C_BAD if proc.data.kind == "hang" else C_INK)
+			btn.text = "จบการทำงาน"
+			# NOTE: kill_process ยิง process_changed → รีเฟรชรายการเอง
+			btn.pressed.connect(
+				func():
+					if _check_process(pid):
+						os.kill_process(pid),
+			)
+			list.add_child(node)
+	else:
+		var list = _autostart_panel.get_node("List") as VBoxContainer
+		for c in list.get_children():
+			c.queue_free()
+		var msg = Label.new()
+		msg.text = "เปิดเครื่องใช้เวลา ~%d วินาที" % os.boot_time()
+		msg.add_theme_color_override("font_color", C_INK)
+		list.add_child(msg)
+		for pid in os.autostart_map:
+			var proc = os.process_map[pid] as DesktopOS.Process
+			var node = info_row.instantiate() as Control
+			var info = node.get_node("%Info") as Label
+			var btn = node.get_node("%Primary") as Button
+			var impact := "สูง" if int(proc.data.boot_s) >= 6 else ("กลาง" if int(proc.data.boot_s) >= 3 else "ต่ำ")
+			info.text = "%s%s\nผลต่อการเปิดเครื่อง: %s · %s" % [
+				proc.data.name,
+				"  (ระบบ)" if proc.data.kind == "system" else "",
+				impact,
+				"เปิดอยู่" if proc.autostart else "ปิดแล้ว",
+			]
+			btn.text = "ปิด" if proc.autostart else "เปิด"
+			btn.pressed.connect(
+				func():
+					if !_set_autostart(pid, !proc.autostart):
+						return
+					msg.text = "เปิดเครื่องใช้เวลา ~%d วินาที" % os.boot_time()
+					info.text = "%s%s\nผลต่อการเปิดเครื่อง: %s · %s" % [
+						proc.data.name,
+						"  (ระบบ)" if proc.data.kind == "system" else "",
+						impact,
+						"เปิดอยู่" if proc.autostart else "ปิดแล้ว",
+					]
+					btn.text = "ปิด" if proc.autostart else "เปิด",
+			)
+			list.add_child(node)
+
+
+func _set_autostart(pid: int, enable: bool) -> bool:
+	var p = os.process_map.get(pid) as DesktopOS.Process
+	print(p.data.name)
+	if p == null:
+		return false
+	if !enable && p.data.kind == "system":
+		_trap(
+			&"disable_system",
+			"nostart_" + String(p.data.name),
+			&"safety",
+			10,
+			"ปิด %s ไม่ให้เปิดพร้อมเครื่อง" % p.data.name,
 		)
-		list.add_child(node)
-	list = _autostart_panel.get_node("List") as VBoxContainer
+		_pib_say(
+			"%s ต้องเปิดพร้อมเครื่องนะ ไม่งั้นเครื่องไม่ปลอดภัยหรือทำงานได้ไม่เต็มประสิทธิภาพ" % p.data.name,
+			PibHint.Mood.WORRY,
+		)
+		return false
+	p.autostart = enable
+	return true
 
 
 func _check_process(pid: int) -> bool:
 	var p = os.process_map[pid]
-	var proc = p.data
-	match String(proc.kind):
+	match String(p.data.kind):
 		"system":
 			_trap(
 				&"kill_system",
-				"kill_" + String(proc.name),
+				"kill_" + String(p.data.name),
 				&"safety",
 				10,
-				"ปิดโปรแกรมของระบบ (%s) เครื่องจอฟ้า" % proc.name,
+				"ปิดโปรแกรมของระบบ (%s) เครื่องจอฟ้า" % p.data.name,
 			)
 			_pib_say("อันนั้นของระบบ! ปิดแล้วเครื่องล่มเลย ดูคอลัมน์ประเภทก่อนนะ", PibHint.Mood.WORRY)
 			return false
 		"unsaved":
 			_trap(
 				&"kill_unsaved",
-				"kill_" + String(proc.name),
+				"kill_" + String(p.data.name),
 				&"listen",
 				10,
-				"ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % proc.name,
+				"ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % p.data.name,
 			)
 			# m.lost_user_file = true
 			# m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
