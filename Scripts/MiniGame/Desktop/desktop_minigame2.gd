@@ -995,9 +995,8 @@ func _open_sound() -> void:
 		var volume_label = w.get_node("%VolumeLabel") as Label
 		var test_btn = w.get_node("%Test") as Button
 		var result_text = w.get_node("%Result") as Label
-		for dev_id in os.sound_dev_map:
-			var dev = os.sound_dev_map.get(dev_id) as DesktopSoundDevice
-			device_list.add_item(dev.name, dev_id)
+		for dev in os.sound_dev_list:
+			device_list.add_item(dev.name)
 		device_list.selected = os.selected_sound_dev
 		device_list.item_selected.connect(os.set_selected_sound_device)
 		mute.toggle_mode = os.is_mute
@@ -1027,16 +1026,26 @@ func _open_sound() -> void:
 
 func test_sound() -> String:
 	sound_tested = true
-	var dev = os.sound_dev_map.get(os.selected_sound_dev) as DesktopSoundDevice
+	var dev = os.sound_dev_list.get(os.selected_sound_dev) as DesktopSoundDevice
+	if task.sound_devices.is_empty() || dev == null:
+		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
 	if !os.installed_programs.has("ไดรเวอร์เสียง"):
 		return "ไม่มีไดรเวอร์เสียง เครื่องไม่รู้จักลำโพงเลย"
-	if task.sound_devices.is_empty() || (dev.works && !os.is_mute):
-		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
 	if os.is_mute:
 		return "เงียบ… (ปิดเสียงอยู่)"
 	if os.sound_volume < 20:
 		return "เบามากจนไม่ได้ยิน"
+	if dev.works:
+		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
 	return "เงียบ… เสียงไปออกที่ \"%s\"" % dev.name
+
+
+# NOTE: Wifi's Setting Logic
+func _open_wifi() -> void:
+	var w = _find_window(DesktopOS.WinType.Wifi)
+	if w == null:
+		w = load(WIFI_SETTING).instantiate() as OsWindow2
+	pass
 
 
 func _refresh_all():
