@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cggfyl6no8alb"]
 
 [ext_resource type="Script" uid="uid://bq0g46pdu2xoq" path="res://Scripts/MiniGame/Desktop/desktop_minigame2.gd" id="1_hw1fy"]
-[ext_resource type="Resource" uid="uid://dosc2n4fqx2cy" path="res://Resources/Desktop/task_printer_teacher.tres" id="2_mp0gt"]
+[ext_resource type="Resource" uid="uid://cru2u7spw8skq" path="res://Resources/Desktop/task_sound_headman.tres" id="2_mp0gt"]
 [ext_resource type="Texture2D" uid="uid://beia843eoudkm" path="res://Assets/MiniGame/Desktop/os_frame_desk.png" id="3_hh2bf"]
 [ext_resource type="PackedScene" uid="uid://bdf1p3qywimo3" path="res://Scene/MiniGame/PartBase/pib_hint.tscn" id="3_xepuo"]
 [ext_resource type="Texture2D" uid="uid://d07dp7a6skaeb" path="res://Assets/MiniGame/Desktop/os_wallpaper.jpg" id="4_ycono"]
@@ -211,17 +211,17 @@ text = "เสียง"
 flat = true
 expand_icon = true
 
+[node name="Disk" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1940721730]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+
 [node name="Clock" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1563288819]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
-
-[node name="Disk" type="Label" parent="Os/Screen/Taskbar/HBoxContainer" unique_id=1940721730]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
 
 [node name="Note" parent="Os/Screen" unique_id=442420618 instance=ExtResource("15_esb47")]
 unique_name_in_owner = true

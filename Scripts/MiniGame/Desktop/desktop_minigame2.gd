@@ -35,6 +35,7 @@ const INFO_ROW = "res://Scene/MiniGame/Desktop/os_row.tscn"
 # NOTE: Setting constant
 const INSTALLED_APP = "res://Scene/MiniGame/Desktop/os_app_row.tscn"
 const PRINTERS_SETTING = "res://Scene/MiniGame/Desktop/os_printers.tscn"
+const SOUND_SETTING = "res://Scene/MiniGame/Desktop/os_sound.tscn"
 const UPDATED_SETTING = "res://Scene/MiniGame/Desktop/os_update.tscn"
 const SECURITY_SETTING = "res://Scene/MiniGame/Desktop/os_security.tscn"
 const DISPLAY_SETTING = "res://Scene/MiniGame/Desktop/os_display.tscn"
@@ -100,6 +101,7 @@ var start_menu: PopupMenu
 # var file_menu: PopupMenu
 var customer_name: String
 var _popup_timer := Timer.new()
+var sound_tested := false
 # NOTE: Explorer var
 var _explorer_folder := "เดสก์ท็อป"
 var _explorer_win: OsExplorer
@@ -158,6 +160,11 @@ func _ready() -> void:
 		os.installed(p, icon)
 	for p in task.printers:
 		os.add_printer(p)
+	for s in task.sound_devices:
+		os.add_sound_device(s)
+	os.is_mute = task.sound_muted
+	os.set_selected_sound_device(task.sound_device)
+	os.change_sound_volumn(task.sound_volume)
 
 	for p in task.processes:
 		var w: OsWindow2 = null
@@ -180,7 +187,9 @@ func _ready() -> void:
 	os.disk_free_mb = task.disk_free_mb
 
 	clock.text = EventManager.get_clock_text()
+	disk.text = "พื้นที่ที่เหลือ %s" % [size_text(os.disk_free_mb)]
 	start_button.pressed.connect(self._on_start_button)
+	sound.pressed.connect(self._open_sound)
 
 	start_menu = PopupMenu.new()
 	start_menu.popup_window = false
@@ -853,7 +862,9 @@ func open_settings() -> void:
 		w.restore(true)
 		_settings_installed_list = w.get_node("%Apps")
 		var printer_btn = w.get_node("%SecPrinters") as Button
+		var sound_btn = w.get_node("%SecSound") as Button
 		printer_btn.pressed.connect(self._open_printer)
+		sound_btn.pressed.connect(self._open_sound)
 		screen.add_child(w)
 		os.add_instance(w)
 	else:
@@ -969,9 +980,69 @@ func _refresh_printer() -> void:
 			_printer_found_list.add_child(node)
 
 
+# NOTE: Sound's Setting Logic
+func _open_sound() -> void:
+	var w = _find_window(DesktopOS.WinType.Sound)
+	if w == null:
+		w = load(SOUND_SETTING).instantiate() as OsWindow2
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred(),
+		)
+		var device_list = w.get_node("%Device") as OptionButton
+		var mute = w.get_node("%Mute") as CheckBox
+		var volume_slider = w.get_node("%Volume") as HSlider
+		var volume_label = w.get_node("%VolumeLabel") as Label
+		var test_btn = w.get_node("%Test") as Button
+		var result_text = w.get_node("%Result") as Label
+		for dev_id in os.sound_dev_map:
+			var dev = os.sound_dev_map.get(dev_id) as DesktopSoundDevice
+			device_list.add_item(dev.name, dev_id)
+		device_list.selected = os.selected_sound_dev
+		device_list.item_selected.connect(os.set_selected_sound_device)
+		mute.toggle_mode = os.is_mute
+		mute.pressed.connect(
+			func():
+				os.is_mute = !os.is_mute,
+		)
+		volume_slider.min_value = 0
+		volume_slider.max_value = 100
+		volume_slider.value = os.sound_volume
+		volume_slider.step = 1
+		volume_slider.value_changed.connect(
+			func(value: float):
+				os.change_sound_volumn(int(value))
+				volume_label.text = str(os.sound_volume),
+		)
+		volume_label.text = str(os.sound_volume)
+		test_btn.pressed.connect(
+			func():
+				result_text.text = test_sound(),
+		)
+		w.restore(true)
+		screen.add_child(w)
+	else:
+		w.restore()
+
+
+func test_sound() -> String:
+	sound_tested = true
+	var dev = os.sound_dev_map.get(os.selected_sound_dev) as DesktopSoundDevice
+	if !os.installed_programs.has("ไดรเวอร์เสียง"):
+		return "ไม่มีไดรเวอร์เสียง เครื่องไม่รู้จักลำโพงเลย"
+	if task.sound_devices.is_empty() || (dev.works && !os.is_mute):
+		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
+	if os.is_mute:
+		return "เงียบ… (ปิดเสียงอยู่)"
+	if os.sound_volume < 20:
+		return "เบามากจนไม่ได้ยิน"
+	return "เงียบ… เสียงไปออกที่ \"%s\"" % dev.name
+
+
 func _refresh_all():
 	_refresh_explorer()
 	_refresh_setting()
+	disk.text = "พื้นที่ที่เหลือ %s" % [size_text(os.disk_free_mb)]
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:

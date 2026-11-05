@@ -6,6 +6,7 @@ enum WinType {
 	Settings,
 	TaskManager,
 	Printer,
+	Sound,
 }
 
 
@@ -54,6 +55,12 @@ class Printer extends RefCounted:
 	var is_install: bool
 
 
+# NOTE: when sound device need to have different setting for each one
+# class SoundDev extends RefCounted:
+# 	var data: DesktopSoundDevice
+# 	var is_mute: bool
+# 	var volume: int
+
 ## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
 signal process_changed
 
@@ -69,6 +76,11 @@ var process_map: Dictionary[int, Process] = { }
 var autostart_map: Dictionary[int, Process] = { }
 var printer_map: Dictionary[int, Printer] = { }
 var printer_default_index: int = -1
+var sound_dev_map: Dictionary[int, DesktopSoundDevice] = { }
+var selected_sound_dev: int = -1
+var is_mute = false
+var sound_volume = 0
+
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
 var current_id = 0
@@ -242,6 +254,9 @@ func remove_printer(id: int) -> bool:
 
 	if printer_default_index < 0:
 		return true
+	if id != printer_default_index:
+		return true
+
 	printer_default_index = -1
 	for index in printer_map:
 		printer = printer_map.get(index) as Printer
@@ -267,6 +282,22 @@ func print_test() -> String:
 		p.data.name,
 		"ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…",
 	]
+
+
+func add_sound_device(dev: DesktopSoundDevice):
+	var id = sound_dev_map.size()
+	sound_dev_map.set(id, dev)
+
+
+func set_selected_sound_device(id: int) -> bool:
+	if !sound_dev_map.has(id):
+		return false
+	selected_sound_dev = id
+	return true
+
+
+func change_sound_volumn(value: int):
+	sound_volume = value
 
 
 func _on_instance_closed(proc_id: int) -> void:
