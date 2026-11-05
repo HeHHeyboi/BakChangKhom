@@ -7,6 +7,7 @@ enum WinType {
 	TaskManager,
 	Printer,
 	Sound,
+	Wifi,
 }
 
 
@@ -54,14 +55,19 @@ class Printer extends RefCounted:
 	var data: DesktopPrinter
 	var is_install: bool
 
-
 # NOTE: when sound device need to have different setting for each one
 # class SoundDev extends RefCounted:
 # 	var data: DesktopSoundDevice
 # 	var is_mute: bool
 # 	var volume: int
 
+
+class Wifi extends RefCounted:
+	var data: DesktopWifi
+	var connected: bool
 ## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
+
+
 signal process_changed
 
 
@@ -76,10 +82,11 @@ var process_map: Dictionary[int, Process] = { }
 var autostart_map: Dictionary[int, Process] = { }
 var printer_map: Dictionary[int, Printer] = { }
 var printer_default_index: int = -1
-var sound_dev_map: Dictionary[int, DesktopSoundDevice] = { }
+var sound_dev_list: Array[DesktopSoundDevice] = []
 var selected_sound_dev: int = -1
 var is_mute = false
 var sound_volume = 0
+var wifi_detected: Array[Wifi] = []
 
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
@@ -285,12 +292,11 @@ func print_test() -> String:
 
 
 func add_sound_device(dev: DesktopSoundDevice):
-	var id = sound_dev_map.size()
-	sound_dev_map.set(id, dev)
+	sound_dev_list.append(dev)
 
 
 func set_selected_sound_device(id: int) -> bool:
-	if !sound_dev_map.has(id):
+	if id > sound_dev_list.size():
 		return false
 	selected_sound_dev = id
 	return true
