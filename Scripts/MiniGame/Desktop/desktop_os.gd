@@ -171,9 +171,8 @@ func clear_trash() -> void:
 	fs = kept
 
 
-func add_instance(win: OsWindow2) -> int:
+func add_instance(win: OsWindow2) -> void:
 	instances.append(win)
-	return instances.size() - 1 # return index of instance
 
 
 func installed(program: DesktopProgram, app_icon: Texture2D = null):

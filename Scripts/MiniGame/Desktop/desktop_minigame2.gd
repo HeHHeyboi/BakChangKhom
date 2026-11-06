@@ -917,11 +917,11 @@ func _open_printer() -> void:
 		w = load(PRINTERS_SETTING).instantiate() as OsWindow2
 		w.restore(true)
 		w.set_meta("type", DesktopOS.WinType.Printer)
-		var id = os.add_instance(w)
+		os.add_instance(w)
 		w.closed.connect(
 			func():
 				w.queue_free.call_deferred()
-				os.instances.remove_at(id),
+				os.instances.erase(w),
 		)
 		_printer_install_list = w.get_node("%Installed")
 		_printer_found_list = w.get_node("%Found")
@@ -996,11 +996,11 @@ func _open_sound() -> void:
 	if w == null:
 		w = load(SOUND_SETTING).instantiate() as OsWindow2
 		w.set_meta("type", DesktopOS.WinType.Sound)
-		var index = os.add_instance(w)
+		os.add_instance(w)
 		w.closed.connect(
 			func():
 				w.queue_free.call_deferred()
-				os.instances.remove_at(index),
+				os.instances.erase(w),
 		)
 		var device_list = w.get_node("%Device") as OptionButton
 		var mute = w.get_node("%Mute") as CheckBox
@@ -1059,11 +1059,11 @@ func _open_wifi() -> void:
 	if w == null:
 		w = load(WIFI_SETTING).instantiate() as OsWindow2
 		w.set_meta("type", DesktopOS.WinType.Wifi)
-		var index = os.add_instance(w)
+		os.add_instance(w)
 		w.closed.connect(
 			func():
 				w.queue_free.call_deferred()
-				os.instances.remove_at(index),
+				os.instances.erase(w),
 		)
 		w.restore(true)
 		screen.add_child(w)
@@ -1090,7 +1090,7 @@ func _refresh_wifi(w):
 		info.text = "%s %s\n%s" % [
 			net.data.name,
 			"▮".repeat(net.data.signal_level),
-			"ตัองใส่รหัส" if net.data.locked else "ไม่ต้องใส่รหัส (สาธารณะ)",
+			"ต้องใส่รหัส" if net.data.locked else "ไม่ต้องใส่รหัส (สาธารณะ)",
 		]
 		password_input.visible = net.data.locked
 		connect_btn.text = "เชื่อมต่อ" if !net.is_connected else "ตัดการเชื่อมต่อ"
