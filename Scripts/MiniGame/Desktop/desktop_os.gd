@@ -64,7 +64,8 @@ class Printer extends RefCounted:
 
 class Wifi extends RefCounted:
 	var data: DesktopWifi
-	var connected: bool
+	var is_connected: bool
+	var id: int
 ## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
 
 
@@ -87,6 +88,7 @@ var selected_sound_dev: int = -1
 var is_mute = false
 var sound_volume = 0
 var wifi_detected: Array[Wifi] = []
+var connected_network: int = -1
 
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
@@ -169,8 +171,9 @@ func clear_trash() -> void:
 	fs = kept
 
 
-func add_instance(win: OsWindow2) -> void:
+func add_instance(win: OsWindow2) -> int:
 	instances.append(win)
+	return instances.size() - 1 # return index of instance
 
 
 func installed(program: DesktopProgram, app_icon: Texture2D = null):
@@ -304,6 +307,41 @@ func set_selected_sound_device(id: int) -> bool:
 
 func change_sound_volumn(value: int):
 	sound_volume = value
+
+
+func add_wifi(wifi: DesktopWifi):
+	var w = Wifi.new()
+	w.data = wifi
+	w.id = wifi_detected.size()
+	wifi_detected.append(w)
+
+
+func wifi_connect(net: Wifi, password: String = "") -> bool:
+	var prev_wifi: Wifi = null
+	if connected_network >= 0:
+		prev_wifi = wifi_detected[connected_network] as Wifi
+	if net.data.locked:
+		var ok = net.data.password.casecmp_to(password)
+		if ok != 0 || password.is_empty():
+			return false
+	connected_network = net.id
+	net.is_connected = true
+	if prev_wifi != null:
+		prev_wifi.is_connected = false
+	return true
+
+
+func wifi_disconnect():
+	assert(connected_network >= 0)
+	var wifi = wifi_detected[connected_network]
+	wifi.is_connected = false
+	connected_network = -1
+
+
+func network_status() -> String:
+	if connected_network < 0:
+		return "ไม่ได้เชื่อมต่อ"
+	return "เชื่อมต่อ: %s" % [wifi_detected[connected_network].data.name]
 
 
 func _on_instance_closed(proc_id: int) -> void:
