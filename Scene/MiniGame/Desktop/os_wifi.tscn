@@ -27,8 +27,10 @@ layout_mode = 2
 
 [node name="Message" type="Label" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="2" unique_id=1885361179]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.2, 0.12, 1)
 theme_override_font_sizes/font_size = 14
+text = "รหัสผ่านไม่ถูกต้อง"
 
 [editable path="VBoxContainer/Topbar"]

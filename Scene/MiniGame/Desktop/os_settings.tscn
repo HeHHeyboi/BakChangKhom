@@ -1,88 +1,90 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bvrdwllankgwb"]
 
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://tkd4ebyaw0pg" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="2_icon"]
 
-[node name="OsSettings" instance=ExtResource("1_base")]
+[node name="OsSettings" unique_id=2077733558 instance=ExtResource("1_base")]
 custom_minimum_size = Vector2(600, 430)
 offset_right = 600.0
 offset_bottom = 430.0
 
-[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" parent_id_path=PackedInt32Array(64961897, 790668433) index="0" unique_id=1195365466]
 texture = ExtResource("2_icon")
 
-[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" parent_id_path=PackedInt32Array(64961897, 790668433) index="1" unique_id=1281458214]
 text = "ตั้งค่า"
 
-[node name="Sections" type="HFlowContainer" parent="VBoxContainer/Body/Content" index="0"]
+[node name="Sections" type="HFlowContainer" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="0" unique_id=478151295]
 layout_mode = 2
 
-[node name="SecPrinters" type="Button" parent="VBoxContainer/Body/Content/Sections" index="0"]
+[node name="SecPrinters" type="Button" parent="VBoxContainer/Body/Content/Sections" index="0" unique_id=1592739009]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "เครื่องพิมพ์"
 
-[node name="SecSound" type="Button" parent="VBoxContainer/Body/Content/Sections" index="1"]
+[node name="SecSound" type="Button" parent="VBoxContainer/Body/Content/Sections" index="1" unique_id=756354362]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "เสียง"
 
-[node name="SecWifi" type="Button" parent="VBoxContainer/Body/Content/Sections" index="2"]
+[node name="SecWifi" type="Button" parent="VBoxContainer/Body/Content/Sections" index="2" unique_id=600274792]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Wi-Fi"
 
-[node name="SecDisplay" type="Button" parent="VBoxContainer/Body/Content/Sections" index="3"]
+[node name="SecDisplay" type="Button" parent="VBoxContainer/Body/Content/Sections" index="3" unique_id=1309980438]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "จอภาพ"
 
-[node name="SecUpdate" type="Button" parent="VBoxContainer/Body/Content/Sections" index="4"]
+[node name="SecUpdate" type="Button" parent="VBoxContainer/Body/Content/Sections" index="4" unique_id=1532420321]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "อัปเดต"
 
-[node name="SecSecurity" type="Button" parent="VBoxContainer/Body/Content/Sections" index="5"]
+[node name="SecSecurity" type="Button" parent="VBoxContainer/Body/Content/Sections" index="5" unique_id=1606301256]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "ขมการ์ด"
 
-[node name="StorageTitle" type="Label" parent="VBoxContainer/Body/Content" index="1"]
+[node name="StorageTitle" type="Label" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="1" unique_id=1672305719]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "พื้นที่จัดเก็บ"
 
-[node name="DiskBar" type="ProgressBar" parent="VBoxContainer/Body/Content" index="2"]
+[node name="DiskBar" type="ProgressBar" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="2" unique_id=433681682]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 show_percentage = false
 
-[node name="DiskLabel" type="Label" parent="VBoxContainer/Body/Content" index="3"]
+[node name="DiskLabel" type="Label" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="3" unique_id=101325008]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.35, 0.4, 1)
 theme_override_font_sizes/font_size = 14
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer/Body/Content" index="4"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="4" unique_id=1254333848]
 layout_mode = 2
 
-[node name="AppsTitle" type="Label" parent="VBoxContainer/Body/Content" index="5"]
+[node name="AppsTitle" type="Label" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="5" unique_id=324010963]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "แอปที่ติดตั้ง"
 
-[node name="Scroll" type="ScrollContainer" parent="VBoxContainer/Body/Content" index="6"]
+[node name="Scroll" type="ScrollContainer" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="6" unique_id=1207890065]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Apps" type="VBoxContainer" parent="VBoxContainer/Body/Content/Scroll" index="0"]
+[node name="Apps" type="VBoxContainer" parent="VBoxContainer/Body/Content/Scroll" index="0" unique_id=1157566573]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+
+[editable path="VBoxContainer/Topbar"]

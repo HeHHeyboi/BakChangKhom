@@ -6,6 +6,7 @@ const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
 const C_INK := Color(0.23, 0.16, 0.11)
 const C_BAD := Color(0.75, 0.2, 0.12)
 const C_DIM := Color(0.4, 0.35, 0.3)
+const C_OK := Color(0.15, 0.5, 0.2)
 # NOTE: Load app scene
 const EXPLORER_SCENE := preload("res://Scene/MiniGame/Desktop/os_explorer.tscn")
 const BROWSER_SCENE := preload("res://Scene/MiniGame/Desktop/os_browser.tscn")
@@ -40,6 +41,7 @@ const UPDATED_SETTING = "res://Scene/MiniGame/Desktop/os_update.tscn"
 const SECURITY_SETTING = "res://Scene/MiniGame/Desktop/os_security.tscn"
 const DISPLAY_SETTING = "res://Scene/MiniGame/Desktop/os_display.tscn"
 const WIFI_SETTING = "res://Scene/MiniGame/Desktop/os_wifi.tscn"
+const NET_INFO = "res://Scene/MiniGame/Desktop/os_net_row.tscn"
 
 
 # NOTE: Icon Texture
@@ -162,6 +164,9 @@ func _ready() -> void:
 		os.add_printer(p)
 	for s in task.sound_devices:
 		os.add_sound_device(s)
+	for w in task.wifi:
+		os.add_wifi(w)
+
 	os.is_mute = task.sound_muted
 	os.set_selected_sound_device(task.sound_device)
 	os.change_sound_volumn(task.sound_volume)
@@ -208,6 +213,7 @@ func _ready() -> void:
 	explorer.pressed.connect(open_explorer)
 	browser.pressed.connect(open_browser)
 	settings.pressed.connect(open_settings)
+	wifi.pressed.connect(self._open_wifi)
 
 	_popup_timer.wait_time = popup_every
 	_popup_timer.timeout.connect(
@@ -295,7 +301,7 @@ func _on_file_menu(id: int) -> void:
 
 func _find_window(type: DesktopOS.WinType) -> OsWindow2:
 	for w: OsWindow2 in os.instances:
-		if !w.has_meta("type"):
+		if w.is_queued_for_deletion() || !w.has_meta("type"):
 			continue
 		if w.get_meta("type") == type:
 			return w
@@ -863,8 +869,10 @@ func open_settings() -> void:
 		_settings_installed_list = w.get_node("%Apps")
 		var printer_btn = w.get_node("%SecPrinters") as Button
 		var sound_btn = w.get_node("%SecSound") as Button
+		var wifi_btn = w.get_node("%SecWifi") as Button
 		printer_btn.pressed.connect(self._open_printer)
 		sound_btn.pressed.connect(self._open_sound)
+		wifi_btn.pressed.connect(self._open_wifi)
 		screen.add_child(w)
 		os.add_instance(w)
 	else:
@@ -909,9 +917,11 @@ func _open_printer() -> void:
 		w = load(PRINTERS_SETTING).instantiate() as OsWindow2
 		w.restore(true)
 		w.set_meta("type", DesktopOS.WinType.Printer)
+		var id = os.add_instance(w)
 		w.closed.connect(
 			func():
-				w.queue_free.call_deferred(),
+				w.queue_free.call_deferred()
+				os.instances.remove_at(id),
 		)
 		_printer_install_list = w.get_node("%Installed")
 		_printer_found_list = w.get_node("%Found")
@@ -985,9 +995,12 @@ func _open_sound() -> void:
 	var w = _find_window(DesktopOS.WinType.Sound)
 	if w == null:
 		w = load(SOUND_SETTING).instantiate() as OsWindow2
+		w.set_meta("type", DesktopOS.WinType.Sound)
+		var index = os.add_instance(w)
 		w.closed.connect(
 			func():
-				w.queue_free.call_deferred(),
+				w.queue_free.call_deferred()
+				os.instances.remove_at(index),
 		)
 		var device_list = w.get_node("%Device") as OptionButton
 		var mute = w.get_node("%Mute") as CheckBox
@@ -1045,7 +1058,64 @@ func _open_wifi() -> void:
 	var w = _find_window(DesktopOS.WinType.Wifi)
 	if w == null:
 		w = load(WIFI_SETTING).instantiate() as OsWindow2
-	pass
+		w.set_meta("type", DesktopOS.WinType.Wifi)
+		var index = os.add_instance(w)
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred()
+				os.instances.remove_at(index),
+		)
+		w.restore(true)
+		screen.add_child(w)
+	else:
+		w.restore()
+	_refresh_wifi(w)
+
+
+func _refresh_wifi(w):
+	var network_info = load(NET_INFO)
+	var network_container = w.get_node("%Networks") as VBoxContainer
+	for n in network_container.get_children():
+		n.queue_free()
+	var status = w.get_node("%Status") as Label
+	var msg = w.get_node("%Message") as Label
+	status.text = os.network_status()
+	status.add_theme_color_override("font_color", C_BAD if os.connected_network < 0 else C_OK)
+	msg.visible = false
+	for net in os.wifi_detected:
+		var node = network_info.instantiate() as Control
+		var info = node.get_node("%Info") as Label
+		var password_input = node.get_node("%Password") as LineEdit
+		var connect_btn = node.get_node("%Connect") as Button
+		info.text = "%s %s\n%s" % [
+			net.data.name,
+			"▮".repeat(net.data.signal_level),
+			"ตัองใส่รหัส" if net.data.locked else "ไม่ต้องใส่รหัส (สาธารณะ)",
+		]
+		password_input.visible = net.data.locked
+		connect_btn.text = "เชื่อมต่อ" if !net.is_connected else "ตัดการเชื่อมต่อ"
+		connect_btn.pressed.connect(
+			func():
+				if net.is_connected:
+					os.wifi_disconnect()
+					_refresh_wifi(w)
+					return
+				var ok = os.wifi_connect(net, password_input.text)
+				msg.visible = !ok
+				if !ok:
+					return
+				if !net.data.right:
+					_trap(
+						&"open_wifi",
+						"wifi_" + net.data.name,
+						&"safety",
+						10,
+						"ต่อ Wi-Fi สาธารณะที่ไม่มีรหัส (%s)" % net.data.name,
+					)
+					_pib_say("เน็ตฟรีไม่มีรหัสแบบนี้ ใครก็แอบดูข้อมูลได้ ใช้เน็ตบ้านลูกค้าดีกว่า", PibHint.Mood.WORRY)
+				_refresh_wifi(w),
+		)
+		network_container.add_child(node)
 
 
 func _refresh_all():
