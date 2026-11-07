@@ -170,6 +170,8 @@ func _ready() -> void:
 	os.is_mute = task.sound_muted
 	os.set_selected_sound_device(task.sound_device)
 	os.change_sound_volumn(task.sound_volume)
+	os.selected_scale = os.scale_list.find(task.display_scale)
+	_apply_display(task.display_scale)
 
 	for p in task.processes:
 		var w: OsWindow2 = null
@@ -870,9 +872,11 @@ func open_settings() -> void:
 		var printer_btn = w.get_node("%SecPrinters") as Button
 		var sound_btn = w.get_node("%SecSound") as Button
 		var wifi_btn = w.get_node("%SecWifi") as Button
+		var display_btn = w.get_node("%SecDisplay") as Button
 		printer_btn.pressed.connect(self._open_printer)
 		sound_btn.pressed.connect(self._open_sound)
 		wifi_btn.pressed.connect(self._open_wifi)
+		display_btn.pressed.connect(self._open_display)
 		screen.add_child(w)
 		os.add_instance(w)
 	else:
@@ -1075,10 +1079,10 @@ func _open_wifi() -> void:
 func _refresh_wifi(w):
 	var network_info = load(NET_INFO)
 	var network_container = w.get_node("%Networks") as VBoxContainer
-	for n in network_container.get_children():
-		n.queue_free()
 	var status = w.get_node("%Status") as Label
 	var msg = w.get_node("%Message") as Label
+	for n in network_container.get_children():
+		n.queue_free()
 	status.text = os.network_status()
 	status.add_theme_color_override("font_color", C_BAD if os.connected_network < 0 else C_OK)
 	msg.visible = false
@@ -1116,6 +1120,91 @@ func _refresh_wifi(w):
 				_refresh_wifi(w),
 		)
 		network_container.add_child(node)
+
+
+# NOTE: Display's Setting Logic
+func _open_display() -> void:
+	var w = _find_window(DesktopOS.WinType.Display)
+	if w == null:
+		w = load(DISPLAY_SETTING).instantiate() as OsWindow2
+		os.add_instance(w)
+		w.restore(true)
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred()
+				os.instances.erase(w),
+		)
+		var opt = w.get_node("%Options") as Control
+		var resolutions_opt = w.get_node("%Resolution") as OptionButton
+		var scale_opt = w.get_node("%Scale") as OptionButton
+		var pending = w.get_node("%Pending") as Control
+		var pending_msg = w.get_node("%PendingMessage") as Control
+		var keep_btn = w.get_node("%Keep") as Button
+		var revert_btn = w.get_node("%Revert") as Button
+		for r in task.resolutions:
+			var opt_str = r.name
+			if r.best:
+				opt_str += " (แนะนำ)"
+			resolutions_opt.add_item(opt_str)
+		for s in os.scale_list:
+			var opt_str = str(s)
+			if task.display_scale_best == s:
+				opt_str += " (แนะนำ)"
+			scale_opt.add_item(opt_str)
+		scale_opt.selected = os.selected_scale
+		keep_btn.pressed.connect(
+			func():
+				keep_resolution(true)
+				opt.show()
+				pending.hide()
+				resolutions_opt.selected = os.selected_resolution,
+		)
+		revert_btn.pressed.connect(
+			func():
+				keep_resolution(false)
+				opt.show()
+				pending.hide()
+				resolutions_opt.selected = os.selected_resolution,
+		)
+		resolutions_opt.item_selected.connect(
+			func(index: int):
+				if !task.resolutions[index].ok:
+					os.pending_resolution = index
+					opt.hide()
+					pending.show()
+					pending_msg.text = "จอดับ… \"%s\" — จอนี้แสดงไม่ได้\nจะเก็บค่านี้ไว้ไหม?" % task \
+							.resolutions[os.pending_resolution] \
+							.name
+				else:
+					os.selected_resolution = index
+					_apply_display(os.scale_list[os.selected_scale]),
+		)
+		scale_opt.item_selected.connect(
+			func(index: int):
+				os.selected_scale = index
+				_apply_display(os.scale_list[index]),
+		)
+		screen.add_child(w)
+	else:
+		w.restore()
+
+
+func _apply_display(scale_pct: float) -> void:
+	if task.goal != DesktopTask.Goal.DISPLAY:
+		return
+	var f := scale_pct / 100.0
+	if !task.resolutions.is_empty() && !task.resolutions[os.selected_resolution].best:
+		f *= 1.35
+	desktop.scale = Vector2.ONE * clampf(f, 1.0, 2.0)
+
+
+func keep_resolution(keep: bool) -> void:
+	if os.pending_resolution < 0:
+		return
+	if keep:
+		_trap(&"bad_resolution", "badres", &"fix", 10, "เก็บความละเอียดที่จอไม่รองรับ (จอดำ)")
+		_pib_say("จอดำเลย! ความละเอียดที่จอไม่รองรับต้องกดคืนค่าเดิม เลือกอันที่มีคำว่าแนะนำ", PibHint.Mood.WORRY)
+	os.pending_resolution = -1
 
 
 func _refresh_all():

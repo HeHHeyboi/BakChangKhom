@@ -8,6 +8,7 @@ enum WinType {
 	Printer,
 	Sound,
 	Wifi,
+	Display,
 }
 
 
@@ -66,7 +67,6 @@ class Wifi extends RefCounted:
 	var data: DesktopWifi
 	var is_connected: bool
 	var id: int
-## เปลี่ยนทุกครั้งที่ process เกิด/จบ (ตัวจัดการงานใช้รีเฟรชรายการ)
 
 
 signal process_changed
@@ -89,6 +89,10 @@ var is_mute = false
 var sound_volume = 0
 var wifi_detected: Array[Wifi] = []
 var connected_network: int = -1
+var scale_list = [100, 125, 150, 175, 200]
+var selected_resolution = 0
+var pending_resolution = -1
+var selected_scale = -1
 
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
@@ -225,6 +229,14 @@ func kill_process(proc_id: int) -> bool:
 	return true
 
 
+func _on_instance_closed(proc_id: int) -> void:
+	var p := process_map.get(proc_id) as Process
+	if p != null and is_instance_valid(p.instance):
+		p.instance.remove_meta("pid")
+	if process_map.erase(proc_id):
+		process_changed.emit()
+
+
 func boot_time() -> int:
 	var result = 0
 	for pid in autostart_map:
@@ -341,11 +353,3 @@ func network_status() -> String:
 	if connected_network < 0:
 		return "ไม่ได้เชื่อมต่อ"
 	return "เชื่อมต่อ: %s" % [wifi_detected[connected_network].data.name]
-
-
-func _on_instance_closed(proc_id: int) -> void:
-	var p := process_map.get(proc_id) as Process
-	if p != null and is_instance_valid(p.instance):
-		p.instance.remove_meta("pid")
-	if process_map.erase(proc_id):
-		process_changed.emit()
