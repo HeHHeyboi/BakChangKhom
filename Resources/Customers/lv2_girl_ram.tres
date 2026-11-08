@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_girl_ram"
+customer = "เด็กหญิง"
+reason = "ต้องใช้คอมพิมพ์รายงานส่งครูพรุ่งนี้"
+device = "คอมพิวเตอร์ที่บ้านของน้อง"
+symptom = "เมื่อวานแม่ทำความสะอาดโต๊ะแล้วชนเครื่อง วันนี้เปิดแล้วจอดำ มีเสียงปี๊บ"
+level = 2
+est_slots = 3
+due_shifts = 1
+months = PackedInt32Array(1, 2, 3, 6, 7, 8, 9, 11, 12)
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_girl_ram.txt"
+thanks_text = "พิมพ์รายงานทันแล้วค่ะ ขอบคุณพี่ขม!"
+complain_text = "ยังจอดำอยู่เลยค่ะพี่… หนูไปพิมพ์ที่บ้านเพื่อนก่อนนะ"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv4_coworker_frontpanel"
+customer = "เพื่อนร่วมงาน"
+reason = "ย้ายคอนโดแล้วขนคอมมาเอง"
+device = "คอมพิวเตอร์ตั้งโต๊ะของเพื่อนร่วมงาน"
+symptom = "ย้ายห้องเสร็จกดปุ่มเปิดไม่ติด แถมก่อนย้ายก็ช้าผิดปกติ"
+level = 4
+est_slots = 5
+due_shifts = 1
+part_id = "part_front_panel"
+job_title = "เสียบสายหน้าเคส + จัดแรม Dual Channel"
+arrive_dialog = "res://Assets/Dialog/Customer/lv4_coworker_frontpanel.txt"
+thanks_text = "เปิดติดแล้ว เร็วขึ้นเหมือนได้เครื่องใหม่ ไว้แนะนำเพื่อนให้นะ"
+complain_text = "ยังไม่ติดเลยว่ะขม ไว้ค่อยว่ากันนะ"

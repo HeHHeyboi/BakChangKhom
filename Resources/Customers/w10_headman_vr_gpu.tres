@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w10_headman_vr_gpu"
+customer = "ผู้ใหญ่บ้าน"
+reason = "บูธ VR ของร้านในงานหมู่บ้าน"
+device = "คอมพิวเตอร์ที่ต่อแว่น VR ในบูธร้าน"
+symptom = "เด็ก ๆ ลองแว่น VR ได้สักพักภาพกระตุก แล้วจอดับ เครื่องร้อนจี๋"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/w10_headman_vr_gpu.txt"
+thanks_text = "บูธร้านคนต่อคิวยาวที่สุดในงานเลย!"
+complain_text = "ยังดับอยู่ เด็ก ๆ เลยต้องวาดรูปรอไปก่อน"
+forced = true

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_kid_gpu_used"
+customer = "เด็ก"
+reason = "รวมเงินกับเพื่อนซื้อการ์ดจอมือสองมา"
+device = "คอมพิวเตอร์ของน้อง ใส่การ์ดจอมือสองที่เพิ่งซื้อ"
+symptom = "เล่นเกมได้สักพักภาพกระตุก แล้วจอดับไปเลย"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_kid_gpu_used.txt"
+thanks_text = "เล่นได้ลื่นแล้ว! เพื่อน ๆ ต้องอิจฉาแน่"
+complain_text = "ยังกระตุกอยู่เลยพี่… ผมจะไปบอกเพื่อนก่อน"

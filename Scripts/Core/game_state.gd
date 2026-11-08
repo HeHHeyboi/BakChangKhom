@@ -283,7 +283,7 @@ func chapter_profit(ch: int) -> int:
 	return chapter_income(ch) - chapter_expense(ch)
 
 
-## [0.2.0] เดือนของบท (4 บท = 1 เดือน)
+## [0.2.0] เดือนของบท · [0.2.5] 1 บท = 1 เดือน (TimeSystem.WEEKS_PER_MONTH = 1) → คืนบทเดิม
 static func month_of(ch: int) -> int:
 	return floori((maxi(ch, 1) - 1) / float(TimeSystem.WEEKS_PER_MONTH)) + 1
 
@@ -407,8 +407,11 @@ func close_month(m: int) -> Dictionary:
 	var counted := m > e.grace_months
 	rep["counted"] = counted
 	rep["strike"] = counted and not bool(rep.reached)
+	# [0.2.5] นับพลาดเป้า "ติดกัน" — ถึงเป้าเดือนไหนเริ่มนับใหม่ (เกม 12 เดือน ให้โอกาสแก้ตัว)
 	if rep.strike:
 		missed_months += 1
+	elif counted:
+		missed_months = 0
 	debt_streak = debt_streak + 1 if debt > 0 else 0
 	shop_closed = shop_closed or missed_months >= e.fail_missed_months or debt_streak >= e.fail_debt_months
 	rep["missed_months"] = missed_months
@@ -677,7 +680,7 @@ func buy_block_reason(item: ItemDef, qty := 1) -> String:
 		return "ล็อก · ต้องเป็น%s" % e.rank_names[clampi(item.unlock_rank, 0, e.rank_names.size() - 1)]
 	var left := stock_left(item)
 	if left == 0:
-		return "ของหมด (มาใหม่สัปดาห์หน้า)"
+		return "ของหมด (มาใหม่เดือนหน้า)"
 	if left > 0 and qty > left:
 		return "ร้านเหลือแค่ %d" % left
 	if not can_afford(item.price * qty):

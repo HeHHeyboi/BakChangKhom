@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv5_teacher_bios"
+customer = "ครู"
+reason = "โรงเรียนได้งบเปลี่ยน SSD ใหม่ให้ห้องธุรการ"
+device = "คอมพิวเตอร์ห้องธุรการ ใส่ SSD ลูกใหม่"
+symptom = "ใส่ SSD ใหม่แล้วเปิดเครื่องขึ้นว่าหาไดรฟ์บูตไม่เจอ"
+level = 5
+est_slots = 8
+due_shifts = 1
+months = PackedInt32Array(5, 6, 10, 11)
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/lv5_teacher_bios.txt"
+thanks_text = "เปิดเร็วกว่าเดิมเยอะเลย ครูธุรการดีใจมาก"
+complain_text = "ยังขึ้นหาไดรฟ์ไม่เจออยู่เลยขม"

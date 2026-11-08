@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w11_boss_bios"
+customer = "หัวหน้า"
+reason = "หัวหน้าจากบริษัทเก่าขับรถมาหาถึงร้าน"
+device = "โน้ตบุ๊กทำงานของหัวหน้า เพิ่งเปลี่ยนไดรฟ์"
+symptom = "เปลี่ยนไดรฟ์แล้วเปิดไม่เข้าระบบ แรมก็วิ่งช้ากว่าสเปก"
+level = 5
+est_slots = 8
+due_shifts = 1
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/w11_boss_bios.txt"
+thanks_text = "ฝ่ายไอทีบริษัทยังทำไม่ได้ขนาดนี้ ข้อเสนอของบริษัทยังรออยู่นะขม"
+complain_text = "ยังไม่เข้าระบบ… ไม่เป็นไร คิดเรื่องข้อเสนอให้ดีนะ"
+forced = true

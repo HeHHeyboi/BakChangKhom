@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://Scripts/UI/month_summary.gd" id="1_ms"]
+[ext_resource type="Script" path="res://Scripts/UI/profit_chart.gd" id="2_chart"]
 [ext_resource type="Texture2D" uid="uid://c16rueah2nblt" path="res://Assets/CharacterSprite/char_pib_happy.png" id="2_pib"]
 
 [sub_resource type="StyleBoxFlat" id="SB_card"]
@@ -286,6 +287,28 @@ theme_override_colors/font_color = Color(0.45, 0.3, 0.15, 1)
 theme_override_font_sizes/font_size = 14
 text = "พลาดเป้า ●○"
 horizontal_alignment = 2
+
+[node name="ChartBox" type="HBoxContainer" parent="Card/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ChartTitle" type="Label" parent="Card/VBox/ChartBox"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.35, 0.25, 0.15, 1)
+theme_override_font_sizes/font_size = 13
+text = "กำไรทั้งปี
+▬ = เป้า"
+vertical_alignment = 1
+
+[node name="ProfitChart" type="Control" parent="Card/VBox/ChartBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("2_chart")
 
 [node name="PibRow" type="HBoxContainer" parent="Card/VBox"]
 layout_mode = 2

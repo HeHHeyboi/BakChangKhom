@@ -1,12 +1,12 @@
 @tool
 class_name WeekPlan extends Resource
-## งานของ 1 สัปดาห์ (3 กะ จ. พ. ศ. = 1 Chapter) ตาม Docs/LEVEL_DESIGN.md ข้อ 6
+## งานของ 1 บท ([0.2.5] 1 บท = 1 เดือน · เปิดร้าน 4 วัน วันที่ 4 · 11 · 18 · 25) ตาม Docs/LEVEL_DESIGN.md ข้อ 6
 ## แก้ใน Inspector: ดับเบิลคลิก Resources/Week/weekN.tres
 ##   shifts        — งานบังคับรายกะ (ช่อง 0 = กะ 1) ช่องว่าง = ไม่มีงานบังคับ · ลูกค้า forced เดินเข้ามาเอง
 ##   level_weights — สัดส่วนงานใหม่บนกระดาน Lv1–Lv5 (%) · ว่าง = ใช้ตาราง DayLoop.DEFAULT_WEIGHTS
 ## [Claude 5 ต.ค. 2569] · [9 ต.ค.] เปลี่ยน days (7 วัน) เป็น shifts (5 กะ) + level_weights
 
-## สัปดาห์ที่ (1–12)
+## บทที่ (1–12) = เดือน ม.ค.–ธ.ค. (ชื่อตัวแปรเดิม week)
 @export_range(1, 12) var week := 1
 ## งานบังคับรายกะ ≤ 5 ช่อง
 @export var shifts: Array[CustomerCase] = []
