@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w3_yai_grandpa_mainboard"
+customer = "ยาย"
+reason = "ยายอยากให้ใช้คอมเครื่องเก่าของตาในร้าน"
+device = "คอมพิวเตอร์เครื่องเก่าที่ตาเคยใช้ เก็บไว้ในห้องเก็บของ"
+symptom = "เปิดได้ไม่นานก็ดับ ตัวเครื่องร้อนมาก ฝุ่นจับหนา"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/w3_yai_grandpa_mainboard.txt"
+thanks_text = "ใช้ได้แล้วเหรอลูก ตาคงดีใจที่เครื่องนี้ได้อยู่ในร้านหลาน"
+complain_text = "ยังดับอยู่เลยลูก เก็บไว้เป็นที่ระลึกก็ได้นะ"
+forced = true

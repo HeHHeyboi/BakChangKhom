@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w7_yai_class_gpu"
+customer = "ยาย"
+reason = "คลาสสอนคอมที่ศาลา ยายเป็นนักเรียนคนแรก"
+device = "คอมพิวเตอร์ที่ศาลาหมู่บ้าน ต่อโปรเจกเตอร์ใช้สอน"
+symptom = "เปิดคลิปสอนแล้วภาพกระตุก สักพักจอดับ พัดลมดังมาก"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/w7_yai_class_gpu.txt"
+thanks_text = "ยายเห็นจอชัดแล้ว คลาสหน้ายายจะพิมพ์ชื่อหลานให้ครบเลย"
+complain_text = "ยังดับอยู่เลยลูก วันนี้ยายจดในสมุดไปก่อน"
+forced = true

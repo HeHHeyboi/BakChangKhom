@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_director_gpu"
+customer = "ผอ."
+reason = "นักเรียนจะใช้เครื่องซ้อมแข่ง e-sport ของอำเภอ"
+device = "คอมพิวเตอร์ห้องคอมโรงเรียน เครื่องที่แรงที่สุด"
+symptom = "เล่นเกมแข่งได้ไม่นานภาพกระตุก แล้วจอดับ เครื่องร้อนมาก"
+level = 3
+est_slots = 5
+due_shifts = 1
+months = PackedInt32Array(3, 4, 5, 6, 7, 8, 9, 10)
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_director_gpu.txt"
+thanks_text = "เด็ก ๆ ซ้อมได้ทั้งวันแล้ว ครูขอบใจมากนะขม"
+complain_text = "ยังดับอยู่ เด็ก ๆ คงต้องไปซ้อมร้านเกมแทน"

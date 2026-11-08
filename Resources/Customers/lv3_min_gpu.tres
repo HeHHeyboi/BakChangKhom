@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_min_gpu"
+customer = "มิ้น"
+reason = "ตัดต่อวิดีโอโปรโมทร้านไม่ทันกำหนด"
+device = "คอมพิวเตอร์ที่มิ้นใช้ตัดต่อ"
+symptom = "ตัดต่อวิดีโอแล้วภาพกระตุก พัดลมการ์ดจอหอนเสียงดัง"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_min_gpu.txt"
+thanks_text = "วิดีโอเสร็จแล้ว ลื่นมาก ฉันลงเพจร้านให้เลย"
+complain_text = "ยังกระตุกอยู่ ฉันว่าเราคงต้องเลื่อนลงคลิปก่อนนะ"

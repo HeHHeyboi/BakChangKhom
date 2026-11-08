@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv5_headman_bios"
+customer = "ผู้ใหญ่บ้าน"
+reason = "อำเภอส่งคอมเครื่องใหม่มาให้หมู่บ้าน"
+device = "คอมพิวเตอร์เครื่องใหม่จากอำเภอ"
+symptom = "เปิดเครื่องแล้วขึ้นว่าหาไดรฟ์บูตไม่เจอ ยังใช้ทำอะไรไม่ได้"
+level = 5
+est_slots = 8
+due_shifts = 1
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/lv5_headman_bios.txt"
+thanks_text = "ใช้ได้แล้ว ผู้ใหญ่จะได้ส่งรายงานออนไลน์ให้อำเภอเสียที"
+complain_text = "ยังใช้ไม่ได้เลยขม เครื่องใหม่แท้ ๆ"

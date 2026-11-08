@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WeekPlan" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="1_week"]
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="2_case"]
+[ext_resource type="Resource" path="res://Resources/Customers/w9_director_lab_bios.tres" id="c1"]
+
+[resource]
+script = ExtResource("1_week")
+week = 9
+shifts = Array[ExtResource("2_case")]([ExtResource("c1")])
+note = "[0.2.5] บท 9 ก.ย. สอนที่โรงเรียน · ผอ.ขอความร่วมมือ · วันที่ 1 ของบท ลูกค้าเนื้อเรื่อง (forced) เดินเข้ามาเอง · ที่เหลือสุ่มตาม DEFAULT_WEIGHTS"

@@ -49,10 +49,10 @@ func _ready() -> void:
 	_check(GameState.ledger.back().kind == &"other", "หมวดที่ไม่รู้จัก → อื่น ๆ")
 
 	# ---- บิล: จ่ายหลัง TimeSystem ขึ้นบท 2 แล้ว ต้องจดเข้าบท 1
-	ts.set_shift(13) # ขึ้นเดือน ก.พ. แล้ว
+	ts.set_shift(5) # [0.2.5] วันที่ 5 = บท 2 = ก.พ.
 	var bill := GameState.pay_month_bill(1, 10)
-	_check(int(GameState.chapter_by_kind(4).get(&"bill", 0)) == -int(bill.paid) and GameState.month_entries(2).is_empty(), "บิล ม.ค. (จ่ายตอนขึ้น ก.พ.) จดเข้าบท 4 = เดือน ม.ค. · ก.พ. ยังว่าง")
-	_check(GameState.month_of(1) == 1 and GameState.month_of(4) == 1 and GameState.month_of(5) == 2 and GameState.month_of(12) == 3, "บท 1–4 = ม.ค. · 5 = ก.พ. · 12 = มี.ค.")
+	_check(int(GameState.chapter_by_kind(1).get(&"bill", 0)) == -int(bill.paid) and GameState.month_entries(2).is_empty(), "บิล ม.ค. (จ่ายตอนขึ้น ก.พ.) จดเข้าบท 1 = เดือน ม.ค. · ก.พ. ยังว่าง")
+	_check(GameState.month_of(1) == 1 and GameState.month_of(2) == 2 and GameState.month_of(12) == 12, "[0.2.5] 1 บท = 1 เดือน: บท 1 = ม.ค. · บท 12 = ธ.ค.")
 
 	# ---- ผลรวม = เงินที่เปลี่ยนจริง · กำไรไม่นับลงทุน
 	var total := 0
@@ -85,72 +85,86 @@ func _ready() -> void:
 	var bar: MonthGoalBar = DayLoop.goal_bar
 	_check(bar != null and bar.get_parent().name == "GoalLayer" and (bar.get_parent() as CanvasLayer).layer == 100, "แถบเป้าอยู่ใน day_loop.tscn → GoalLayer ชั้น 100")
 	_check(DayLoop._day_skip != null and DayLoop._day_skip.get_parent().name == "DaySkipLayer" and (DayLoop._day_skip.get_parent() as CanvasLayer).layer == 110, "ข้ามวันอยู่ใน day_loop.tscn → DaySkipLayer ชั้น 110")
-	_check(GameState.economy.target_for(1) == 1200 and GameState.economy.target_for(3) == 6000, "เป้า ม.ค. = ฿1,200 · มี.ค. = ฿6,000 (เปิด 3 วัน/สัปดาห์)")
+	_check(GameState.economy.target_for(1) == 200 and GameState.economy.target_for(12) == 2000 and GameState.economy.month_target.size() == 12, "[0.2.5] เป้า 12 เดือน: ม.ค. ฿200 · ธ.ค. ฿2,000")
 	GameState.reset()
 	ts.set_shift(2)
 	GameState.record_repair(&"part_ram", 100, false, -1, 1) # +80
 	bar.refresh()
-	_check(bar._title.text == "เป้า ม.ค." and bar._value.text.begins_with("฿80/฿1,200") and bar._value.text.contains("เหลือ 10 วัน") and absf(bar._bar.value - 80.0 / 1200.0) < 0.01, "แถบเป้า: %s · %.2f" % [bar._value.text, bar._bar.value])
+	_check(bar._title.text == "เป้า ม.ค." and bar._value.text.begins_with("฿80/฿200") and bar._value.text.contains("เหลือ 2 วัน") and absf(bar._bar.value - 80.0 / 200.0) < 0.01, "แถบเป้า: %s · %.2f" % [bar._value.text, bar._bar.value])
 	GameState.buy(load("res://Resources/Shop/storage_shelf.tres"))
 	bar.refresh()
 	_check(bar._value.text.begins_with("฿80/"), "ซื้อชั้นเหล็ก (ลงทุน) ไม่ทำให้กำไรในแถบลด")
-	ts.set_shift(10) # บท 4 (สัปดาห์ 4) ยังเป็น ม.ค. → กำไรรวมทั้งเดือน
+	ts.set_shift(4) # วันที่ 4 (25 ม.ค.) ยังเป็น ม.ค. → กำไรรวมทั้งเดือน
 	GameState.add_money(1950, &"fee", "test")
 	bar.refresh()
-	_check(bar._value.text.begins_with("฿2,030/") and bar._value.text.contains("ถึงเป้าแล้ว") and bar._fill.bg_color == bar.reached_color, "กำไรรวมทั้งเดือน ฿2,030 ≥ ฿1,200 → ถึงเป้าแล้ว (แถบเขียว)")
+	_check(bar._value.text.begins_with("฿2,030/") and bar._value.text.contains("ถึงเป้าแล้ว") and bar._fill.bg_color == bar.reached_color, "กำไรรวมทั้งเดือน ฿2,030 ≥ ฿200 → ถึงเป้าแล้ว (แถบเขียว)")
 	GameState.add_money(-2300, &"buy", "test")
 	bar.refresh()
 	_check(bar._value.text.begins_with("−฿270/") and is_zero_approx(bar._bar.value), "ขาดทุน → แสดง −฿270 แถบว่าง")
-	ts.set_shift(13)
+	ts.set_shift(5)
 	bar.refresh()
-	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿4,200"), "ขึ้นบท 5 = ก.พ. → เป้า ฿4,200 เริ่มจาก 0")
+	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿300"), "ขึ้นบท 2 = ก.พ. → เป้า ฿300 เริ่มจาก 0")
 
-	# ---- [0.2.0-E/F] ปิดเดือน: เป้า · ค่าปรับ · พลาดเป้า · ร้านปิด
+	# ---- [0.2.0-E/F · 0.2.5] ปิดเดือน: เป้า · ค่าปรับ · พลาดเป้าติดกัน · ร้านปิด
 	GameState.reset()
 	GameState.help_mode = false
 	ts.set_shift(1)
-	GameState.add_money(500, &"fee", "test")
+	GameState.add_money(100, &"fee", "test")
 	var r1 := GameState.close_month(1)
-	_check(not r1.reached and not r1.counted and not r1.strike and GameState.missed_months == 0, "ม.ค. ไม่ถึงเป้าแต่เดือนแรกยังไม่นับ")
-	_check(String(r1.hint) != "" and r1.target == 1200 and r1.profit == 500, "รายงานเดือน: กำไร ฿500 / เป้า ฿1,200 · ปิ๊บ: %s" % r1.hint)
-	ts.set_shift(13)
-	GameState.add_money(300, &"fee", "test")
+	_check(not r1.reached and not r1.counted and not r1.strike and GameState.missed_months == 0, "ม.ค. ไม่ถึงเป้าแต่ช่วงเรียนรู้ยังไม่นับ")
+	_check(String(r1.hint) != "" and r1.target == 200 and r1.profit == 100, "รายงานเดือน: กำไร ฿100 / เป้า ฿200 · ปิ๊บ: %s" % r1.hint)
+	ts.set_shift(5)
 	var r2 := GameState.close_month(2)
-	_check(r2.strike and GameState.missed_months == 1 and not GameState.shop_closed, "ก.พ. ไม่ถึงเป้า → พลาด 1/2 ร้านยังเปิด")
+	_check(not r2.counted and not r2.strike and GameState.missed_months == 0, "[0.2.5] ก.พ. ยังเป็นช่วงเรียนรู้ (grace 2 เดือน)")
+	ts.set_shift(9)
+	var r3 := GameState.close_month(3)
+	_check(r3.strike and GameState.missed_months == 1 and not GameState.shop_closed, "มี.ค. ไม่ถึงเป้า → พลาด 1/3 ร้านยังเปิด")
 	GameState.money = 100
 	GameState.debt = 0
-	var bill1 := GameState.pay_month_bill(2, 0)
+	var bill1 := GameState.pay_month_bill(3, 0)
 	_check(bill1.late_fee == 0 and GameState.debt > 0, "บิลเกินเงิน → ค้าง ฿%d (ยังไม่มีค่าปรับ)" % GameState.debt)
 	var d0 := GameState.debt
 	GameState.money = 0
-	var bill2 := GameState.pay_month_bill(3, 0)
+	var bill2 := GameState.pay_month_bill(4, 0)
 	_check(bill2.late_fee == ceili(d0 * 0.1) and bill2.prev_debt == d0, "เดือนต่อไปค่าปรับ 10%% ของยอดค้าง = ฿%d" % bill2.late_fee)
 	GameState.help_mode = true
-	_check(GameState.target_of(3) == 4200 and GameState.pay_month_bill(3, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿4,200) · ไม่มีค่าปรับ")
+	_check(GameState.target_of(4) == 560 and GameState.pay_month_bill(4, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿800 → ฿560) · ไม่มีค่าปรับ")
 	GameState.help_mode = false
-	ts.set_shift(25)
-	var r3 := GameState.close_month(3)
-	_check(r3.strike and GameState.missed_months == 2 and GameState.shop_closed and GameState.decide_ending() == &"failure", "พลาดเป้า 2 เดือน → ร้านปิด → ฉากจบล้มเหลว")
-	_check(GameState.month_results.size() == 3, "เก็บผล 3 เดือนไว้ใน month_results")
+	GameState.debt = 0
+	ts.set_shift(13)
+	var r4 := GameState.close_month(4)
+	_check(r4.strike and GameState.missed_months == 2 and not GameState.shop_closed, "เม.ย. พลาดอีก → 2/3 ติดกัน")
+	ts.set_shift(17)
+	GameState.add_money(2000, &"fee", "test")
+	var r5m := GameState.close_month(5)
+	_check(r5m.reached and GameState.missed_months == 0 and not GameState.shop_closed, "[0.2.5] พ.ค. ถึงเป้า → นับพลาดใหม่ (0/3)")
+	for m in [6, 7]:
+		ts.set_shift((m - 1) * TimeSystem.SHIFTS_PER_WEEK + 1)
+		GameState.close_month(m)
+	_check(GameState.missed_months == 2 and not GameState.shop_closed, "มิ.ย.–ก.ค. พลาด 2/3 ร้านยังเปิด")
+	ts.set_shift(29)
+	var r8 := GameState.close_month(8)
+	_check(r8.strike and GameState.missed_months == 3 and GameState.shop_closed and GameState.decide_ending() == &"failure", "พลาดเป้า 3 เดือนติด → ร้านปิด → ฉากจบล้มเหลว")
+	_check(GameState.month_results.size() == 8, "เก็บผล 8 เดือนไว้ใน month_results")
 	GameState.reset()
 	_check(not GameState.shop_closed and GameState.missed_months == 0 and GameState.month_results.is_empty(), "reset() ล้างผลสิ้นเดือน")
 	# ถึงเป้า → ชื่อเสียงเพิ่ม · ไม่นับพลาด
-	ts.set_shift(13)
+	ts.set_shift(5)
 	var rep0 := GameState.reputation
 	GameState.add_money(9500, &"fee", "test")
-	var r4 := GameState.close_month(2)
-	_check(r4.reached and r4.over and not r4.strike and GameState.reputation > rep0, "ก.พ. ฿9,500 ≥ ฿4,200×1.3 → เกินเป้า · ชื่อเสียง +%d" % (GameState.reputation - rep0))
+	var r4b := GameState.close_month(2)
+	_check(r4b.reached and r4b.over and not r4b.strike and GameState.reputation > rep0, "ก.พ. ฿9,500 ≥ ฿300×1.3 → เกินเป้า · ชื่อเสียง +%d" % (GameState.reputation - rep0))
 	# ข้อความสรุปเดือนในการ์ด
-	var txt := DayLoop.month_summary_text(r4, { })
+	var txt := DayLoop.month_summary_text(r4b, { })
 	_check(txt.contains("เกินเป้า") and txt.contains("฿9,500"), "การ์ดสรุปเดือนมีกำไรและผลเป้า")
 	var ms: MonthSummary = DayLoop.month_summary
 	_check(ms != null and ms.get_parent().name == "SummaryLayer" and (ms.get_parent() as CanvasLayer).layer == 108, "หน้าสรุปเดือนอยู่ใน day_loop.tscn → SummaryLayer ชั้น 108")
-	ms.show_report("สิ้นเดือน ก.พ.", "", r4, { "rent": 1500, "power": 320, "water": 100, "internet": 300 }, "ไปต่อ")
+	ms.show_report("สิ้นเดือน ก.พ.", "", r4b, { "rent": 1500, "power": 320, "water": 100, "internet": 300 }, "ไปต่อ")
 	_check(ms.visible and ms._income_grid.get_child_count() == 2 and ms._income_total.text == "฿9,500" and ms._result.text == "เกินเป้า!", "ตารางรายรับ 1 แถว (฿9,500) · ผล เกินเป้า!")
 	ms.visible = false
 	# ค้างบิล 2 เดือนติด → ร้านปิด
 	GameState.reset()
-	ts.set_shift(13)
+	ts.set_shift(5)
 	GameState.add_money(9000, &"fee", "test")
 	GameState.debt = 50
 	GameState.close_month(2)

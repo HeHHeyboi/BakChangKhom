@@ -7,7 +7,8 @@ class_name SaveGame extends RefCounted
 
 const PATH := "user://save.json"
 ## [0.2.0-G] 2 = เวลาแบบสัปดาห์ + ledger + ผลสิ้นเดือน · เซฟ 1 (0.1.x) ใช้ไม่ได้ → เมนูบอกให้เริ่มใหม่
-const VERSION := 2
+## [0.2.5] 3 = 1 บท = 1 เดือน (48 วัน) — เซฟ v2 (1 บท = 1 สัปดาห์ · 36 วัน) เลขกะ/บทไม่ตรงกัน → ให้เริ่มใหม่
+const VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
 static var allow_in_tests := false
 
@@ -59,7 +60,7 @@ static func save() -> bool:
 	for j in DayLoop.board:
 		var c: CustomerCase = j.get("case")
 		if c and c.resource_path != "":
-			board.append({ "case": c.resource_path, "due_shift": int(j.get("due_shift", 0)), "phone": bool(j.get("phone", false)) })
+			board.append({ "case": c.resource_path, "due_shift": int(j.get("due_shift", 0)), "phone": bool(j.get("phone", false)), "walkin": bool(j.get("walkin", false)) })
 	var stars := { }
 	for k in GameState.level_stars:
 		stars[str(k)] = GameState.level_stars[k]
@@ -85,6 +86,8 @@ static func save() -> bool:
 			# [0.2.0] การ์ดสรุปบท/เดือนที่ยังไม่ได้กด (บันทึกอัตโนมัติตอนเริ่มกะใหม่เกิดก่อนผู้เล่นกด "ไปต่อ")
 			"pending_summary": DayLoop._pending_summary_week, "summary_month_end": not DayLoop._last_month.is_empty(),
 			"last_bill": _plain(DayLoop._last_bill),
+			# [0.2.5] ลูกค้าทยอยมา
+			"waves": DayLoop.visitor_waves.duplicate(true), "visitors_today": DayLoop.visitors_today, "visitors_arrived": DayLoop.visitors_arrived,
 		},
 		"quest": { "task": ev.currentTask if ev else 0, "done": ev.isDone if ev else false },
 		# [13 ต.ค.] คลังของ (STORAGE_SHOP_ECO)
@@ -162,7 +165,13 @@ static func load_into() -> int:
 	DayLoop.board.clear()
 	for j in l.get("board", []):
 		if ResourceLoader.exists(String(j.case)):
-			DayLoop.board.append({ "case": load(String(j.case)), "due_shift": int(j.due_shift), "phone": bool(j.phone) })
+			DayLoop.board.append({ "case": load(String(j.case)), "due_shift": int(j.due_shift), "phone": bool(j.phone), "walkin": bool(j.get("walkin", false)) })
+	# [0.2.5] ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้
+	DayLoop.visitor_waves.clear()
+	for w in l.get("waves", []):
+		DayLoop.visitor_waves.append({ "minute": int(w.get("minute", 0)), "count": int(w.get("count", 0)) })
+	DayLoop.visitors_today = int(l.get("visitors_today", 0))
+	DayLoop.visitors_arrived = int(l.get("visitors_arrived", 0))
 	DayLoop.ot_this_week = int(l.get("ot_this_week", 0))
 	DayLoop._parts_seen.clear()
 	for k in l.get("parts_seen", []):

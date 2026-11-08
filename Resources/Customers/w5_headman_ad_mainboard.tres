@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w5_headman_ad_mainboard"
+customer = "ผู้ใหญ่บ้าน"
+reason = "ผู้ใหญ่บ้านเห็นโฆษณาร้านในเพจชุมชน"
+device = "คอมพิวเตอร์ที่ใช้เปิดเสียงตามสายของหมู่บ้าน"
+symptom = "ประกาศเสียงตามสายได้สักพักเครื่องดับเอง ร้อนมาก"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/w5_headman_ad_mainboard.txt"
+thanks_text = "ประกาศได้จนจบแล้ว เดี๋ยวผู้ใหญ่จะประกาศชื่อร้านให้ด้วย"
+complain_text = "ยังดับกลางประกาศอยู่เลยขม"
+forced = true

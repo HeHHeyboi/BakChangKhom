@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_teacher_mainboard"
+customer = "ครู"
+reason = "ต้องพิมพ์ข้อสอบปลายภาคให้ทัน"
+device = "คอมพิวเตอร์ห้องธุรการโรงเรียน"
+symptom = "พิมพ์ข้อสอบได้สักพักเครื่องดับ พัดลมในเครื่องดังผิดปกติ"
+level = 3
+est_slots = 5
+due_shifts = 1
+months = PackedInt32Array(2, 3, 8, 9)
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_teacher_mainboard.txt"
+thanks_text = "พิมพ์ข้อสอบเสร็จแล้ว ไม่ดับอีกเลย ขอบใจจ้ะ"
+complain_text = "ยังดับระหว่างพิมพ์อยู่เลยขม ครูต้องพิมพ์มือแล้วล่ะ"

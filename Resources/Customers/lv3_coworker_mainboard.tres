@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_coworker_mainboard"
+customer = "เพื่อนร่วมงาน"
+reason = "ส่งพัสดุจากในเมือง ร้านแถวบ้านคิวยาวสองอาทิตย์"
+device = "คอมพิวเตอร์ที่บ้านของเพื่อนร่วมงาน ไม่เคยล้างมา 4 ปี"
+symptom = "ประชุมออนไลน์ได้ครึ่งชั่วโมงเครื่องดับ เปิดใหม่ก็ดับอีก"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_coworker_mainboard.txt"
+thanks_text = "ประชุมจบไม่ดับสักรอบ ขอบใจมากขม คนในทีมถามถึงนายด้วยนะ"
+complain_text = "ยังดับกลางประชุมอยู่เลย… ไม่เป็นไร ส่งกลับมาก่อนก็ได้"

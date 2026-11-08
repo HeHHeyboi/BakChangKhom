@@ -52,8 +52,8 @@ func _ready() -> void:
 		{ "label": "เวลา: ทำงาน +1 ชม.", "call": func() -> void: EventManager.time_system.advance_minutes(60) },
 		{ "label": "เวลา: ไปช่วงถัดไป (เย็น → 18:30)", "call": EventManager.advance_period },
 		{ "label": "เวลา: ปิดร้าน → กะถัดไป", "call": DayLoop.end_shift },
-		{ "label": "เวลา: ไป 18:30 กะสุดท้ายของสัปดาห์", "call": _jump_week_end },
-		{ "label": "จบบท: ไปปิดร้านวันสุดท้ายของบทที่ 1 (ศ.) → ฉากยาย", "call": func() -> void: DayLoop.debug_goto(maxi(DayLoop.demo_shifts, 1)) },
+		{ "label": "เวลา: ไป 18:30 วันสุดท้ายของบท (เดือน)", "call": _jump_week_end },
+		{ "label": "จบเดโม: ไปปิดร้านวันสุดท้ายของเดโม (demo_shifts) → ฉากยาย", "call": func() -> void: DayLoop.debug_goto(maxi(DayLoop.demo_shifts, 1)) },
 		# [0.2.0] เดโมจบที่บท 1 → ปิดเดโมก่อนถึงจะไปสิ้นเดือน/สิ้นเกมได้
 		{ "label": "ทดสอบเดือน: ปิดเดโม → ไปปิดร้านวันสุดท้ายของ ม.ค. (หน้าสรุปเดือน)", "call": func() -> void: _goto_no_demo(TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH) },
 		{ "label": "ทดสอบจบเกม: ปิดเดโม → ไปปิดร้านวันสุดท้ายของเกม", "call": func() -> void: _goto_no_demo(TimeSystem.TOTAL_SHIFTS) },

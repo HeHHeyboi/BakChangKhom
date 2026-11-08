@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv5_min_bios"
+customer = "มิ้น"
+reason = "สั่งคอมประกอบออนไลน์มาลดราคา"
+device = "คอมพิวเตอร์ประกอบใหม่ที่มิ้นสั่งออนไลน์"
+symptom = "เปิดแล้วค้างที่หน้า BIOS ไม่เข้า Windows สักที"
+level = 5
+est_slots = 8
+due_shifts = 1
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/lv5_min_bios.txt"
+thanks_text = "เครื่องใหม่ใช้ได้แล้ว! ขมเอาไปเลยค่าลงวินโดวส์ฉันจ่ายเอง"
+complain_text = "ยังค้างหน้าจอฟ้า ๆ อยู่เลย ฉันโดนหลอกหรือเปล่าเนี่ย"

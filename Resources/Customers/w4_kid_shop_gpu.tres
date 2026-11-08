@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w4_kid_shop_gpu"
+customer = "เด็ก"
+reason = "เด็ก ๆ อยากเล่นเกมที่ร้านวันเปิดร้าน"
+device = "คอมพิวเตอร์มุมเกมของร้าน"
+symptom = "เด็ก ๆ เล่นเกมได้สักพักภาพกระตุก แล้วจอดับ"
+level = 3
+est_slots = 5
+due_shifts = 1
+part_id = "part_gpu"
+job_title = "ล้างการ์ดจอ + จัดสายไฟ"
+arrive_dialog = "res://Assets/Dialog/Customer/w4_kid_shop_gpu.txt"
+thanks_text = "เล่นได้แล้ว! วันเปิดร้านสนุกที่สุดเลยพี่"
+complain_text = "ยังดับอยู่เลยพี่… พวกผมไปทำการบ้านก่อนก็ได้"
+forced = true

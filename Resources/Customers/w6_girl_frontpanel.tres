@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w6_girl_frontpanel"
+customer = "เด็กหญิง"
+reason = "เปิดเทอมใหม่ น้องย้ายคอมไปห้องนอนเพื่อทำการบ้าน"
+device = "คอมพิวเตอร์ของน้อง เพิ่งย้ายห้อง"
+symptom = "ย้ายเครื่องแล้วกดปุ่มเปิดไม่ติด ก่อนหน้านี้ก็เปิดโปรแกรมช้ามาก"
+level = 4
+est_slots = 5
+due_shifts = 1
+part_id = "part_front_panel"
+job_title = "เสียบสายหน้าเคส + จัดแรม Dual Channel"
+arrive_dialog = "res://Assets/Dialog/Customer/w6_girl_frontpanel.txt"
+thanks_text = "เปิดติดแล้วค่ะ แถมทำรายงานเร็วขึ้นด้วย!"
+complain_text = "ยังไม่ติดเลยค่ะพี่ หนูไปทำการบ้านที่ร้านพี่แทนก่อนนะ"
+forced = true

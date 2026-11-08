@@ -38,7 +38,7 @@ func _ready() -> void:
 	stalls[0].pressed.emit()
 	var sp: ShopPanel = market.get_node("ShopPanel")
 	# [15 ต.ค.] ตั้งแต่ 0.1.2 แผงมีของขายจริง (Market.tscn MarketStall.items) — เดิมเช็กว่า "ยังไม่มีของขาย"
-	_check(sp.visible and sp.title.text == "ร้านอะไหล่คอม" and not sp.empty.visible and sp.grid.get_child_count() == stalls[0].items.size(), "กดแผง → หน้าต่างร้านค้า มีของ %d ชิ้น" % stalls[0].items.size())
+	_check(sp.visible and sp.title.text.begins_with("ร้านอะไหล่คอม") and not sp.empty.visible and sp.grid.get_child_count() == stalls[0].items.size(), "กดแผง → หน้าต่างร้านค้า มีของ %d ชิ้น" % stalls[0].items.size())
 	await get_tree().create_timer(0.6).timeout
 	await _shot("shop")
 	var it := ShopItem.new()

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w2_min_ram"
+customer = "มิ้น"
+reason = "มิ้นเอาโน้ตบุ๊กมาลองฝีมือพี่ขมก่อนช่วยร้าน"
+device = "โน้ตบุ๊กเครื่องแรกของมิ้นสมัยเรียน"
+symptom = "เปิดแล้วไฟติด แต่จอดำ มีเสียงปี๊บสั้น ๆ หลายที"
+level = 2
+est_slots = 3
+due_shifts = 1
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/w2_min_ram.txt"
+thanks_text = "ติดแล้ว! โอเค ฉันยอมรับว่าพี่ขมเก่งจริง ต่อไปฉันช่วยร้านเต็มที่"
+complain_text = "ยังไม่ติดเลยพี่ขม… ไม่เป็นไร ค่อย ๆ ฝึกด้วยกันนะ"
+forced = true
