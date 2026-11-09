@@ -1,33 +1,33 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://m0pydrpdtegr"]
 
-[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://tkd4ebyaw0pg" path="res://Scene/MiniGame/Desktop/os_window_base.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://x0n4r63o4lcl" path="res://Assets/MiniGame/Desktop/os_icon_settings.png" id="2_icon"]
 
-[node name="OsUpdate" instance=ExtResource("1_base")]
+[node name="OsUpdate" unique_id=519313784 instance=ExtResource("1_base")]
 custom_minimum_size = Vector2(520, 300)
 offset_right = 520.0
 offset_bottom = 300.0
 
-[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" index="0"]
+[node name="Icon" parent="VBoxContainer/Topbar/HBoxContainer" parent_id_path=PackedInt32Array(64961897, 790668433) index="0" unique_id=1195365466]
 texture = ExtResource("2_icon")
 
-[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" index="1"]
+[node name="Title" parent="VBoxContainer/Topbar/HBoxContainer" parent_id_path=PackedInt32Array(64961897, 790668433) index="1" unique_id=1281458214]
 text = "ตั้งค่า › อัปเดต"
 
-[node name="Status" type="Label" parent="VBoxContainer/Body/Content" index="0"]
+[node name="Status" type="Label" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="0" unique_id=1590389494]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "ยังไม่ได้ตรวจหาอัปเดต"
 
-[node name="Check" type="Button" parent="VBoxContainer/Body/Content" index="1"]
+[node name="Check" type="Button" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="1" unique_id=100317760]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 focus_mode = 0
 text = "ตรวจหาอัปเดต"
 
-[node name="Install" type="Button" parent="VBoxContainer/Body/Content" index="2"]
+[node name="Install" type="Button" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="2" unique_id=154777031]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -35,14 +35,14 @@ size_flags_horizontal = 0
 focus_mode = 0
 text = "ดาวน์โหลดและติดตั้ง"
 
-[node name="Progress" type="ProgressBar" parent="VBoxContainer/Body/Content" index="3"]
+[node name="Progress" type="ProgressBar" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="3" unique_id=1979471769]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 show_percentage = false
 
-[node name="PowerOff" type="Button" parent="VBoxContainer/Body/Content" index="4"]
+[node name="PowerOff" type="Button" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="4" unique_id=262742690]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -50,10 +50,12 @@ size_flags_horizontal = 0
 focus_mode = 0
 text = "ปิดเครื่องเลย (ไม่รอ)"
 
-[node name="Restart" type="Button" parent="VBoxContainer/Body/Content" index="5"]
+[node name="Restart" type="Button" parent="VBoxContainer/Body/Content" parent_id_path=PackedInt32Array(1967406055) index="5" unique_id=2049967473]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 focus_mode = 0
 text = "รีสตาร์ตตอนนี้"
+
+[editable path="VBoxContainer/Topbar"]

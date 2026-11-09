@@ -9,6 +9,7 @@ enum WinType {
 	Sound,
 	Wifi,
 	Display,
+	Update,
 }
 
 

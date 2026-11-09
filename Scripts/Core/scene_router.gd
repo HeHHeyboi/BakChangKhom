@@ -110,6 +110,10 @@ func pop(result: Variant = null) -> void:
 	overlay_closed.emit(path, result)
 
 
+func has(obj: Variant) -> bool:
+	return _stack.has(obj)
+
+
 func _set_location_paused(on: bool) -> void:
 	for c in location_slot.get_children():
 		c.process_mode = Node.PROCESS_MODE_DISABLED if on else Node.PROCESS_MODE_INHERIT
