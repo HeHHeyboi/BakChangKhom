@@ -59,10 +59,21 @@ func _process(_delta: float) -> void:
 	_tw.tween_callback(func() -> void: visible = false)
 
 
-## ไม่แสดงตอนมินิเกม · บทพูด · ฉากข้ามวัน (รอแล้วค่อยขึ้น)
+## ไม่แสดงตอนมินิเกม · บทพูด · ฉากข้ามวัน · เมนูหลัก/เมนูพัก · ยังไม่เริ่มลูปร้าน (บทนำ/เควสต์หลัก) · อยู่นอกร้าน (ตลาด/แผนที่) — รอแล้วค่อยขึ้น
+## [9 พ.ย.] แก้บั๊ก: ป้าย "วันนี้มีลูกค้า n คน" ขึ้นทับเมนูหลักตอนเปิดเกม
 func _blocked() -> bool:
-	if Global.in_minigame:
+	if Global.on_start or Global.in_minigame:
 		return true
+	var pm := get_node_or_null(^"/root/PauseMenu") as CanvasItem
+	if pm and pm.visible:
+		return true
+	var tree_scene := get_tree().current_scene
+	if tree_scene and tree_scene.is_in_group(&"main_menu") and tree_scene.visible:
+		return true
+	var loop := get_node_or_null(^"/root/DayLoop")
+	if loop and loop.has_method(&"_loop_active") and loop.has_method(&"_in_shop"):
+		if not loop.call(&"_loop_active") or not loop.call(&"_in_shop"):
+			return true
 	var sr := get_node_or_null(^"/root/SceneRouter")
 	if sr and sr.get("overlay_stack") is CanvasLayer and (sr.get("overlay_stack") as CanvasLayer).get_child_count() > 0:
 		return true # มินิเกม/หน้าต่างซ้อนเปิดอยู่
