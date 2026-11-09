@@ -154,6 +154,7 @@ func _finish() -> void:
 	_done = true
 	_kill()
 	finished.emit()
+	self.hide()
 
 
 ## นาฬิกาบนหน้าลงชื่อเข้าใช้ = เวลาในเกม (ไม่มี = เวลาเครื่อง)

@@ -16,6 +16,7 @@ const INFO_WINDOW := preload("res://Scene/MiniGame/Desktop/os_info.tscn")
 const TASKMANAGER_SCENE := preload("res://Scene/MiniGame/Desktop/os_taskman.tscn")
 const WIZARD_SCENE := preload("res://Scene/MiniGame/Desktop/os_wizard.tscn")
 const AD_POPUP := preload("res://Scene/MiniGame/Desktop/os_popup_ad.tscn")
+const UNSAVED_DOC := "res://Scene/MiniGame/Desktop/os_unsaved_doc.tscn"
 
 
 # NOTE: Explorer constant
@@ -66,6 +67,13 @@ const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 const CAP := { &"fix": 40, &"safety": 30, &"listen": 20, &"explain": 10 }
 const ADWARE_SIZE_MB := 120
 
+enum Step {
+	LISTEN,
+	WORK,
+	EXPLAIN,
+	SUMMARY,
+	DONE,
+}
 @export var task: DesktopTask
 @export var popup_every := 7.0
 @export var free_mode := false
@@ -73,6 +81,11 @@ const ADWARE_SIZE_MB := 120
 @export var ui_layer := 5
 @export var framed := true
 @export var boot_screen := true
+var doc_saved = false
+var lost_user_file = false
+var step: Step = Step.LISTEN
+@onready var boot_node = $Os/Screen/OsBoot as OsBoot
+
 
 # NOTE: Taskbar icon
 @onready var start_button = %StartMenu as Button
@@ -143,6 +156,15 @@ var items := [
 	["ตัวจัดการงาน", TEX_SETTINGS],
 	["ขมการ์ด (ความปลอดภัย)", TEX_SETTINGS],
 ]
+enum UpdateState {
+	NOT_CHECKED,
+	FOUND,
+	INSTALL,
+	RESTART,
+	FINISH,
+	CORRUPT,
+}
+var update_state: UpdateState = UpdateState.NOT_CHECKED
 
 
 func _ready() -> void:
@@ -171,6 +193,18 @@ func _ready() -> void:
 	os.set_selected_sound_device(task.sound_device)
 	os.change_sound_volumn(task.sound_volume)
 	os.selected_scale = os.scale_list.find(task.display_scale)
+	if task.unsaved_doc != "":
+		var w = load(UNSAVED_DOC).instantiate() as OsWindow2
+		w.set_title(task.unsaved_doc + " *ยังไม่บันทึก")
+		w.closed.connect(w.queue_free.call_deferred)
+		var save_btn = w.get_node("%SaveDoc")
+		save_btn.pressed.connect(
+			func():
+				doc_saved = true
+				w.queue_free.call_deferred(),
+		)
+		screen.add_child(w)
+		_ensure_process(w, task.unsaved_doc + " *ยังไม่บันทึก")
 	_apply_display(task.display_scale)
 
 	for p in task.processes:
@@ -283,7 +317,6 @@ func _on_start_menu(id: int) -> void:
 			open_browser()
 		4:
 			open_settings()
-			# print("setting")
 		5:
 			open_explorer(TRASH_DIR)
 		6:
@@ -292,8 +325,7 @@ func _on_start_menu(id: int) -> void:
 			# extra.open_security()
 			print("security")
 		99:
-			print("shutdown")
-			# shut_down()
+			_shut_down()
 
 
 func _on_file_menu(id: int) -> void:
@@ -873,10 +905,12 @@ func open_settings() -> void:
 		var sound_btn = w.get_node("%SecSound") as Button
 		var wifi_btn = w.get_node("%SecWifi") as Button
 		var display_btn = w.get_node("%SecDisplay") as Button
+		var update_btn = w.get_node("%SecUpdate") as Button
 		printer_btn.pressed.connect(self._open_printer)
 		sound_btn.pressed.connect(self._open_sound)
 		wifi_btn.pressed.connect(self._open_wifi)
 		display_btn.pressed.connect(self._open_display)
+		update_btn.pressed.connect(self._open_update)
 		screen.add_child(w)
 		os.add_instance(w)
 	else:
@@ -939,6 +973,7 @@ func _open_printer() -> void:
 		screen.add_child(w)
 	else:
 		w.restore()
+	_ensure_process(w, "เครื่องพิมพ์")
 	_refresh_printer()
 
 
@@ -1039,6 +1074,7 @@ func _open_sound() -> void:
 		screen.add_child(w)
 	else:
 		w.restore()
+	_ensure_process(w, "เสียง")
 
 
 func test_sound() -> String:
@@ -1073,6 +1109,7 @@ func _open_wifi() -> void:
 		screen.add_child(w)
 	else:
 		w.restore()
+	_ensure_process(w, "Wi-Fi")
 	_refresh_wifi(w)
 
 
@@ -1127,6 +1164,7 @@ func _open_display() -> void:
 	var w = _find_window(DesktopOS.WinType.Display)
 	if w == null:
 		w = load(DISPLAY_SETTING).instantiate() as OsWindow2
+		w.set_meta("type", DesktopOS.WinType.Display)
 		os.add_instance(w)
 		w.restore(true)
 		w.closed.connect(
@@ -1187,6 +1225,7 @@ func _open_display() -> void:
 		screen.add_child(w)
 	else:
 		w.restore()
+	_ensure_process(w, "จอภาพ")
 
 
 func _apply_display(scale_pct: float) -> void:
@@ -1207,10 +1246,143 @@ func keep_resolution(keep: bool) -> void:
 	os.pending_resolution = -1
 
 
+# NOTE: Update's settings
+func _open_update() -> void:
+	var w = _find_window(DesktopOS.WinType.Update)
+	if w == null:
+		w = load(UPDATED_SETTING).instantiate() as OsWindow2
+		w.set_meta("type", DesktopOS.WinType.Update)
+		w.restore(true)
+		os.add_instance(w)
+		w.closed.connect(
+			func():
+				w.queue_free.call_deferred()
+				os.instances.erase(w),
+		)
+
+		var check_btn = w.get_node("%Check") as Button
+		var install_btn = w.get_node("%Install") as Button
+		var poweroff_btn = w.get_node("%PowerOff") as Button
+		var restart_btn = w.get_node("%Restart") as Button
+		check_btn.pressed.connect(
+			func():
+				update_state = UpdateState.FOUND
+				_refresh_update(w),
+		)
+		install_btn.pressed.connect(
+			func():
+				update_state = UpdateState.INSTALL
+				_refresh_update(w)
+				var tw = self.create_tween()
+				tw.tween_interval(3.0)
+				tw.tween_callback(self._finish_install.bind(w)),
+		)
+		poweroff_btn.pressed.connect(self._power_off_during_update.bind(w))
+		restart_btn.pressed.connect(self._restart_now)
+		screen.add_child(w)
+	else:
+		w.restore()
+	_ensure_process(w, "อัปเดต")
+	_refresh_update(w)
+
+
+func _refresh_update(w: OsWindow2):
+	var status_text = ""
+	match update_state:
+		UpdateState.NOT_CHECKED:
+			status_text = "ยังไม่ได้ตรวจหาอัปเดต"
+		UpdateState.FOUND:
+			status_text = "พบอัปเดตความปลอดภัย ขนาด %s" % size_text(task.update_mb)
+		UpdateState.INSTALL:
+			status_text = "กำลังติดตั้ง… ห้ามปิดเครื่อง"
+		UpdateState.RESTART:
+			status_text = "ติดตั้งเสร็จ ต้องรีสตาร์ตเพื่อให้ใช้งานได้"
+		UpdateState.FINISH:
+			status_text = "เครื่องเป็นเวอร์ชันล่าสุดแล้ว ✓"
+		UpdateState.CORRUPT:
+			status_text = "อัปเดตล้มเหลว (เครื่องถูกปิดระหว่างติดตั้ง) — ตรวจหาใหม่"
+		_:
+			push_error("Should not go to this route")
+	var status = w.get_node("%Status") as Label
+	var check_btn = w.get_node("%Check") as Button
+	var install_btn = w.get_node("%Install") as Button
+	var pb = w.get_node("%Progress") as ProgressBar
+	var poweroff_btn = w.get_node("%PowerOff") as Button
+	var restart_btn = w.get_node("%Restart") as Button
+	status.text = status_text
+	check_btn.hide()
+	install_btn.hide()
+	pb.hide()
+	poweroff_btn.hide()
+	restart_btn.hide()
+	if update_state in [UpdateState.NOT_CHECKED, UpdateState.CORRUPT]:
+		check_btn.show()
+	elif update_state == UpdateState.FOUND:
+		install_btn.show()
+	elif update_state == UpdateState.INSTALL:
+		pb.show()
+		poweroff_btn.show()
+		pb.show_percentage = false
+		pb.value = 0
+		create_tween().tween_property(pb, "value", 100.0, 3.0)
+	elif update_state == UpdateState.RESTART:
+		restart_btn.show()
+
+
+func _finish_install(w) -> void:
+	if update_state == UpdateState.INSTALL:
+		update_state = UpdateState.RESTART
+		_refresh_update(w)
+
+
+func _power_off_during_update(w) -> void:
+	if update_state != UpdateState.INSTALL:
+		return
+	_trap(&"interrupt_update", "interrupt", &"safety", 10, "ปิดเครื่องตอนกำลังอัปเดต")
+	update_state = UpdateState.CORRUPT
+	_pib_say("ห้ามปิดเครื่องตอนอัปเดตเด็ดขาด! ระบบเสียหายได้ ต้องตรวจหาใหม่", PibHint.Mood.WORRY)
+	_refresh_update(w)
+
+
 func _refresh_all():
 	_refresh_explorer()
 	_refresh_setting()
 	disk.text = "พื้นที่ที่เหลือ %s" % [size_text(os.disk_free_mb)]
+
+
+func _shut_down() -> void:
+	if !free_mode || step == Step.DONE:
+		return
+	# WARN: not yet implement
+	if tour_mode:
+		push_error("not yet implement tour_mode")
+		pass
+	step = Step.DONE
+	_finished = true
+	Global.in_minigame = false
+	Global.cur_pib = null
+	if SceneRouter.has(self):
+		SceneRouter.pop()
+	else:
+		queue_free()
+
+
+func _restart_now() -> void:
+	if update_state != UpdateState.RESTART:
+		return
+	if !doc_saved:
+		_trap(&"unsaved_work", "unsaved", &"listen", 10, "รีสตาร์ตทั้งที่งานลูกค้ายังไม่บันทึก")
+		lost_user_file = true
+		# _refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
+		_pib_say("งานที่ลูกค้าพิมพ์ค้างไว้หายหมดเลย… ต้องกดบันทึกก่อนรีสตาร์ตทุกครั้ง", PibHint.Mood.WORRY)
+	update_state = UpdateState.FINISH
+	var pid_list = []
+	for pid in os.process_map:
+		pid_list.append(pid)
+	for pid in pid_list:
+		os.kill_process(pid)
+	boot_node.show()
+	boot_node.play()
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
