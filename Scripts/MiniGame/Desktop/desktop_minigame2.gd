@@ -83,6 +83,7 @@ enum Step {
 @export var boot_screen := true
 var doc_saved = false
 var lost_user_file = false
+var protection_on = true
 var step: Step = Step.LISTEN
 @onready var boot_node = $Os/Screen/OsBoot as OsBoot
 
@@ -164,7 +165,37 @@ enum UpdateState {
 	FINISH,
 	CORRUPT,
 }
+
 var update_state: UpdateState = UpdateState.NOT_CHECKED
+
+enum ThreatState {
+	HIDDEN,
+	FOUND,
+	QUARANTINE,
+	ALLOW,
+}
+
+const ThreatDesc = {
+	ThreatState.HIDDEN: "ไม่พบ",
+	ThreatState.FOUND: "พบ",
+	ThreatState.QUARANTINE: "กักกัน",
+	ThreatState.ALLOW: "อนุญาติ",
+}
+
+const ThreatColor = { ThreatState.FOUND: C_INK, ThreatState.QUARANTINE: C_OK, ThreatState.ALLOW: C_BAD }
+
+
+class Threat extends RefCounted:
+	var data: DesktopThreat
+	var state: ThreatState
+
+
+	func _init(d: DesktopThreat, s: ThreatState):
+		self.data = d
+		self.state = s
+
+
+var threat_list: Array[Threat] = []
 
 
 func _ready() -> void:
@@ -188,6 +219,9 @@ func _ready() -> void:
 		os.add_sound_device(s)
 	for w in task.wifi:
 		os.add_wifi(w)
+	for t in task.threats:
+		var threat = Threat.new(t, ThreatState.HIDDEN)
+		threat_list.append(threat)
 
 	os.is_mute = task.sound_muted
 	os.set_selected_sound_device(task.sound_device)
@@ -198,6 +232,7 @@ func _ready() -> void:
 		w.set_title(task.unsaved_doc + " *ยังไม่บันทึก")
 		w.closed.connect(w.queue_free.call_deferred)
 		var save_btn = w.get_node("%SaveDoc")
+		w.restore(true)
 		save_btn.pressed.connect(
 			func():
 				doc_saved = true
@@ -226,6 +261,8 @@ func _ready() -> void:
 
 	os.disk_total_mb = task.disk_total_mb
 	os.disk_free_mb = task.disk_free_mb
+	os.disk_temp_mb = task.temp_mb
+	os.disk_free_mb -= os.disk_temp_mb
 
 	clock.text = EventManager.get_clock_text()
 	disk.text = "พื้นที่ที่เหลือ %s" % [size_text(os.disk_free_mb)]
@@ -322,8 +359,7 @@ func _on_start_menu(id: int) -> void:
 		6:
 			open_task_manager()
 		7:
-			# extra.open_security()
-			print("security")
+			_open_security()
 		99:
 			_shut_down()
 
@@ -906,11 +942,13 @@ func open_settings() -> void:
 		var wifi_btn = w.get_node("%SecWifi") as Button
 		var display_btn = w.get_node("%SecDisplay") as Button
 		var update_btn = w.get_node("%SecUpdate") as Button
+		var security_btn = w.get_node("%SecSecurity") as Button
 		printer_btn.pressed.connect(self._open_printer)
 		sound_btn.pressed.connect(self._open_sound)
 		wifi_btn.pressed.connect(self._open_wifi)
 		display_btn.pressed.connect(self._open_display)
 		update_btn.pressed.connect(self._open_update)
+		security_btn.pressed.connect(self._open_security)
 		screen.add_child(w)
 		os.add_instance(w)
 	else:
@@ -1342,6 +1380,80 @@ func _power_off_during_update(w) -> void:
 	update_state = UpdateState.CORRUPT
 	_pib_say("ห้ามปิดเครื่องตอนอัปเดตเด็ดขาด! ระบบเสียหายได้ ต้องตรวจหาใหม่", PibHint.Mood.WORRY)
 	_refresh_update(w)
+
+
+func _open_security() -> void:
+	var w = _find_window(DesktopOS.WinType.Security)
+	if w == null:
+		w = load(SECURITY_SETTING).instantiate() as OsWindow2
+		w.set_meta("type", DesktopOS.WinType.Security)
+		w.restore(true)
+		os.add_instance(w)
+		var protection_check = w.get_node("%Protection") as CheckBox
+		var scan_btn = w.get_node("%Scan") as Button
+		var clean_btn = w.get_node("%CleanTemp") as Button
+		protection_check.button_pressed = protection_on
+		protection_check.toggled.connect(
+			func(toggled_on: bool):
+				protection_on = toggled_on,
+		)
+		scan_btn.pressed.connect(
+			func():
+				if !protection_on:
+					return
+				for t in threat_list:
+					if t.state == ThreatState.HIDDEN:
+						t.state = ThreatState.FOUND
+				_refresh_security(w),
+		)
+		clean_btn.pressed.connect(
+			func():
+				os.disk_free_mb += os.disk_temp_mb
+				os.disk_temp_mb = 0
+				_refresh_all()
+				_refresh_security(w),
+		)
+		screen.add_child(w)
+	else:
+		w.restore()
+	_ensure_process(w, "security")
+	_refresh_security(w)
+
+
+func _refresh_security(w) -> void:
+	var threat_container = w.get_node("%Threats") as VBoxContainer
+	var temp_label = w.get_node("%TempLabel") as Label
+	for c in threat_container.get_children():
+		c.queue_free()
+	var info = load(INFO_ROW)
+	for t in threat_list:
+		if t.state == ThreatState.HIDDEN:
+			continue
+		var st: String = ThreatDesc.get(t.state)
+		var node = info.instantiate()
+		var info_label = node.get_node("%Info") as Label
+		var quarantine_btn = node.get_node("%Primary") as Button
+		var allow_btn = node.get_node("%Secondary") as Button
+		info_label.text = "%s\n%s · %s" % [t.data.name, t.data.where, st]
+		info_label.add_theme_color_override("font_color", ThreatColor[t.state])
+		quarantine_btn.text = "กักกัน"
+		allow_btn.text = "อนุญาติ"
+		quarantine_btn.visible = t.state in [ThreatState.FOUND, ThreatState.ALLOW]
+		allow_btn.visible = t.state in [ThreatState.FOUND, ThreatState.QUARANTINE]
+		quarantine_btn.pressed.connect(
+			func():
+				t.state = ThreatState.QUARANTINE
+				_refresh_security(w),
+		)
+		allow_btn.pressed.connect(
+			func():
+				_trap(&"allow_threat", "allow_" + t.data.name, &"safety", 10, "กดอนุญาตไวรัส (%s)" % t.data.name)
+				_pib_say("อนุญาต = ปล่อยให้ไวรัสอยู่ต่อนะ! ต้องกักกัน", PibHint.Mood.WORRY)
+				t.state = ThreatState.ALLOW
+				_refresh_security(w),
+		)
+		threat_container.add_child(node)
+	temp_label.text = "ไฟล์ชั่วคราว: %s" % [size_text(os.disk_temp_mb)]
 
 
 func _refresh_all():

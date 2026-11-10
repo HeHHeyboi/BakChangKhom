@@ -10,6 +10,7 @@ enum WinType {
 	Wifi,
 	Display,
 	Update,
+	Security,
 }
 
 
@@ -97,6 +98,7 @@ var selected_scale = -1
 
 var disk_total_mb: int = 0
 var disk_free_mb: int = 0
+var disk_temp_mb: int = 0
 var current_id = 0
 
 
