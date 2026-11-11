@@ -126,6 +126,7 @@ var _explorer_win: OsExplorer
 var _explorer_list: ItemList
 var _explorer_path: Label
 var _explorer_status: Label
+var _explorer_usb_dir: Control
 var notes: PackedStringArray = []
 var _bubble_tw: Tween
 ## ชื่อโปรแกรม → ไอคอนบนเดสก์ท็อป
@@ -431,6 +432,7 @@ func _setup_explorer(w: OsExplorer) -> void:
 	for fo in os.dir_map.keys():
 		if fo == DesktopOS.TRASH or (fo == DesktopTask.USB and not task.usb_drive):
 			continue
+
 		var b: Button = trash.duplicate()
 		b.unique_name_in_owner = false
 		b.name = "Folder_" + fo.validate_node_name()
@@ -440,6 +442,8 @@ func _setup_explorer(w: OsExplorer) -> void:
 				_explorer_folder = fo
 				_refresh_explorer(),
 		)
+		if fo == DesktopTask.USB:
+			_explorer_usb_dir = b
 		side.add_child(b)
 	side.move_child(trash, -1)
 	trash.pressed.connect(
@@ -473,6 +477,9 @@ func _explorer_selected() -> int:
 func _explorer_action(what: String) -> void:
 	if what == "eject":
 		_explorer_status.text = eject_usb()
+		_explorer_usb_dir.hide()
+		for btn in ["CopyUsb", "MoveUsb", "Eject"]:
+			_explorer_win.get_node("%" + btn).visible = false
 		return
 	var idx := _explorer_selected()
 	if what == "delete" && _explorer_folder == DesktopOS.TRASH:
@@ -505,13 +512,45 @@ func _explorer_action(what: String) -> void:
 			if os.move_file(idx, os.fs[idx].prev_dir):
 				_refresh_explorer()
 		"copy_usb":
-			var copy_data = os.fs[idx].data
-			var ok = os.add_file(copy_data, DesktopTask.USB)
-			if ok > -1:
-				_refresh_explorer()
+			_explorer_status.text = copy_to_usb(idx)
 		"move_usb":
-			if os.move_file(idx, DesktopTask.USB):
-				_refresh_explorer()
+			_explorer_status.text = move_to_usb(idx)
+
+
+## WARN: not yet implement: check usb free space
+func copy_to_usb(file_idx: int) -> String:
+	if task.usb_drive && usb_ejected:
+		return "ไม่มี USB เสียบอยู่"
+	var copy_data = os.fs[file_idx].data
+	if os.find_file(copy_data.name, DesktopTask.USB):
+		return "มีไฟล์นี้ใน USB แล้ว"
+	var ok = os.add_file(copy_data, DesktopTask.USB)
+	if ok > -1:
+		_refresh_explorer()
+
+	return "คัดลอก \"%s\" ลง USB แล้ว" % copy_data.name
+
+
+## WARN: not yet implement: check usb free space
+func move_to_usb(file_idx: int) -> String:
+	if task.usb_drive && usb_ejected:
+		return "ไม่มี USB เสียบอยู่"
+	var f = os.fs[file_idx]
+	if f.data.kind == "user":
+		_trap(
+			&"move_not_copy",
+			"move_" + String(f.data.name),
+			&"safety",
+			10,
+			"\"ย้าย\" รูปลูกค้าออกจากเครื่อง (ควร \"คัดลอก\")",
+		)
+		_pib_say(
+			"ย้าย = ไฟล์ออกจากเครื่องไปอยู่ใน USB อย่างเดียวนะ สำรองต้อง \"คัดลอก\" ให้มีสองที่",
+			PibHint.Mood.WORRY,
+		)
+	if os.move_file(file_idx, DesktopTask.USB):
+		_refresh_explorer()
+	return "ย้าย \"%s\" ไป USB แล้ว" % f.data.name
 
 
 func eject_usb() -> String:
@@ -596,18 +635,10 @@ func _open_program(pname: String) -> void:
 	if app == null:
 		return
 	if app.data.adware:
-		_show_info(
-			pname,
-			"🎁 ยินดีด้วย! คุณได้รับสิทธิ์พิเศษ!\nกดรับรางวัลในหน้าต่างที่เด้งขึ้นมาได้เลย",
-			app.icon,
-		)
+		_show_info(pname, "🎁 ยินดีด้วย! คุณได้รับสิทธิ์พิเศษ!\nกดรับรางวัลในหน้าต่างที่เด้งขึ้นมาได้เลย", app.icon)
 		_spawn_popup()
 	elif app.data.app:
-		_show_info(
-			pname,
-			"ยังไม่มีข้อความใหม่\nล่าสุด: ยายส่งสติกเกอร์รูปดอกไม้มา \"กินข้าวยังลูก\"",
-			app.icon,
-		)
+		_show_info(pname, "ยังไม่มีข้อความใหม่\nล่าสุด: ยายส่งสติกเกอร์รูปดอกไม้มา \"กินข้าวยังลูก\"", app.icon)
 		if not free_mode:
 			customer_say("เปิดได้แล้ว! เดี๋ยวคืนนี้โทรหาหลานเลย")
 	else:
