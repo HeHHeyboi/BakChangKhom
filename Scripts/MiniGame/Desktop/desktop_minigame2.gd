@@ -17,6 +17,7 @@ const TASKMANAGER_SCENE := preload("res://Scene/MiniGame/Desktop/os_taskman.tscn
 const WIZARD_SCENE := preload("res://Scene/MiniGame/Desktop/os_wizard.tscn")
 const AD_POPUP := preload("res://Scene/MiniGame/Desktop/os_popup_ad.tscn")
 const UNSAVED_DOC := "res://Scene/MiniGame/Desktop/os_unsaved_doc.tscn"
+const SHORTCUT_SCENE := preload("res://Scene/MiniGame/Desktop/shortcut.tscn")
 
 
 # NOTE: Explorer constant
@@ -85,6 +86,7 @@ var doc_saved = false
 var lost_user_file = false
 var protection_on = true
 var step: Step = Step.LISTEN
+var usb_ejected = true
 @onready var boot_node = $Os/Screen/OsBoot as OsBoot
 
 
@@ -126,6 +128,8 @@ var _explorer_path: Label
 var _explorer_status: Label
 var notes: PackedStringArray = []
 var _bubble_tw: Tween
+## ชื่อโปรแกรม → ไอคอนบนเดสก์ท็อป
+var _app_shortcuts: Dictionary[String, DesktopShortcut] = { }
 
 # NOTE: Browser var
 var _browser_page: VBoxContainer
@@ -203,6 +207,9 @@ func _ready() -> void:
 	os = DesktopOS.new()
 	_resolve_task()
 	for dir in task.FOLDERS:
+		if dir == DesktopTask.USB && !task.usb_drive:
+			usb_ejected = false
+			continue
 		os.create_dir(dir)
 	for file in task.files:
 		os.add_file(file)
@@ -287,6 +294,7 @@ func _ready() -> void:
 	browser.pressed.connect(open_browser)
 	settings.pressed.connect(open_settings)
 	wifi.pressed.connect(self._open_wifi)
+	_refresh_app_shortcuts()
 
 	_popup_timer.wait_time = popup_every
 	_popup_timer.timeout.connect(
@@ -464,7 +472,7 @@ func _explorer_selected() -> int:
 
 func _explorer_action(what: String) -> void:
 	if what == "eject":
-		print("eject_usb")
+		_explorer_status.text = eject_usb()
 		return
 	var idx := _explorer_selected()
 	if what == "delete" && _explorer_folder == DesktopOS.TRASH:
@@ -497,9 +505,23 @@ func _explorer_action(what: String) -> void:
 			if os.move_file(idx, os.fs[idx].prev_dir):
 				_refresh_explorer()
 		"copy_usb":
-			print("copy_usb ", f.name)
+			var copy_data = os.fs[idx].data
+			var ok = os.add_file(copy_data, DesktopTask.USB)
+			if ok > -1:
+				_refresh_explorer()
 		"move_usb":
-			print("move_usb ", f.name)
+			if os.move_file(idx, DesktopTask.USB):
+				_refresh_explorer()
+
+
+func eject_usb() -> String:
+	if task.usb_drive && !usb_ejected:
+		return ""
+	usb_ejected = true
+	if _explorer_folder == DesktopTask.USB:
+		_explorer_folder = "เดสก์ท็อป"
+	_refresh_all()
+	return "ถอด USB ได้อย่างปลอดภัยแล้ว"
 
 
 func _open_file(f: DesktopFile):
@@ -520,34 +542,83 @@ func _open_file(f: DesktopFile):
 		DesktopFile.SYSTEM:
 			msg = f.note if f.note != "" else "ไฟล์ระบบของขมOS — เครื่องต้องใช้ตอนเปิด"
 	if msg != "":
-		var w = INFO_WINDOW.instantiate() as OsWindow2
-		if w == null:
-			push_error("w is OsWindow2")
-			return
-		w.closed.connect(
-			func():
-				w.queue_free.call_deferred(),
-		)
-		w.restore(true)
-		w.set_title("เปิด %s" % [f.name])
-		w.set_icon(self._file_tex(f))
-		var label = w.get_node("%Message") as Label
-		label.text = msg
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_show_info("เปิด %s" % [f.name], msg, _file_tex(f))
 
-		var ok := w.get_node("%Ok") as Button
-		ok.text = "ตกลง"
-		ok.size_flags_horizontal = Control.SIZE_SHRINK_END
-		ok.pressed.connect(w.close)
-		screen.add_child(w)
+
+## หน้าต่างข้อความ (os_info.tscn) — ปิดแล้วทิ้งเลย
+func _show_info(title: String, msg: String, tex: Texture2D) -> void:
+	var w = INFO_WINDOW.instantiate() as OsWindow2
+	if w == null:
+		push_error("w is OsWindow2")
+		return
+	w.closed.connect(
+		func():
+			w.queue_free.call_deferred(),
+	)
+	w.restore(true)
+	w.set_title(title)
+	w.set_icon(tex)
+	var label = w.get_node("%Message") as Label
+	label.text = msg
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+	var ok := w.get_node("%Ok") as Button
+	ok.text = "ตกลง"
+	ok.size_flags_horizontal = Control.SIZE_SHRINK_END
+	ok.pressed.connect(w.close)
+	screen.add_child(w)
+
+
+## ไอคอนบนเดสก์ท็อปของโปรแกรมที่ติดตั้ง (desktop_icon) — สร้างเพิ่ม/ลบออกให้ตรงกับ os.installed_programs
+func _refresh_app_shortcuts() -> void:
+	for pname in _app_shortcuts.keys():
+		var app = os.installed_programs.get(pname) as DesktopOS.App
+		if app == null or not app.data.desktop_icon:
+			_app_shortcuts[pname].queue_free()
+			_app_shortcuts.erase(pname)
+	for pname in os.installed_programs:
+		var app = os.installed_programs[pname] as DesktopOS.App
+		if not app.data.desktop_icon or _app_shortcuts.has(pname):
+			continue
+		var s := SHORTCUT_SCENE.instantiate() as DesktopShortcut
+		s.name = "App_" + pname.validate_node_name()
+		s.icon = app.icon if app.icon else TEX_EXE
+		s.shortcut_name = pname
+		desktop.add_child(s)
+		s.button.pressed.connect(_open_program.bind(pname))
+		_app_shortcuts[pname] = s
+
+
+## ดับเบิลคลิกไอคอนโปรแกรมบนเดสก์ท็อป
+func _open_program(pname: String) -> void:
+	var app = os.installed_programs.get(pname) as DesktopOS.App
+	if app == null:
+		return
+	if app.data.adware:
+		_show_info(
+			pname,
+			"🎁 ยินดีด้วย! คุณได้รับสิทธิ์พิเศษ!\nกดรับรางวัลในหน้าต่างที่เด้งขึ้นมาได้เลย",
+			app.icon,
+		)
+		_spawn_popup()
+	elif app.data.app:
+		_show_info(
+			pname,
+			"ยังไม่มีข้อความใหม่\nล่าสุด: ยายส่งสติกเกอร์รูปดอกไม้มา \"กินข้าวยังลูก\"",
+			app.icon,
+		)
+		if not free_mode:
+			customer_say("เปิดได้แล้ว! เดี๋ยวคืนนี้โทรหาหลานเลย")
+	else:
+		_show_info(pname, "%s\nผู้พัฒนา: %s" % [pname, app.data.publisher], app.icon)
 
 
 func _refresh_explorer() -> void:
 	if not is_instance_valid(_explorer_list):
 		return
 	_explorer_list.clear()
-	_explorer_path.text = "เครื่องนี้ › " + _explorer_folder
+	_explorer_path.text = "เครื่องนี้ > " + _explorer_folder
 	_explorer_win.show_action_bar_preset(OsExplorer.TRASH if _explorer_folder == DesktopOS.TRASH else OsExplorer.NORM)
 	if free_mode:
 		_explorer_win.ask_action.hide()
@@ -1459,6 +1530,7 @@ func _refresh_security(w) -> void:
 func _refresh_all():
 	_refresh_explorer()
 	_refresh_setting()
+	_refresh_app_shortcuts()
 	disk.text = "พื้นที่ที่เหลือ %s" % [size_text(os.disk_free_mb)]
 
 
