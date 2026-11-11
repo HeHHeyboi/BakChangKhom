@@ -112,13 +112,17 @@ func create_dir(dir_name: String) -> void:
 		dir_map.set(d.dname, d)
 
 
-func add_file(src: DesktopFile) -> int:
+func add_file(src: DesktopFile, dir: String = "") -> int:
 	var file := File.new(src)
-	var dir: Dir = dir_map.get(file.dir)
-	if dir == null:
+	var d: Dir = null
+	if !dir.is_empty():
+		d = dir_map.get(dir)
+	else:
+		d = dir_map.get(file.dir)
+	if d == null:
 		return -1
 	var index := fs.size()
-	dir.files.append(index)
+	d.files.append(index)
 	fs.append(file)
 	disk_free_mb += src.size_mb
 	return index

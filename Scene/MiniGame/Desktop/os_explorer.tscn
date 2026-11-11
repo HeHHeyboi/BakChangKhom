@@ -28,10 +28,12 @@ border_color = Color(0.61960787, 0.58431375, 0.5411765, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1xt0"]
 bg_color = Color(0.48235294, 0.5764706, 0.91764706, 0.6392157)
 
-[node name="OsExplorer" type="Panel" unique_id=1857937811 node_paths=PackedStringArray("_topbar")]
+[node name="OsExplorer" type="Panel" unique_id=2038721292 node_paths=PackedStringArray("_topbar")]
 custom_minimum_size = Vector2(300, 150)
-offset_right = 300.0
-offset_bottom = 150.0
+offset_right = 370.0
+offset_bottom = 200.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_q5167")
 script = ExtResource("3_osexp")
 _topbar = NodePath("VBoxContainer/Topbar")
@@ -116,7 +118,6 @@ layout_mode = 2
 
 [node name="Open" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1578144717]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
@@ -125,7 +126,6 @@ text = "เปิด"
 
 [node name="Ask" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1183803308]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
@@ -134,6 +134,7 @@ text = "ถามลูกค้า"
 
 [node name="Restore" type="Button" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=824999304]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("2_qrs8u")
@@ -175,7 +176,7 @@ theme = ExtResource("2_qrs8u")
 theme_override_font_sizes/font_size = 15
 text = "ถอด USB"
 
-[node name="Status" type="Label" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer/ActionBar" unique_id=1196402871]
+[node name="Status" type="Label" parent="VBoxContainer/Body/HBoxContainer/FileSection/VBoxContainer" unique_id=1196402871]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
