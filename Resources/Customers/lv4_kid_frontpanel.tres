@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv4_kid_frontpanel"
+customer = "เด็ก"
+reason = "พ่อซื้อเคสไฟ RGB ให้เป็นของขวัญสอบได้"
+device = "คอมพิวเตอร์ของน้อง ย้ายใส่เคสไฟ RGB"
+symptom = "ย้ายเคสแล้วกดเปิดไม่ติด พ่อบอกว่าก่อนหน้านี้เครื่องก็อืดอยู่แล้ว"
+level = 4
+est_slots = 5
+due_shifts = 1
+months = PackedInt32Array(3, 4, 10, 11)
+part_id = "part_front_panel"
+job_title = "เสียบสายหน้าเคส + จัดแรม Dual Channel"
+arrive_dialog = "res://Assets/Dialog/Customer/lv4_kid_frontpanel.txt"
+thanks_text = "เปิดติดแล้ว ไฟสวยมากพี่! เครื่องก็เร็วขึ้นด้วย"
+complain_text = "ยังกดไม่ติดเลยพี่ พ่อต้องดุแน่ ๆ"

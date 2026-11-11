@@ -45,6 +45,47 @@ static func on_button(b: Button, id: StringName, px: int = 0) -> Button:
 	return b
 
 
+## [8 พ.ย. 2569] [ไอคอน ข้อความ] เป็นกลุ่มเดียวกันกลางปุ่ม (Godot วางไอคอนชิดขอบซ้ายเสมอถ้าจัดข้อความกลาง)
+## ข้อความย้ายไปอยู่ใน Label ลูก "IconRow" · สีตัวอักษรตามสถานะปุ่ม (ปกติ/ชี้/กด) · อ่านข้อความเดิมได้จาก get_meta("label")
+static func on_button_center(b: Button, id: StringName, px: int = 0) -> Button:
+	if px <= 0:
+		px = b.get_theme_font_size(&"font_size") + 2
+	var old := b.get_node_or_null(^"IconRow")
+	if old:
+		old.queue_free()
+	var lbl := Label.new()
+	lbl.text = b.text
+	lbl.add_theme_font_size_override(&"font_size", b.get_theme_font_size(&"font_size"))
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override(&"separation", 8)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_child(rect(id, px))
+	h.add_child(lbl)
+	var c := CenterContainer.new()
+	c.name = "IconRow"
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# เว้นขอบล่างให้เท่าขอบในของปุ่ม (ปุ่มลายไม้ขอบบน 15 ล่าง 9)
+	var sb := b.get_theme_stylebox(&"normal")
+	if sb:
+		c.offset_top = sb.content_margin_top - sb.content_margin_bottom
+	c.add_child(h)
+	b.set_meta(&"label", b.text)
+	b.text = ""
+	b.icon = null
+	b.add_child(c)
+	var col := func(state: StringName) -> void:
+		lbl.add_theme_color_override(&"font_color", b.get_theme_color(state))
+	col.call(&"font_color")
+	b.mouse_entered.connect(func() -> void: col.call(&"font_hover_color"))
+	b.mouse_exited.connect(func() -> void: col.call(&"font_color"))
+	b.button_down.connect(func() -> void: col.call(&"font_pressed_color"))
+	b.button_up.connect(func() -> void: col.call(&"font_hover_color" if b.is_hovered() else &"font_color"))
+	return b
+
+
 ## TextureRect สี่เหลี่ยม px×px ไว้วางหน้า Label ใน HBoxContainer
 static func rect(id: StringName, px: int) -> TextureRect:
 	var r := TextureRect.new()

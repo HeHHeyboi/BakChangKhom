@@ -36,6 +36,8 @@ const EXPENSE_KINDS := [&"bill", &"buy", &"ot_power", &"damage", &"other"]
 @onready var _strikes: Label = %Strikes
 @onready var _hint: Label = %Hint
 @onready var _continue: Button = %Continue
+## [0.2.5] กราฟกำไร 12 เดือน
+@onready var _chart: ProfitChart = get_node_or_null(^"%ProfitChart") as ProfitChart
 
 
 func _ready() -> void:
@@ -93,7 +95,7 @@ func show_report(title: String, sub: String, rep: Dictionary, bill: Dictionary, 
 		_result.text = "ถึงเป้าแล้ว!"
 		col = good_color
 	elif not bool(rep.get("counted", true)):
-		_result.text = "ยังไม่ถึงเป้า (เดือนแรกไม่นับ)"
+		_result.text = "ยังไม่ถึงเป้า (ช่วงเรียนรู้ ยังไม่นับ)"
 		col = warn_color
 	else:
 		_result.text = "ไม่ถึงเป้า"
@@ -107,11 +109,17 @@ func show_report(title: String, sub: String, rep: Dictionary, bill: Dictionary, 
 		fill.bg_color = col
 		_bar.add_theme_stylebox_override("fill", fill)
 	var debt := int(rep.get("debt", 0))
-	_strikes.text = "พลาดเป้า %s%s" % [
+	_strikes.text = "พลาดเป้าติดกัน %s%s" % [
 		_marks(int(rep.get("missed_months", 0)), econ.fail_missed_months),
 		("  ·  ค้างบิล %s %s" % [_baht(debt), _marks(int(rep.get("debt_streak", 0)), econ.fail_debt_months)]) if debt > 0 else "",
 	]
 	_hint.text = String(rep.get("hint", ""))
+	if _chart:
+		# เดือนที่ปิดแล้ว (GameState.month_results) · รายงานนี้อาจยังไม่อยู่ในรายการ (เรียกจาก month_report)
+		var all: Array = GameState.month_results.duplicate()
+		if not all.any(func(x: Dictionary) -> bool: return int(x.get("m", 0)) == int(rep.get("m", 0))):
+			all.append(rep)
+		_chart.set_data(all, int(rep.get("m", 0)))
 	_continue.text = button_text
 	visible = true
 

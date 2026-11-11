@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv2_headman_ram"
+customer = "ผู้ใหญ่บ้าน"
+reason = "คอมที่ทำการหมู่บ้านใช้พิมพ์หนังสือราชการ ต้องใช้ด่วน"
+device = "คอมพิวเตอร์ที่ทำการหมู่บ้าน"
+symptom = "เปิดแล้วพัดลมหมุน ไฟติด แต่จอดำ มีเสียงปี๊บยาว ๆ"
+level = 2
+est_slots = 3
+due_shifts = 1
+part_id = "part_ram"
+job_title = "ทำความสะอาดแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_headman_ram.txt"
+thanks_text = "ใช้ได้แล้ว ทันส่งหนังสืออำเภอพอดี ขอบใจหลาย"
+complain_text = "ยังจอดำอยู่เลยขม พรุ่งนี้อำเภอต้องการเอกสารแล้วนะ"

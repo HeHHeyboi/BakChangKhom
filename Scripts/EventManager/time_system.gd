@@ -1,10 +1,11 @@
 class_name TimeSystem extends CanvasLayer
 ## เวลาในเกม — กะ · สัปดาห์ · เดือน ตาม Docs/LEVEL_DESIGN.md ข้อ 4 · 7.1
 ## 1 กะ = 08:30–18:30 (ช่อง 30 นาที · ทำงานได้ 16 ช่อง) · พัก 12:00–13:00 และ 15:30–16:00
-## [15 ต.ค. 2569 · 0.2.0 ตัดสินใหม่] 1 บท (Chapter) = 1 สัปดาห์ · **ร้านเปิด 3 วัน: จ. · พ. · ศ.** (อ. · พฤ. ขมไปช่วยยาย/ซื้อของ) · 4 สัปดาห์ = 1 เดือน
-##   12 บท = 12 สัปดาห์ = ม.ค.–มี.ค. 2570 = 36 วันเล่น · ปฏิทินจริงปี 2570 (ค.ศ. 2027): เริ่ม จ. 4 ม.ค. → ทุกเดือนลงตัว 4 สัปดาห์พอดี
-##   จ. → พ. ข้าม 2 วัน · ศุกร์ → จันทร์ ข้าม 3 วัน · บิล/เป้ากำไร = รายเดือน (ทุก 4 บท) · ดู Docs/ROADMAP_1_0_0.md ข้อ 1
-##   (เดิมเปิด จ.–ศ. 5 วัน = 60 วันเล่น → ทีมเห็นว่านานไป: เล่นทั้งเกม 12–20 ชม. · กว่าจะเห็นสรุปเดือนแรก 4–7 ชม.)
+## [6 พ.ย. 2569 · 0.2.5 ตัดสินใหม่] **1 บท (Chapter) = 1 เดือน · 12 บท = 1 ปี (ม.ค.–ธ.ค. 2570)**
+##   แต่ละเดือนเปิดร้าน 4 วัน = วันที่ 4 · 11 · 18 · 25 ของเดือน (PLAY_DATES · สัปดาห์ละครั้ง) → ทั้งเกม 48 วันเล่น
+##   วันอื่นในเดือนเกิดนอกจอ (ข้ามวันด้วยปฏิทินฉีก 7 วัน · ข้ามเดือน 10–11 วัน) · บิล/เป้ากำไร/สรุปเดือน = ทุกบท
+##   ชื่อเดิมของ API ยังใช้ได้: week() = chapter() = month() = บท 1–12 · shift_in_week() = วันที่ 1–4 ของบท
+##   (0.2.0: 1 บท = 1 สัปดาห์ เปิด จ. พ. ศ. · 4 บท = 1 เดือน · ม.ค.–มี.ค. 36 วัน → ผู้เล่นเห็นสรุปเดือนแค่ 3 ครั้ง และเกมไม่ครบปี)
 ## นาฬิกาเดินตามการกระทำเท่านั้น (advance_minutes) ไม่เดินเอง
 ## [Claude 9 ต.ค. 2569] เขียนใหม่จาก "วันที่ 1, 2, 3…" — commit 3a1375b ลบ week_ended ไป ตอนนี้กลับมาในรูปกะ/สัปดาห์
 
@@ -15,16 +16,32 @@ const CLOSE := 18 * 60 + 30 # 18:30
 const OT_LIMIT := 19 * 60 + 30 # 19:30 (ล่วงเวลาได้ ≤ 2 ช่อง)
 ## [เริ่ม, จบ, ชื่อ] — ช่วงพัก ไม่นับเวลางาน · งานที่ทำค้างข้ามพักต่อหลังพักเอง
 const BREAKS := [[12 * 60, 13 * 60, &"lunch"], [15 * 60 + 30, 16 * 60, &"afternoon"]]
-const SHIFTS_PER_WEEK := 3
-## [0.2.0] วันที่ร้านเปิดในสัปดาห์ (0 = จ. … 4 = ศ.) · จำนวนต้องเท่ากับ SHIFTS_PER_WEEK
-const OPEN_WEEKDAYS := [0, 2, 4]
-const WEEKS_PER_MONTH := 4
-const MONTHS := 3
-const TOTAL_SHIFTS := SHIFTS_PER_WEEK * WEEKS_PER_MONTH * MONTHS # 36
+## [0.2.5] วันเปิดร้านต่อบท (= ต่อเดือน) · ชื่อเดิมยังเป็น "ต่อสัปดาห์" เพื่อไม่ให้โค้ดเพื่อนพัง
+const SHIFTS_PER_WEEK := 4
+## [0.2.5] วันที่ของเดือนที่ร้านเปิด (ตัวที่ i = วันที่ i+1 ของบท) · จำนวนต้องเท่ากับ SHIFTS_PER_WEEK · ต้องไม่เกิน 28
+const PLAY_DATES := [4, 11, 18, 25]
+## [0.2.5] 1 บท = 1 เดือน → 1 "สัปดาห์" (บท) ต่อเดือน
+const WEEKS_PER_MONTH := 1
+const MONTHS := 12
+const TOTAL_SHIFTS := SHIFTS_PER_WEEK * WEEKS_PER_MONTH * MONTHS # 48
 const WORK_SLOTS_PER_SHIFT := 16
 ## [0.2.0] ปฏิทินจริง พ.ศ. 2570 (ค.ศ. 2027 ไม่ใช่ปีอธิกสุรทิน) · วันแรกของเกม = จันทร์ 4 ม.ค. (วันที่ 4 ของปี)
 const YEAR_BE := 2570
 const START_DAY_OF_YEAR := 4
+const MONTH_FULL := [
+	"มกราคม",
+	"กุมภาพันธ์",
+	"มีนาคม",
+	"เมษายน",
+	"พฤษภาคม",
+	"มิถุนายน",
+	"กรกฎาคม",
+	"สิงหาคม",
+	"กันยายน",
+	"ตุลาคม",
+	"พฤศจิกายน",
+	"ธันวาคม",
+]
 const MONTH_DAYS := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const WEEKDAY_SHORT := ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."]
 const WEEKDAY_FULL := ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
@@ -36,32 +53,32 @@ enum TIME {
 }
 const PERIOD_START := { TIME.MORNING: 9 * 60, TIME.NOON: 13 * 60, TIME.EVENING: 16 * 60 }
 const PERIOD_NAME := { TIME.MORNING: "ช่วงเช้า", TIME.NOON: "ช่วงบ่าย", TIME.EVENING: "ช่วงเย็น" }
-const MONTH_NAME := ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."] # เกมเริ่มเดือนมกราคม · 4 บท (สัปดาห์) = 1 เดือน
+const MONTH_NAME := ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."] # เกมเริ่มเดือนมกราคม · [0.2.5] 1 บท = 1 เดือน
 
 ## ช่วงเวลาเปลี่ยน (เช้า → บ่าย → เย็น)
 signal period_changed(period: TIME)
 ## นาฬิกาเปลี่ยน
 signal clock_changed(minute: int)
-## เริ่มกะใหม่ (หลังปิดร้านกะก่อน) · month = week = บท 1–12 · shift_in_week = วันที่ 1–5 ของบท
+## เริ่มกะใหม่ (หลังปิดร้านกะก่อน) · month = week = บท 1–12 · shift_in_week = วันที่ 1–4 ของบท
 signal shift_started(month: int, week: int, shift_in_week: int)
 ## เดินเวลาข้ามช่วงพัก · kind = &"lunch" / &"afternoon"
 signal break_started(kind: StringName)
 ## นาฬิกาถึง 18:30
 signal shift_closed
-## ครบ 3 กะ (จ. พ. ศ.) (ยิงก่อน shift_started ของสัปดาห์ถัดไป) · DayLoop ใช้ทำสรุปสัปดาห์ + Chapter
+## ครบ 4 วันของบท (ยิงก่อน shift_started ของบทถัดไป) · DayLoop ใช้ทำสรุปบท + Chapter
 signal week_ended(week: int)
-## ครบ 4 บท (1 เดือน) · ยิงต่อจาก week_ended · DayLoop จ่ายบิลรายเดือน (GameState.pay_month_bill)
+## [0.2.5] สิ้นเดือน = สิ้นบท · ยิงต่อจาก week_ended ทุกบท · DayLoop จ่ายบิลรายเดือน (GameState.pay_month_bill)
 signal month_ended(month: int)
-## ครบ 60 กะ → ฉากจบ
+## ครบ 48 วัน (TOTAL_SHIFTS) → ฉากจบ
 signal game_ended
 
 @onready var timeText = $PanelContainer/HBoxContainer/Time as Label ## [Claude 10 ต.ค. 2569] เดิม RichTextLabel — engine แจ้ง "Rect2i size is negative" กับข้อความไทย
 @onready var dateText = $PanelContainer/HBoxContainer/Date as Label
 
-## กะที่เท่าไรของทั้งเกม 1–60 (ไม่โชว์ผู้เล่น)
+## กะที่เท่าไรของทั้งเกม 1–48 (ไม่โชว์ผู้เล่น)
 var shift := 1
 ## [Claude 10 ต.ค. 2569] true = HUD/การ์ดบอกเวลาเป็นนาฬิกา (แบบเดิม) · false = บอกเป็น "เทิร์น" แบบ Volcano Princess
-## 1 เทิร์น = 1 ช่อง 30 นาที (SLOT_MIN) · วันหนึ่งมี 16 เทิร์น · 1 บท = 1 สัปดาห์ (เปิดร้าน จ. พ. ศ.)
+## 1 เทิร์น = 1 ช่อง 30 นาที (SLOT_MIN) · วันหนึ่งมี 16 เทิร์น · 1 บท = 1 เดือน (เปิดร้าน 4 วัน)
 @export var show_clock := false
 
 var current_minute := OPEN
@@ -125,7 +142,7 @@ func work_slots_used_this_month() -> int:
 
 
 func work_slots_per_month() -> int:
-	return WORK_SLOTS_PER_SHIFT * SHIFTS_PER_WEEK * WEEKS_PER_MONTH # 320
+	return WORK_SLOTS_PER_SHIFT * SHIFTS_PER_WEEK * WEEKS_PER_MONTH # 64
 
 # ---------------------------------------------------------------- นาฬิกา
 
@@ -145,7 +162,7 @@ static func turns_text(n: int) -> String:
 	return "%d เทิร์น" % n
 
 
-## บทที่ 1–12 (1 บท = 1 สัปดาห์)
+## บทที่ 1–12 (1 บท = 1 เดือน)
 func chapter() -> int:
 	return week()
 
@@ -155,7 +172,7 @@ func days_left_in_chapter() -> int:
 	return SHIFTS_PER_WEEK - shift_in_week()
 
 
-## สัปดาห์ที่เท่าไรของเดือน 1–4
+## (เดิม) สัปดาห์ที่เท่าไรของเดือน · [0.2.5] 1 บท = 1 เดือน → คืน 1 เสมอ
 func week_in_month() -> int:
 	return (week() - 1) % WEEKS_PER_MONTH + 1
 
@@ -165,28 +182,24 @@ func days_left_in_month() -> int:
 	return (WEEKS_PER_MONTH - week_in_month()) * SHIFTS_PER_WEEK + days_left_in_chapter()
 
 
-## [0.2.0] วันที่ของปี (1 = 1 ม.ค.) ของวันที่เล่นวันนี้ · จ. พ. ศ. ของแต่ละสัปดาห์
+## [0.2.5] วันที่ของปี (1 = 1 ม.ค.) ของวันที่เล่นวันนี้
 func day_of_year() -> int:
-	return START_DAY_OF_YEAR + (week() - 1) * 7 + weekday()
+	return day_of_year_of(PLAY_DATES[shift_in_week() - 1], month())
 
 
 ## [0.2.0] วันที่ในปฏิทิน → Vector2i(วัน, เดือน 1–12)
 func calendar_date() -> Vector2i:
-	var d := day_of_year()
-	var m := 1
-	while m < 12 and d > days_in_month(m):
-		d -= days_in_month(m)
-		m += 1
-	return Vector2i(d, m)
+	return Vector2i(PLAY_DATES[shift_in_week() - 1], month())
 
 
 func calendar_day() -> int:
 	return calendar_date().x
 
 
-## 0 = จันทร์ … 4 = ศุกร์ (เฉพาะวันที่ร้านเปิด: จ. พ. ศ.)
+## 0 = จันทร์ … 6 = อาทิตย์ ([0.2.5] วันที่ 4 · 11 · 18 · 25 ตกวันไหนก็ได้ ร้านเปิดเสาร์–อาทิตย์ด้วย)
 func weekday() -> int:
-	return OPEN_WEEKDAYS[clampi(shift_in_week(), 1, SHIFTS_PER_WEEK) - 1]
+	var c := calendar_date()
+	return weekday_of(c.x, c.y)
 
 
 ## [0.2.0] "อ. 5 ม.ค."
@@ -195,14 +208,18 @@ func date_text() -> String:
 	return "%s %d %s" % [WEEKDAY_SHORT[weekday()], c.x, MONTH_NAME[c.y - 1]]
 
 
-## [0.2.0] ผ่านไปกี่วันในปฏิทินจากวันที่เล่นครั้งก่อน · จ.→พ. / พ.→ศ. = 2 · ศุกร์ → จันทร์ = 3 (ข้ามเสาร์–อาทิตย์) · วันแรกของเกม = 0
+## [0.2.5] ผ่านไปกี่วันในปฏิทินจากวันที่เล่นครั้งก่อน · ในเดือน = 7 · ข้ามเดือน = 25 → 4 ของเดือนถัดไป (9–10 วัน) · วันแรกของเกม = 0
 func days_since_last_play() -> int:
 	if shift <= 1:
 		return 0
-	var i := shift_in_week() - 1
-	if i == 0:
-		return 7 - OPEN_WEEKDAYS[SHIFTS_PER_WEEK - 1] + OPEN_WEEKDAYS[0]
-	return OPEN_WEEKDAYS[i] - OPEN_WEEKDAYS[i - 1]
+	return day_of_year() - shift_day_of_year(shift - 1)
+
+
+## [0.2.5] วันที่ของปีของกะ s (ไม่ต้องมีโหนด)
+static func shift_day_of_year(s: int) -> int:
+	s = clampi(s, 1, TOTAL_SHIFTS)
+	var ch := floori((s - 1) / float(SHIFTS_PER_WEEK)) + 1
+	return day_of_year_of(PLAY_DATES[(s - 1) % SHIFTS_PER_WEEK], ch)
 
 
 ## วันที่ของปีของ (วัน, เดือน)
@@ -218,17 +235,12 @@ static func weekday_of(day: int, month: int) -> int:
 	return posmod(day_of_year_of(day, month) - START_DAY_OF_YEAR, 7)
 
 
-## [0.2.0] ป้ายสั้นของกะ (ไม่ต้องมีโหนด) เช่นปุ่มเล่นต่อ: "บทที่ 1 · อ. 5 ม.ค."
+## [0.2.0] ป้ายสั้นของกะ (ไม่ต้องมีโหนด) เช่นปุ่มเล่นต่อ: "บทที่ 1 · จ. 4 ม.ค."
 static func shift_label(s: int) -> String:
 	s = clampi(s, 1, TOTAL_SHIFTS)
-	var wk := floori((s - 1) / float(SHIFTS_PER_WEEK)) + 1
-	var wd: int = OPEN_WEEKDAYS[(s - 1) % SHIFTS_PER_WEEK]
-	var doy := START_DAY_OF_YEAR + (wk - 1) * 7 + wd
-	var m := 1
-	while m < 12 and doy > days_in_month(m):
-		doy -= days_in_month(m)
-		m += 1
-	return "บทที่ %d · %s %d %s" % [wk, WEEKDAY_SHORT[wd], doy, MONTH_NAME[m - 1]]
+	var ch := floori((s - 1) / float(SHIFTS_PER_WEEK)) + 1
+	var d: int = PLAY_DATES[(s - 1) % SHIFTS_PER_WEEK]
+	return "บทที่ %d · %s %d %s" % [ch, WEEKDAY_SHORT[weekday_of(d, ch)], d, MONTH_NAME[ch - 1]]
 
 
 static func days_in_month(m: int) -> int:
@@ -429,10 +441,10 @@ func updateTime() -> void:
 	timeText.add_theme_color_override("font_color", col)
 	timeText.text = txt
 	dateText.text = (
-		"%s · สัปดาห์ %d · กะ %d/%d\n%s น. · ชม.งาน %d/%d"
+		"%s · บท %d · วันที่ %d/%d\n%s น. · ชม.งาน %d/%d"
 		% [
 			MONTH_NAME[month() - 1],
-			week(),
+			chapter(),
 			shift_in_week(),
 			SHIFTS_PER_WEEK,
 			clock_text(current_minute),
@@ -442,7 +454,7 @@ func updateTime() -> void:
 	)
 
 
-## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "อังคาร 5 ม.ค." / "บทที่ 1 · สัปดาห์ที่ 1 ของ ม.ค." ([0.2.0])
+## [10 ต.ค.] HUD แบบเทิร์น: "12 เทิร์น" · "จันทร์ 4 ม.ค." / "บทที่ 1 · มกราคม · วันที่ 1/4" ([0.2.5])
 func _update_turns() -> void:
 	var br := in_break()
 	var n := turns_left()
@@ -458,13 +470,14 @@ func _update_turns() -> void:
 		col = Color.ORANGE
 	timeText.add_theme_color_override("font_color", col)
 	timeText.text = txt
-	# [0.2.0] "อังคาร 5 ม.ค." / "บทที่ 1 · สัปดาห์ที่ 1 ของ ม.ค." — เลิกใช้ "วันที่ 2/5 · อีก 3 วันจบบท" (ทีมบอกว่างง)
+	# [0.2.5] "จันทร์ 4 ม.ค." / "บทที่ 1 · มกราคม · วันที่ 1/4" (1 บท = 1 เดือน เปิดร้าน 4 วัน)
 	var c := calendar_date()
-	dateText.text = "%s %d %s\nบทที่ %d · สัปดาห์ที่ %d ของ %s" % [
+	dateText.text = "%s %d %s\nบทที่ %d · %s · วันที่ %d/%d" % [
 		WEEKDAY_FULL[weekday()],
 		c.x,
 		MONTH_NAME[c.y - 1],
 		chapter(),
-		week_in_month(),
-		MONTH_NAME[clampi(month(), 1, MONTH_NAME.size()) - 1],
+		MONTH_FULL[clampi(month(), 1, MONTH_FULL.size()) - 1],
+		shift_in_week(),
+		SHIFTS_PER_WEEK,
 	]

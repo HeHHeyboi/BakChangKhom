@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w8_amnuay_storm_frontpanel"
+customer = "ลุงอำนวย"
+reason = "พายุเข้า ลุงยกคอมหนีน้ำขึ้นชั้นบน"
+device = "คอมพิวเตอร์ของลุง ยกหนีน้ำขึ้นชั้นบน"
+symptom = "ยกเครื่องหนีน้ำแล้วกดปุ่มเปิดไม่ติด ก่อนพายุก็ช้ามากอยู่แล้ว"
+level = 4
+est_slots = 5
+due_shifts = 1
+part_id = "part_front_panel"
+job_title = "เสียบสายหน้าเคส + จัดแรม Dual Channel"
+arrive_dialog = "res://Assets/Dialog/Customer/w8_amnuay_storm_frontpanel.txt"
+thanks_text = "ติดแล้ว! น้ำลดแล้วคอมก็ดีขึ้นกว่าเดิมอีก"
+complain_text = "ยังไม่ติดเลยขม รอไฟมาแล้วค่อยว่ากัน"
+forced = true

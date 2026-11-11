@@ -36,10 +36,12 @@ signal finished
 @onready var _page_day: Label = _page.get_node(^"Day")
 @onready var _cal_wd: Label = _cal.get_node(^"Weekday")
 @onready var _page_wd: Label = _page.get_node(^"Weekday")
-## ข้อความต่อท้ายป้ายเมื่อข้ามเสาร์–อาทิตย์
-@export var weekend_note := "หยุดเสาร์–อาทิตย์"
-## [0.2.0] ข้อความต่อท้ายเมื่อข้ามวันธรรมดาที่ร้านปิด (อ. · พฤ.)
+## (0.2.0) ข้อความต่อท้ายป้ายเมื่อข้ามเสาร์–อาทิตย์ · [0.2.5] ไม่ใช้แล้ว (ร้านเปิดสัปดาห์ละวัน วันที่ 4 · 11 · 18 · 25)
+@export var weekend_note := ""
+## ข้อความต่อท้ายเมื่อข้ามวันในเดือนเดียวกัน (วันที่ร้านปิด)
 @export var closed_note := "ร้านปิด ขมไปช่วยยาย"
+## [0.2.5] ข้อความต่อท้ายเมื่อข้ามขึ้นเดือนใหม่ · %s = ชื่อเดือนเต็ม
+@export var new_month_note := "เข้าสู่เดือน%s"
 
 var _page_pos: Vector2
 var _pib_pos: Vector2
@@ -85,13 +87,16 @@ func play(from_day: int, to_day: int, month: int, gap_days: int, notes: PackedSt
 		var d := _day_after(from_day, from_month, i + 1)
 		var wd_i := TimeSystem.weekday_of(d.x, d.y)
 		weekend = weekend or wd_i >= 5
-		closed = closed or (i < gap_days - 1 and wd_i < 5) # วันธรรมดาที่ข้ามไป (ไม่ใช่วันนี้)
+		closed = closed or i < gap_days - 1 # [0.2.5] วันที่ข้ามไป (ไม่ใช่วันนี้) ร้านปิดทุกวัน
 		_tw.tween_callback(_set_page.bind(_cal_month, _cal_day, d.y, d.x, _cal_wd))
 		_tw.tween_property(_page, "position", _page_pos + tear_offset, step).set_ease(Tween.EASE_IN)
 		_tw.parallel().tween_property(_page, "rotation", tear_rotation, step)
 		_tw.parallel().tween_property(_page, "modulate:a", 0.0, step)
 		_tw.tween_callback(_after_tear.bind(d.y, d.x, i + 1))
-	if weekend and weekend_note != "":
+	if from_month != month and new_month_note != "":
+		var note: String = new_month_note % TimeSystem.MONTH_FULL[clampi(month, 1, 12) - 1] if new_month_note.contains("%s") else new_month_note
+		_tw.tween_callback(func() -> void: _passed.text += " · " + note)
+	elif weekend and weekend_note != "":
 		_tw.tween_callback(func() -> void: _passed.text += " · " + weekend_note)
 	elif closed and closed_note != "":
 		_tw.tween_callback(func() -> void: _passed.text += " · " + closed_note)

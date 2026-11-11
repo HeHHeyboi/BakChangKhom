@@ -42,6 +42,8 @@ const PART_BENCH = "part_bench"
 @export_range(0, 14) var est_slots := 0
 ## ต้องรับภายในกี่กะ · 0 = ภายในกะนี้ · หมดเขต = ลูกค้าเดินออก
 @export_range(0, 10) var due_shifts := 1
+## [0.2.5] เดือนที่ลูกค้าคนนี้มาได้ (1 = ม.ค. … 12 = ธ.ค.) · ว่าง = ทุกเดือน · ใช้กับงานตามฤดู เช่น หน้าร้อนการ์ดจอร้อน (เม.ย.–พ.ค.) หน้าฝนแรมขึ้นสนิม
+@export var months: PackedInt32Array = []
 
 @export_group("งานซ่อม")
 ## Core Part ที่ต้องซ่อม → เปิดมินิเกมตัวนั้น
@@ -78,6 +80,11 @@ const PART_BENCH = "part_bench"
 @export_group("Event")
 ## event บังคับ: บทลูกค้าเล่นเองทันทีที่เข้าร้าน · ปฏิเสธงาน/ปิดร้านไม่ได้ (ใช้กับลูกค้าคนแรกหลัง Tutorial)
 @export var forced := false
+
+
+## [0.2.5] มาได้ในเดือนนี้ไหม
+func in_month(m: int) -> bool:
+	return months.is_empty() or months.has(m)
 
 
 func scene_path() -> String:

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv3_min_mainboard"
+customer = "มิ้น"
+reason = "ทำภาพโฆษณาร้านอยู่ดี ๆ เครื่องดับ"
+device = "คอมพิวเตอร์ที่มิ้นใช้ทำกราฟิก"
+symptom = "ทำงานหนัก ๆ ได้แป๊บเดียวเครื่องดับเอง ตรงกลางเครื่องร้อนจี๋"
+level = 3
+est_slots = 5
+due_shifts = 1
+months = PackedInt32Array(3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+part_id = "part_mainboard"
+job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
+arrive_dialog = "res://Assets/Dialog/Customer/lv3_min_mainboard.txt"
+thanks_text = "เรนเดอร์จบแล้ว! เดี๋ยวโฆษณาร้านเราออกพรุ่งนี้เลย"
+complain_text = "ยังดับอยู่เลยขม งานฉันค้างหมดแล้วนะ"

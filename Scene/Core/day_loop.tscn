@@ -4,6 +4,17 @@
 [ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="2_week"]
 [ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="3_case"]
 [ext_resource type="Resource" path="res://Resources/Week/week1.tres" id="w1"]
+[ext_resource type="Resource" path="res://Resources/Week/week2.tres" id="w2"]
+[ext_resource type="Resource" path="res://Resources/Week/week3.tres" id="w3"]
+[ext_resource type="Resource" path="res://Resources/Week/week4.tres" id="w4"]
+[ext_resource type="Resource" path="res://Resources/Week/week5.tres" id="w5"]
+[ext_resource type="Resource" path="res://Resources/Week/week6.tres" id="w6"]
+[ext_resource type="Resource" path="res://Resources/Week/week7.tres" id="w7"]
+[ext_resource type="Resource" path="res://Resources/Week/week8.tres" id="w8"]
+[ext_resource type="Resource" path="res://Resources/Week/week9.tres" id="w9"]
+[ext_resource type="Resource" path="res://Resources/Week/week10.tres" id="w10"]
+[ext_resource type="Resource" path="res://Resources/Week/week11.tres" id="w11"]
+[ext_resource type="Resource" path="res://Resources/Week/week12.tres" id="w12"]
 [ext_resource type="Resource" path="res://Resources/Customers/w1_d6_girl_ram.tres" id="p0"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_min_ram.tres" id="p1"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_teacher_ram.tres" id="p2"]
@@ -30,15 +41,40 @@
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_coworker_mouse.tres" id="b0"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_teacher_monitor.tres" id="b1"]
 [ext_resource type="Resource" path="res://Resources/Customers/lv2_kid_keyboard.tres" id="b2"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_headman_ram.tres" id="n0"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_amnuay_ram_rain.tres" id="n1"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_yai_ram.tres" id="n2"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv2_girl_ram.tres" id="n3"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_min_mainboard.tres" id="n4"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_teacher_mainboard.tres" id="n5"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_coworker_mainboard.tres" id="n6"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_yai_mainboard.tres" id="n7"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_kid_gpu_used.tres" id="n8"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_min_gpu.tres" id="n9"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_headman_gpu.tres" id="n10"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv3_director_gpu.tres" id="n11"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv4_headman_frontpanel.tres" id="n12"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv4_min_frontpanel.tres" id="n13"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv4_kid_frontpanel.tres" id="n14"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv4_coworker_frontpanel.tres" id="n15"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv4_amnuay_frontpanel.tres" id="n16"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv5_teacher_bios.tres" id="n17"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv5_min_bios.tres" id="n18"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv5_headman_bios.tres" id="n19"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv5_amnuay_bios.tres" id="n20"]
+[ext_resource type="Resource" path="res://Resources/Customers/lv5_boss_bios.tres" id="n21"]
 [ext_resource type="PackedScene" path="res://Scene/UI/day_skip.tscn" id="ui_dayskip"]
 [ext_resource type="PackedScene" path="res://Scene/UI/month_goal_bar.tscn" id="ui_goal"]
 [ext_resource type="PackedScene" path="res://Scene/UI/month_summary.tscn" id="ui_summary"]
+[ext_resource type="PackedScene" path="res://Scene/UI/visitor_toast.tscn" id="ui_toast"]
+[ext_resource type="PackedScene" path="res://Scene/UI/job_reminder.tscn" id="ui_reminder"]
+[ext_resource type="PackedScene" path="res://Scene/UI/reward_popup.tscn" id="ui_popup"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
 script = ExtResource("1_loop")
-week_plans = Array[ExtResource("2_week")]([ExtResource("w1")])
-random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5"), ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("b0"), ExtResource("b1"), ExtResource("b2")])
+week_plans = Array[ExtResource("2_week")]([ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9"), ExtResource("w10"), ExtResource("w11"), ExtResource("w12")])
+random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5"), ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("b0"), ExtResource("b1"), ExtResource("b2"), ExtResource("n0"), ExtResource("n1"), ExtResource("n2"), ExtResource("n3"), ExtResource("n4"), ExtResource("n5"), ExtResource("n6"), ExtResource("n7"), ExtResource("n8"), ExtResource("n9"), ExtResource("n10"), ExtResource("n11"), ExtResource("n12"), ExtResource("n13"), ExtResource("n14"), ExtResource("n15"), ExtResource("n16"), ExtResource("n17"), ExtResource("n18"), ExtResource("n19"), ExtResource("n20"), ExtResource("n21")])
 
 [node name="DaySkipLayer" type="CanvasLayer" parent="."]
 layer = 110
@@ -54,3 +90,18 @@ layer = 100
 layer = 108
 
 [node name="MonthSummary" parent="SummaryLayer" instance=ExtResource("ui_summary")]
+
+[node name="ToastLayer" type="CanvasLayer" parent="."]
+layer = 104
+
+[node name="VisitorToast" parent="ToastLayer" instance=ExtResource("ui_toast")]
+
+[node name="ReminderLayer" type="CanvasLayer" parent="."]
+layer = 11
+
+[node name="JobReminder" parent="ReminderLayer" instance=ExtResource("ui_reminder")]
+
+[node name="PopupLayer" type="CanvasLayer" parent="."]
+layer = 106
+
+[node name="RewardPopup" parent="PopupLayer" instance=ExtResource("ui_popup")]

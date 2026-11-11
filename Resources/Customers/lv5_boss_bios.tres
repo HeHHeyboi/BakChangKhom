@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"lv5_boss_bios"
+customer = "หัวหน้า"
+reason = "หัวหน้าเก่าส่งเครื่องมาให้ แอบดูฝีมือขมด้วย"
+device = "คอมพิวเตอร์ทดสอบของบริษัทเก่า"
+symptom = "เปลี่ยนไดรฟ์แล้วเปิดไม่เข้าระบบ แรมก็วิ่งช้ากว่าที่ควร"
+level = 5
+est_slots = 8
+due_shifts = 1
+months = PackedInt32Array(12)
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/lv5_boss_bios.txt"
+thanks_text = "เครื่องเร็วกว่าที่ฝ่ายไอทีบริษัททำให้อีก ไว้คุยเรื่องงานกันนะขม"
+complain_text = "ยังไม่เข้าระบบ… ไม่เป็นไร บริษัทจัดการเองได้"

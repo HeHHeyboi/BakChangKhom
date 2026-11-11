@@ -1,5 +1,5 @@
 extends Node
-## [Claude 9 ต.ค. 2569] ทดสอบลูปกะ/สัปดาห์ (LEVEL_DESIGN ข้อ 4–7): TimeSystem · ปลดระดับ · กระดานงาน · ล่วงเวลา · สรุปสัปดาห์
+## [Claude 9 ต.ค. 2569 · 0.2.5 1 บท = 1 เดือน] ทดสอบลูปกะ/บท/เดือน (LEVEL_DESIGN ข้อ 4–7): TimeSystem · ปลดระดับ · กระดานงาน · ล่วงเวลา · สรุปสัปดาห์
 ## เปิด Test/loop_test.tscn → F6 → Output ต้องจบด้วย "T DONE fails=0" · มินิเกมเปิดจริงแล้วปิดทันที (คะแนนสมมติ)
 
 var fails := 0
@@ -8,6 +8,7 @@ var _weeks: Array[int] = []
 var _months: Array[int] = []
 var _ended := false
 var _closed := 0
+var _rem_checked := false
 
 
 func _ready() -> void:
@@ -16,7 +17,7 @@ func _ready() -> void:
 	get_parent().remove_child(self)
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
-	DayLoop.demo_shifts = 5 # [0.2.0] เกมจริงจบบทที่ 1 ที่กะ 3 (จ. พ. ศ.) — เทสต์นี้เลื่อนไป 5 เพื่อทดสอบสรุปสัปดาห์ด้วย
+	DayLoop.demo_shifts = 6 # [0.2.5] เกมจริงจบบทที่ 1 ที่วันที่ 4 (25 ม.ค.) — เทสต์นี้เลื่อนไป 6 เพื่อทดสอบสรุปเดือน + บทที่ 2 ด้วย
 	DayLoop.day_skip_seconds = 0.0 # [0.2.0] ปิดแอนิเมชันข้ามวันระหว่างเดินลูป (ทดสอบแยกในหัวข้อ A2)
 	ts.break_started.connect(func(k: StringName) -> void: _breaks.append(k))
 	ts.week_ended.connect(func(w: int) -> void: _weeks.append(w))
@@ -46,51 +47,49 @@ func _ready() -> void:
 	ts.advance_minutes(120)
 	_check(ts.current_minute == TimeSystem.OT_LIMIT, "ล่วงเวลา → หยุด 19:30")
 	ts.set_shift(1)
-	for i in 2:
+	for i in 3:
 		ts.end_shift()
-	_check(_weeks.is_empty() and ts.shift_in_week() == 3, "2 กะยังไม่จบสัปดาห์")
+	_check(_weeks.is_empty() and ts.shift_in_week() == 4, "3 วันยังไม่จบบท")
 	ts.end_shift()
-	# [0.2.0 ตัดสินใหม่] 1 บท = 1 สัปดาห์ (เปิด จ. พ. ศ.) · 4 บท = 1 เดือน
-	_check(_weeks == [1] and _months.is_empty() and ts.week() == 2 and ts.chapter() == 2 and ts.month() == 1 and ts.shift_in_week() == 1, "ครบ 3 วัน → จบบท 1 (สัปดาห์ 1) · ยังเป็น ม.ค.")
+	# [0.2.5] 1 บท = 1 เดือน (เปิดร้าน 4 วัน วันที่ 4 · 11 · 18 · 25)
+	_check(_weeks == [1] and _months == [1] and ts.week() == 2 and ts.chapter() == 2 and ts.month() == 2 and ts.shift_in_week() == 1, "ครบ 4 วัน → จบบท 1 = สิ้นเดือน ม.ค. · บท 2 = ก.พ.")
 	ts.updateTime()
-	_check(ts.dateText.text.contains("จันทร์ 11 ม.ค.") and ts.dateText.text.contains("บทที่ 2 · สัปดาห์ที่ 2 ของ ม.ค.") and not ts.dateText.text.contains("จบบท"), "HUD บอกวัน + บท (%s)" % ts.dateText.text.replace("\n", " | "))
-	ts.set_shift(12)
+	_check(ts.dateText.text.contains("พฤหัสบดี 4 ก.พ.") and ts.dateText.text.contains("บทที่ 2 · กุมภาพันธ์ · วันที่ 1/4") and not ts.dateText.text.contains("สัปดาห์"), "HUD บอกวัน + บท + เดือน (%s)" % ts.dateText.text.replace("\n", " | "))
+	ts.set_shift(44)
 	ts.end_shift()
-	_check(_months == [1] and ts.month() == 2 and ts.chapter() == 5, "ครบ 12 วัน (4 บท) → month_ended(1) · บท 5 = ก.พ.")
-	_check(ts.work_slots_per_month() == 192 and TimeSystem.TOTAL_SHIFTS == 36, "เทิร์นงานต่อเดือน = 16 × 3 × 4 = 192 · ทั้งเกม 36 วัน")
-	ts.set_shift(36)
+	_check(_months.back() == 11 and ts.month() == 12 and ts.chapter() == 12, "ครบ 44 วัน → month_ended(11) · บท 12 = ธ.ค.")
+	_check(ts.work_slots_per_month() == 64 and TimeSystem.TOTAL_SHIFTS == 48, "เทิร์นงานต่อเดือน = 16 × 4 = 64 · ทั้งเกม 48 วัน")
+	ts.set_shift(48)
 	ts.end_shift()
-	_check(_ended and ts.finished and _months.back() == 3, "ครบ 36 วัน (12 บท) → month_ended(3) + game_ended")
+	_check(_ended and ts.finished and _months.back() == 12, "ครบ 48 วัน (12 บท = 1 ปี) → month_ended(12) + game_ended")
 	_weeks.clear()
 	_months.clear()
 
-	# ---------------- A2 · [0.2.0] ปฏิทินจริง 2570 · วันเดินทีละวัน · ศุกร์ → จันทร์ ข้ามเสาร์–อาทิตย์
+	# ---------------- A2 · [0.2.5] ปฏิทินจริง 2570 · เปิดร้านวันที่ 4 · 11 · 18 · 25 ของทุกเดือน
 	ts.set_shift(1)
 	_check(ts.date_text() == "จ. 4 ม.ค." and ts.days_since_last_play() == 0, "วันแรกของเกม = จ. 4 ม.ค. ไม่มีข้ามวัน")
 	ts.set_shift(2)
-	_check(ts.date_text() == "พ. 6 ม.ค." and ts.days_since_last_play() == 2, "วันที่ 2 = พ. 6 ม.ค. · ผ่านไป 2 วัน (อังคารร้านปิด)")
-	ts.set_shift(3)
-	_check(ts.date_text() == "ศ. 8 ม.ค." and ts.days_since_last_play() == 2, "วันที่ 3 = ศ. 8 ม.ค.")
+	_check(ts.date_text() == "จ. 11 ม.ค." and ts.days_since_last_play() == 7, "วันที่ 2 = 11 ม.ค. · ผ่านไป 7 วัน")
 	ts.set_shift(4)
-	_check(ts.date_text() == "จ. 11 ม.ค." and ts.days_since_last_play() == 3, "บท 2 เริ่ม จ. 11 ม.ค. · ข้ามเสาร์–อาทิตย์ = 3 วัน")
-	ts.set_shift(13)
-	_check(ts.date_text() == "จ. 1 ก.พ." and ts.month() == 2, "บท 5 = จ. 1 ก.พ. (เดือนลงตัว 4 สัปดาห์)")
-	ts.set_shift(25)
-	_check(ts.date_text() == "จ. 1 มี.ค." and ts.month() == 3, "บท 9 = จ. 1 มี.ค.")
-	ts.set_shift(36)
-	_check(ts.date_text() == "ศ. 26 มี.ค." and ts.days_left_in_month() == 0 and TimeSystem.shift_label(36) == "บทที่ 12 · ศ. 26 มี.ค.", "วันสุดท้ายของเกม = ศ. 26 มี.ค.")
+	_check(ts.date_text() == "จ. 25 ม.ค." and ts.days_left_in_month() == 0, "วันที่ 4 = 25 ม.ค. = วันสุดท้ายของ ม.ค.")
+	ts.set_shift(5)
+	_check(ts.date_text() == "พฤ. 4 ก.พ." and ts.month() == 2 and ts.days_since_last_play() == 10, "บท 2 เริ่ม พฤ. 4 ก.พ. · ข้ามเดือน 10 วัน")
+	ts.set_shift(9)
+	_check(ts.date_text() == "พฤ. 4 มี.ค." and ts.month() == 3 and ts.days_since_last_play() == 7, "บท 3 = 4 มี.ค. (ก.พ. 28 วัน → 25 ก.พ. ถึง 4 มี.ค. = 7 วัน)")
+	ts.set_shift(48)
+	_check(ts.date_text() == "ส. 25 ธ.ค." and ts.days_left_in_month() == 0 and TimeSystem.shift_label(48) == "บทที่ 12 · ส. 25 ธ.ค.", "วันสุดท้ายของเกม = ส. 25 ธ.ค.")
 	ts.set_shift(1)
-	_check(ts.days_left_in_month() == 11 and TimeSystem.weekday_of(9, 1) == 5 and TimeSystem.weekday_of(10, 1) == 6, "เหลือ 11 วันทำการใน ม.ค. · 9–10 ม.ค. = เสาร์–อาทิตย์")
+	_check(ts.days_left_in_month() == 3 and TimeSystem.weekday_of(9, 1) == 5 and TimeSystem.weekday_of(10, 1) == 6, "เหลือ 3 วันเปิดร้านใน ม.ค. · 9–10 ม.ค. = เสาร์–อาทิตย์")
 	var ds: DaySkip = DayLoop._day_skip
-	ds.play(29, 1, 2, 3, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
+	ds.play(25, 4, 2, 10, PackedStringArray(["ของที่สั่งมาถึงแล้ว"]), 0.4)
 	await _frames(3)
 	_check(ds.visible and ds.is_playing() and ds._pib.texture != null, "ข้ามวัน → จอปิ๊บ + ปฏิทินขึ้น")
 	await ds.finished
-	_check(not ds.visible and ds._page_day.text == "1" and ds._page_month.text == "ก.พ." and ds._page_wd.text == "จันทร์" and ds._passed.text.begins_with("ผ่านไป 3 วัน") and ds._passed.text.contains("หยุดเสาร์–อาทิตย์"), "ศ. 29 ม.ค. → จ. 1 ก.พ. · ป้าย \"%s\"" % ds._passed.text)
+	_check(not ds.visible and ds._page_day.text == "4" and ds._page_month.text == "ก.พ." and ds._page_wd.text == "พฤหัสบดี" and ds._passed.text.begins_with("ผ่านไป 10 วัน") and ds._passed.text.contains("เข้าสู่เดือนกุมภาพันธ์"), "25 ม.ค. → พฤ. 4 ก.พ. · ป้าย \"%s\"" % ds._passed.text)
 	_check(ds._pib.visible and ds._say.text == "ของที่สั่งมาถึงแล้ว" and not ds._say.text.contains("ผ่านไป"), "ปิ๊บพูดแค่เรื่องที่เกิดระหว่างข้ามวัน")
-	ds.play(4, 6, 1, 2, PackedStringArray(), 0.3)
+	ds.play(4, 11, 1, 7, PackedStringArray(), 0.3)
 	await ds.finished
-	_check(not ds._pib.visible and ds._page_day.text == "6" and ds._page_wd.text == "พุธ" and ds._passed.text == "ผ่านไป 2 วัน · ร้านปิด ขมไปช่วยยาย", "จ. 4 → พ. 6 ม.ค. · ไม่มีปิ๊บ · บอกว่าอังคารร้านปิด (%s)" % ds._passed.text)
+	_check(not ds._pib.visible and ds._page_day.text == "11" and ds._page_wd.text == "จันทร์" and ds._passed.text == "ผ่านไป 7 วัน · ร้านปิด ขมไปช่วยยาย", "4 → 11 ม.ค. · ไม่มีปิ๊บ · บอกว่าร้านปิด (%s)" % ds._passed.text)
 
 	# ---------------- B · ระดับงาน
 	DayLoop._reset_run()
@@ -104,8 +103,14 @@ func _ready() -> void:
 	var uniq := { }
 	for i in ids:
 		uniq[i] = true
-	_check(DayLoop.board.size() == 5 and uniq.size() == 5 and DayLoop.board.all(func(j: Dictionary) -> bool: return j["case"].level <= 2),
-		"กะ 1 กระดานมีงาน Lv1–2 %d ใบ (ไม่ซ้ำ) %s" % [DayLoop.board.size(), ids])
+	# [0.2.5] ลูกค้า 5 คน (ชื่อเสียง 20 = ปกติ) ทยอยมา 3 รอบ: เปิดร้าน 3 · 11:00 1 · 14:00 1
+	_check(DayLoop.visitors_today == 5 and GameState.economy.split_waves(5) == PackedInt32Array([3, 1, 1]) and DayLoop.visitor_waves.size() == 2, "ลูกค้าวันนี้ 5 คน แบ่ง 3 · 1 · 1 (%s)" % [DayLoop.visitor_waves])
+	_check(DayLoop.board.size() == 3 and uniq.size() == 3 and DayLoop.board.all(func(j: Dictionary) -> bool: return j["case"].level <= 2 and j.get("walkin", false)),
+		"กะ 1 เปิดร้านมีลูกค้า Lv1–2 %d คน (ไม่ซ้ำ · รอได้แค่วันนี้) %s" % [DayLoop.board.size(), ids])
+	var e := GameState.economy
+	_check(e.visitors_for(1, 10) == 4 and e.visitors_for(1, 20) == 5 and e.visitors_for(1, 45) == 6 and e.visitors_for(1, 80) == 7 and e.visitors_for(9, 0) == 2 and e.visitors_for(8, 0) == 2, "[0.2.5] ชื่อเสียงคุมจำนวนลูกค้า: <20 → 4 · 20 → 5 · 45 → 6 · 80 → 7 · ก.ย./ส.ค. ชื่อเสียง 0 → ขั้นต่ำ 2")
+	_check(e.visitors_for(2, 20) == 6 and e.visitors_for(6, 20) == 3 and String(e.month_event(4).name) == "สงกรานต์" and e.month_events.size() == 12 and e.month_event_notes.size() == 12 and e.month_visitor_bonus.size() == 12, "[0.2.5] เทศกาล: ตรุษจีน +1 · บุญบั้งไฟ −1 · เม.ย. = สงกรานต์ · ครบ 12 เดือน")
+	_check(DayLoop.visitors_line().contains("ลูกค้าวันนี้มาแล้ว 3/5 คน") and DayLoop.visitors_line().contains("รอบถัดไปอีก"), "กระดานบอกชื่อเสียง + ลูกค้าวันนี้ (%s)" % DayLoop.visitors_line())
 	_check(DayLoop.forced_case != null and DayLoop.forced_case.id == &"w1_d1_amnuay_space", "กะ 1 มีงานบังคับ ลุงอำนวย")
 	_check(DayLoop.forced_case.level == 1 and DayLoop.forced_case.part_id == "part_desktop", "งานแรกของลุงเป็นงานบนจอ Lv1 (ไม่ซ้ำเควสต์ซ่อมแรม)")
 	# ส่วนที่เหลือของเทสต์ทดสอบกลไกเวลา/ปลดระดับด้วยงาน Lv2 → ใช้เคสซ่อมแรมเดิมเป็นงานบังคับแทน
@@ -129,6 +134,8 @@ func _ready() -> void:
 	_check(ts.current_minute == 11 * 60, "งาน Lv2 3 ช่อง + ครั้งแรก 1 ช่อง → 09:00 → 11:00 (%s)" % TimeSystem.clock_text(ts.current_minute))
 	_check(DayLoop._card == DayLoop.Card.RESULT and GameState.money == GameState.economy.start_money + 150 + 20,
 		"การ์ดผลงาน · ค่าแรง Lv2 ฿150 + ทิป ⭐⭐⭐ ฿20 (เงิน %d)" % GameState.money)
+	var pops := DayLoop.reward_popup.live.map(func(l: Label) -> String: return l.text)
+	_check(DayLoop.reward_popup.get_parent().name == "PopupLayer" and (DayLoop.reward_popup.get_parent() as CanvasLayer).layer == 106 and pops.has("+฿170") and pops.has("XP +100") and pops.any(func(t: String) -> bool: return t.begins_with("ชื่อเสียง +")), "[0.2.5] ตัวเลขเด้งตอนส่งงาน (PopupLayer ชั้น 106) %s" % [pops])
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
 	DayLoop._on_primary()
 	await _frames(3)
@@ -200,43 +207,55 @@ func _ready() -> void:
 	await _frames(3)
 	_check(DayLoop._board_panel.visible and not DayLoop._cards_tab.visible, "กดแถบ → กระดานงานกลับมา")
 
-	# กะ 2–3: ปิดร้านเลย · งานหมดเขตต้องเดินออก
-	for s in range(2, 4):
+	# กะ 2–4: ปิดร้านเลย · งานหมดเขตต้องเดินออก
+	for s in range(2, 5):
 		ts.set_clock(TimeSystem.CLOSE)
 		await _frames(3)
 		_check(DayLoop._card == DayLoop.Card.SHIFT_END, "กะ %d ปิดร้าน" % s)
 		DayLoop._on_primary()
 		await _frames(3)
-	_check(_weeks == [1] and DayLoop._card == DayLoop.Card.WEEK_SUMMARY, "ครบ 3 กะ → สรุปสัปดาห์ 1")
+	_check(_weeks == [1] and _months == [1] and DayLoop._card == DayLoop.Card.WEEK_SUMMARY and DayLoop.month_summary.visible, "[0.2.5] ครบ 4 วัน → สรุปบท 1 = หน้าสรุปเดือน ม.ค.")
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
-	_check(GameState.reputation < rep, "ลูกค้าที่รอนานเกินเดินออก → ชื่อเสียงลด (%d → %d)" % [rep, GameState.reputation])
+	var goal_rep: int = GameState.economy.rep_month_goal if bool(DayLoop._last_month.get("reached", false)) else 0
+	_check(GameState.reputation < rep + goal_rep, "ลูกค้าที่รอนานเกินเดินออก → ชื่อเสียงลด (%d → %d)" % [rep, GameState.reputation])
 	DayLoop._on_primary()
 	await _frames(3)
-	_check(DialogScene.visible and DialogScene.Title.text.contains("คอมเก่า"), "สรุปสัปดาห์ → บท Chapter 2")
+	_check(DialogScene.visible and DialogScene.Title.text.contains("เก่าของขม"), "สรุปสัปดาห์ → บท Chapter 2")
 	DialogScene.dialog_end()
+	await _frames(3)
+	# [0.2.5] บท 2 วันที่ 1 มีลูกค้าเนื้อเรื่อง (week2.tres) เดินเข้ามาเอง → เล่นให้จบก่อน
+	_check(ts.week() == 2 and DayLoop.forced_case != null and DayLoop.forced_case.id == &"w2_min_ram", "บท 2 วันที่ 1 มีงานเนื้อเรื่อง มิ้น (%s)" % (DayLoop.forced_case.id if DayLoop.forced_case else "ไม่มี"))
+	await _wait(DayLoop.time_skip_seconds + DayLoop.forced_delay + 1.2)
+	_check(DialogScene.visible and DialogScene.Title.text.contains("มิ้น"), "มิ้นเดินเข้ามาเอง (%s)" % DialogScene.Title.text)
+	DialogScene.dialog_end()
+	await _frames(3)
+	_check(DayLoop._card == DayLoop.Card.JOB_FORCED, "การ์ดงานเนื้อเรื่อง ปุ่มเดียว")
+	DayLoop._on_primary()
+	await _finish_minigame(90)
+	DayLoop._on_primary()
 	await _frames(3)
 	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.BOARD, "สัปดาห์ 2 กะ 1 → กระดานงาน")
 	_check(DayLoop.effective_weights(2)[2] > 0.0, "สัปดาห์ 2 มีสัดส่วน Lv3 แล้ว (%s)" % DayLoop.effective_weights(2))
 
 	# [10 ต.ค.] จบบท (demo_shifts): ปิดร้านกะสุดท้าย → การ์ดจบบท → กลับบ้าน → บทยาย → ป้าย "กำลังพัฒนา"
-	# (เกมจริงจบที่กะ 3 = จบบทที่ 1 · เทสต์นี้ตั้ง 5 เพื่อทดสอบสรุปสัปดาห์ + Chapter 2 ก่อน)
-	for s in [4, 5]:
+	# (เกมจริงจบที่วันที่ 4 = จบบทที่ 1 · เทสต์นี้ตั้ง 6 เพื่อทดสอบสรุปเดือน + Chapter 2 ก่อน)
+	for s in [5, 6]:
 		ts.set_clock(TimeSystem.CLOSE)
 		await _frames(3)
 		_check(DayLoop._card == DayLoop.Card.SHIFT_END and ts.shift == s, "กะ %d ปิดร้าน" % s)
-		if s == 5:
-			_check(DayLoop._primary.text.contains("จบบทที่"), "กะ 5 ปุ่มปิดร้าน = จบบท (%s)" % DayLoop._primary.text)
+		if s == 6:
+			_check(DayLoop._primary.text.contains("จบบทที่"), "กะ 6 ปุ่มปิดร้าน = จบบท (%s)" % DayLoop._primary.text)
 		DayLoop._on_primary()
 		await _frames(3)
-	_check(DayLoop.demo_over and ts.shift == 5 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 5 กะ → การ์ดสิ้นสุดการเล่นเดโม")
+	_check(DayLoop.demo_over and ts.shift == 6 and DayLoop._card == DayLoop.Card.DEMO_END, "ครบ 6 วัน → การ์ดสิ้นสุดการเล่นเดโม")
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
-	_check(DayLoop._title.text.contains("จบบทที่ 1") and DayLoop._body.text.contains("ยศช่าง"), "การ์ดจบบทมียศช่าง")
+	_check(DayLoop._title.text.contains("จบบทที่ 2") and DayLoop._body.text.contains("ยศช่าง"), "การ์ดจบบทมียศช่าง (เดโมเทสต์จบวันที่ 6 = บทที่ 2)")
 	DayLoop._on_primary()
 	await _wait(3.0)
-	_check(SceneRouter.current_id == SceneRouter.HOME and DialogScene.visible and DialogScene.Title.text == "จบบทที่ 1", "กลับบ้าน → บทปิดบทกับยาย (%s · %s · %s)" % [SceneRouter.current_id, DialogScene.visible, DialogScene.Title.text])
+	_check(SceneRouter.current_id == SceneRouter.HOME and DialogScene.visible and DialogScene.Title.text == "จบบทที่ 2", "กลับบ้าน → บทปิดบทกับยาย (%s · %s · %s)" % [SceneRouter.current_id, DialogScene.visible, DialogScene.Title.text])
 	DialogScene.dialog_end()
 	await _frames(3)
-	_check(DayLoop._demo_banner.visible, "จบบทกับยาย → ป้ายจบบทที่ 1 (กำลังพัฒนาบทที่ 2)")
+	_check(DayLoop._demo_banner.visible and (DayLoop._demo_card.find_child("Text", true, false) as Label).text.contains("บทที่ 3"), "จบบทกับยาย → ป้ายจบบทที่ 2 (กำลังพัฒนาบทที่ 3)")
 	_check(DayLoop._card == DayLoop.Card.NONE and not DayLoop._board_panel.visible, "หลังจบเดโมไม่มีกระดานงาน")
 	_check(DayLoop._demo_card.visible and DayLoop._demo_layer.layer > 100, "หน้าจบเดโมอยู่กลางจอ เหนือ HUD")
 	_check(Audio.want_music() == &"demo_end", "จบเดโม → เพลงจบเดโม")
@@ -245,19 +264,74 @@ func _ready() -> void:
 	DayLoop._reset_run()
 	_check(not DayLoop.demo_over and not DayLoop._demo_banner.visible and ts.shift == 1, "เริ่มใหม่ → ล้างสถานะเดโม")
 
-	# บิลรายเดือน [0.2.0] ทุก 4 บท · ค่าเช่า 1,500 + ไฟ (ฐาน + 4/เทิร์น) + น้ำ 100 + เน็ต 300
+	# [0.2.5] ลูกค้าทยอยมา: 11:00 · 14:00 · ป้ายแจ้ง · ไม่รับภายในวัน = กลับบ้าน ชื่อเสียง −1/คน
+	DayLoop._reset_run()
+	var toast: VisitorToast = DayLoop.visitor_toast
+	_check(toast != null and toast.get_parent().name == "ToastLayer" and (toast.get_parent() as CanvasLayer).layer == 104, "ป้ายลูกค้าเข้าร้านอยู่ใน day_loop.tscn → ToastLayer ชั้น 104")
+	toast.clear()
+	ts.set_clock(11 * 60)
+	_check(DayLoop.visitors_arrived == 4 and DayLoop.board.size() == 4 and toast._queue.size() == 1 and toast._queue[0][0] == "ลูกค้าเดินเข้าร้าน 1 คน", "11:00 ลูกค้ารอบ 2 เข้าร้าน + ป้ายแจ้ง")
+	ts.set_clock(14 * 60 + 30)
+	_check(DayLoop.visitors_arrived == 5 and DayLoop.visitor_waves.is_empty(), "14:00 ครบ 5 คน")
+	var rep_close := GameState.reputation
+	var n_left := DayLoop.board.size()
+	ts.end_shift()
+	await _frames(2)
+	_check(DayLoop.left_home.size() == n_left and GameState.reputation == rep_close + n_left * GameState.economy.rep_left_unserved and DayLoop.walkouts.is_empty(), "ปิดร้าน → ลูกค้า %d คนกลับบ้าน ชื่อเสียง −1/คน (%d → %d)" % [n_left, rep_close, GameState.reputation])
+	DayLoop._reset_run()
+	ts.set_clock(TimeSystem.CLOSE)
+	_check(DayLoop.visitors_arrived == 3 and DayLoop.visitor_waves.is_empty(), "ข้ามไปปิดร้านเลย → รอบ 11:00/14:00 ไม่มา (ไม่หักชื่อเสียง)")
+	DayLoop._reset_run()
+
+	# [0.2.5] เนื้อหา: บท 2–12 มีงานเนื้อเรื่อง · งานในคลังกรอกครบ · ทุกเดือนมีงานแต่ละระดับให้เลือกพอ
+	var plan_weeks := { }
+	for plan in DayLoop.week_plans:
+		var fc0: CustomerCase = plan.case_for_shift(1) if plan else null
+		if plan and fc0 and fc0.forced and fc0.problems().is_empty():
+			plan_weeks[plan.week] = true
+	_check(plan_weeks.size() == 12, "บท 1–12 มีงานเนื้อเรื่องวันที่ 1 ครบ (%s)" % [plan_weeks.keys()])
+	var bad := PackedStringArray()
+	for c in DayLoop.random_pool:
+		if c.forced or not c.problems().is_empty():
+			bad.append("%s %s" % [c.id, c.problems()])
+	_check(DayLoop.random_pool.size() >= 48 and bad.is_empty(), "คลังสุ่ม %d งาน กรอกครบ ไม่มีงานบังคับปน %s" % [DayLoop.random_pool.size(), bad])
+	var thin := PackedStringArray()
+	for m in range(1, 13):
+		for lv in range(1, 6):
+			var n := DayLoop.random_pool.filter(func(c: CustomerCase) -> bool: return c.level == lv and c.in_month(m)).size()
+			if n < (4 if lv >= 3 else 8):
+				thin.append("เดือน %d Lv%d มี %d" % [m, lv, n])
+	_check(thin.is_empty(), "ทุกเดือนมีงาน Lv1–2 ≥ 8 · Lv3–5 ≥ 4 ให้สุ่ม %s" % thin)
+
+	# [8 พ.ย.] บทปิ๊บใช้อาการจากใบงานลูกค้า ({symptom|ข้อความเดิม})
+	var hc: CustomerCase = load("res://Resources/Customers/w1_d2_headman_mainboard.tres")
+	var tpl := "{customer|ลูกค้า}บอกว่า \"{symptom|เล่นเกมไปสักพักแล้วดับเอง}\""
+	_check(PartMinigame.fill_case_text(tpl, hc) == "ผู้ใหญ่บ้านบอกว่า \"%s\"" % hc.symptom and PartMinigame.fill_case_text(tpl, null) == "ลูกค้าบอกว่า \"เล่นเกมไปสักพักแล้วดับเอง\"", "บทปิ๊บ: งานลูกค้าใช้อาการจากใบงาน · บทฝึกใช้ข้อความเดิม")
+	var leftover := PackedStringArray()
+	for f in ["Ram", "Mainboard", "Gpu", "FrontPanel", "Bios"]:
+		var dd := PhaseDialogParser.parse("res://Assets/Dialog/MiniGame/%s_Pib.txt" % f)
+		for k in dd:
+			for t in dd[k]:
+				var filled := PartMinigame.fill_case_text(t.dialog, hc)
+				if filled.contains("{") or filled.contains("|"):
+					leftover.append("%s/%s" % [f, k])
+	_check(leftover.is_empty(), "บทปิ๊บ 5 Part ไม่มีตัวแทนค้าง %s" % leftover)
+
+	# บิลรายเดือน [0.2.5] ทุกบท · ค่าเช่า (ม.ค. ฿0 · ก.พ.–เม.ย. ฿300) + ไฟ (ฐาน + 2/เทิร์น) + น้ำ 50 + เน็ต 150
 	GameState.debt = 0
 	GameState.money = 5000
 	var m0 := GameState.money
-	var bill := GameState.pay_month_bill(1, 100)
-	_check(int(bill["total"]) == 1500 + (200 + 400) + 100 + 300 and GameState.money == m0 - int(bill["paid"]) and GameState.debt == 0, "บิล ม.ค. (ทำงาน 100 เทิร์น) = ฿2,500 (จ่าย %d)" % bill["paid"])
+	var bill := GameState.pay_month_bill(1, 50)
+	_check(int(bill["total"]) == 0 + (100 + 100) + 50 + 150 and GameState.money == m0 - int(bill["paid"]) and GameState.debt == 0, "บิล ม.ค. (ทำงาน 50 เทิร์น · ยายไม่เก็บค่าเช่า) = ฿400 (จ่าย %d)" % bill["paid"])
 	bill = GameState.pay_month_bill(3, 0)
-	_check(int(bill["power"]) == 250 and int(bill["total"]) == 1500 + 250 + 100 + 300, "บิล มี.ค. ไฟฐาน 250 (หน้าร้อน) = %d" % bill["total"])
+	_check(int(bill["power"]) == 150 and int(bill["total"]) == 300 + 150 + 50 + 150, "บิล มี.ค. ไฟฐาน 150 (หน้าร้อน) = %d" % bill["total"])
+	bill = GameState.pay_month_bill(12, 0)
+	_check(int(bill["rent"]) == 500 and int(bill["total"]) == 500 + 100 + 50 + 150, "บิล ธ.ค. ค่าเช่า 500 = %d" % bill["total"])
 	GameState.money = 100
 	bill = GameState.pay_month_bill(2, 0)
 	_check(int(bill["paid"]) == 100 and GameState.money == 0 and GameState.debt == int(bill["total"]) - 100, "เงินไม่พอ → จ่ายเท่าที่มี ส่วนที่ขาดเป็นยอดค้าง (ค้าง %d)" % GameState.debt)
 	bill = GameState.pay_month_bill(3, 0)
-	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 1500 + 250 + 100 + 300 + int(bill["prev_debt"]) + int(bill["late_fee"]) and int(bill["late_fee"]) == ceili(int(bill["prev_debt"]) * 0.1), "ยอดค้างเดิม + ค่าปรับ 10%% รวมในบิลเดือนถัดไป (ปรับ ฿%d)" % bill["late_fee"])
+	_check(int(bill["prev_debt"]) > 0 and int(bill["total"]) == 300 + 150 + 50 + 150 + int(bill["prev_debt"]) + int(bill["late_fee"]) and int(bill["late_fee"]) == ceili(int(bill["prev_debt"]) * 0.1), "ยอดค้างเดิม + ค่าปรับ 10%% รวมในบิลเดือนถัดไป (ปรับ ฿%d)" % bill["late_fee"])
 	GameState.debt = 0
 
 	print("T DONE fails=", fails)
@@ -272,6 +346,15 @@ func _finish_minigame(score: int) -> void:
 	if m == null:
 		return
 	var c: CustomerCase = DayLoop.today_case
+	if not _rem_checked:
+		# [8 พ.ย.] ปุ่ม "งาน" ระหว่างซ่อม (ReminderLayer ชั้น 11) → การ์ดบอกว่าลูกค้าขออะไร
+		_rem_checked = true
+		await _frames(2)
+		var rem: JobReminder = DayLoop.job_reminder
+		_check(rem != null and (rem.get_parent() as CanvasLayer).layer == 11 and rem._btn.visible, "ระหว่างซ่อมมีปุ่ม \"งาน\" เหนือมินิเกม")
+		rem.open_card()
+		_check(rem.is_open() and rem.card_text().contains(c.customer) and rem.card_text().contains(c.symptom), "กดแล้วเห็นว่าลูกค้าขออะไร (%s)" % rem.card_text().replace("\n", " | "))
+		rem.close_card()
 	GameState.record_repair(c.part(), score, false, c.fee, c.level)
 	SceneRouter.pop()
 	Global.in_minigame = false

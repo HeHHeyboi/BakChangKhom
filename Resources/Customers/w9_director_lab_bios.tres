@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w9_director_lab_bios"
+customer = "ผอ."
+reason = "ก่อนขมไปสอนที่โรงเรียน เครื่องในห้องคอมต้องพร้อม"
+device = "คอมพิวเตอร์เครื่องครูในห้องคอมโรงเรียน"
+symptom = "เปลี่ยนไดรฟ์ใหม่แล้วเปิดไม่เข้าระบบ แรมก็ช้ากว่าสเปก"
+level = 5
+est_slots = 8
+due_shifts = 1
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS + ลง Windows"
+arrive_dialog = "res://Assets/Dialog/Customer/w9_director_lab_bios.txt"
+thanks_text = "เครื่องครูพร้อมแล้ว พรุ่งนี้มาสอนเด็ก ๆ ได้เลยนะคุณขม"
+complain_text = "ยังไม่เข้าระบบเลย พรุ่งนี้คงต้องสอนจากกระดานไปก่อน"
+forced = true

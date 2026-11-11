@@ -21,7 +21,10 @@ func _ready() -> void:
 	GameState.level_stars[1] = 2
 	DayLoop.board.clear()
 	var cc: CustomerCase = load("res://Resources/Customers/lv1_girl_wifi.tres")
-	DayLoop.board.append({ "case": cc, "due_shift": 5, "phone": true })
+	DayLoop.board.append({ "case": cc, "due_shift": 5, "phone": true, "walkin": true })
+	DayLoop.visitor_waves = [{ "minute": 840, "count": 2 }] as Array[Dictionary]
+	DayLoop.visitors_today = 6
+	DayLoop.visitors_arrived = 4
 	EventManager.jump_event(EventManager.EventID.MAIN, 1)
 	SceneRouter.current_id = SceneRouter.VILLAGE
 	_check(SaveGame.save() and SaveGame.exists(), "บันทึกได้")
@@ -31,11 +34,15 @@ func _ready() -> void:
 	ts.set_shift(1)
 	GameState.reset()
 	DayLoop.board.clear()
+	DayLoop.visitor_waves.clear()
+	DayLoop.visitors_today = 0
+	DayLoop.visitors_arrived = 0
 	EventManager.jump_event(EventManager.EventID.MAIN, 0)
 	var loc := SaveGame.load_into()
 	_check(loc == SceneRouter.VILLAGE, "โหลด → กลับฉากหน้าบ้าน")
 	_check(ts.shift == 4 and GameState.money == 1234 and GameState.xp == 77 and GameState.reputation == 33 and GameState.level_stars.get(1, 0) == 2, "โหลด → กะ เงิน XP ชื่อเสียง ดาว ครบ")
-	_check(DayLoop.board.size() == 1 and DayLoop.board[0].case == cc and DayLoop.board[0].due_shift == 5 and DayLoop.board[0].phone, "โหลด → กระดานงานครบ")
+	_check(DayLoop.board.size() == 1 and DayLoop.board[0].case == cc and DayLoop.board[0].due_shift == 5 and DayLoop.board[0].phone and DayLoop.board[0].walkin, "โหลด → กระดานงานครบ")
+	_check(DayLoop.visitor_waves.size() == 1 and int(DayLoop.visitor_waves[0].minute) == 840 and int(DayLoop.visitor_waves[0].count) == 2 and DayLoop.visitors_today == 6 and DayLoop.visitors_arrived == 4, "[0.2.5] โหลด → ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้ครบ")
 	var ev = EventManager.eventMap[EventManager.EventID.MAIN]
 	_check(ev.currentTask == 1 and not ev.isDone, "โหลด → เควสต์ขั้นที่ 2")
 
@@ -53,7 +60,7 @@ func _ready() -> void:
 	add_child(start)
 	await get_tree().process_frame
 	var cont: Button = start.get_node("Menu/Continue_Button")
-	_check(cont.visible and cont.text.contains("บทที่ 2 · จ. 11 ม.ค."), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
+	_check(cont.visible and cont.text.contains("บทที่ 1 · จ. 25 ม.ค."), "เมนูหลักมีปุ่มเล่นต่อ (%s)" % cont.text)
 	start._on_start_button_pressed()
 	_check(SaveGame.exists() and start.get_node("Menu/Start_Button").text.contains("อีกครั้ง"), "มีเซฟ → เริ่มเกมใหม่ต้องกดยืนยันอีกครั้ง")
 	start._on_start_button_pressed()
@@ -119,7 +126,7 @@ func _ready() -> void:
 	DayLoop._last_bill = { }
 	# เซฟเวอร์ชัน 1 (0.1.x) → โหลดไม่ได้ · เมนูบอกให้เริ่มใหม่
 	var old := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
-	old.store_string(JSON.stringify({ "version": 1, "game": { "shift": 3, "money": 99 } }))
+	old.store_string(JSON.stringify({ "version": 2, "game": { "shift": 3, "money": 99 } })) # [0.2.5] เซฟ v2 (บทละสัปดาห์) ก็เก่าแล้ว
 	old.close()
 	_check(SaveGame.is_old_version() and SaveGame.info().is_empty(), "เซฟ v1 → is_old_version() · info ว่าง")
 	var start2: Control = load("res://Scene/Start_Scene.tscn").instantiate()

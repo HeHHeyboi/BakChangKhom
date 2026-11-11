@@ -6,7 +6,7 @@ extends CanvasLayer
 ##   เลือกรับ/ปฏิเสธ · การ์ดบอกแค่อาการ ไม่บอก Part · รับงาน → บทลูกค้า → มินิเกม → นาฬิกาเดินตามช่องของงาน → การ์ดผลงาน
 ##   พักบ่าย 15:30 มีงานโทรเข้า · 18:30 ปิดร้าน (ล่วงเวลาได้ ≤ 2 ช่อง · ≤ 2 กะ/สัปดาห์) → กะถัดไป
 ## งานหมดเขต (due_shifts) = ลูกค้าเดินออก ชื่อเสียงลด · งาน Lv n+1 ขึ้นกระดานเมื่อได้ ⭐⭐ ใน Lv n ครบ 2 งาน
-## ครบ 3 กะ (จ. พ. ศ.) = สรุปสัปดาห์ (+ บิลรายเดือนทุก 4 สัปดาห์) → บท Chapter ถัดไป · ครบ 36 กะ = Epilogue + ฉากจบ
+## [0.2.5] ครบ 4 วัน (วันที่ 4 · 11 · 18 · 25) = จบบท = สิ้นเดือน → บิล + หน้าสรุปเดือน → บท Chapter ถัดไป · ครบ 48 วัน (12 เดือน) = Epilogue + ฉากจบ
 ## งานบังคับรายกะ (WeekPlan.shifts) ที่เป็น forced: ลูกค้าเดินเข้ามาเอง ปฏิเสธไม่ได้ (กะแรก = ลุงอำนวย หลังบทพัก Tutorial)
 ## เริ่มทำงานหลังเควสต์หลัก (main.tres) จบ — งานในเควสต์ไม่นับเป็นงานลูกค้า · UI เป็น placeholder สร้างจากโค้ด
 
@@ -34,13 +34,15 @@ extends CanvasLayer
 
 @export_group("เดโม")
 ## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
-@export var demo_shifts := 3 ## [0.2.0] 3 = จบบทที่ 1 (ครบ 1 สัปดาห์ = เปิดร้าน จ. พ. ศ.)
-@export var demo_banner_title := "จบบทที่ 1"
-@export_multiline var demo_banner_text := "ขอบคุณที่เล่นบทแรกของร้านบักช่างขมนะ!\nบทที่ 2 กำลังพัฒนาให้ครบลูป\nแล้วพบกันเร็ว ๆ นี้"
+@export var demo_shifts := 8 ## [0.2.5] 8 = จบบทที่ 2 (ครบ ม.ค.–ก.พ. = เห็นสรุปเดือน 2 ครั้ง) · 4 = จบบทที่ 1
+## ว่าง = "จบบทที่ n" ตามบทของ demo_shifts
+@export var demo_banner_title := ""
+## {n} = บทที่จบ · {next} = บทถัดไป
+@export_multiline var demo_banner_text := "ขอบคุณที่เปิดร้านบักช่างขมมาด้วยกัน {n} เดือนนะ!\nบทที่ {next} กำลังพัฒนาให้ครบปี\nแล้วพบกันเร็ว ๆ นี้"
 ## บทปิดท้ายเมื่อกลับถึงบ้าน (ว่าง = ข้าม)
-@export_file("*.txt") var chapter_end_dialog := "res://Assets/Dialog/Chapter1End.txt"
+@export_file("*.txt") var chapter_end_dialog := "res://Assets/Dialog/Chapter2End.txt"
 
-## สัดส่วนงาน Lv1/2/3/4/5 (%) ต่อสัปดาห์ 1–12 (LEVEL_DESIGN ข้อ 6) · WeekPlan.level_weights ทับได้
+## สัดส่วนงาน Lv1/2/3/4/5 (%) ต่อบท 1–12 ([0.2.5] 1 บท = 1 เดือน · LEVEL_DESIGN ข้อ 6) · WeekPlan.level_weights ทับได้
 const DEFAULT_WEIGHTS := [
 	[70, 30, 0, 0, 0],
 	[50, 40, 10, 0, 0],
@@ -74,7 +76,8 @@ enum Card {
 	DEMO_END,
 }
 
-## งานบนกระดาน: { "case": CustomerCase, "due_shift": int (กะสุดท้ายที่ยังรับได้), "phone": bool }
+## งานบนกระดาน: { "case": CustomerCase, "due_shift": int (กะสุดท้ายที่ยังรับได้), "phone": bool, "walkin": bool }
+## [0.2.5] walkin = ลูกค้าเดินเข้าร้าน/โทรเข้าวันนี้ → ไม่รับภายในวัน = กลับบ้านตอนปิดร้าน (rep_left_unserved) · ไม่ใช่ walkin (งานนัด/แก้ตัว) = รอได้ตาม due_shifts
 var board: Array[Dictionary] = []
 ## งานที่กำลังทำ (ลูกค้าคนนี้)
 var today_case: CustomerCase
@@ -90,6 +93,26 @@ var week_start_money := 0
 ## ล่วงเวลาไปแล้วกี่กะในสัปดาห์นี้
 var ot_this_week := 0
 var walkouts: PackedStringArray = []
+## [0.2.5] ลูกค้าที่ไม่ได้รับงานเมื่อวันก่อน กลับบ้านไปแล้ว (แสดงบนกระดานวันถัดไป)
+var left_home: PackedStringArray = []
+## [0.2.5] ลูกค้ารอบที่ยังไม่มา [{ "minute": int, "count": int }] · รอบแรกมาตอนเปิดร้าน
+var visitor_waves: Array[Dictionary] = []
+## [0.2.5] ลูกค้าทั้งหมดของวันนี้ (ตามชื่อเสียง) / มาถึงแล้ว
+var visitors_today := 0
+var visitors_arrived := 0
+## [0.2.5] งานที่เพิ่งขึ้นกระดาน (กันซ้ำ) · จำได้กี่งาน
+var _recent: Array[CustomerCase] = []
+const RECENT_MEMORY := 10
+## [0.2.5] ป้ายแจ้งลูกค้าเข้าร้าน (Scene/UI/visitor_toast.tscn ใน ToastLayer ชั้น 104)
+const VISITOR_TOAST_SCENE := preload("res://Scene/UI/visitor_toast.tscn")
+var visitor_toast: VisitorToast
+## [8 พ.ย.] ปุ่ม "งาน" ระหว่างซ่อม (Scene/UI/job_reminder.tscn ใน ReminderLayer ชั้น 11)
+const JOB_REMINDER_SCENE := preload("res://Scene/UI/job_reminder.tscn")
+var job_reminder: JobReminder
+## [0.2.5] ตัวเลขเด้งตอนส่งงาน (Scene/UI/reward_popup.tscn ใน PopupLayer ชั้น 106)
+const REWARD_POPUP_SCENE := preload("res://Scene/UI/reward_popup.tscn")
+var reward_popup: RewardPopup
+var _result_popped := false
 var _ot_this_shift := false
 var _result_pending := false
 ## [13 ต.ค.] งานที่ยอมแพ้ → ขึ้นกระดานใหม่ต้นกะถัดไป · _retried = เคยให้ลองใหม่แล้ว (ให้ครั้งเดียว)
@@ -195,6 +218,24 @@ func _connect() -> void:
 	_day_skip_pending = false # เริ่มเกม/โหลดเซฟ ไม่ต้องเล่นข้ามวัน
 
 
+## [0.2.5] "ชื่อเสียง 25 (ปกติ) · ลูกค้าวันนี้ 3/5 คน · รอบถัดไปอีก 4 เทิร์น"
+func visitors_line() -> String:
+	var e := _econ()
+	var t := e.rep_tier(GameState.reputation)
+	var nxt := next_wave_turns()
+	var ts := _ts()
+	var ev := e.month_event(ts.month() if ts else 1)
+	var b := int(ev.bonus)
+	return "ชื่อเสียง %d (%s) · ลูกค้าวันนี้มาแล้ว %d/%d คน%s%s" % [
+		GameState.reputation,
+		e.rep_tier_names[clampi(t, 0, e.rep_tier_names.size() - 1)],
+		visitors_arrived,
+		visitors_today,
+		(" · รอบถัดไปอีก %s" % TimeSystem.turns_text(nxt)) if nxt >= 0 else "",
+		("\nเดือนนี้: %s%s" % [ev.name, (" (ลูกค้า %s%d/วัน)" % ["+" if b > 0 else "−", absi(b)]) if b != 0 else ""]) if String(ev.name) != "" else "",
+	]
+
+
 ## เตือนใน Output ถ้าลูกค้าคนไหนกรอกไม่ครบ (เช่น ไม่มีเหตุผลที่มาร้าน)
 func _validate() -> void:
 	var all: Array[CustomerCase] = []
@@ -278,13 +319,32 @@ func effective_weights(week: int) -> PackedFloat32Array:
 
 func _cases_of_level(lv: int, exclude_board := true) -> Array[CustomerCase]:
 	var out: Array[CustomerCase] = []
+	var ts := _ts()
+	var m := ts.month() if ts else 1
 	for c in random_pool:
-		if c == null or c.forced or c.level != lv:
+		if c == null or c.forced or c.level != lv or not c.in_month(m): # [0.2.5] งานตามฤดู
 			continue
 		if exclude_board and (_on_board(c) or c == today_case):
 			continue
 		out.append(c)
 	return out
+
+
+## [0.2.5] เลือกงานจากคลังให้หลากหลาย: ไม่เอาคนที่ยืนรออยู่แล้ว · ไม่เอางานที่เพิ่งขึ้นกระดานไม่นาน (_recent) · ไม่มีให้เลือกค่อยยอมซ้ำ
+func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
+	var waiting := { }
+	for j in board:
+		waiting[(j["case"] as CustomerCase).customer] = true
+	var best: Array[CustomerCase] = pool.filter(func(c: CustomerCase) -> bool: return not waiting.has(c.customer) and not _recent.has(c))
+	if best.is_empty():
+		best = pool.filter(func(c: CustomerCase) -> bool: return not _recent.has(c))
+	if best.is_empty():
+		best = pool
+	var c: CustomerCase = best[_rng.randi_range(0, best.size() - 1)]
+	_recent.append(c)
+	while _recent.size() > RECENT_MEMORY:
+		_recent.pop_front()
+	return c
 
 
 func _on_board(c: CustomerCase) -> bool:
@@ -324,9 +384,9 @@ func add_jobs(n: int, phone := false) -> int:
 		var pool := _cases_of_level(lv)
 		if pool.is_empty():
 			continue
-		var c: CustomerCase = pool[_rng.randi_range(0, pool.size() - 1)]
-		var due := ts.shift if phone else ts.shift + c.due_shifts
-		board.append({ "case": c, "due_shift": due, "phone": phone })
+		var c := _pick_case(pool)
+		# [0.2.5] 1 บท = 1 เดือน วันเปิดร้านห่างกัน 7 วัน → ลูกค้าเดินเข้า/โทรเข้า รอได้แค่ในวันนั้น (เดิมรอ due_shifts กะ)
+		board.append({ "case": c, "due_shift": ts.shift, "phone": phone, "walkin": true })
 		added += 1
 	_board_dirty = true
 	return added
@@ -344,13 +404,19 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	shift_results.clear()
 	shift_start_money = GameState.money
 	_day_skip_pending = ts.shift > 1 and day_skip_seconds > 0.0
-	# งานหมดเขต = ลูกค้าเดินออก
+	# งานหมดเขต = ลูกค้าเดินออก · [0.2.5] ลูกค้าวันก่อนที่ไม่ได้รับงาน = กลับบ้านตอนปิดร้าน (ชื่อเสียงลดน้อยกว่า)
 	walkouts.clear()
+	left_home.clear()
 	for j in board.duplicate():
 		if int(j["due_shift"]) < ts.shift:
 			board.erase(j)
-			walkouts.append((j["case"] as CustomerCase).customer)
-			GameState.add_reputation(_econ().rep_walkout)
+			var who := (j["case"] as CustomerCase).customer
+			if bool(j.get("walkin", false)):
+				left_home.append(who)
+				GameState.add_reputation(_econ().rep_left_unserved)
+			else:
+				walkouts.append(who)
+				GameState.add_reputation(_econ().rep_walkout)
 	var fc := case_for(week, shift_in_week)
 	forced_case = fc if fc and fc.forced else null
 	if fc and not fc.forced and not _on_board(fc):
@@ -359,9 +425,60 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 		if rc and not _on_board(rc):
 			board.append({ "case": rc, "due_shift": ts.shift + rc.due_shifts, "phone": false, "retry": true })
 	retry_cases.clear()
-	add_jobs(_econ().month_value(_econ().board_new_per_shift, ts.month()))
+	_plan_visitors(ts)
 	_board_dirty = true
 	autosave.call_deferred()
+
+
+## [0.2.5] ลูกค้าวันนี้ = ฐานของเดือน + โบนัสชื่อเสียง → แบ่งเป็นรอบ (08:30 · 11:00 · 14:00) · รอบแรกเข้าทันที
+func _plan_visitors(ts: TimeSystem) -> void:
+	var e := _econ()
+	visitors_today = e.visitors_for(ts.month(), GameState.reputation)
+	visitors_arrived = 0
+	visitor_waves.clear()
+	var counts := e.split_waves(visitors_today)
+	for i in counts.size():
+		if counts[i] > 0:
+			visitor_waves.append({ "minute": e.visitor_waves[i] if i < e.visitor_waves.size() else TimeSystem.OPEN, "count": counts[i] })
+	var tier := e.rep_tier(GameState.reputation)
+	if visitor_toast:
+		visitor_toast.clear()
+		# [0.2.5] วันแรกของเดือน → ป้ายเทศกาลก่อน
+		var ev := e.month_event(ts.month())
+		if ts.shift_in_week() == 1 and String(ev.name) != "":
+			visitor_toast.show_message("%s · %s" % [TimeSystem.MONTH_FULL[clampi(ts.month(), 1, 12) - 1], ev.name], String(ev.note))
+		visitor_toast.show_message(
+			"วันนี้มีลูกค้า %d คน" % visitors_today,
+			"ชื่อเสียงร้าน %d (%s) · ทยอยมาตลอดวัน" % [GameState.reputation, e.rep_tier_names[clampi(tier, 0, e.rep_tier_names.size() - 1)]],
+		)
+	_check_waves(ts, false)
+
+
+## [0.2.5] ลูกค้ารอบที่ถึงเวลาแล้วเดินเข้าร้าน · เลยเวลาปิดร้านแล้ว = ไม่มา (ไม่หักชื่อเสียง)
+func _check_waves(ts: TimeSystem, notify := true) -> void:
+	if ts == null or visitor_waves.is_empty():
+		return
+	if ts.current_minute >= TimeSystem.CLOSE:
+		visitor_waves.clear()
+		return
+	var came := 0
+	while not visitor_waves.is_empty() and int(visitor_waves[0]["minute"]) <= ts.current_minute:
+		var w: Dictionary = visitor_waves.pop_front()
+		came += add_jobs(int(w["count"]))
+	if came <= 0:
+		return
+	visitors_arrived += came
+	_board_dirty = true
+	if notify and visitor_toast:
+		visitor_toast.show_message("ลูกค้าเดินเข้าร้าน %d คน" % came, "ดูงานใหม่ที่กระดานงาน")
+
+
+## [0.2.5] รอบถัดไปมาอีกกี่เทิร์น (-1 = ไม่มีแล้ว)
+func next_wave_turns() -> int:
+	var ts := _ts()
+	if ts == null or visitor_waves.is_empty():
+		return -1
+	return floori(TimeSystem.work_minutes_between(ts.current_minute, int(visitor_waves[0]["minute"])) / float(TimeSystem.SLOT_MIN))
 
 
 ## [10 ต.ค.] บันทึกอัตโนมัติ (SaveGame) — ไม่บันทึกตอนยังอยู่เมนูหลัก/บทนำ หรือระหว่างมินิเกม
@@ -381,6 +498,7 @@ func _on_break_started(kind: StringName) -> void:
 
 func _on_clock_changed(_minute: int) -> void:
 	_board_dirty = true
+	_check_waves(_ts())
 
 
 func _on_week_ended(week: int) -> void:
@@ -389,7 +507,7 @@ func _on_week_ended(week: int) -> void:
 
 
 func _on_month_ended(month: int) -> void:
-	# [0.2.0] ยิงทุก 4 บท (สิ้นเดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
+	# [0.2.5] ยิงทุกบท (1 บท = 1 เดือน) · ยิงก่อน TimeSystem ล้าง worked_minutes_month จึงยังอ่านเทิร์นของบทนี้ได้
 	_last_bill = GameState.pay_month_bill(month, _ts().work_slots_used_this_month() if _ts() else 0)
 	# [0.2.0-E/F] ปิดเดือน: เทียบกำไรกับเป้า · นับพลาดเป้า/ค้างบิล · ร้านปิด → ไปฉากจบ
 	_last_month = GameState.close_month(month)
@@ -418,6 +536,7 @@ func _on_repair_recorded(result: Dictionary) -> void:
 	current_job = { }
 	last_result = result
 	_result_pending = true
+	_result_popped = false
 	shift_results.append(result)
 	week_results.append(result)
 	_working = false
@@ -621,9 +740,9 @@ func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
 	elif bool(rep.reached):
 		result = "ถึงเป้าแล้ว!"
 	elif not bool(rep.get("counted", true)):
-		result = "ยังไม่ถึงเป้า (เดือนแรกยังไม่นับ)"
+		result = "ยังไม่ถึงเป้า (ช่วงเรียนรู้ ยังไม่นับ)"
 	else:
-		result = "ไม่ถึงเป้า (พลาด %d/%d)" % [int(rep.get("missed_months", 0)), _econ().fail_missed_months]
+		result = "ไม่ถึงเป้า (พลาด %d/%d เดือนติด)" % [int(rep.get("missed_months", 0)), _econ().fail_missed_months]
 	lines.append("กำไร %s / เป้า %s → %s" % [b.call(int(rep.profit)), b.call(int(rep.target)), result])
 	if int(rep.get("debt", 0)) > 0:
 		lines.append("ค้างบิล %s (ค้าง %d/%d เดือนติด)" % [b.call(int(rep.debt)), int(rep.get("debt_streak", 0)), _econ().fail_debt_months])
@@ -646,8 +765,8 @@ func _play_day_skip() -> void:
 		from_day += TimeSystem.days_in_month(today.y - 1 if today.y > 1 else 12)
 	var notes := day_skip_notes.duplicate()
 	day_skip_notes.clear()
-	# กลางสัปดาห์ (จ.→พ. · พ.→ศ.) เล่นสั้นกว่า · ศุกร์ → จันทร์ (ข้ามเสาร์–อาทิตย์) เล่นเต็ม
-	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 2 and notes.is_empty() else 1.0)
+	# [0.2.5] ในเดือนเดียวกัน (7 วัน) เล่นสั้นกว่า · ข้ามเดือน (9–10 วัน) เล่นเต็ม
+	var secs := day_skip_seconds * (day_skip_short_ratio if gap <= 7 and notes.is_empty() else 1.0)
 	await _day_skip.play(from_day, today.x, today.y, gap, notes, secs)
 	_skipping = false
 
@@ -744,6 +863,16 @@ func end_shift() -> void:
 	ts.end_shift()
 
 
+## [0.2.5] บทที่เดโมจบ (จาก demo_shifts)
+func demo_chapter() -> int:
+	return clampi(floori((maxi(demo_shifts, 1) - 1) / float(TimeSystem.SHIFTS_PER_WEEK)) + 1, 1, 12)
+
+
+## [0.2.5] ชื่อหัวป้ายจบเดโม ("จบบทที่ 2" ถ้า demo_banner_title ว่าง)
+func demo_title() -> String:
+	return demo_banner_title if demo_banner_title != "" else "จบบทที่ %d" % demo_chapter()
+
+
 ## กะนี้เป็นกะสุดท้ายของเดโมไหม
 func is_demo_last_shift() -> bool:
 	var ts := _ts()
@@ -756,7 +885,7 @@ func finish_demo() -> void:
 	_hide()
 	await SceneRouter.go(SceneRouter.HOME) # เปลี่ยนฉาก → autosave
 	# [10 ต.ค.] บทปิดบทกับยาย ก่อนขึ้นหน้าจบบท
-	if chapter_end_dialog != "" and EventManager.play_story_dialog(demo_banner_title, chapter_end_dialog, "res://Assets/Background/bg_home_inside.jpg", ["ขม", "ยาย"]):
+	if chapter_end_dialog != "" and EventManager.play_story_dialog(demo_title(), chapter_end_dialog, "res://Assets/Background/bg_home_inside.jpg", ["ขม", "ยาย"]):
 		await DialogScene.on_dialog_finish
 	_show_demo_banner(true)
 
@@ -765,8 +894,8 @@ func finish_demo() -> void:
 func _show_demo_banner(on: bool) -> void:
 	if not is_instance_valid(_demo_banner):
 		_build_demo_banner()
-	(_demo_card.find_child("Text", true, false) as Label).text = demo_banner_text
-	(_demo_card.find_child("Title", true, false) as Label).text = demo_banner_title
+	(_demo_card.find_child("Text", true, false) as Label).text = demo_banner_text.replace("{n}", str(demo_chapter())).replace("{next}", str(demo_chapter() + 1))
+	(_demo_card.find_child("Title", true, false) as Label).text = demo_title()
 	(_demo_card.find_child("Stats", true, false) as Label).text = "เปิดร้านครบ %d วัน · ซ่อม %d งาน · เงิน ฿%d · ชื่อเสียง %d · ยศ %s" % [
 		demo_shifts, GameState.satisfaction_history.size(), GameState.money, GameState.reputation, GameState.rank_name()]
 	_demo_banner.visible = on
@@ -841,7 +970,7 @@ func _build_demo_banner() -> void:
 		row.add_child(b)
 	_demo_badge = Button.new()
 	_demo_badge.name = "Badge"
-	_demo_badge.text = "★ %s · กดเพื่อดูอีกครั้ง" % demo_banner_title
+	_demo_badge.text = "★ %s · กดเพื่อดูอีกครั้ง" % demo_title()
 	_demo_badge.focus_mode = Control.FOCUS_NONE
 	_demo_badge.add_theme_font_size_override("font_size", 20)
 	for st2 in ["normal", "hover", "pressed"]:
@@ -903,6 +1032,11 @@ func _reset_run() -> void:
 	retry_cases.clear()
 	_retried.clear()
 	walkouts.clear()
+	left_home.clear()
+	_recent.clear()
+	visitor_waves.clear()
+	visitors_today = 0
+	visitors_arrived = 0
 	_parts_seen.clear()
 	_last_bill = { }
 	_last_month = { }
@@ -1058,6 +1192,9 @@ func _show_card(card: Card) -> void:
 		Card.RESULT:
 			_title.text = "ส่งเครื่องคืนลูกค้า · %s" % _now_text()
 			var r := last_result
+			if not _result_popped and reward_popup:
+				_result_popped = true
+				reward_popup.pop_result(r)
 			var money: int = r.get("money", 0)
 			var grade: int = clampi(int(r.get("grade", GameState.Grade.PASS)), 0, GRADE_TEXT.size() - 1)
 			var money_txt := ("+฿%d" % money) if money >= 0 else ("−฿%d" % -money)
@@ -1086,16 +1223,22 @@ func _show_card(card: Card) -> void:
 			var earned := GameState.money - shift_start_money
 			var ot := ot_slots_now()
 			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · " + TimeSystem.clock_text(ts.current_minute) + " น.") if ts.show_clock else ""]
-			_body.text = "งานเสร็จวันนี้ %d งาน · รายได้ %s฿%d\nงานค้างบนกระดาน %d ใบ (ต่อพรุ่งนี้)%s\nชื่อเสียง %d · %s" % [
+			# [0.2.5] ลูกค้าวันนี้ที่ยังไม่ได้รับงาน → กลับบ้านตอนปิดร้าน · งานนัด/แก้ตัวยังรอต่อได้
+			var unserved := board.filter(func(j: Dictionary) -> bool: return bool(j.get("walkin", false)) and int(j.get("due_shift", 0)) <= ts.shift).size()
+			var carried := board.size() - unserved
+			var board_line := "ลูกค้าที่ยังไม่ได้รับ %d คน จะกลับบ้าน (ชื่อเสียง %d)" % [unserved, unserved * _econ().rep_left_unserved] if unserved > 0 else "รับลูกค้าครบทุกคน"
+			if carried > 0:
+				board_line += " · งานนัดค้าง %d ใบ (ต่อวันเปิดร้านถัดไป)" % carried
+			_body.text = "งานเสร็จวันนี้ %d งาน · รายได้ %s฿%d\n%s%s\nชื่อเสียง %d · %s" % [
 				shift_results.size(),
 				"+" if earned >= 0 else "−",
 				absi(earned),
-				board.size(),
+				board_line,
 				("\nล่วงเวลา %s · ค่าไฟ ฿%d" % [_cost_text(ot), ot * _econ().ot_cost_per_slot]) if ot > 0 else "",
 				GameState.reputation,
 				GameState.rank_name(),
 			]
-			_primary.text = "ปิดร้าน → สรุปบท" if ts.is_last_shift_of_week() else "ปิดร้าน → วันถัดไป"
+			_primary.text = "ปิดร้าน → สรุปเดือน" if ts.is_last_shift_of_week() else "ปิดร้าน → วันถัดไป"
 			if is_demo_last_shift():
 				_primary.text = "ปิดร้าน → จบบทที่ %d" % ts.chapter()
 			if _close_requested and ts.current_minute < TimeSystem.CLOSE:
@@ -1113,8 +1256,8 @@ func _show_card(card: Card) -> void:
 				week_results.size(), roundi(sat), GameState.reputation, GameState.rank_name(), GameState.xp,
 			]
 			if _last_month.is_empty():
-				_title.text = "สรุปบทที่ %d (สัปดาห์ที่ %d ของ %s)" % [_pending_summary_week, (_pending_summary_week - 1) % TimeSystem.WEEKS_PER_MONTH + 1, TimeSystem.MONTH_NAME[mi]]
-				_body.text = "%s\nเงินเพิ่ม/ลดสัปดาห์นี้ %s%s" % [week_line, "+" if earned >= 0 else "", MonthGoalBar._baht(earned)]
+				_title.text = "สรุปบทที่ %d (%s)" % [_pending_summary_week, TimeSystem.MONTH_FULL[mi]]
+				_body.text = "%s\nเงินเพิ่ม/ลดเดือนนี้ %s%s" % [week_line, "+" if earned >= 0 else "", MonthGoalBar._baht(earned)]
 			else:
 				# [0.2.0-E] สิ้นเดือน: รายรับ/รายจ่ายแยกหมวด · ลงทุน · กำไรเทียบเป้า · ผล · ปิ๊บบอกสาเหตุ
 				_title.text = "สิ้นเดือน %s · สรุปบทที่ %d" % [TimeSystem.MONTH_NAME[mi], _pending_summary_week]
@@ -1135,7 +1278,7 @@ func _show_card(card: Card) -> void:
 			_primary.text = "กลับหน้าแรก"
 		Card.DEMO_END:
 			var nxt := GameState.xp_next()
-			_title.text = "%s · เปิดร้านครบ %d วัน" % [demo_banner_title, demo_shifts]
+			_title.text = "%s · เปิดร้านครบ %d วัน" % [demo_title(), demo_shifts]
 			_body.text = "ขมเปิดร้านมาครบ %d วันแล้ว!\n\nซ่อมไปทั้งหมด %d งาน · เงิน ฿%d\nชื่อเสียง %d · ความพอใจเฉลี่ย %d\nยศช่าง: %s (%s)%s\n\nกลับบ้านไปเล่าให้ยายฟังกันเถอะ" % [
 				demo_shifts,
 				GameState.satisfaction_history.size(),
@@ -1169,11 +1312,13 @@ func _fill_board() -> void:
 			TimeSystem.SHIFTS_PER_WEEK,
 			TimeSystem.turns_text(ts.turns_left()),
 		]
-	var note := ""
+	var note := visitors_line()
+	if not left_home.is_empty():
+		note += "\nวันก่อนไม่ได้รับงาน กลับบ้านไป: %s (ชื่อเสียง %d/คน)" % [", ".join(left_home), _econ().rep_left_unserved]
 	if not walkouts.is_empty():
-		note = "ลูกค้าเดินออกเพราะรอนานเกิน: %s" % ", ".join(walkouts)
+		note += "\nลูกค้าเดินออกเพราะรอนานเกิน: %s" % ", ".join(walkouts)
 	if board.is_empty():
-		note += ("\n" if note != "" else "") + "ยังไม่มีงานรอ — รอลูกค้า หรือปิดร้าน (ช่วงพักบ่ายมักมีโทรเข้า)"
+		note += "\nยังไม่มีงานรอ — รอลูกค้ารอบถัดไป หรือปิดร้าน (ช่วงพักบ่ายมักมีโทรเข้า)"
 	_board_note.text = note
 	_board_note.visible = note != ""
 	for i in board.size():
@@ -1303,6 +1448,12 @@ func _build_time_skip() -> void:
 	goal_bar = _ensure_ui(^"GoalLayer", 100, GOAL_BAR_SCENE) as MonthGoalBar
 	# [0.2.0-E] SummaryLayer ชั้น 108 (เหนือ HUD/แถบเป้า 100 · ปุ่มคลัง 105 · ใต้ข้ามวัน 110)
 	month_summary = _ensure_ui(^"SummaryLayer", 108, MONTH_SUMMARY_SCENE) as MonthSummary
+	# [0.2.5] ToastLayer ชั้น 104 (เหนือ HUD/แถบเป้า 100 · ใต้ปุ่มคลัง 105 · สรุปเดือน 108)
+	visitor_toast = _ensure_ui(^"ToastLayer", 104, VISITOR_TOAST_SCENE) as VisitorToast
+	# [8 พ.ย.] ReminderLayer ชั้น 11 (เหนือมินิเกม overlay_stack 10 · ใต้ HUD 100) — ปุ่มดูงานของลูกค้าซ้ำระหว่างซ่อม
+	job_reminder = _ensure_ui(^"ReminderLayer", 11, JOB_REMINDER_SCENE) as JobReminder
+	# [0.2.5] PopupLayer ชั้น 106 (เหนือ HUD 100 · ปุ่มคลัง 105 · ใต้สรุปเดือน 108)
+	reward_popup = _ensure_ui(^"PopupLayer", 106, REWARD_POPUP_SCENE) as RewardPopup
 	if not month_summary.continue_pressed.is_connected(_on_primary):
 		month_summary.continue_pressed.connect(_on_primary)
 

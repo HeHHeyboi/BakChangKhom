@@ -37,6 +37,7 @@ func _ready() -> void:
 	EventManager.hideUI()
 	Global.cur_pib = pib
 	dialog_dict = PhaseDialogParser.parse(dialog_path)
+	_fill_case_text()
 	if pib == null:
 		push_error("Pib is null please assign")
 		return
@@ -336,3 +337,29 @@ func _unhandled_input(event: InputEvent) -> void:
 	):
 		_debug_layer.visible = not _debug_layer.visible
 		get_viewport().set_input_as_handled()
+
+
+# ---------------------------------------------------------------- [8 พ.ย. 2569] บทปิ๊บใช้อาการจากใบงานลูกค้า
+
+
+## ในไฟล์บท (Assets/Dialog/MiniGame/*_Pib.txt) เขียน {symptom|ข้อความเดิม} · {customer|…} · {device|…} ได้
+## งานลูกค้า (มี meta work_order) → ใช้ค่าจาก CustomerCase · บทฝึก/เควสต์หลัก (ไม่มีใบงาน) → ใช้ข้อความหลัง |
+## กันอาการที่ลูกค้าเล่ากับที่ปิ๊บพูดไม่ตรงกัน (เดิมปิ๊บพูดข้อความตายตัวของ Part นั้น)
+func _fill_case_text() -> void:
+	var c: CustomerCase = get_meta("work_order") as CustomerCase if has_meta("work_order") else null
+	for key in dialog_dict:
+		for t in dialog_dict[key]:
+			if t is DialogToken and t.dialog.contains("{"):
+				t.dialog = fill_case_text(t.dialog, c)
+
+
+static func fill_case_text(text: String, c: CustomerCase) -> String:
+	var re := RegEx.create_from_string("\\{(symptom|customer|device)\\|([^}]*)\\}")
+	var out := text
+	for m in re.search_all(text):
+		var v := ""
+		if c:
+			v = String(c.get(m.get_string(1))).strip_edges().trim_suffix(".")
+		out = out.replace(m.get_string(), v if v != "" else m.get_string(2))
+	return out
+
