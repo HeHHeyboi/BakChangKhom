@@ -28,6 +28,8 @@ class File extends RefCounted:
 	var data: DesktopFile
 	var dir: String
 	var prev_dir: String = ""
+	## เปิดดูหรือถามลูกค้าแล้ว (ลบไฟล์ซ้ำก่อนดู = เสียคะแนนฟังลูกค้า)
+	var inspected := false
 
 
 	func _init(src: DesktopFile):
@@ -71,11 +73,40 @@ class Wifi extends RefCounted:
 	var id: int
 
 
+enum ThreatState {
+	HIDDEN,
+	FOUND,
+	QUARANTINE,
+	ALLOW,
+}
+
+
+class Threat extends RefCounted:
+	var data: DesktopThreat
+	var state: ThreatState
+
+
+	func _init(d: DesktopThreat, s: ThreatState):
+		self.data = d
+		self.state = s
+
+
+enum UpdateState {
+	NOT_CHECKED,
+	FOUND,
+	INSTALL,
+	RESTART,
+	FINISH,
+	CORRUPT,
+}
+
 signal process_changed
 
 
 ## ชื่อโฟลเดอร์ถังขยะ — ลบไฟล์ = ย้ายมาที่นี่
 const TRASH := "ถังขยะ"
+## โปรแกรมไดรเวอร์เสียง — ถอนออกแล้วลำโพงไม่ดัง
+const SOUND_DRIVER := "ไดรเวอร์เสียง"
 
 var fs: Array[File] = []
 var dir_map: Dictionary[String, Dir] = { }
@@ -100,10 +131,25 @@ var disk_total_mb: int = 0
 var disk_free_mb: int = 0
 var disk_temp_mb: int = 0
 var current_id = 0
+## พิมพ์หน้าทดสอบล่าสุดออกที่เครื่องที่ถูก
+var printed_ok := false
+## USB ถูกถอดอย่างปลอดภัยแล้ว (ไม่มี USB = true)
+var usb_ejected := true
+var update_state: UpdateState = UpdateState.NOT_CHECKED
+## ขมการ์ด: การป้องกันไวรัสเปิดอยู่
+var protection_on := true
+var threats: Array[Threat] = []
 
 
 func _init():
 	create_dir(TRASH)
+
+
+## ขนาดไฟล์/ดิสก์แบบอ่านง่าย (MB · GB)
+static func size_text(mb: int) -> String:
+	if absi(mb) >= 1000:
+		return "%.1f GB" % (mb / 1000.0)
+	return "%d MB" % mb
 
 
 func create_dir(dir_name: String) -> void:
@@ -124,8 +170,15 @@ func add_file(src: DesktopFile, dir: String = "") -> int:
 	var index := fs.size()
 	d.files.append(index)
 	fs.append(file)
-	disk_free_mb += src.size_mb
+	file.dir = d.dname
+	if _on_pc(file.dir):
+		disk_free_mb -= src.size_mb
 	return index
+
+
+## ไฟล์ในโฟลเดอร์นี้กินพื้นที่ดิสก์ของเครื่องไหม (USB ไม่นับ)
+func _on_pc(dir: String) -> bool:
+	return dir != DesktopTask.USB
 
 
 ## คืนไฟล์ในโฟลเดอร์ dir · dir ว่าง = ทุกไฟล์ใน fs (รวมถังขยะ) · ไม่มีโฟลเดอร์นั้นคืน []
@@ -161,6 +214,11 @@ func move_file(file_index: int, dest: String) -> bool:
 	var from: Dir = dir_map.get(file.dir)
 	from.files.remove_at(from.files.find(file_index))
 	to.files.append(file_index)
+	# NOTE: ย้ายข้ามเครื่อง ↔ USB = พื้นที่ในเครื่องเปลี่ยน (ลงถังขยะยังกินที่อยู่จนกว่าจะล้าง)
+	if _on_pc(from.dname) and not _on_pc(dest):
+		disk_free_mb += file.data.size_mb
+	elif not _on_pc(from.dname) and _on_pc(dest):
+		disk_free_mb -= file.data.size_mb
 	file.dir = dest
 	file.prev_dir = from.dname
 	return true
@@ -199,6 +257,13 @@ func uninstalled(name: String) -> bool:
 	self.disk_free_mb += p.data.size_mb
 	self.installed_programs.erase(name)
 	return true
+
+
+func has_adware() -> bool:
+	for pname in installed_programs:
+		if installed_programs[pname].data.adware:
+			return true
+	return false
 
 
 ## instance = หน้าต่างที่ผู้ใช้เปิด — ผูก pid ไว้ที่ meta "pid" ของหน้าต่าง · ปิดหน้าต่างเอง (✕) = process จบด้วย
@@ -305,7 +370,7 @@ func print_test() -> String:
 	if printer_default_index < 0:
 		return "ยังไม่มีเครื่องพิมพ์ในเครื่องเลย"
 	var p = printer_map.get(printer_default_index) as DesktopOS.Printer
-	var printed_ok = p != null and p.data.right
+	printed_ok = p != null and p.data.right
 	return "พิมพ์หน้าทดสอบที่ \"%s\" แล้ว — %s" % [
 		p.data.name,
 		"ออกกระดาษที่โต๊ะลูกค้า!" if printed_ok else "กระดาษไปออกที่ห้องอื่น…",
@@ -325,6 +390,44 @@ func set_selected_sound_device(id: int) -> bool:
 
 func change_sound_volumn(value: int):
 	sound_volume = value
+
+
+## ผลกดทดสอบเสียง · ขึ้นต้น "♪" = ได้ยินเสียง
+func test_sound() -> String:
+	var dev: DesktopSoundDevice = null
+	if selected_sound_dev >= 0 and selected_sound_dev < sound_dev_list.size():
+		dev = sound_dev_list[selected_sound_dev]
+	if dev == null:
+		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
+	if !installed_programs.has(SOUND_DRIVER):
+		return "ไม่มีไดรเวอร์เสียง เครื่องไม่รู้จักลำโพงเลย"
+	if is_mute:
+		return "เงียบ… (ปิดเสียงอยู่)"
+	if sound_volume < 20:
+		return "เบามากจนไม่ได้ยิน"
+	if dev.works:
+		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
+	return "เงียบ… เสียงไปออกที่ \"%s\"" % dev.name
+
+
+func add_threat(data: DesktopThreat) -> void:
+	threats.append(Threat.new(data, ThreatState.HIDDEN))
+
+
+## สแกนไวรัส — ปิดการป้องกันอยู่ = สแกนไม่ได้ (คืน false)
+func scan_threats() -> bool:
+	if !protection_on:
+		return false
+	for t in threats:
+		if t.state == ThreatState.HIDDEN:
+			t.state = ThreatState.FOUND
+	return true
+
+
+## ล้างไฟล์ชั่วคราว → ได้พื้นที่คืน
+func clean_temp() -> void:
+	disk_free_mb += disk_temp_mb
+	disk_temp_mb = 0
 
 
 func add_wifi(wifi: DesktopWifi):
