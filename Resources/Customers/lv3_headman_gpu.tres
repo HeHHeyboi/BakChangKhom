@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://cpdxvqv6o857s"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,6 @@ device = "คอมพิวเตอร์ของศาลาหมู่บ�
 symptom = "ฉายวิดีโอได้สักพักภาพกระตุก แล้วจอดับ คนในงานมองกันใหญ่"
 level = 3
 est_slots = 5
-due_shifts = 1
 months = PackedInt32Array(5, 6, 10, 11)
 part_id = "part_gpu"
 job_title = "ล้างการ์ดจอ + จัดสายไฟ"

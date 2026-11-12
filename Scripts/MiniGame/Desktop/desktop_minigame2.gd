@@ -201,22 +201,6 @@ var _printer_test_btn: Button
 var _printer_found_list: VBoxContainer
 var _print_test_result: Label
 
-# NOTE: Task Manager var
-var _proc_panel: Control
-var _autostart_panel: Control
-
-# NOTE: Setting var
-var _settings_installed_list: VBoxContainer
-var _settings_progress_bar: ProgressBar
-var _settings_disk_label: Label
-
-# NOTE: Printer var
-var _printer_install_list: VBoxContainer
-var _printer_empty_text: Label
-var _printer_test_btn: Button
-var _printer_found_list: VBoxContainer
-var _print_test_result: Label
-
 var items := [
 	["เอกสาร", TEX_FOLDER],
 	["รูปภาพ", TEX_PICTURES],

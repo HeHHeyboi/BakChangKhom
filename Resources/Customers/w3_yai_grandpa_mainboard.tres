@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://broprn5ybjn16"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,7 @@ device = "คอมพิวเตอร์เครื่องเก่าท�
 symptom = "เปิดได้ไม่นานก็ดับ ตัวเครื่องร้อนมาก ฝุ่นจับหนา"
 level = 3
 est_slots = 5
-due_shifts = 1
+months = PackedInt32Array()
 part_id = "part_mainboard"
 job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"
 arrive_dialog = "res://Assets/Dialog/Customer/w3_yai_grandpa_mainboard.txt"

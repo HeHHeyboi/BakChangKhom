@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://bfbpkvpupohy7"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,6 @@ device = "คอมพิวเตอร์ที่มิ้นใช้ทำ�
 symptom = "ทำงานหนัก ๆ ได้แป๊บเดียวเครื่องดับเอง ตรงกลางเครื่องร้อนจี๋"
 level = 3
 est_slots = 5
-due_shifts = 1
 months = PackedInt32Array(3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 part_id = "part_mainboard"
 job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮีตซิงก์"

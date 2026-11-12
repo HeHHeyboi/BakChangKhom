@@ -1,17 +1,16 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://dq65u78fvgdbp"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
 id = &"w12_amnuay_newyear_bios"
-customer = "ลุงอำนวย"
 reason = "ลูกชายลุงกลับบ้านปีใหม่ ซื้อคอมเครื่องใหม่ให้"
 device = "คอมพิวเตอร์เครื่องใหม่ที่ลูกชายซื้อให้ลุง"
 symptom = "เปิดเครื่องใหม่แล้วขึ้นว่าหาไดรฟ์บูตไม่เจอ"
 level = 5
 est_slots = 8
-due_shifts = 1
+months = PackedInt32Array()
 part_id = "part_bios"
 job_title = "ตั้งค่า BIOS + ลง Windows"
 arrive_dialog = "res://Assets/Dialog/Customer/w12_amnuay_newyear_bios.txt"

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://dvvy33uy0sdxx"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,7 @@ device = "คอมพิวเตอร์ที่มิ้นใช้ตั�
 symptom = "ตัดต่อวิดีโอแล้วภาพกระตุก พัดลมการ์ดจอหอนเสียงดัง"
 level = 3
 est_slots = 5
-due_shifts = 1
+months = PackedInt32Array()
 part_id = "part_gpu"
 job_title = "ล้างการ์ดจอ + จัดสายไฟ"
 arrive_dialog = "res://Assets/Dialog/Customer/lv3_min_gpu.txt"

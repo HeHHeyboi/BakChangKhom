@@ -26,7 +26,7 @@ bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
 border_width_top = 2
 border_color = Color(0.5179158, 0.4353445, 0.36556464, 1)
 
-[node name="DesktopWindow" type="Node2D" unique_id=369883786 node_paths=PackedStringArray("pib")]
+[node name="DesktopWindow2" type="Node2D" unique_id=369883786 node_paths=PackedStringArray("pib")]
 script = ExtResource("1_hw1fy")
 task = ExtResource("2_g2yld")
 pib = NodePath("PibHint")

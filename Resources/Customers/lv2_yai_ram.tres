@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://dajp1s4m4aahu"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -9,10 +9,8 @@ customer = "ยาย"
 reason = "คอมที่ยายใช้ดูละครย้อนหลัง จอไม่ขึ้น"
 device = "คอมพิวเตอร์ที่หลานเก่าให้ยายไว้ดูละคร"
 symptom = "กดเปิดแล้วไม่มีภาพ มีแต่เสียงปี๊บ ๆ"
-level = 2
 est_slots = 3
-due_shifts = 1
-part_id = "part_ram"
+months = PackedInt32Array()
 job_title = "ทำความสะอาดแรม"
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_yai_ram.txt"
 thanks_text = "ดูละครต่อได้แล้ว หลานยายเก่งที่สุด"

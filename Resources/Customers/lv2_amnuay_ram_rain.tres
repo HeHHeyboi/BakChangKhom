@@ -1,19 +1,15 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://bl3gti3qul5y0"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
 id = &"lv2_amnuay_ram_rain"
-customer = "ลุงอำนวย"
 reason = "หน้าฝนบ้านลุงชื้น เครื่องเริ่มงอแง"
 device = "คอมพิวเตอร์ตั้งโต๊ะของลุง วางติดหน้าต่าง"
 symptom = "ฝนตกติดกันหลายวัน เปิดคอมติดบ้างไม่ติดบ้าง บางทีจอดำแล้วมีเสียงปี๊บ"
-level = 2
 est_slots = 3
-due_shifts = 1
 months = PackedInt32Array(6, 7, 8, 9, 10)
-part_id = "part_ram"
 job_title = "ทำความสะอาดแรม"
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_amnuay_ram_rain.txt"
 thanks_text = "เปิดติดทุกรอบแล้ว ลุงจะย้ายเครื่องออกห่างหน้าต่างนะ"

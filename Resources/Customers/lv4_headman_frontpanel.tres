@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://5au0b5pn4k3q"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,7 @@ device = "คอมพิวเตอร์ที่ทำการหมู่�
 symptom = "ย้ายเครื่องเสร็จกดปุ่มเปิดไม่ติด ก่อนหน้านี้ก็ช้ามาก"
 level = 4
 est_slots = 5
-due_shifts = 1
+months = PackedInt32Array()
 part_id = "part_front_panel"
 job_title = "เสียบสายหน้าเคส + จัดแรม Dual Channel"
 arrive_dialog = "res://Assets/Dialog/Customer/lv4_headman_frontpanel.txt"

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CustomerCase" format=3]
+[gd_resource type="Resource" script_class="CustomerCase" format=3 uid="uid://ds8p63ssifgix"]
 
-[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
 
 [resource]
 script = ExtResource("1_case")
@@ -11,7 +11,6 @@ device = "คอมพิวเตอร์ทดสอบของบริษ�
 symptom = "เปลี่ยนไดรฟ์แล้วเปิดไม่เข้าระบบ แรมก็วิ่งช้ากว่าที่ควร"
 level = 5
 est_slots = 8
-due_shifts = 1
 months = PackedInt32Array(12)
 part_id = "part_bios"
 job_title = "ตั้งค่า BIOS + ลง Windows"
