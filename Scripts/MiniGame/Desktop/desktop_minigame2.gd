@@ -282,7 +282,7 @@ func _ready() -> void:
 		var w: OsWindow2 = null
 		if p.kind == "hang":
 			w = WINDOW_BASE.instantiate() as OsWindow2
-			var body = w.get_node("%Content") as Control
+			var body: Control = w.get_node("%Content")
 			w.set_title(p.name + " (ไม่ตอบสนอง)")
 			w.set_icon(TEX_EXE)
 			w.set_closable(false)
@@ -695,12 +695,12 @@ func _show_info(title: String, msg: String, tex: Texture2D) -> void:
 	w.restore(true)
 	w.set_title(title)
 	w.set_icon(tex)
-	var label = w.get_node("%Message") as Label
+	var label: Label = w.get_node("%Message")
 	label.text = msg
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
-	var ok := w.get_node("%Ok") as Button
+	var ok: Button = w.get_node("%Ok")
 	ok.text = "ตกลง"
 	ok.size_flags_horizontal = Control.SIZE_SHRINK_END
 	ok.pressed.connect(w.close)
@@ -817,7 +817,7 @@ func _browser_show(page: String) -> void:
 		return
 	if task.browser_ad:
 		var ad = load(BROWSER_AD_SCENE).instantiate()
-		var btn = ad.get_node("%AdDownload") as Button
+		var btn: Button = ad.get_node("%AdDownload")
 		btn.pressed.connect(
 			func():
 				click_download_ad()
@@ -826,16 +826,16 @@ func _browser_show(page: String) -> void:
 		_browser_page.add_child(ad)
 	if is_install:
 		var result = load(BROWSER_RESULT_SCENE).instantiate() as Control
-		var link = result.get_node("%Link") as LinkButton
-		var url = result.get_node("%Url") as Label
+		var link: LinkButton = result.get_node("%Link")
+		var url: Label = result.get_node("%Url")
 		link.text = "%s — ดาวน์โหลดโปรแกรม (เว็บทางการ)" % task.install_name
 		link.pressed.connect(self._browser_show.bind(BROWSER_OFFICIAL))
 		url.text = task.install_site
 		_browser_page.add_child(result)
 
 		result = load(BROWSER_RESULT_SCENE).instantiate() as Control
-		link = result.get_node("%Link") as LinkButton
-		url = result.get_node("%Url") as Label
+		link = result.get_node("%Link")
+		url = result.get_node("%Url")
 		link.text = "รวมโปรแกรมฟรี 2569 โหลดได้ทุกตัว!!"
 		link.pressed.connect(
 			func():
@@ -904,18 +904,20 @@ func _wizard_page(w: OsWindow2, page: int, bundle: bool) -> void:
 		return
 	for i in 4:
 		w.get_node("%%Page%d" % i).visible = i == page
-	var next := w.get_node("%Next") as Button
+	var next: Button = w.get_node("%Next")
 	for c in next.pressed.get_connections():
 		next.pressed.disconnect(c.callable)
 	next.show()
 	match page:
 		0:
-			(w.get_node("%Welcome") as Label).text = "ยินดีต้อนรับสู่ตัวติดตั้ง %s" % task.install_name
+			var welcome: Label = w.get_node("%Welcome")
+			welcome.text = "ยินดีต้อนรับสู่ตัวติดตั้ง %s" % task.install_name
 			next.text = "ถัดไป ›"
 			next.pressed.connect(self._wizard_page.bind(w, 1, bundle))
 		1:
-			(w.get_node("%CoreCheck") as CheckBox).text = "%s (จำเป็น)" % task.install_name
-			var check := w.get_node("%BundleCheck") as CheckBox
+			var core_check: CheckBox = w.get_node("%CoreCheck")
+			core_check.text = "%s (จำเป็น)" % task.install_name
+			var check: CheckBox = w.get_node("%BundleCheck")
 			check.text = "ติดตั้ง \"%s\" ด้วย (แนะนำ!) — ผู้สนับสนุน" % task.bundle_name
 			check.button_pressed = bundle
 			next.text = "ติดตั้ง"
@@ -926,7 +928,7 @@ func _wizard_page(w: OsWindow2, page: int, bundle: bool) -> void:
 		2:
 			next.hide()
 			w.set_closable(false)
-			var bar := w.get_node("%Progress") as ProgressBar
+			var bar: ProgressBar = w.get_node("%Progress")
 			bar.value = 0.0
 			# NOTE: tween ผูกกับหน้าต่าง — หน้าต่างหายไป tween ก็หยุดด้วย
 			var tw := w.create_tween()
@@ -938,7 +940,8 @@ func _wizard_page(w: OsWindow2, page: int, bundle: bool) -> void:
 					_wizard_page(w, 3, bundle),
 			)
 		3:
-			(w.get_node("%Done") as Label).text = "ติดตั้ง %s เสร็จแล้ว" % task.install_name
+			var done: Label = w.get_node("%Done")
+			done.text = "ติดตั้ง %s เสร็จแล้ว" % task.install_name
 			next.text = "เสร็จ"
 			next.pressed.connect(w.close)
 
@@ -981,8 +984,8 @@ func open_task_manager():
 		w.restore(true)
 		_proc_panel = w.get_node("%Proc")
 		_autostart_panel = w.get_node("%AutoStart")
-		var tab_proc = w.get_node("%TabProc") as Button
-		var tab_autostart = w.get_node("%TabStartup") as Button
+		var tab_proc: Button = w.get_node("%TabProc")
+		var tab_autostart: Button = w.get_node("%TabStartup")
 		tab_proc.pressed.connect(
 			func():
 				_proc_panel.show()
@@ -1013,14 +1016,14 @@ func _refresh_task_manager():
 		return
 	var info_row = load(INFO_ROW)
 	if _proc_panel.visible:
-		var list := _proc_panel.get_node("List") as VBoxContainer
+		var list: VBoxContainer = _proc_panel.get_node("List")
 		for c in list.get_children():
 			c.queue_free()
 		for pid in os.process_map:
 			var proc = os.process_map[pid] as DesktopOS.Process
 			var node = info_row.instantiate() as Control
-			var info = node.get_node("%Info") as Label
-			var btn = node.get_node("%Primary") as Button
+			var info: Label = node.get_node("%Info")
+			var btn: Button = node.get_node("%Primary")
 			info.text = "%s\n%s · %s · ซีพียู %d%%" % [proc.data.name, proc.status, proc.kind, int(proc.data.cpu)]
 			info.add_theme_color_override("font_color", C_BAD if proc.data.kind == "hang" else C_INK)
 			btn.text = "จบการทำงาน"
@@ -1032,7 +1035,7 @@ func _refresh_task_manager():
 			)
 			list.add_child(node)
 	else:
-		var list = _autostart_panel.get_node("List") as VBoxContainer
+		var list: VBoxContainer = _autostart_panel.get_node("List")
 		for c in list.get_children():
 			c.queue_free()
 		var msg = Label.new()
@@ -1042,8 +1045,8 @@ func _refresh_task_manager():
 		for pid in os.autostart_map:
 			var proc = os.process_map[pid] as DesktopOS.Process
 			var node = info_row.instantiate() as Control
-			var info = node.get_node("%Info") as Label
-			var btn = node.get_node("%Primary") as Button
+			var info: Label = node.get_node("%Info")
+			var btn: Button = node.get_node("%Primary")
 			var impact := "สูง" if int(proc.data.boot_s) >= 6 else ("กลาง" if int(proc.data.boot_s) >= 3 else "ต่ำ")
 			info.text = "%s%s\nผลต่อการเปิดเครื่อง: %s · %s" % [
 				proc.data.name,
@@ -1125,23 +1128,23 @@ func open_settings() -> void:
 	if w == null:
 		w = SETTING_SCENE.instantiate()
 		w.set_meta("type", DesktopOS.WinType.Settings)
-		_settings_progress_bar = w.get_node("%DiskBar") as ProgressBar
+		_settings_progress_bar = w.get_node("%DiskBar")
 		_settings_progress_bar.max_value = os.disk_total_mb
 		_settings_progress_bar.value = os.disk_total_mb - os.disk_free_mb
 
-		_settings_disk_label = w.get_node("%DiskLabel") as Label
+		_settings_disk_label = w.get_node("%DiskLabel")
 		_settings_disk_label.text = "%s / %s" % [
 			size_text(os.disk_total_mb - os.disk_free_mb),
 			size_text(os.disk_total_mb),
 		]
 		w.restore(true)
 		_settings_installed_list = w.get_node("%Apps")
-		var printer_btn = w.get_node("%SecPrinters") as Button
-		var sound_btn = w.get_node("%SecSound") as Button
-		var wifi_btn = w.get_node("%SecWifi") as Button
-		var display_btn = w.get_node("%SecDisplay") as Button
-		var update_btn = w.get_node("%SecUpdate") as Button
-		var security_btn = w.get_node("%SecSecurity") as Button
+		var printer_btn: Button = w.get_node("%SecPrinters")
+		var sound_btn: Button = w.get_node("%SecSound")
+		var wifi_btn: Button = w.get_node("%SecWifi")
+		var display_btn: Button = w.get_node("%SecDisplay")
+		var update_btn: Button = w.get_node("%SecUpdate")
+		var security_btn: Button = w.get_node("%SecSecurity")
 		printer_btn.pressed.connect(self._open_printer)
 		sound_btn.pressed.connect(self._open_sound)
 		wifi_btn.pressed.connect(self._open_wifi)
@@ -1172,9 +1175,9 @@ func _refresh_setting() -> void:
 		var p = os.installed_programs.get(pname)
 		if p == null:
 			continue
-		var icon = app.get_node("%Icon") as TextureRect
-		var pinfo = app.get_node("%Info") as Label
-		var btn = app.get_node("%Uninstall") as Button
+		var icon: TextureRect = app.get_node("%Icon")
+		var pinfo: Label = app.get_node("%Info")
+		var btn: Button = app.get_node("%Uninstall")
 		icon.texture = p.icon
 		pinfo.text = "%s \n %s, %d mb" % [pname, p.data.publisher, p.data.size_mb]
 		btn.pressed.connect(
@@ -1225,9 +1228,9 @@ func _refresh_printer() -> void:
 	for id in os.printer_map:
 		var printer = os.printer_map.get(id) as DesktopOS.Printer
 		var node = info_node.instantiate()
-		var info = node.get_node("%Info") as Label
-		var btn1 = node.get_node("%Primary") as Button
-		var btn2 = node.get_node("%Secondary") as Button
+		var info: Label = node.get_node("%Info")
+		var btn1: Button = node.get_node("%Primary")
+		var btn2: Button = node.get_node("%Secondary")
 		if printer.is_install:
 			info.text = printer.data.name
 			if os.printer_default_index == id:
@@ -1279,12 +1282,12 @@ func _open_sound() -> void:
 				w.queue_free.call_deferred()
 				os.instances.erase(w),
 		)
-		var device_list = w.get_node("%Device") as OptionButton
-		var mute = w.get_node("%Mute") as CheckBox
-		var volume_slider = w.get_node("%Volume") as HSlider
-		var volume_label = w.get_node("%VolumeLabel") as Label
-		var test_btn = w.get_node("%Test") as Button
-		var result_text = w.get_node("%Result") as Label
+		var device_list: OptionButton = w.get_node("%Device")
+		var mute: CheckBox = w.get_node("%Mute")
+		var volume_slider: HSlider = w.get_node("%Volume")
+		var volume_label: Label = w.get_node("%VolumeLabel")
+		var test_btn: Button = w.get_node("%Test")
+		var result_text: Label = w.get_node("%Result")
 		for dev in os.sound_dev_list:
 			device_list.add_item(dev.name)
 		device_list.selected = os.selected_sound_dev
@@ -1342,9 +1345,9 @@ func _open_wifi() -> void:
 
 func _refresh_wifi(w):
 	var network_info = load(NET_INFO)
-	var network_container = w.get_node("%Networks") as VBoxContainer
-	var status = w.get_node("%Status") as Label
-	var msg = w.get_node("%Message") as Label
+	var network_container: VBoxContainer = w.get_node("%Networks")
+	var status: Label = w.get_node("%Status")
+	var msg: Label = w.get_node("%Message")
 	for n in network_container.get_children():
 		n.queue_free()
 	status.text = os.network_status()
@@ -1352,9 +1355,9 @@ func _refresh_wifi(w):
 	msg.visible = false
 	for net in os.wifi_detected:
 		var node = network_info.instantiate() as Control
-		var info = node.get_node("%Info") as Label
-		var password_input = node.get_node("%Password") as LineEdit
-		var connect_btn = node.get_node("%Connect") as Button
+		var info: Label = node.get_node("%Info")
+		var password_input: LineEdit = node.get_node("%Password")
+		var connect_btn: Button = node.get_node("%Connect")
 		info.text = "%s %s\n%s" % [
 			net.data.name,
 			"▮".repeat(net.data.signal_level),
@@ -1399,13 +1402,13 @@ func _open_display() -> void:
 				w.queue_free.call_deferred()
 				os.instances.erase(w),
 		)
-		var opt = w.get_node("%Options") as Control
-		var resolutions_opt = w.get_node("%Resolution") as OptionButton
-		var scale_opt = w.get_node("%Scale") as OptionButton
-		var pending = w.get_node("%Pending") as Control
-		var pending_msg = w.get_node("%PendingMessage") as Control
-		var keep_btn = w.get_node("%Keep") as Button
-		var revert_btn = w.get_node("%Revert") as Button
+		var opt: Control = w.get_node("%Options")
+		var resolutions_opt: OptionButton = w.get_node("%Resolution")
+		var scale_opt: OptionButton = w.get_node("%Scale")
+		var pending: Control = w.get_node("%Pending")
+		var pending_msg: Label = w.get_node("%PendingMessage")
+		var keep_btn: Button = w.get_node("%Keep")
+		var revert_btn: Button = w.get_node("%Revert")
 		for r in task.resolutions:
 			var opt_str = r.name
 			if r.best:
@@ -1487,10 +1490,10 @@ func _open_update() -> void:
 				os.instances.erase(w),
 		)
 
-		var check_btn = w.get_node("%Check") as Button
-		var install_btn = w.get_node("%Install") as Button
-		var poweroff_btn = w.get_node("%PowerOff") as Button
-		var restart_btn = w.get_node("%Restart") as Button
+		var check_btn: Button = w.get_node("%Check")
+		var install_btn: Button = w.get_node("%Install")
+		var poweroff_btn: Button = w.get_node("%PowerOff")
+		var restart_btn: Button = w.get_node("%Restart")
 		check_btn.pressed.connect(
 			func():
 				os.update_state = DesktopOS.UpdateState.FOUND
@@ -1530,12 +1533,12 @@ func _refresh_update(w: OsWindow2):
 			status_text = "อัปเดตล้มเหลว (เครื่องถูกปิดระหว่างติดตั้ง) — ตรวจหาใหม่"
 		_:
 			push_error("Should not go to this route")
-	var status = w.get_node("%Status") as Label
-	var check_btn = w.get_node("%Check") as Button
-	var install_btn = w.get_node("%Install") as Button
-	var pb = w.get_node("%Progress") as ProgressBar
-	var poweroff_btn = w.get_node("%PowerOff") as Button
-	var restart_btn = w.get_node("%Restart") as Button
+	var status: Label = w.get_node("%Status")
+	var check_btn: Button = w.get_node("%Check")
+	var install_btn: Button = w.get_node("%Install")
+	var pb: ProgressBar = w.get_node("%Progress")
+	var poweroff_btn: Button = w.get_node("%PowerOff")
+	var restart_btn: Button = w.get_node("%Restart")
 	status.text = status_text
 	check_btn.hide()
 	install_btn.hide()
@@ -1578,9 +1581,9 @@ func _open_security() -> void:
 		w.set_meta("type", DesktopOS.WinType.Security)
 		w.restore(true)
 		os.add_instance(w)
-		var protection_check = w.get_node("%Protection") as CheckBox
-		var scan_btn = w.get_node("%Scan") as Button
-		var clean_btn = w.get_node("%CleanTemp") as Button
+		var protection_check: CheckBox = w.get_node("%Protection")
+		var scan_btn: Button = w.get_node("%Scan")
+		var clean_btn: Button = w.get_node("%CleanTemp")
 		protection_check.button_pressed = os.protection_on
 		protection_check.toggled.connect(
 			func(toggled_on: bool):
@@ -1605,8 +1608,8 @@ func _open_security() -> void:
 
 
 func _refresh_security(w) -> void:
-	var threat_container = w.get_node("%Threats") as VBoxContainer
-	var temp_label = w.get_node("%TempLabel") as Label
+	var threat_container: VBoxContainer = w.get_node("%Threats")
+	var temp_label: Label = w.get_node("%TempLabel")
 	for c in threat_container.get_children():
 		c.queue_free()
 	var info = load(INFO_ROW)
@@ -1615,9 +1618,9 @@ func _refresh_security(w) -> void:
 			continue
 		var st: String = ThreatDesc.get(t.state)
 		var node = info.instantiate()
-		var info_label = node.get_node("%Info") as Label
-		var quarantine_btn = node.get_node("%Primary") as Button
-		var allow_btn = node.get_node("%Secondary") as Button
+		var info_label: Label = node.get_node("%Info")
+		var quarantine_btn: Button = node.get_node("%Primary")
+		var allow_btn: Button = node.get_node("%Secondary")
 		info_label.text = "%s\n%s · %s" % [t.data.name, t.data.where, st]
 		info_label.add_theme_color_override("font_color", ThreatColor[t.state])
 		quarantine_btn.text = "กักกัน"
@@ -1646,8 +1649,10 @@ func _setup_note() -> void:
 	_note_checklist = note_node.get_node("%Checklist")
 	_check_btn = note_node.get_node("%CheckButton")
 	_give_up_btn = note_node.get_node("%GiveUpButton")
-	(note_node.get_node("%Title") as Label).text = task.title
-	(note_node.get_node("%Request") as Label).text = task.request
+	var title: Label = note_node.get_node("%Title")
+	var request: Label = note_node.get_node("%Request")
+	title.text = task.title
+	request.text = task.request
 	_ask_note_label.hide()
 	_give_up_btn.hide()
 	var checks := _note_checklist.get_children()
@@ -1735,7 +1740,8 @@ func _fit_window(w: OsWindow2) -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(w):
 		return
-	var need := (w.get_node("VBoxContainer") as Control).get_combined_minimum_size()
+	var box: Control = w.get_node("VBoxContainer")
+	var need := box.get_combined_minimum_size()
 	w.size = Vector2(maxf(w.size.x, need.x), maxf(w.custom_minimum_size.y, need.y))
 	w.restore(true)
 
@@ -1798,7 +1804,7 @@ func _open_summary() -> void:
 	var n_star := 3 if score >= 90 else (2 if score >= 75 else (1 if score >= 60 else 0))
 	if lost_user_file:
 		n_star = 0
-	var score_label := summary_node.get_node("%Score") as Label
+	var score_label: Label = summary_node.get_node("%Score")
 	score_label.text = "คะแนน %d / 100" % score
 	if is_instance_valid(_summary_stars):
 		_summary_stars.queue_free()
@@ -1810,7 +1816,7 @@ func _open_summary() -> void:
 	for cat in CAT_NAMES:
 		var l := summary_node.get_node("%" + String(cat).capitalize()) as Label
 		l.text = "• %s  %d / %d" % [CAT_NAMES[cat], score_of(cat), CAP[cat]]
-	var notes_box := summary_node.get_node("%Notes") as VBoxContainer
+	var notes_box: VBoxContainer = summary_node.get_node("%Notes")
 	for c in notes_box.get_children():
 		if c is Label:
 			c.queue_free()
@@ -2115,8 +2121,8 @@ func lose(cat: StringName, pts: int, note := "") -> void:
 func customer_say(text: String, secs := 3.0) -> void:
 	if not is_instance_valid(msg_bubble_node) or text == "":
 		return
-	var c_name := msg_bubble_node.get_node("%Name") as Label
-	var msg := msg_bubble_node.get_node("%Text") as Label
+	var c_name: Label = msg_bubble_node.get_node("%Name")
+	var msg: Label = msg_bubble_node.get_node("%Text")
 	c_name.text = customer_name if !customer_name.is_empty() else "ลูกค้า"
 	msg.text = text
 	msg_bubble_node.show()
