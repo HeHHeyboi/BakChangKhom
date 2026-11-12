@@ -1,16 +1,5 @@
 class_name DesktopMinigameV2 extends PartMinigame
 
-
-class Threat extends RefCounted:
-	var data: DesktopThreat
-	var state: ThreatState
-
-
-	func _init(d: DesktopThreat, s: ThreatState):
-		self.data = d
-		self.state = s
-
-
 signal step_changed(step: Step)
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
 const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
@@ -139,9 +128,7 @@ enum Step {
 var doc_saved = false
 var lost_user_file = false
 var check_fails := 0
-var protection_on = true
 var step: Step = Step.LISTEN
-var usb_ejected = true
 
 # NOTE: Taskbar icon
 @onready var start_button = %StartMenu as Button
@@ -177,7 +164,6 @@ var _explain_options: VBoxContainer
 var _summary_stars: Control
 ## กับดักที่หักไปแล้ว (key) — หักครั้งเดียวต่อ key
 var _trap_hit: Dictionary = { }
-var printed_ok := false
 # NOTE: tour var
 var tour_done: Dictionary = { } # id → true
 var _tour_ring: Panel
@@ -226,29 +212,17 @@ var items := [
 	["ตัวจัดการงาน", TEX_SETTINGS],
 	["ขมการ์ด (ความปลอดภัย)", TEX_SETTINGS],
 ]
-enum UpdateState {
-	NOT_CHECKED,
-	FOUND,
-	INSTALL,
-	RESTART,
-	FINISH,
-	CORRUPT,
-}
-var update_state: UpdateState = UpdateState.NOT_CHECKED
-enum ThreatState {
-	HIDDEN,
-	FOUND,
-	QUARANTINE,
-	ALLOW,
-}
 const ThreatDesc = {
-	ThreatState.HIDDEN: "ไม่พบ",
-	ThreatState.FOUND: "พบ",
-	ThreatState.QUARANTINE: "กักกัน",
-	ThreatState.ALLOW: "อนุญาติ",
+	DesktopOS.ThreatState.HIDDEN: "ไม่พบ",
+	DesktopOS.ThreatState.FOUND: "พบ",
+	DesktopOS.ThreatState.QUARANTINE: "กักกัน",
+	DesktopOS.ThreatState.ALLOW: "อนุญาติ",
 }
-const ThreatColor = { ThreatState.FOUND: C_INK, ThreatState.QUARANTINE: C_OK, ThreatState.ALLOW: C_BAD }
-var threat_list: Array[Threat] = []
+const ThreatColor = {
+	DesktopOS.ThreatState.FOUND: C_INK,
+	DesktopOS.ThreatState.QUARANTINE: C_OK,
+	DesktopOS.ThreatState.ALLOW: C_BAD,
+}
 
 
 func _ready() -> void:
@@ -262,7 +236,7 @@ func _ready() -> void:
 	os = DesktopOS.new()
 	_resolve_task()
 	# NOTE: มี USB เสียบอยู่ = ยังไม่ถอด
-	usb_ejected = !task.usb_drive
+	os.usb_ejected = !task.usb_drive
 	for dir in task.FOLDERS:
 		if dir == DesktopTask.USB && !task.usb_drive:
 			continue
@@ -283,8 +257,7 @@ func _ready() -> void:
 	for w in task.wifi:
 		os.add_wifi(w)
 	for t in task.threats:
-		var threat = Threat.new(t, ThreatState.HIDDEN)
-		threat_list.append(threat)
+		os.add_threat(t)
 
 	os.is_mute = task.sound_muted
 	os.set_selected_sound_device(task.sound_device)
@@ -355,7 +328,7 @@ func _ready() -> void:
 	_popup_timer.wait_time = popup_every
 	_popup_timer.timeout.connect(
 		func():
-			if step == Step.WORK and has_adware():
+			if step == Step.WORK and os.has_adware():
 				_spawn_popup(),
 	)
 	_popup_timer.autostart = true
@@ -402,14 +375,6 @@ func _on_minigame_finished(_score: Dictionary) -> void:
 
 func repair_damaged() -> bool:
 	return lost_user_file
-
-
-func has_adware() -> bool:
-	for pname in os.installed_programs:
-		var p = os.installed_programs.get(pname) as DesktopOS.App
-		if p.data.adware:
-			return true
-	return false
 
 
 func _spawn_popup():
@@ -584,6 +549,17 @@ func _explorer_action(what: String) -> void:
 	var idx := _explorer_selected()
 	if what == "delete" && _explorer_folder == DesktopOS.TRASH:
 		var had_files := !os.dir_map[DesktopOS.TRASH].files.is_empty()
+		# NOTE: ของลูกค้าที่อยู่ในถัง = หายถาวร (ซ่อมไม่ผ่าน + หักเงิน) · โชว์ปุ่ม "ส่งงานตามสภาพ"
+		var lost_now := false
+		for i in os.dir_map[DesktopOS.TRASH].files:
+			if os.fs[i].data.kind == DesktopFile.USER:
+				lost_now = true
+		if lost_now:
+			lost_user_file = true
+			lose(&"safety", 0, "ล้างถังขยะทั้งที่มีของลูกค้าอยู่ — หายถาวร")
+			if not free_mode:
+				_pib_say("ในถังมีของลูกค้าอยู่! ล้างแล้วกู้คืนไม่ได้อีกแล้ว…", PibHint.Mood.WORRY)
+			_refresh_note()
 		os.clear_trash()
 		_refresh_all()
 		if had_files:
@@ -595,8 +571,13 @@ func _explorer_action(what: String) -> void:
 		return
 	match what:
 		"open":
+			os.fs[idx].inspected = true
 			_open_file(f)
 		"ask":
+			os.fs[idx].inspected = true
+			if f.reply != "":
+				customer_say(f.reply)
+				return
 			match f.kind:
 				DesktopFile.USER:
 					customer_say("อันนั้นอย่าลบนะ! ของสำคัญเลย")
@@ -609,6 +590,19 @@ func _explorer_action(what: String) -> void:
 				_:
 					customer_say("อันนั้นโหลดมาเอง")
 		"delete":
+			match f.kind:
+				DesktopFile.SYSTEM:
+					# NOTE: ไฟล์ระบบ — ปิ๊บคว้าไว้ ไม่ลบ
+					_trap(&"delete_system", "sys_" + f.name, &"safety", 15, "เกือบลบไฟล์ระบบ (%s)" % f.name)
+					_pib(&"SYSTEM_GRAB", PibHint.Mood.WORRY)
+					return
+				DesktopFile.USER:
+					if not free_mode:
+						_trap(&"delete_user", "user_" + f.name, &"safety", 10, "ลบของลูกค้า (%s)" % f.name)
+						_pib_toast("USER_DELETE")
+				DesktopFile.DUP:
+					if not os.fs[idx].inspected:
+						lose(&"listen", 3, "ลบไฟล์ก่อนเปิดดูว่าซ้ำจริง")
 			if os.move_file(idx, DesktopOS.TRASH):
 				_refresh_explorer()
 				tour_event("delete_file")
@@ -623,7 +617,7 @@ func _explorer_action(what: String) -> void:
 
 ## WARN: not yet implement: check usb free space
 func copy_to_usb(file_idx: int) -> String:
-	if task.usb_drive && usb_ejected:
+	if task.usb_drive && os.usb_ejected:
 		return "ไม่มี USB เสียบอยู่"
 	var copy_data = os.fs[file_idx].data
 	if os.find_file(copy_data.name, DesktopTask.USB):
@@ -637,7 +631,7 @@ func copy_to_usb(file_idx: int) -> String:
 
 ## WARN: not yet implement: check usb free space
 func move_to_usb(file_idx: int) -> String:
-	if task.usb_drive && usb_ejected:
+	if task.usb_drive && os.usb_ejected:
 		return "ไม่มี USB เสียบอยู่"
 	var f = os.fs[file_idx]
 	if f.data.kind == "user":
@@ -658,9 +652,9 @@ func move_to_usb(file_idx: int) -> String:
 
 
 func eject_usb() -> String:
-	if !task.usb_drive || usb_ejected:
+	if !task.usb_drive || os.usb_ejected:
 		return ""
-	usb_ejected = true
+	os.usb_ejected = true
 	if _explorer_folder == DesktopTask.USB:
 		_explorer_folder = "เดสก์ท็อป"
 	_refresh_all()
@@ -777,9 +771,7 @@ func _on_explorer_key(e: InputEvent) -> void:
 
 
 func size_text(mb: int) -> String:
-	if absi(mb) >= 1000:
-		return "%.1f GB" % (mb / 1000.0)
-	return "%d MB" % mb
+	return DesktopOS.size_text(mb)
 
 
 # NOTE: Browser Logic
@@ -1214,9 +1206,7 @@ func _open_printer() -> void:
 		_printer_empty_text = w.get_node("%Empty")
 		_printer_test_btn.pressed.connect(
 			func():
-				_print_test_result.text = os.print_test()
-				var p = os.printer_map.get(os.printer_default_index) as DesktopOS.Printer
-				printed_ok = p != null and p.data.right,
+				_print_test_result.text = os.print_test(),
 		)
 		screen.add_child(w)
 	else:
@@ -1327,18 +1317,7 @@ func _open_sound() -> void:
 
 func test_sound() -> String:
 	sound_tested = true
-	var dev = os.sound_dev_list.get(os.selected_sound_dev) as DesktopSoundDevice
-	if task.sound_devices.is_empty() || dev == null:
-		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
-	if !os.installed_programs.has("ไดรเวอร์เสียง"):
-		return "ไม่มีไดรเวอร์เสียง เครื่องไม่รู้จักลำโพงเลย"
-	if os.is_mute:
-		return "เงียบ… (ปิดเสียงอยู่)"
-	if os.sound_volume < 20:
-		return "เบามากจนไม่ได้ยิน"
-	if dev.works:
-		return "♪ ติ๊ง! มีเสียงออกลำโพงแล้ว"
-	return "เงียบ… เสียงไปออกที่ \"%s\"" % dev.name
+	return os.test_sound()
 
 
 # NOTE: Wifi's Setting Logic
@@ -1514,12 +1493,12 @@ func _open_update() -> void:
 		var restart_btn = w.get_node("%Restart") as Button
 		check_btn.pressed.connect(
 			func():
-				update_state = UpdateState.FOUND
+				os.update_state = DesktopOS.UpdateState.FOUND
 				_refresh_update(w),
 		)
 		install_btn.pressed.connect(
 			func():
-				update_state = UpdateState.INSTALL
+				os.update_state = DesktopOS.UpdateState.INSTALL
 				_refresh_update(w)
 				var tw = self.create_tween()
 				tw.tween_interval(3.0)
@@ -1536,18 +1515,18 @@ func _open_update() -> void:
 
 func _refresh_update(w: OsWindow2):
 	var status_text = ""
-	match update_state:
-		UpdateState.NOT_CHECKED:
+	match os.update_state:
+		DesktopOS.UpdateState.NOT_CHECKED:
 			status_text = "ยังไม่ได้ตรวจหาอัปเดต"
-		UpdateState.FOUND:
+		DesktopOS.UpdateState.FOUND:
 			status_text = "พบอัปเดตความปลอดภัย ขนาด %s" % size_text(task.update_mb)
-		UpdateState.INSTALL:
+		DesktopOS.UpdateState.INSTALL:
 			status_text = "กำลังติดตั้ง… ห้ามปิดเครื่อง"
-		UpdateState.RESTART:
+		DesktopOS.UpdateState.RESTART:
 			status_text = "ติดตั้งเสร็จ ต้องรีสตาร์ตเพื่อให้ใช้งานได้"
-		UpdateState.FINISH:
+		DesktopOS.UpdateState.FINISH:
 			status_text = "เครื่องเป็นเวอร์ชันล่าสุดแล้ว ✓"
-		UpdateState.CORRUPT:
+		DesktopOS.UpdateState.CORRUPT:
 			status_text = "อัปเดตล้มเหลว (เครื่องถูกปิดระหว่างติดตั้ง) — ตรวจหาใหม่"
 		_:
 			push_error("Should not go to this route")
@@ -1563,31 +1542,31 @@ func _refresh_update(w: OsWindow2):
 	pb.hide()
 	poweroff_btn.hide()
 	restart_btn.hide()
-	if update_state in [UpdateState.NOT_CHECKED, UpdateState.CORRUPT]:
+	if os.update_state in [DesktopOS.UpdateState.NOT_CHECKED, DesktopOS.UpdateState.CORRUPT]:
 		check_btn.show()
-	elif update_state == UpdateState.FOUND:
+	elif os.update_state == DesktopOS.UpdateState.FOUND:
 		install_btn.show()
-	elif update_state == UpdateState.INSTALL:
+	elif os.update_state == DesktopOS.UpdateState.INSTALL:
 		pb.show()
 		poweroff_btn.show()
 		pb.show_percentage = false
 		pb.value = 0
 		create_tween().tween_property(pb, "value", 100.0, 3.0)
-	elif update_state == UpdateState.RESTART:
+	elif os.update_state == DesktopOS.UpdateState.RESTART:
 		restart_btn.show()
 
 
 func _finish_install(w) -> void:
-	if update_state == UpdateState.INSTALL:
-		update_state = UpdateState.RESTART
+	if os.update_state == DesktopOS.UpdateState.INSTALL:
+		os.update_state = DesktopOS.UpdateState.RESTART
 		_refresh_update(w)
 
 
 func _power_off_during_update(w) -> void:
-	if update_state != UpdateState.INSTALL:
+	if os.update_state != DesktopOS.UpdateState.INSTALL:
 		return
 	_trap(&"interrupt_update", "interrupt", &"safety", 10, "ปิดเครื่องตอนกำลังอัปเดต")
-	update_state = UpdateState.CORRUPT
+	os.update_state = DesktopOS.UpdateState.CORRUPT
 	_pib_say("ห้ามปิดเครื่องตอนอัปเดตเด็ดขาด! ระบบเสียหายได้ ต้องตรวจหาใหม่", PibHint.Mood.WORRY)
 	_refresh_update(w)
 
@@ -1602,24 +1581,19 @@ func _open_security() -> void:
 		var protection_check = w.get_node("%Protection") as CheckBox
 		var scan_btn = w.get_node("%Scan") as Button
 		var clean_btn = w.get_node("%CleanTemp") as Button
-		protection_check.button_pressed = protection_on
+		protection_check.button_pressed = os.protection_on
 		protection_check.toggled.connect(
 			func(toggled_on: bool):
-				protection_on = toggled_on,
+				os.protection_on = toggled_on,
 		)
 		scan_btn.pressed.connect(
 			func():
-				if !protection_on:
-					return
-				for t in threat_list:
-					if t.state == ThreatState.HIDDEN:
-						t.state = ThreatState.FOUND
-				_refresh_security(w),
+				if os.scan_threats():
+					_refresh_security(w),
 		)
 		clean_btn.pressed.connect(
 			func():
-				os.disk_free_mb += os.disk_temp_mb
-				os.disk_temp_mb = 0
+				os.clean_temp()
 				_refresh_all()
 				_refresh_security(w),
 		)
@@ -1636,8 +1610,8 @@ func _refresh_security(w) -> void:
 	for c in threat_container.get_children():
 		c.queue_free()
 	var info = load(INFO_ROW)
-	for t in threat_list:
-		if t.state == ThreatState.HIDDEN:
+	for t in os.threats:
+		if t.state == DesktopOS.ThreatState.HIDDEN:
 			continue
 		var st: String = ThreatDesc.get(t.state)
 		var node = info.instantiate()
@@ -1648,18 +1622,18 @@ func _refresh_security(w) -> void:
 		info_label.add_theme_color_override("font_color", ThreatColor[t.state])
 		quarantine_btn.text = "กักกัน"
 		allow_btn.text = "อนุญาติ"
-		quarantine_btn.visible = t.state in [ThreatState.FOUND, ThreatState.ALLOW]
-		allow_btn.visible = t.state in [ThreatState.FOUND, ThreatState.QUARANTINE]
+		quarantine_btn.visible = t.state in [DesktopOS.ThreatState.FOUND, DesktopOS.ThreatState.ALLOW]
+		allow_btn.visible = t.state in [DesktopOS.ThreatState.FOUND, DesktopOS.ThreatState.QUARANTINE]
 		quarantine_btn.pressed.connect(
 			func():
-				t.state = ThreatState.QUARANTINE
+				t.state = DesktopOS.ThreatState.QUARANTINE
 				_refresh_security(w),
 		)
 		allow_btn.pressed.connect(
 			func():
 				_trap(&"allow_threat", "allow_" + t.data.name, &"safety", 10, "กดอนุญาตไวรัส (%s)" % t.data.name)
 				_pib_say("อนุญาต = ปล่อยให้ไวรัสอยู่ต่อนะ! ต้องกักกัน", PibHint.Mood.WORRY)
-				t.state = ThreatState.ALLOW
+				t.state = DesktopOS.ThreatState.ALLOW
 				_refresh_security(w),
 		)
 		threat_container.add_child(node)
@@ -1865,7 +1839,7 @@ func finish() -> void:
 
 
 func _close_popups_if_clean() -> void:
-	if has_adware():
+	if os.has_adware():
 		return
 	for w in get_tree().get_nodes_in_group(&"os_ad_popup"):
 		if is_instance_valid(w) and not w.is_queued_for_deletion():
@@ -2023,14 +1997,14 @@ func _end_tour(skipped: bool) -> void:
 
 
 func _restart_now() -> void:
-	if update_state != UpdateState.RESTART:
+	if os.update_state != DesktopOS.UpdateState.RESTART:
 		return
 	if !doc_saved:
 		_trap(&"unsaved_work", "unsaved", &"listen", 10, "รีสตาร์ตทั้งที่งานลูกค้ายังไม่บันทึก")
 		lost_user_file = true
 		_refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 		_pib_say("งานที่ลูกค้าพิมพ์ค้างไว้หายหมดเลย… ต้องกดบันทึกก่อนรีสตาร์ตทุกครั้ง", PibHint.Mood.WORRY)
-	update_state = UpdateState.FINISH
+	os.update_state = DesktopOS.UpdateState.FINISH
 	var pid_list = []
 	for pid in os.process_map:
 		pid_list.append(pid)
@@ -2043,7 +2017,7 @@ func _restart_now() -> void:
 func check() -> String:
 	if step != Step.WORK:
 		return "ยังไม่ถึงขั้นนี้"
-	var why := _check_reason()
+	var why := DesktopTaskCheck.reason(task, os)
 	if why != "":
 		check_fails += 1
 		lose(&"fix", 10, "ส่งงานแล้วยังไม่เรียบร้อย %d ครั้ง" % check_fails)
@@ -2063,92 +2037,6 @@ func give_up() -> void:
 	lose(&"fix", int(CAP[&"fix"]), "ส่งเครื่องคืนทั้งที่งานยังไม่เสร็จ")
 	lose(&"explain", int(CAP[&"explain"]))
 	_set_step(Step.SUMMARY)
-
-
-## ลองใช้ให้ลูกค้าดูไม่ผ่านเพราะอะไร · "" = ผ่าน
-func _check_reason() -> String:
-	match task.goal:
-		DesktopTask.Goal.INSTALL:
-			if not os.installed_programs.has(task.install_name):
-				return "ยังไม่มีโปรแกรม %s ในเครื่องเลย" % task.install_name
-			if has_adware():
-				return "เปิดเครื่องมามีโฆษณาเด้ง! มีโปรแกรมแถมติดมา ต้องถอนออกก่อน"
-		DesktopTask.Goal.UNINSTALL:
-			if has_adware():
-				return "โฆษณายังเด้งอยู่เลย"
-		DesktopTask.Goal.FREE_SPACE:
-			for idx in os.dir_map[DesktopOS.TRASH].files:
-				var f := os.fs[idx].data
-				if f.kind == DesktopFile.USER:
-					return "\"%s\" ของลูกค้าหายไปจากโฟลเดอร์! (อยู่ในถังขยะ)" % f.name
-			if os.disk_free_mb < task.free_space_target_mb:
-				return "ยังเซฟไม่ได้ พื้นที่เหลือ %s (ต้อง %s) — ลบแล้วอย่าลืมล้างถังขยะ" % [
-					size_text(os.disk_free_mb),
-					size_text(task.free_space_target_mb),
-				]
-		DesktopTask.Goal.CLOSE_HANG:
-			for pid in os.process_map:
-				var p := os.process_map[pid]
-				if p.data.kind == "hang":
-					return "\"%s\" ยังค้างอยู่เลย กดอะไรก็ไม่ขยับ" % p.data.name
-		DesktopTask.Goal.STARTUP:
-			for pid in os.autostart_map:
-				var p := os.autostart_map[pid]
-				if p.data.kind == "system" and not p.autostart:
-					return "%s ไม่เปิดพร้อมเครื่อง เครื่องไม่ปลอดภัย" % p.data.name
-			if os.boot_time() > task.boot_target_s:
-				return "เปิดเครื่องยังช้าอยู่ (~%d วินาที) ลูกค้ารอนานเกิน" % os.boot_time()
-		DesktopTask.Goal.PRINTER:
-			var pr = os.printer_map.get(os.printer_default_index) as DesktopOS.Printer
-			if pr == null:
-				return "ยังพิมพ์ไม่ได้ ไม่มีเครื่องพิมพ์ในเครื่อง"
-			if not pr.data.right:
-				return "สั่งพิมพ์แล้วไปออกที่เครื่อง \"%s\"" % pr.data.name
-			if not printed_ok:
-				return "ยังไม่ได้ลองพิมพ์หน้าทดสอบเลย"
-		DesktopTask.Goal.SOUND:
-			var res := test_sound()
-			if not res.begins_with("♪"):
-				return "เปิดเพลงแล้วยังเงียบ — " + res
-		DesktopTask.Goal.WIFI:
-			if os.connected_network < 0:
-				return "ยังเข้าเน็ตไม่ได้เลย"
-			if not os.wifi_detected[os.connected_network].data.right:
-				return "เข้าเน็ตได้ แต่เป็นเน็ตสาธารณะ ไม่ใช่เน็ตบ้านลูกค้า"
-		DesktopTask.Goal.BACKUP:
-			var miss: PackedStringArray = []
-			for f in task.files:
-				if f.folder_name() != task.backup_folder or f.kind != DesktopFile.USER:
-					continue
-				if not (os.find_file(f.name, task.backup_folder) and os.find_file(f.name, DesktopTask.USB)):
-					miss.append(f.name)
-			if not miss.is_empty():
-				return "รูปยังไม่ครบสองที่ (ในเครื่อง + USB): %s" % ", ".join(miss)
-			if not usb_ejected:
-				return "ยังไม่ได้กด \"ถอด USB อย่างปลอดภัย\" ดึงออกเลยไฟล์อาจเสีย"
-		DesktopTask.Goal.UPDATE:
-			if update_state == UpdateState.RESTART:
-				return "ติดตั้งแล้วแต่ยังไม่ได้รีสตาร์ต"
-			if update_state != UpdateState.FINISH:
-				return "เครื่องยังไม่ได้อัปเดต"
-		DesktopTask.Goal.VIRUS_SCAN:
-			if not protection_on:
-				return "การป้องกันไวรัสถูกปิดอยู่ เครื่องไม่ปลอดภัย"
-			for t in threat_list:
-				if t.state != ThreatState.QUARANTINE:
-					return "ยังมีไวรัสอยู่ในเครื่อง (สแกนแล้วกักกันให้หมด)"
-			if task.temp_mb > 0 and os.disk_temp_mb > 0:
-				return "ยังอืดอยู่ ไฟล์ชั่วคราวเต็มเครื่อง"
-		DesktopTask.Goal.DISPLAY:
-			if os.pending_resolution >= 0:
-				return "จอดำอยู่!"
-			if not task.resolutions.is_empty():
-				var scale_ok: bool = (
-					os.selected_scale >= 0 and os.scale_list[os.selected_scale] == task.display_scale_best
-				)
-				if not task.resolutions[os.selected_resolution].best or not scale_ok:
-					return "จอยังดูแปลก ๆ ตัวหนังสือใหญ่/แตกอยู่"
-	return ""
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
