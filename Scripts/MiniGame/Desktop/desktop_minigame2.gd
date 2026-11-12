@@ -33,6 +33,7 @@ const SHORTCUT_SCENE := preload("res://Scene/MiniGame/Desktop/shortcut.tscn")
 
 # NOTE: Explorer constant
 const DOC_DIR = "เอกสาร"
+const DESKTOP_DIR = "เดสก์ท็อป"
 const DOWNLOAD_DIR = "ดาวน์โหลด"
 const PIC_DIR = "รูปภาพ"
 const TRASH_DIR = DesktopOS.TRASH
@@ -81,6 +82,44 @@ const CAT_NAMES := { &"fix": "ทำงานสำเร็จ", &"safety": "�
 const FREE_TIPS := ["• ดับเบิลคลิกไอคอน = เปิด", "• ปุ่มเริ่ม = รวมทุกโปรแกรม", "• ถอนโปรแกรม = ตั้งค่า"]
 const CHIOICE_BUTTON := "res://Scene/MiniGame/Desktop/os_choice_button.tscn"
 const ADWARE_SIZE_MB := 120
+
+## ทำความรู้จัก OS: ทำครบทุกขั้นแล้วปิดเครื่อง (หรือกดข้าม) → tour_finished
+signal tour_finished(skipped: bool)
+const TOUR_RING := preload("res://Scene/MiniGame/Desktop/os_tour_ring.tscn")
+## ขั้นของ tour: id · บอกให้ทำ · วิธีทำ · ปิ๊บอธิบายหลังทำเสร็จ
+const TOUR := [
+	{
+		"id": "open_docs",
+		"text": "เปิดโฟลเดอร์เอกสาร",
+		"how": "ดับเบิลคลิกไอคอน \"เอกสาร\" บนเดสก์ท็อป",
+		"done": "นี่คือหน้าต่างไฟล์ ไฟล์ทุกอย่างในเครื่องแยกเก็บเป็นโฟลเดอร์ เหมือนลิ้นชัก",
+	},
+	{
+		"id": "open_browser",
+		"text": "เปิดเบราว์เซอร์",
+		"how": "กดรูปลูกโลกที่แถบงานด้านล่าง",
+		"done": "เบราว์เซอร์ใช้เปิดเว็บ ปุ่มสีจัดที่เขียนว่าโฆษณาอย่าไปกดนะ",
+	},
+	{
+		"id": "open_settings",
+		"text": "ดูพื้นที่ในหน้าตั้งค่า",
+		"how": "กดรูปเฟืองที่แถบงาน",
+		"done": "หน้าตั้งค่าบอกพื้นที่เหลือ และเป็นที่ถอนโปรแกรมด้วย",
+	},
+	{
+		"id": "delete_file",
+		"text": "ลบไฟล์ทดสอบ",
+		"how": "ในหน้าต่างไฟล์ กดโฟลเดอร์ \"เดสก์ท็อป\" → เลือก \"ไฟล์ทดสอบ.doc\" → กดลบ",
+		"done": "ไฟล์ที่ลบยังไม่หายจริงนะ มันไปอยู่ในถังขยะ",
+	},
+	{
+		"id": "empty_trash",
+		"text": "ล้างถังขยะ",
+		"how": "เปิดถังขยะ → กด \"ล้างถังขยะ\"",
+		"done": "ล้างถังขยะแล้วไฟล์ถึงหายจริง พื้นที่ก็กลับมา",
+	},
+	{ "id": "shutdown", "text": "ปิดเครื่อง", "how": "กดปุ่มเริ่มมุมซ้ายล่าง → ปิดเครื่อง", "done": "" },
+]
 
 enum Step {
 	LISTEN,
@@ -139,6 +178,10 @@ var _summary_stars: Control
 ## กับดักที่หักไปแล้ว (key) — หักครั้งเดียวต่อ key
 var _trap_hit: Dictionary = { }
 var printed_ok := false
+# NOTE: tour var
+var tour_done: Dictionary = { } # id → true
+var _tour_ring: Panel
+var _tour_t := 0.0
 var os: DesktopOS
 var start_menu: PopupMenu
 var customer_name: String
@@ -211,7 +254,11 @@ var threat_list: Array[Threat] = []
 func _ready() -> void:
 	_mistakes = { &"fix": 0, &"safety": 0, &"listen": 0, &"explain": 0 }
 	minigame_finished.connect(_on_minigame_finished)
+	# NOTE: tour = คอมของขมเอง (ไม่มีลูกค้า/คะแนน) + ทำตามขั้นใน TOUR
+	if tour_mode:
+		free_mode = true
 	super._ready()
+	($Os as CanvasLayer).layer = ui_layer
 	os = DesktopOS.new()
 	_resolve_task()
 	# NOTE: มี USB เสียบอยู่ = ยังไม่ถอด
@@ -324,6 +371,11 @@ func _ready() -> void:
 	_explain_options = explain_node.get_node("%Options")
 	summary_node.get_node("%Finish").pressed.connect(finish)
 	_setup_note()
+	if tour_mode:
+		_tour_ring = TOUR_RING.instantiate()
+		_tour_ring.z_index = 7
+		_tour_ring.hide()
+		screen.add_child(_tour_ring)
 	if free_mode:
 		customer_name = "ขม"
 		_set_step(Step.WORK)
@@ -335,6 +387,8 @@ func _ready() -> void:
 		await boot_node.finished
 	if free_mode:
 		_pib_lines(task.pib_intro)
+		if tour_mode:
+			_tour_hint_later()
 	elif step == Step.LISTEN and not modal_node.visible:
 		_open_ask()
 
@@ -378,8 +432,10 @@ func _spawn_popup():
 	pass
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	start_button.disabled = start_menu.visible
+	if tour_mode:
+		_tour_update_ring(delta)
 	if !os.dir_map[os.TRASH].files.is_empty():
 		trash_icon.icon = TEX_TRASH_FULL
 	else:
@@ -454,6 +510,8 @@ func open_explorer(folder: String = "เอกสาร") -> void:
 		w.restore()
 	_ensure_process(w, "ไฟล์")
 	_refresh_explorer()
+	if folder == DOC_DIR:
+		tour_event("open_docs")
 
 
 ## ผูกปุ่ม/รายการในฉาก os_explorer.tscn เข้ากับข้อมูล (ปุ่มโฟลเดอร์สร้างจากแม่แบบ Trash)
@@ -525,8 +583,11 @@ func _explorer_action(what: String) -> void:
 		return
 	var idx := _explorer_selected()
 	if what == "delete" && _explorer_folder == DesktopOS.TRASH:
+		var had_files := !os.dir_map[DesktopOS.TRASH].files.is_empty()
 		os.clear_trash()
-		_refresh_explorer()
+		_refresh_all()
+		if had_files:
+			tour_event("empty_trash")
 		return
 	var f: DesktopFile = os.fs[idx].data if idx >= 0 else null
 	if f == null:
@@ -550,6 +611,7 @@ func _explorer_action(what: String) -> void:
 		"delete":
 			if os.move_file(idx, DesktopOS.TRASH):
 				_refresh_explorer()
+				tour_event("delete_file")
 		"restore":
 			if os.move_file(idx, os.fs[idx].prev_dir):
 				_refresh_explorer()
@@ -736,6 +798,7 @@ func open_browser() -> void:
 		w.restore()
 	_ensure_process(w, "เบราว์เซอร์")
 	_browser_show(BROWSER_HOME)
+	tour_event("open_browser")
 
 
 func _browser_show(page: String) -> void:
@@ -1099,6 +1162,7 @@ func open_settings() -> void:
 		w.restore()
 	_ensure_process(w, "ตั้งค่า")
 	_refresh_setting()
+	tour_event("open_settings")
 
 
 func _refresh_setting() -> void:
@@ -1613,6 +1677,19 @@ func _setup_note() -> void:
 	_ask_note_label.hide()
 	_give_up_btn.hide()
 	var checks := _note_checklist.get_children()
+	if tour_mode:
+		# ขั้นของ tour มีมากกว่าบรรทัดในโน้ต — ก๊อปบรรทัดสุดท้ายเพิ่มให้พอ
+		while checks.size() < TOUR.size():
+			var extra := (checks[-1] as Label).duplicate() as Label
+			_note_checklist.add_child(extra)
+			checks.append(extra)
+		for i in checks.size():
+			checks[i].visible = i < TOUR.size()
+			if i < TOUR.size():
+				checks[i].set_meta("text", TOUR[i].text)
+		_check_btn.text = "ข้ามการแนะนำ ►"
+		_check_btn.pressed.connect(_end_tour.bind(true))
+		return
 	if free_mode:
 		for i in checks.size():
 			checks[i].visible = i < FREE_TIPS.size()
@@ -1634,6 +1711,15 @@ func _setup_note() -> void:
 
 func _refresh_note() -> void:
 	if not is_instance_valid(_check_btn):
+		return
+	if tour_mode:
+		var cur := _tour_current()
+		var checks := _note_checklist.get_children()
+		for i in mini(checks.size(), TOUR.size()):
+			var id: String = TOUR[i].id
+			var mark := "☑ " if tour_done.has(id) else ("▶ " if id == cur else "☐ ")
+			checks[i].text = mark + String(checks[i].get_meta("text", ""))
+		_check_btn.disabled = step == Step.DONE
 		return
 	if free_mode:
 		_check_btn.disabled = step == Step.DONE
@@ -1815,10 +1901,13 @@ func _refresh_all():
 func _shut_down() -> void:
 	if !free_mode || step == Step.DONE:
 		return
-	# WARN: not yet implement
 	if tour_mode:
-		push_error("not yet implement tour_mode")
-		pass
+		if _tour_current() != "shutdown":
+			_tour_say("ยังเหลืออีกนิด — " + String(_tour_step(_tour_current()).how))
+			return
+		tour_event("shutdown")
+		_end_tour(false)
+		return
 	step = Step.DONE
 	_finished = true
 	_popup_timer.stop()
@@ -1830,6 +1919,107 @@ func _shut_down() -> void:
 		SceneRouter.pop()
 	else:
 		queue_free()
+
+
+# NOTE: ทำความรู้จัก OS (tour_mode)
+## ขั้นแรกที่ยังไม่เสร็จ ("" = ครบ)
+func _tour_current() -> String:
+	for st in TOUR:
+		if not tour_done.has(st.id):
+			return st.id
+	return ""
+
+
+func _tour_step(id: String) -> Dictionary:
+	for st in TOUR:
+		if st.id == id:
+			return st
+	return { }
+
+
+## เหตุการณ์ใน OS (เปิดหน้าต่าง · ลบไฟล์ …) — นับเฉพาะตอน tour และทำไม่เรียงก็นับ
+func tour_event(id: String) -> void:
+	if not tour_mode or tour_done.has(id) or _tour_step(id).is_empty():
+		return
+	tour_done[id] = true
+	_refresh_note()
+	var st := _tour_step(id)
+	if String(st.done) != "":
+		_tour_say(st.done)
+	_tour_hint_later()
+
+
+## ทำขั้นนี้ไม่เสร็จใน 3.8 วิ → ปิ๊บบอกวิธีทำ
+func _tour_hint_later() -> void:
+	var cur := _tour_current()
+	if cur == "":
+		return
+	await get_tree().create_timer(3.8).timeout
+	if is_inside_tree() and step != Step.DONE and _tour_current() == cur:
+		_tour_say("ต่อไป " + String(_tour_step(cur).how))
+
+
+func _tour_say(text: String) -> void:
+	if is_instance_valid(pib):
+		pib.toast(DialogToken.new(PibHint.DEFAULT_SPEAKER, text), 3.6, PibHint.Mood.POINT)
+
+
+## ของที่ต้องกดในขั้นนี้ (ไว้วาดกรอบกะพริบ)
+func _tour_target() -> Control:
+	var explorer_open := is_instance_valid(_explorer_win) and _explorer_win.is_visible_in_tree()
+	match _tour_current():
+		"open_docs":
+			return doc_icon
+		"open_browser":
+			return browser
+		"open_settings":
+			return settings
+		"delete_file":
+			if not explorer_open:
+				return explorer
+			if _explorer_folder != DESKTOP_DIR:
+				return _explorer_win.find_child("Folder_" + DESKTOP_DIR.validate_node_name(), true, false) as Control
+			return _explorer_win.delete_action
+		"empty_trash":
+			if not explorer_open:
+				return trash_icon
+			if _explorer_folder != DesktopOS.TRASH:
+				return _explorer_win.get_node("%Trash")
+			return _explorer_win.delete_action
+		"shutdown":
+			return start_button
+	return null
+
+
+func _tour_update_ring(delta: float) -> void:
+	if not is_instance_valid(_tour_ring):
+		return
+	_tour_t += delta
+	var t := _tour_target()
+	if t == null or not t.is_visible_in_tree() or step == Step.DONE or boot_node.visible or modal_node.visible:
+		_tour_ring.hide()
+		return
+	# พิกัดในจอ (Screen) — แปลงจาก global เผื่อจอ/เดสก์ท็อปถูกย่อขยาย
+	var inv: Transform2D = screen.get_global_transform().affine_inverse() * t.get_global_transform()
+	var r := Rect2(inv * Vector2.ZERO, inv.basis_xform(t.size)).grow(6.0 + 3.0 * sin(_tour_t * 6.0))
+	_tour_ring.show()
+	_tour_ring.position = r.position
+	_tour_ring.size = r.size
+	_tour_ring.move_to_front()
+
+
+## จบ tour (ปิดเครื่องครบ หรือกดข้าม) — ไม่แตะ Global/SceneRouter · มินิเกมแม่รอ tour_finished
+func _end_tour(skipped: bool) -> void:
+	if step == Step.DONE:
+		return
+	step = Step.DONE
+	_finished = true
+	_popup_timer.stop()
+	if is_instance_valid(_tour_ring):
+		_tour_ring.hide()
+	_refresh_note()
+	tour_finished.emit(skipped)
+	queue_free()
 
 
 func _restart_now() -> void:
