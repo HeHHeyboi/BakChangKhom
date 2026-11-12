@@ -1,5 +1,17 @@
 class_name DesktopMinigameV2 extends PartMinigame
 
+
+class Threat extends RefCounted:
+	var data: DesktopThreat
+	var state: ThreatState
+
+
+	func _init(d: DesktopThreat, s: ThreatState):
+		self.data = d
+		self.state = s
+
+
+signal step_changed(step: Step)
 const MIN_SHORTCUT_SIZE = Vector2(60, 60)
 const DEFAULT_WINDOW_SIZE = Vector2(450, 350)
 
@@ -19,9 +31,7 @@ const AD_POPUP := preload("res://Scene/MiniGame/Desktop/os_popup_ad.tscn")
 const UNSAVED_DOC := "res://Scene/MiniGame/Desktop/os_unsaved_doc.tscn"
 const SHORTCUT_SCENE := preload("res://Scene/MiniGame/Desktop/shortcut.tscn")
 
-
 # NOTE: Explorer constant
-## หน้าต่างไฟล์ (Explorer) — โครงจาก os_explorer.tscn · ข้อมูลจาก os.dir_map / os.fs
 const DOC_DIR = "เอกสาร"
 const DOWNLOAD_DIR = "ดาวน์โหลด"
 const PIC_DIR = "รูปภาพ"
@@ -66,6 +76,10 @@ const TEX_DOC := preload(DIR + "os_icon_file_doc.png")
 const TEX_WARN := preload(DIR + "os_icon_file_warn.png")
 
 const CAP := { &"fix": 40, &"safety": 30, &"listen": 20, &"explain": 10 }
+const CAT_NAMES := { &"fix": "ทำงานสำเร็จ", &"safety": "ปลอดภัย", &"listen": "ฟังลูกค้า", &"explain": "อธิบาย" }
+## free_mode: ข้อความในโน้ตแทนรายการขั้นตอน
+const FREE_TIPS := ["• ดับเบิลคลิกไอคอน = เปิด", "• ปุ่มเริ่ม = รวมทุกโปรแกรม", "• ถอนโปรแกรม = ตั้งค่า"]
+const CHIOICE_BUTTON := "res://Scene/MiniGame/Desktop/os_choice_button.tscn"
 const ADWARE_SIZE_MB := 120
 
 enum Step {
@@ -82,13 +96,13 @@ enum Step {
 @export var ui_layer := 5
 @export var framed := true
 @export var boot_screen := true
+@onready var boot_node = $Os/Screen/OsBoot as OsBoot
 var doc_saved = false
 var lost_user_file = false
+var check_fails := 0
 var protection_on = true
 var step: Step = Step.LISTEN
 var usb_ejected = true
-@onready var boot_node = $Os/Screen/OsBoot as OsBoot
-
 
 # NOTE: Taskbar icon
 @onready var start_button = %StartMenu as Button
@@ -110,16 +124,27 @@ var usb_ejected = true
 @onready var browser_icon = %BrowserIcon as DesktopShortcut
 
 # NOTE: Minigame Node
-@onready var msg_bubble = %CustomerBubble
-@onready var note = %Note
-
+@onready var note_node = %Note
+@onready var msg_bubble_node = %CustomerBubble
+@onready var summary_node = %Summary
+@onready var explain_node = %Explain
+@onready var modal_node = %OsModal
+var _ask_note_label: Label
+var _note_checklist: Control
+var _check_btn: Button
+var _give_up_btn: Button
+var _explain_prompt: Label
+var _explain_options: VBoxContainer
+var _summary_stars: Control
+## กับดักที่หักไปแล้ว (key) — หักครั้งเดียวต่อ key
+var _trap_hit: Dictionary = { }
+var printed_ok := false
 var os: DesktopOS
-# var _selected_icon: Control
 var start_menu: PopupMenu
-# var file_menu: PopupMenu
 var customer_name: String
 var _popup_timer := Timer.new()
 var sound_tested := false
+
 # NOTE: Explorer var
 var _explorer_folder := "เดสก์ท็อป"
 var _explorer_win: OsExplorer
@@ -131,20 +156,16 @@ var notes: PackedStringArray = []
 var _bubble_tw: Tween
 ## ชื่อโปรแกรม → ไอคอนบนเดสก์ท็อป
 var _app_shortcuts: Dictionary[String, DesktopShortcut] = { }
-
 # NOTE: Browser var
 var _browser_page: VBoxContainer
 var _browser_addr: LineEdit
-
 # NOTE: Task Manager var
 var _proc_panel: Control
 var _autostart_panel: Control
-
 # NOTE: Setting var
 var _settings_installed_list: VBoxContainer
 var _settings_progress_bar: ProgressBar
 var _settings_disk_label: Label
-
 # NOTE: Printer var
 var _printer_install_list: VBoxContainer
 var _printer_empty_text: Label
@@ -170,46 +191,33 @@ enum UpdateState {
 	FINISH,
 	CORRUPT,
 }
-
 var update_state: UpdateState = UpdateState.NOT_CHECKED
-
 enum ThreatState {
 	HIDDEN,
 	FOUND,
 	QUARANTINE,
 	ALLOW,
 }
-
 const ThreatDesc = {
 	ThreatState.HIDDEN: "ไม่พบ",
 	ThreatState.FOUND: "พบ",
 	ThreatState.QUARANTINE: "กักกัน",
 	ThreatState.ALLOW: "อนุญาติ",
 }
-
 const ThreatColor = { ThreatState.FOUND: C_INK, ThreatState.QUARANTINE: C_OK, ThreatState.ALLOW: C_BAD }
-
-
-class Threat extends RefCounted:
-	var data: DesktopThreat
-	var state: ThreatState
-
-
-	func _init(d: DesktopThreat, s: ThreatState):
-		self.data = d
-		self.state = s
-
-
 var threat_list: Array[Threat] = []
 
 
 func _ready() -> void:
+	_mistakes = { &"fix": 0, &"safety": 0, &"listen": 0, &"explain": 0 }
+	minigame_finished.connect(_on_minigame_finished)
 	super._ready()
 	os = DesktopOS.new()
 	_resolve_task()
+	# NOTE: มี USB เสียบอยู่ = ยังไม่ถอด
+	usb_ejected = !task.usb_drive
 	for dir in task.FOLDERS:
 		if dir == DesktopTask.USB && !task.usb_drive:
-			usb_ejected = false
 			continue
 		os.create_dir(dir)
 	for file in task.files:
@@ -300,13 +308,46 @@ func _ready() -> void:
 	_popup_timer.wait_time = popup_every
 	_popup_timer.timeout.connect(
 		func():
-			if has_adware():
-				_spawn_popup()
-			pass,
+			if step == Step.WORK and has_adware():
+				_spawn_popup(),
 	)
 	_popup_timer.autostart = true
 	self.add_child(_popup_timer)
 	self.add_child(start_menu)
+
+	# NOTE: โน้ตงาน · ลูกค้าพูด · สรุป · ถาม/อธิบาย — โหนดวางไว้ใน desktop_window2.tscn
+	modal_node.hide()
+	explain_node.hide()
+	summary_node.hide()
+	msg_bubble_node.hide()
+	_explain_prompt = explain_node.get_node("%Prompt")
+	_explain_options = explain_node.get_node("%Options")
+	summary_node.get_node("%Finish").pressed.connect(finish)
+	_setup_note()
+	if free_mode:
+		customer_name = "ขม"
+		_set_step(Step.WORK)
+	else:
+		if customer_name.is_empty():
+			customer_name = "ลูกค้า"
+		_set_step(Step.LISTEN)
+	if boot_node.visible:
+		await boot_node.finished
+	if free_mode:
+		_pib_lines(task.pib_intro)
+	elif step == Step.LISTEN and not modal_node.visible:
+		_open_ask()
+
+
+func _on_minigame_finished(_score: Dictionary) -> void:
+	Global.in_minigame = false
+	Global.cur_pib = null
+	EventManager.minigame_end()
+	queue_free.call_deferred()
+
+
+func repair_damaged() -> bool:
+	return lost_user_file
 
 
 func has_adware() -> bool:
@@ -319,6 +360,7 @@ func has_adware() -> bool:
 
 func _spawn_popup():
 	var w = AD_POPUP.instantiate() as OsWindow2
+	w.add_to_group(&"os_ad_popup")
 	w.restore(true)
 	w.closed.connect(
 		func():
@@ -554,7 +596,7 @@ func move_to_usb(file_idx: int) -> String:
 
 
 func eject_usb() -> String:
-	if task.usb_drive && !usb_ejected:
+	if !task.usb_drive || usb_ejected:
 		return ""
 	usb_ejected = true
 	if _explorer_folder == DesktopTask.USB:
@@ -1013,8 +1055,8 @@ func _check_process(pid: int) -> bool:
 				10,
 				"ปิดงานที่ลูกค้ายังไม่บันทึก (%s)" % p.data.name,
 			)
-			# m.lost_user_file = true
-			# m._refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
+			lost_user_file = true
+			_refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 			_pib_say("อ๊ะ! อันนั้นลูกค้ายังใช้อยู่ ข้อมูลที่ยังไม่บันทึกหายหมดแล้ว", PibHint.Mood.WORRY)
 			return true
 	if p.kind == "hang" and is_instance_valid(p.instance):
@@ -1108,7 +1150,9 @@ func _open_printer() -> void:
 		_printer_empty_text = w.get_node("%Empty")
 		_printer_test_btn.pressed.connect(
 			func():
-				_print_test_result.text = os.print_test(),
+				_print_test_result.text = os.print_test()
+				var p = os.printer_map.get(os.printer_default_index) as DesktopOS.Printer
+				printed_ok = p != null and p.data.right,
 		)
 		screen.add_child(w)
 	else:
@@ -1558,6 +1602,209 @@ func _refresh_security(w) -> void:
 	temp_label.text = "ไฟล์ชั่วคราว: %s" % [size_text(os.disk_temp_mb)]
 
 
+# NOTE: โน้ตงาน (โหนด Note)
+func _setup_note() -> void:
+	_ask_note_label = note_node.get_node("%AskNote")
+	_note_checklist = note_node.get_node("%Checklist")
+	_check_btn = note_node.get_node("%CheckButton")
+	_give_up_btn = note_node.get_node("%GiveUpButton")
+	(note_node.get_node("%Title") as Label).text = task.title
+	(note_node.get_node("%Request") as Label).text = task.request
+	_ask_note_label.hide()
+	_give_up_btn.hide()
+	var checks := _note_checklist.get_children()
+	if free_mode:
+		for i in checks.size():
+			checks[i].visible = i < FREE_TIPS.size()
+			if i < FREE_TIPS.size():
+				checks[i].text = FREE_TIPS[i]
+		_check_btn.text = "ปิดเครื่อง"
+		_check_btn.pressed.connect(_shut_down)
+		return
+	# ข้อความขั้นตอนตั้งไว้ใน os_task_note.tscn ("☐ ฟังลูกค้า") — เก็บแค่ส่วนข้อความไว้เติม ☐/☑
+	for l: Label in checks:
+		l.set_meta("text", l.text.trim_prefix("☐ ").trim_prefix("☑ "))
+	_check_btn.pressed.connect(_on_check_pressed)
+	_give_up_btn.pressed.connect(
+		func():
+			give_up()
+			_open_summary(),
+	)
+
+
+func _refresh_note() -> void:
+	if not is_instance_valid(_check_btn):
+		return
+	if free_mode:
+		_check_btn.disabled = step == Step.DONE
+		return
+	var done := [step > Step.LISTEN, step > Step.WORK, step > Step.WORK, step > Step.EXPLAIN]
+	var checks := _note_checklist.get_children()
+	for i in mini(checks.size(), done.size()):
+		checks[i].text = ("☑ " if done[i] else "☐ ") + String(checks[i].get_meta("text", ""))
+	_check_btn.disabled = step != Step.WORK
+	_give_up_btn.visible = can_give_up()
+
+
+# NOTE: หน้าต่างคุยกับลูกค้า (โหนด Explain) — ใช้ทั้งตอนถาม (ขั้นฟัง) และตอนอธิบาย
+func _open_dialog(title: String, prompt: String, options: PackedStringArray, prefix: String, on_pick: Callable) -> void:
+	for c in _explain_options.get_children():
+		_explain_options.remove_child(c)
+		c.queue_free()
+	explain_node.set_title(title)
+	_explain_prompt.text = prompt
+	var choice_res := load(CHIOICE_BUTTON) as PackedScene
+	for i in options.size():
+		var btn := choice_res.instantiate() as Button
+		btn.name = "%s%d" % [prefix, i]
+		btn.text = options[i]
+		btn.pressed.connect(
+			func():
+				modal_node.hide()
+				explain_node.hide()
+				on_pick.call(i),
+		)
+		_explain_options.add_child(btn)
+	modal_node.show()
+	explain_node.restore(true)
+	_fit_window(explain_node)
+
+
+## หน้าต่าง (Panel) ไม่ขยายตามเนื้อหาเอง — รอจัดเลย์เอาต์หนึ่งเฟรมแล้วขยายความสูงให้พอ
+func _fit_window(w: OsWindow2) -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(w):
+		return
+	var need := (w.get_node("VBoxContainer") as Control).get_combined_minimum_size()
+	w.size = Vector2(maxf(w.size.x, need.x), maxf(w.custom_minimum_size.y, need.y))
+	w.restore(true)
+
+
+func _open_ask() -> void:
+	_open_dialog(
+		"คุยกับ" + customer_name,
+		"%s: \"%s\"\nก่อนลงมือ ถามอะไรลูกค้าก่อนดี?" % [customer_name, task.request],
+		task.ask_options,
+		"Ask",
+		func(i: int):
+			customer_say(_ask(i), 7.0)
+			_pib_lines(task.pib_intro),
+	)
+
+
+func _on_check_pressed() -> void:
+	var why := check()
+	if why != "":
+		customer_say(why, 5.0)
+		_pib_toast("CHECK_FAIL", 3.0)
+		_refresh_note()
+		return
+	_close_popups_if_clean()
+	_open_explain()
+
+
+func _open_explain() -> void:
+	_open_dialog(
+		"อธิบายให้%sฟัง" % customer_name,
+		"ใช้ได้แล้ว! บอกลูกค้าว่าอะไรดี?",
+		task.explain_options,
+		"Explain",
+		func(i: int):
+			explain(i)
+			_open_summary()
+			_pib_lines(task.pib_lesson, PibHint.Mood.HAPPY),
+	)
+
+
+## ขั้น 5 — เลือกคำอธิบายให้ลูกค้า
+func explain(i: int) -> void:
+	if step != Step.EXPLAIN:
+		return
+	if i != task.explain_best:
+		lose(&"explain", 10, "อธิบายให้ลูกค้าไม่ตรง")
+	_set_step(Step.SUMMARY)
+
+
+func score_of(cat: StringName) -> int:
+	return int(CAP.get(cat, 0)) - int(_mistakes.get(cat, 0))
+
+
+# NOTE: หน้าสรุปงาน (โหนด Summary)
+func _open_summary() -> void:
+	explain_node.hide()
+	var score := final_score()
+	summary_node.set_title("สรุปงาน — " + task.title)
+	# [20 ต.ค.] ดาวเป็นไอคอนวาดเอง (Icons) แทนอีโมจิ ⭐ ที่ขึ้นเป็นกล่องบนเว็บ
+	var n_star := 3 if score >= 90 else (2 if score >= 75 else (1 if score >= 60 else 0))
+	if lost_user_file:
+		n_star = 0
+	var score_label := summary_node.get_node("%Score") as Label
+	score_label.text = "คะแนน %d / 100" % score
+	if is_instance_valid(_summary_stars):
+		_summary_stars.queue_free()
+	if n_star > 0:
+		_summary_stars = Icons.stars(n_star, 26)
+		score_label.add_sibling(_summary_stars)
+	else:
+		score_label.text += "   " + ("ไม่ผ่าน (ของลูกค้าหาย)" if lost_user_file else "ไม่ผ่าน")
+	for cat in CAT_NAMES:
+		var l := summary_node.get_node("%" + String(cat).capitalize()) as Label
+		l.text = "• %s  %d / %d" % [CAT_NAMES[cat], score_of(cat), CAP[cat]]
+	var notes_box := summary_node.get_node("%Notes") as VBoxContainer
+	for c in notes_box.get_children():
+		if c is Label:
+			c.queue_free()
+	for n in notes:
+		var l := Label.new()
+		l.text = "– " + n
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size.x = 440
+		l.add_theme_font_size_override("font_size", 14)
+		l.add_theme_color_override("font_color", Color(0.6, 0.25, 0.15))
+		notes_box.add_child(l)
+	notes_box.visible = not notes.is_empty()
+	modal_node.show()
+	summary_node.restore(true)
+
+
+## ส่งเครื่องคืน → คะแนนเข้า GameState (งานลูกค้า) → ปิดมินิเกม
+func finish() -> void:
+	if step == Step.DONE:
+		return
+	_set_step(Step.DONE)
+	_popup_timer.stop()
+	summary_node.hide()
+	modal_node.hide()
+	_finish(true)
+
+
+func _close_popups_if_clean() -> void:
+	if has_adware():
+		return
+	for w in get_tree().get_nodes_in_group(&"os_ad_popup"):
+		if is_instance_valid(w) and not w.is_queued_for_deletion():
+			w.close()
+
+
+func _ask(index: int) -> String:
+	if step != Step.LISTEN:
+		return ""
+	var good := index == task.ask_best
+	if not good:
+		lose(&"listen", 10, "ถามลูกค้าไม่ตรงประเด็น")
+	elif task.ask_note != "" && is_instance_valid(_ask_note_label):
+		_ask_note_label.text = task.ask_note
+		_ask_note_label.show()
+	_set_step(Step.WORK)
+	return task.ask_answer if good else task.ask_answer_wrong
+
+
+func _set_step(s: Step) -> void:
+	step = s
+	step_changed.emit(s)
+	_refresh_note()
+
+
 func _refresh_all():
 	_refresh_explorer()
 	_refresh_setting()
@@ -1574,8 +1821,11 @@ func _shut_down() -> void:
 		pass
 	step = Step.DONE
 	_finished = true
+	_popup_timer.stop()
+	_refresh_note()
 	Global.in_minigame = false
 	Global.cur_pib = null
+	EventManager.showUI()
 	if SceneRouter.has(self):
 		SceneRouter.pop()
 	else:
@@ -1588,7 +1838,7 @@ func _restart_now() -> void:
 	if !doc_saved:
 		_trap(&"unsaved_work", "unsaved", &"listen", 10, "รีสตาร์ตทั้งที่งานลูกค้ายังไม่บันทึก")
 		lost_user_file = true
-		# _refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
+		_refresh_note() # [13 ต.ค.] โชว์ปุ่ม "ส่งงานตามสภาพ"
 		_pib_say("งานที่ลูกค้าพิมพ์ค้างไว้หายหมดเลย… ต้องกดบันทึกก่อนรีสตาร์ตทุกครั้ง", PibHint.Mood.WORRY)
 	update_state = UpdateState.FINISH
 	var pid_list = []
@@ -1598,6 +1848,117 @@ func _restart_now() -> void:
 		os.kill_process(pid)
 	boot_node.show()
 	boot_node.play()
+
+
+func check() -> String:
+	if step != Step.WORK:
+		return "ยังไม่ถึงขั้นนี้"
+	var why := _check_reason()
+	if why != "":
+		check_fails += 1
+		lose(&"fix", 10, "ส่งงานแล้วยังไม่เรียบร้อย %d ครั้ง" % check_fails)
+		return why
+	_set_step(Step.EXPLAIN)
+	return ""
+
+
+## ชื่อต้องเป็น can_give_up — PartMinigame ใช้เช็กว่าไม่ต้องใส่ปุ่มยอมแพ้ของตัวเองซ้ำ
+func can_give_up() -> bool:
+	return step == Step.WORK and (check_fails >= 2 or lost_user_file)
+
+
+func give_up() -> void:
+	if step != Step.WORK:
+		return
+	lose(&"fix", int(CAP[&"fix"]), "ส่งเครื่องคืนทั้งที่งานยังไม่เสร็จ")
+	lose(&"explain", int(CAP[&"explain"]))
+	_set_step(Step.SUMMARY)
+
+
+## ลองใช้ให้ลูกค้าดูไม่ผ่านเพราะอะไร · "" = ผ่าน
+func _check_reason() -> String:
+	match task.goal:
+		DesktopTask.Goal.INSTALL:
+			if not os.installed_programs.has(task.install_name):
+				return "ยังไม่มีโปรแกรม %s ในเครื่องเลย" % task.install_name
+			if has_adware():
+				return "เปิดเครื่องมามีโฆษณาเด้ง! มีโปรแกรมแถมติดมา ต้องถอนออกก่อน"
+		DesktopTask.Goal.UNINSTALL:
+			if has_adware():
+				return "โฆษณายังเด้งอยู่เลย"
+		DesktopTask.Goal.FREE_SPACE:
+			for idx in os.dir_map[DesktopOS.TRASH].files:
+				var f := os.fs[idx].data
+				if f.kind == DesktopFile.USER:
+					return "\"%s\" ของลูกค้าหายไปจากโฟลเดอร์! (อยู่ในถังขยะ)" % f.name
+			if os.disk_free_mb < task.free_space_target_mb:
+				return "ยังเซฟไม่ได้ พื้นที่เหลือ %s (ต้อง %s) — ลบแล้วอย่าลืมล้างถังขยะ" % [
+					size_text(os.disk_free_mb),
+					size_text(task.free_space_target_mb),
+				]
+		DesktopTask.Goal.CLOSE_HANG:
+			for pid in os.process_map:
+				var p := os.process_map[pid]
+				if p.data.kind == "hang":
+					return "\"%s\" ยังค้างอยู่เลย กดอะไรก็ไม่ขยับ" % p.data.name
+		DesktopTask.Goal.STARTUP:
+			for pid in os.autostart_map:
+				var p := os.autostart_map[pid]
+				if p.data.kind == "system" and not p.autostart:
+					return "%s ไม่เปิดพร้อมเครื่อง เครื่องไม่ปลอดภัย" % p.data.name
+			if os.boot_time() > task.boot_target_s:
+				return "เปิดเครื่องยังช้าอยู่ (~%d วินาที) ลูกค้ารอนานเกิน" % os.boot_time()
+		DesktopTask.Goal.PRINTER:
+			var pr = os.printer_map.get(os.printer_default_index) as DesktopOS.Printer
+			if pr == null:
+				return "ยังพิมพ์ไม่ได้ ไม่มีเครื่องพิมพ์ในเครื่อง"
+			if not pr.data.right:
+				return "สั่งพิมพ์แล้วไปออกที่เครื่อง \"%s\"" % pr.data.name
+			if not printed_ok:
+				return "ยังไม่ได้ลองพิมพ์หน้าทดสอบเลย"
+		DesktopTask.Goal.SOUND:
+			var res := test_sound()
+			if not res.begins_with("♪"):
+				return "เปิดเพลงแล้วยังเงียบ — " + res
+		DesktopTask.Goal.WIFI:
+			if os.connected_network < 0:
+				return "ยังเข้าเน็ตไม่ได้เลย"
+			if not os.wifi_detected[os.connected_network].data.right:
+				return "เข้าเน็ตได้ แต่เป็นเน็ตสาธารณะ ไม่ใช่เน็ตบ้านลูกค้า"
+		DesktopTask.Goal.BACKUP:
+			var miss: PackedStringArray = []
+			for f in task.files:
+				if f.folder_name() != task.backup_folder or f.kind != DesktopFile.USER:
+					continue
+				if not (os.find_file(f.name, task.backup_folder) and os.find_file(f.name, DesktopTask.USB)):
+					miss.append(f.name)
+			if not miss.is_empty():
+				return "รูปยังไม่ครบสองที่ (ในเครื่อง + USB): %s" % ", ".join(miss)
+			if not usb_ejected:
+				return "ยังไม่ได้กด \"ถอด USB อย่างปลอดภัย\" ดึงออกเลยไฟล์อาจเสีย"
+		DesktopTask.Goal.UPDATE:
+			if update_state == UpdateState.RESTART:
+				return "ติดตั้งแล้วแต่ยังไม่ได้รีสตาร์ต"
+			if update_state != UpdateState.FINISH:
+				return "เครื่องยังไม่ได้อัปเดต"
+		DesktopTask.Goal.VIRUS_SCAN:
+			if not protection_on:
+				return "การป้องกันไวรัสถูกปิดอยู่ เครื่องไม่ปลอดภัย"
+			for t in threat_list:
+				if t.state != ThreatState.QUARANTINE:
+					return "ยังมีไวรัสอยู่ในเครื่อง (สแกนแล้วกักกันให้หมด)"
+			if task.temp_mb > 0 and os.disk_temp_mb > 0:
+				return "ยังอืดอยู่ ไฟล์ชั่วคราวเต็มเครื่อง"
+		DesktopTask.Goal.DISPLAY:
+			if os.pending_resolution >= 0:
+				return "จอดำอยู่!"
+			if not task.resolutions.is_empty():
+				var scale_ok: bool = (
+					os.selected_scale >= 0 and os.scale_list[os.selected_scale] == task.display_scale_best
+				)
+				if not task.resolutions[os.selected_resolution].best or not scale_ok:
+					return "จอยังดูแปลก ๆ ตัวหนังสือใหญ่/แตกอยู่"
+	return ""
 
 
 func _file_tex(f: DesktopFile) -> Texture2D:
@@ -1646,14 +2007,21 @@ func _pib_say(text: String, mood := PibHint.Mood.NORMAL, secs := 4.0) -> void:
 		pib.toast(DialogToken.new(PibHint.DEFAULT_SPEAKER, text), secs, mood)
 
 
+func _pib_lines(lines: PackedStringArray, mood := PibHint.Mood.NORMAL) -> void:
+	if is_instance_valid(pib) and not lines.is_empty():
+		pib.say(Array(lines), mood)
+
+
 func _pib(section: StringName, mood := PibHint.Mood.NORMAL) -> void:
 	if is_instance_valid(pib) and dialog_dict.has(String(section)):
 		pib.say(dialog_dict[String(section)], mood)
 
 
+## NOTE: กับดัก: หักครั้งเดียวต่อ key · ไม่อยู่ใน task.traps = ไม่หัก (ผลในเกมยังเกิด)
 func _trap(id: StringName, key: String, cat: StringName, pts: int, note: String) -> void:
-	if task == null or not task.traps.has(id):
+	if task == null or not task.traps.has(id) or _trap_hit.has(key):
 		return
+	_trap_hit[key] = true
 	lose(cat, pts, note)
 
 
@@ -1667,18 +2035,18 @@ func lose(cat: StringName, pts: int, note := "") -> void:
 
 
 func customer_say(text: String, secs := 3.0) -> void:
-	if not is_instance_valid(msg_bubble) or text == "":
+	if not is_instance_valid(msg_bubble_node) or text == "":
 		return
-	var c_name := msg_bubble.get_node("%Name") as Label
-	var msg := msg_bubble.get_node("%Text") as Label
-	c_name.text = customer_name
+	var c_name := msg_bubble_node.get_node("%Name") as Label
+	var msg := msg_bubble_node.get_node("%Text") as Label
+	c_name.text = customer_name if !customer_name.is_empty() else "ลูกค้า"
 	msg.text = text
-	msg_bubble.show()
-	msg_bubble.modulate.a = 1.0
+	msg_bubble_node.show()
+	msg_bubble_node.modulate.a = 1.0
 	if _bubble_tw:
 		_bubble_tw.kill()
 
 	_bubble_tw = create_tween()
 	_bubble_tw.tween_interval(secs)
-	_bubble_tw.tween_property(msg_bubble, "modulate:a", 0.0, 0.4)
-	_bubble_tw.tween_callback(msg_bubble.hide)
+	_bubble_tw.tween_property(msg_bubble_node, "modulate:a", 0.0, 0.4)
+	_bubble_tw.tween_callback(msg_bubble_node.hide)

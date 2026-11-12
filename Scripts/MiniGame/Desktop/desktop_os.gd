@@ -124,8 +124,15 @@ func add_file(src: DesktopFile, dir: String = "") -> int:
 	var index := fs.size()
 	d.files.append(index)
 	fs.append(file)
-	disk_free_mb += src.size_mb
+	file.dir = d.dname
+	if _on_pc(file.dir):
+		disk_free_mb -= src.size_mb
 	return index
+
+
+## ไฟล์ในโฟลเดอร์นี้กินพื้นที่ดิสก์ของเครื่องไหม (USB ไม่นับ)
+func _on_pc(dir: String) -> bool:
+	return dir != DesktopTask.USB
 
 
 ## คืนไฟล์ในโฟลเดอร์ dir · dir ว่าง = ทุกไฟล์ใน fs (รวมถังขยะ) · ไม่มีโฟลเดอร์นั้นคืน []
@@ -161,6 +168,11 @@ func move_file(file_index: int, dest: String) -> bool:
 	var from: Dir = dir_map.get(file.dir)
 	from.files.remove_at(from.files.find(file_index))
 	to.files.append(file_index)
+	# NOTE: ย้ายข้ามเครื่อง ↔ USB = พื้นที่ในเครื่องเปลี่ยน (ลงถังขยะยังกินที่อยู่จนกว่าจะล้าง)
+	if _on_pc(from.dname) and not _on_pc(dest):
+		disk_free_mb += file.data.size_mb
+	elif not _on_pc(from.dname) and _on_pc(dest):
+		disk_free_mb -= file.data.size_mb
 	file.dir = dest
 	file.prev_dir = from.dname
 	return true

@@ -16,7 +16,10 @@
 [ext_resource type="Texture2D" uid="uid://c0p3q5lw4lii3" path="res://Assets/MiniGame/Desktop/os_icon_trash_empty.png" id="13_80row"]
 [ext_resource type="PackedScene" uid="uid://d27c01wjestrb" path="res://Scene/MiniGame/Desktop/os_task_note.tscn" id="15_esb47"]
 [ext_resource type="PackedScene" uid="uid://26ebfi5qvxra" path="res://Scene/MiniGame/Desktop/os_boot.tscn" id="15_uwad3"]
+[ext_resource type="PackedScene" uid="uid://du51f3x027ika" path="res://Scene/MiniGame/Desktop/os_modal.tscn" id="16_g2yld"]
 [ext_resource type="PackedScene" uid="uid://ctvnpo4gkvxw4" path="res://Scene/MiniGame/Desktop/os_customer_bubble.tscn" id="16_mp0gt"]
+[ext_resource type="PackedScene" path="res://Scene/MiniGame/Desktop/os_summary.tscn" id="17_waob3"]
+[ext_resource type="PackedScene" uid="uid://dc8hc1cucpaih" path="res://Scene/MiniGame/Desktop/os_explain.tscn" id="19_asnx4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycono"]
 bg_color = Color(0.45043758, 0.48677072, 0.5468543, 0.961)
@@ -223,16 +226,21 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
 
+[node name="OsModal" parent="Os/Screen" unique_id=2075539140 instance=ExtResource("16_g2yld")]
+unique_name_in_owner = true
+visible = true
+z_index = 6
+layout_mode = 1
+
 [node name="Note" parent="Os/Screen" unique_id=442420618 instance=ExtResource("15_esb47")]
 unique_name_in_owner = true
-visible = false
-z_index = 1
+z_index = 6
 layout_mode = 1
 
 [node name="CustomerBubble" parent="Os/Screen" unique_id=796627260 instance=ExtResource("16_mp0gt")]
 unique_name_in_owner = true
 visible = false
-z_index = 1
+z_index = 6
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -246,6 +254,39 @@ offset_bottom = -49.0
 grow_horizontal = 0
 grow_vertical = 0
 
+[node name="Summary" parent="Os/Screen" unique_id=854341474 instance=ExtResource("17_waob3")]
+unique_name_in_owner = true
+visible = false
+z_index = 6
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -200.00002
+offset_right = 260.0
+offset_bottom = 200.00002
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Explain" parent="Os/Screen" unique_id=478391861 instance=ExtResource("19_asnx4")]
+unique_name_in_owner = true
+z_index = 6
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="OsBoot" parent="Os/Screen" unique_id=1599778160 instance=ExtResource("15_uwad3")]
 visible = false
 z_index = 5
@@ -254,4 +295,8 @@ autoplay = true
 
 [editable path="Os/Screen/Note"]
 [editable path="Os/Screen/CustomerBubble"]
+[editable path="Os/Screen/Summary"]
+[editable path="Os/Screen/Summary/VBoxContainer/Topbar"]
+[editable path="Os/Screen/Explain"]
+[editable path="Os/Screen/Explain/VBoxContainer/Topbar"]
 [editable path="Os/Screen/OsBoot"]
