@@ -175,13 +175,15 @@ static func make_frame(phase: Control, title: String) -> VBoxContainer:
 		"pressed",
 		func():
 			rail.show()
-			show_button.hide(),
+			show_button.hide()
+			_apply_inset(phase, true),
 	)
 	hide_button.connect(
 		"pressed",
 		func():
 			rail.hide()
-			show_button.show(),
+			show_button.show()
+			_apply_inset(phase, false),
 	)
 	box.name = "RailBox"
 	box.position = Vector2(16, 16)
@@ -297,6 +299,13 @@ static func refresh_layout(phase: Control) -> void:
 		_:
 			open = rail_wanted(phase)
 	apply_rail(phase, open)
+	_apply_inset(phase, open)
+
+
+## [Claude 13 พ.ย. 2569] ฉาก 2.5D หดหนี rail ตอนเปิด / กว้างเต็มจอตอนปิด — เรียกทั้งจาก layout อัตโนมัติและปุ่ม < >
+## (เดิมกดปุ่มพับ rail เองแล้วฉากไม่ขยายกลับ → เห็นพื้นหลังโล่งด้านขวา)
+static func _apply_inset(phase: Control, open: bool) -> void:
+	var overlay: bool = phase.get("rail_overlay") == true
 	var st = phase.owner.get("stage") if phase.owner else null
 	if st is Stage2D:
 		var squeeze := open and not overlay

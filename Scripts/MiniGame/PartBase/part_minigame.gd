@@ -18,6 +18,8 @@ var current_phase: int = -1
 var dialog_dict: Dictionary
 var _mistakes: Dictionary = { }
 var _phase_nodes: Dictionary = { }
+## [Claude 13 พ.ย. 2569] แถบล่างใต้ฉาก Stage (y 476–648) — เดิมเห็นรูป Background (ผนังร้าน) โผล่ใต้ฉากตอนปิ๊บไม่พูด ดูเหมือน 2 ฉากซ้อนกัน
+const FLOOR_BAR_COLOR := Color(0.2, 0.14, 0.1)
 ## QTE กลางของมินิเกม — phase เรียก: var r = await owner.qte.run(SPEC, node("ชิ้นงาน"), owner.qte_zone_scale())
 var qte: QteRunner
 ## มีปุ่ม "ข้ามบทฝึก" มุมขวาบน (กด 2 ครั้งยืนยัน) — ใช้กับ Tutorial / งานในเควสต์ · งานลูกค้า (meta work_order) ข้ามไม่ได้เสมอ
@@ -50,6 +52,7 @@ func _ready() -> void:
 		_phase_nodes[phase].mistake.connect(_on_mistake)
 
 	_build_qte()
+	_build_floor_bar()
 	if skippable and not has_meta("work_order"):
 		_build_skip()
 	# ขมOS (DesktopMinigame) มีปุ่ม "ส่งงานตามสภาพ" ของตัวเอง (can_give_up) → ไม่ใส่ซ้ำ
@@ -363,3 +366,28 @@ static func fill_case_text(text: String, c: CustomerCase) -> String:
 		out = out.replace(m.get_string(), v if v != "" else m.get_string(2))
 	return out
 
+
+## ปิดพื้นที่นอก Stage (ใต้ฉาก + มุมขวาบนเหนือสมุด) ด้วยพื้นสีเข้มทั้งจอ แทนรูป Background ที่โผล่มา
+## อยู่ใต้ Stage และใต้ PibHint (CanvasLayer 120) · ซ่อนตาม Stage → ช่วงที่ Phase ซ่อน Stage ยังเห็น Background เดิม
+func _build_floor_bar() -> void:
+	var stage := get_node_or_null("Stage") as Control
+	if stage == null or has_node("FloorBar"):
+		return
+	var bar := Panel.new()
+	bar.name = "FloorBar"
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.position = Vector2.ZERO
+	bar.size = Vector2(1152, 648)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = FLOOR_BAR_COLOR
+	bar.add_theme_stylebox_override(&"panel", sb)
+	var line := ColorRect.new()
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.color = FLOOR_BAR_COLOR.darkened(0.5)
+	line.position = Vector2(0, stage.position.y + stage.size.y)
+	line.size = Vector2(1152, 4)
+	bar.add_child(line)
+	add_child(bar)
+	move_child(bar, stage.get_index())
+	bar.visible = stage.visible
+	stage.visibility_changed.connect(func(): bar.visible = stage.visible)

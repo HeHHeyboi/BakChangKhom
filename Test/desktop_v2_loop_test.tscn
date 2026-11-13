@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Test/desktop_v2_loop_test.gd" id="1"]
+
+[node name="DesktopV2LoopTest" type="Node"]
+script = ExtResource("1")

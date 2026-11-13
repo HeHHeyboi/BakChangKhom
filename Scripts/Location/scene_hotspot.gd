@@ -52,8 +52,15 @@ func _draw() -> void:
 	var font := get_theme_default_font()
 	var fs := 20
 	var ts := font.get_string_size(label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
-	var plate := Rect2(Vector2((size.x - ts.x) / 2.0 - 12, 0), ts + Vector2(24, 12))
+	var plate := Rect2(Vector2((size.x - ts.x) / 2.0 - 12, 0), Vector2(ts.x + 24, font.get_height(fs) + 12))
 	plate.position.y = size.y + 6 if label_below else -plate.size.y - 6
+	# [Claude 13 พ.ย.] ป้ายล้นขอบล่าง/บนของจอ → สลับไปอีกด้าน (เดิม "ไปร้านซ่อมคอมพิวเตอร์" โดนตัดครึ่งล่าง)
+	var vh := get_viewport_rect().size.y
+	if global_position.y + plate.end.y > vh - 12:
+		# [14 พ.ย.] วางในกรอบด้านล่างแทนเหนือกรอบ — เหนือกรอบมักมีป้าย "!" ของเควสต์ลอยอยู่ (บังกัน)
+		plate.position.y = size.y - plate.size.y - 10
+	elif global_position.y + plate.position.y < 4:
+		plate.position.y = size.y + 6
 	plate.position.x = clampf(plate.position.x, -global_position.x + 4, get_viewport_rect().size.x - global_position.x - plate.size.x - 4)
 	var ps := StyleBoxFlat.new()
 	ps.bg_color = Color(0.23, 0.16, 0.11, 0.92)

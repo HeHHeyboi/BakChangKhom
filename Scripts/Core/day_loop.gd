@@ -1084,14 +1084,17 @@ func _process(delta: float) -> void:
 		_shop_time = 0.0
 		_hide()
 		_cards_tab.visible = false
+		_avoid_goal_card()
 		return
 	if cards_hidden and want in HIDEABLE:
 		_panel.visible = false
 		_board_panel.visible = false
 		_cards_tab.visible = true
 		_cards_tab.text = "กระดานงาน (%d)" % board.size() if want == Card.BOARD else "ดูการ์ดงาน"
+		_place_cards_tab()
 		return
 	_cards_tab.visible = false
+	_avoid_goal_card()
 	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible or (month_summary and month_summary.visible)):
 		_show_card(want)
 
@@ -1585,6 +1588,43 @@ func _build_ui() -> void:
 	_cards_tab.visible = false
 	add_child(_cards_tab)
 	_build_time_skip()
+
+
+## [14 พ.ย.] การ์ดงาน/กระดานงาน (ชั้น 90) วางต่อใต้การ์ดเป้าหมาย (ชั้น 100) ไม่ให้ถูกทับ
+## สูงไม่พอ → พับการ์ดเป้าหมายให้ชั่วคราว แล้วกางคืนเมื่อการ์ดงานปิด (ถ้าผู้เล่นไม่ได้พับเอง)
+const CARD_Y := { "DayCard": 120.0, "JobBoard": 100.0 }
+var _goal_auto_collapsed := false
+
+
+func _avoid_goal_card() -> void:
+	var qb = EventManager.questboard if EventManager and "questboard" in EventManager else null
+	if qb == null or not qb.has_method(&"bottom_y"):
+		return
+	var any := false
+	for p: Control in [_panel, _board_panel]:
+		if p == null or not p.visible:
+			continue
+		any = true
+		var base: float = CARD_Y.get(String(p.name), 100.0)
+		var y := maxf(base, qb.bottom_y() + 10.0)
+		if y + p.size.y > 640.0 and not qb.collapsed:
+			qb.set_collapsed(true)
+			_goal_auto_collapsed = true
+			y = maxf(base, qb.bottom_y() + 10.0)
+		p.position.y = y
+	if not any and _goal_auto_collapsed:
+		_goal_auto_collapsed = false
+		if qb.collapsed:
+			qb.set_collapsed(false)
+
+
+## [13 พ.ย.] ปุ่ม "ดูการ์ดงาน" ชิดขวา ต่อใต้การ์ดเป้าหมาย (QuestBoard) — การ์ดสูงเปลี่ยนตามจำนวนเควสต์
+func _place_cards_tab() -> void:
+	var y := 100.0
+	var qb = EventManager.questboard if EventManager and "questboard" in EventManager else null
+	if qb and qb.has_method(&"bottom_y"):
+		y = maxf(qb.bottom_y() + 10.0, 60.0)
+	_cards_tab.position = Vector2(1152.0 - 8.0 - _cards_tab.size.x, y)
 
 
 ## ย่อ/ขยายกระดาษงาน (ดูฉากข้างหลังได้ · กดแถบมุมขวาเพื่อเปิดคืน)

@@ -20,6 +20,11 @@ const COL_GLOW := Color(1, 0.86, 0.35)
 signal tool_used(tool: ToolDef, result: int)
 
 var hovered := false
+## [Claude 13 พ.ย.] ไกด์ "คลิกตรงนี้" (GuideMarker) ชี้อยู่ที่จุดนี้ → ซ่อนป้ายชื่อ กันป้าย 2 อันทับกัน
+var hint_active := false:
+	set(v):
+		hint_active = v
+		queue_redraw()
 var _t := 0.0
 
 
@@ -55,13 +60,22 @@ func _draw() -> void:
 		var pts := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y), r.position]
 		for i in 4:
 			draw_dashed_line(pts[i], pts[i + 1], c, 3.0, 12.0)
-	if label_text != "" and (always_show_label or hovered or holding or Engine.is_editor_hint()):
+	if label_text != "" and not hint_active and (always_show_label or hovered or holding or Engine.is_editor_hint()):
 		var f := get_theme_default_font()
 		var fs := 17
 		var w := f.get_string_size(label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		var box := Rect2(size.x / 2.0 - w / 2.0 - 12, -30, w + 24, 28)
 		if box.position.y + get_global_rect().position.y < 60:
 			box.position.y = 4
+		# [Claude 13 พ.ย.] ไม่ให้ป้ายล้นขอบซ้าย/ขวาของจอ (เช่น "อ่านมอนิเตอร์" ที่ขอบซ้าย)
+		var gx := get_global_rect().position.x
+		var sx := get_global_transform().get_scale().x
+		var vw := get_viewport_rect().size.x if is_inside_tree() else 1152.0
+		var left := (box.position.x * sx + gx)
+		if left < 4.0:
+			box.position.x += (4.0 - left) / sx
+		elif left + box.size.x * sx > vw - 4.0:
+			box.position.x -= (left + box.size.x * sx - vw + 4.0) / sx
 		draw_rect(Rect2(box.position + Vector2(2, 3), box.size), Color(0, 0, 0, 0.35))
 		draw_rect(box, COL_PLATE)
 		draw_rect(box, COL_INK, false, 3)

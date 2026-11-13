@@ -46,6 +46,7 @@ project/assembly_name="BakChangKhom"
 
 [gui]
 
+theme/custom="res://Assets/UI/tooltip_theme.tres"
 theme/custom_font="res://Assets/Fonts/main_font.tres"
 
 [input]

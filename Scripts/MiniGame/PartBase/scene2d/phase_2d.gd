@@ -108,6 +108,7 @@ func say_text(lines: Array, mood := PibHint.Mood.NORMAL) -> void:
 # ---------------------------------------------------------------- ไกด์ "คลิกตรงนี้" [30 ก.ย.]
 var _hint_marker: GuideMarker
 var _hint_token := 0
+var _hint_hotspots: Array[Hotspot2D] = []
 
 
 ## โชว์วงกลม + ลูกศรที่ชิ้น target หลังผู้เล่นไม่ทำอะไร delay วินาที (0 = ทันที)
@@ -127,8 +128,30 @@ func hint(target: Control, text := "คลิกตรงนี้", delay := 4.
 	if view != &"":
 		cam(view)
 	_hint_marker = GuideMarker.follow(self, stage(), target, text)
+	# ป้ายชื่อของจุดที่ไกด์ชี้ (หรือประตูไปมุมที่มีชิ้นนั้น) ซ่อนไว้ระหว่างไกด์ขึ้น กันป้าย 2 อันทับกัน
+	for h in _hotspots_for(target):
+		h.hint_active = true
+		_hint_hotspots.append(h)
 	if target is Item2D:
 		_hint_marker.flip_below = (target as Item2D).hint_flip
+
+
+## target เป็น Hotspot2D เอง หรืออยู่ในมุม (View2D) ที่มี Hotspot2D พาไป (target_view = ชื่อมุมนั้น)
+func _hotspots_for(target: Control) -> Array[Hotspot2D]:
+	var out: Array[Hotspot2D] = []
+	if target is Hotspot2D:
+		out.append(target)
+		return out
+	var view: Node = target.get_parent()
+	while view != null and not (view is View2D):
+		view = view.get_parent()
+	if view == null or view.get_parent() == null:
+		return out
+	for v in view.get_parent().get_children():
+		for c in v.get_children():
+			if c is Hotspot2D and (c as Hotspot2D).target_view == view.name:
+				out.append(c)
+	return out
 
 
 func _guide_on() -> bool:
@@ -141,6 +164,10 @@ func clear_hint() -> void:
 	if is_instance_valid(_hint_marker):
 		_hint_marker.queue_free()
 	_hint_marker = null
+	for h in _hint_hotspots:
+		if is_instance_valid(h):
+			h.hint_active = false
+	_hint_hotspots.clear()
 
 
 func finish() -> void:

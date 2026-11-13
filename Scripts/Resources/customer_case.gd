@@ -11,7 +11,7 @@ const PART_SCENES := {
 	"part_gpu": "res://Scene/MiniGame/PartGpu/part_gpu.tscn",
 	"part_front_panel": "res://Scene/MiniGame/PartFrontPanel/part_front_panel.tscn",
 	"part_bios": "res://Scene/MiniGame/PartBios/part_bios.tscn",
-	"part_desktop": "res://Scene/MiniGame/Desktop/desktop_window.tscn", # ขมOS งานบนจอ Lv1 → ใส่ desktop_task ด้วย
+	"part_desktop": "res://Scene/MiniGame/Desktop/desktop_window2.tscn", # ขมOS งานบนจอ Lv1 → ใส่ desktop_task ด้วย · [13 พ.ย. 0.3.0] ใช้ขมOS ชุดใหม่ (desktop_minigame2 วางใน Editor) · ตัวเดิม desktop_window.tscn ยังใช้ในบทฝึกประกอบคอม/คอมเล่นอิสระ
 	"part_bench": "res://Scene/MiniGame/Bench/back_bench.tscn", # โต๊ะหลังเครื่อง Lv2 → ใส่ bench_task ด้วย [10 ต.ค.]
 }
 
