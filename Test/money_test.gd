@@ -85,12 +85,12 @@ func _ready() -> void:
 	var bar: MonthGoalBar = DayLoop.goal_bar
 	_check(bar != null and bar.get_parent().name == "GoalLayer" and (bar.get_parent() as CanvasLayer).layer == 100, "แถบเป้าอยู่ใน day_loop.tscn → GoalLayer ชั้น 100")
 	_check(DayLoop._day_skip != null and DayLoop._day_skip.get_parent().name == "DaySkipLayer" and (DayLoop._day_skip.get_parent() as CanvasLayer).layer == 110, "ข้ามวันอยู่ใน day_loop.tscn → DaySkipLayer ชั้น 110")
-	_check(GameState.economy.target_for(1) == 200 and GameState.economy.target_for(12) == 2000 and GameState.economy.month_target.size() == 12, "[0.2.5] เป้า 12 เดือน: ม.ค. ฿200 · ธ.ค. ฿2,000")
+	_check(GameState.economy.target_for(1) == 250 and GameState.economy.target_for(12) == 2400 and GameState.economy.month_target.size() == 12, "[0.3.0 ปรับจากบอท] เป้า 12 เดือน: ม.ค. ฿250 · ธ.ค. ฿2,400")
 	GameState.reset()
 	ts.set_shift(2)
 	GameState.record_repair(&"part_ram", 100, false, -1, 1) # +80
 	bar.refresh()
-	_check(bar._title.text == "เป้า ม.ค." and bar._value.text.begins_with("฿80/฿200") and bar._value.text.contains("เหลือ 2 วัน") and absf(bar._bar.value - 80.0 / 200.0) < 0.01, "แถบเป้า: %s · %.2f" % [bar._value.text, bar._bar.value])
+	_check(bar._title.text == "เป้า ม.ค." and bar._value.text.begins_with("฿80/฿250") and bar._value.text.contains("เหลือ 2 วัน") and absf(bar._bar.value - 80.0 / 250.0) < 0.01, "แถบเป้า: %s · %.2f" % [bar._value.text, bar._bar.value])
 	GameState.buy(load("res://Resources/Shop/storage_shelf.tres"))
 	bar.refresh()
 	_check(bar._value.text.begins_with("฿80/"), "ซื้อชั้นเหล็ก (ลงทุน) ไม่ทำให้กำไรในแถบลด")
@@ -103,7 +103,7 @@ func _ready() -> void:
 	_check(bar._value.text.begins_with("−฿270/") and is_zero_approx(bar._bar.value), "ขาดทุน → แสดง −฿270 แถบว่าง")
 	ts.set_shift(5)
 	bar.refresh()
-	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿300"), "ขึ้นบท 2 = ก.พ. → เป้า ฿300 เริ่มจาก 0")
+	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿450"), "ขึ้นบท 2 = ก.พ. → เป้า ฿450 เริ่มจาก 0")
 
 	# ---- [0.2.0-E/F · 0.2.5] ปิดเดือน: เป้า · ค่าปรับ · พลาดเป้าติดกัน · ร้านปิด
 	GameState.reset()
@@ -112,7 +112,7 @@ func _ready() -> void:
 	GameState.add_money(100, &"fee", "test")
 	var r1 := GameState.close_month(1)
 	_check(not r1.reached and not r1.counted and not r1.strike and GameState.missed_months == 0, "ม.ค. ไม่ถึงเป้าแต่ช่วงเรียนรู้ยังไม่นับ")
-	_check(String(r1.hint) != "" and r1.target == 200 and r1.profit == 100, "รายงานเดือน: กำไร ฿100 / เป้า ฿200 · ปิ๊บ: %s" % r1.hint)
+	_check(String(r1.hint) != "" and r1.target == 250 and r1.profit == 100, "รายงานเดือน: กำไร ฿100 / เป้า ฿250 · ปิ๊บ: %s" % r1.hint)
 	ts.set_shift(5)
 	var r2 := GameState.close_month(2)
 	_check(not r2.counted and not r2.strike and GameState.missed_months == 0, "[0.2.5] ก.พ. ยังเป็นช่วงเรียนรู้ (grace 2 เดือน)")
@@ -128,7 +128,7 @@ func _ready() -> void:
 	var bill2 := GameState.pay_month_bill(4, 0)
 	_check(bill2.late_fee == ceili(d0 * 0.1) and bill2.prev_debt == d0, "เดือนต่อไปค่าปรับ 10%% ของยอดค้าง = ฿%d" % bill2.late_fee)
 	GameState.help_mode = true
-	_check(GameState.target_of(4) == 560 and GameState.pay_month_bill(4, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿800 → ฿560) · ไม่มีค่าปรับ")
+	_check(GameState.target_of(4) == roundi(750 * 0.7) and GameState.pay_month_bill(4, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿750 → ฿%d) · ไม่มีค่าปรับ" % roundi(750 * 0.7))
 	GameState.help_mode = false
 	GameState.debt = 0
 	ts.set_shift(13)
@@ -178,6 +178,20 @@ func _ready() -> void:
 		SaveGame.clear()
 	GameState.reset()
 	ts.set_shift(1)
+	# ---- [0.3.0 ขั้น F] อัปเกรดชั้นวางเครื่อง 2 → 4 → 6 (ลงทุน · ชั้นวางของ DayLoop ขยายตาม)
+	var rack4: ItemDef = load("res://Resources/Shop/shelf_rack_4.tres")
+	var rack6: ItemDef = load("res://Resources/Shop/shelf_rack_6.tres")
+	_check(GameState.shelf_slots == GameState.economy.shelf_slots_start and DayLoop.shelf.slots == GameState.shelf_slots and rack4.card_badge() == "ชั้นวาง 4 เครื่อง", "เริ่มชั้นวาง %d เครื่อง · การ์ดในร้านบอก \"ชั้นวาง 4 เครื่อง\"" % GameState.shelf_slots)
+	GameState.money += 5000
+	var inv0 := int(GameState.chapter_by_kind(1).get(&"invest", 0))
+	var used0 := GameState.used_slots()
+	_check(GameState.buy(rack4) == "" and GameState.shelf_slots == 4 and DayLoop.shelf.slots == 4 and GameState.used_slots() == used0, "ซื้อชั้นไม้ → ชั้นวาง 4 เครื่อง (ไม่กินช่องคลัง)")
+	_check(int(GameState.chapter_by_kind(1).get(&"invest", 0)) == inv0 - rack4.price, "ค่าชั้นวางเข้าหมวดลงทุน −%d" % rack4.price)
+	_check(GameState.buy_block_reason(rack4) == "มีแล้ว", "ซื้อซ้ำไม่ได้ (มีแล้ว)")
+	_check(GameState.buy_block_reason(rack6).begins_with("ล็อก"), "ชั้นเหล็ก 6 เครื่องล็อกจนเป็นช่างฝึกหัด")
+	GameState.add_xp(GameState.economy.rank_xp[1] if GameState.economy.rank_xp.size() > 1 else 500)
+	_check(GameState.rank() >= 1 and GameState.buy(rack6) == "" and GameState.shelf_slots == 6 and DayLoop.shelf.slots == 6 and GameState.buy_block_reason(rack4) == "มีแล้ว", "เป็นช่างฝึกหัด → ซื้อชั้นเหล็ก → 6 เครื่อง · ชั้นไม้ไม่ต้องซื้อแล้ว")
+
 	print("T DONE fails=", fails)
 	get_tree().quit()
 

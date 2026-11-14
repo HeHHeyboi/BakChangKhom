@@ -234,6 +234,7 @@ func _connect() -> void:
 		[ts.break_started, _on_break_started],
 		[ts.clock_changed, _on_clock_changed],
 		[GameState.repair_recorded, _on_repair_recorded],
+		[GameState.shelf_slots_changed, _on_shelf_slots_changed],
 		[SceneRouter.location_changed, func(_id): autosave()],
 	]
 	for l in links:
@@ -242,6 +243,7 @@ func _connect() -> void:
 	week_start_money = GameState.money
 	if shelf == null:
 		shelf = RepairShelf.new(_econ())
+		shelf.slots = maxi(shelf.slots, GameState.shelf_slots)
 	_on_shift_started(ts.month(), ts.week(), ts.shift_in_week())
 	_day_skip_pending = false # เริ่มเกม/โหลดเซฟ ไม่ต้องเล่นข้ามวัน
 	day_skip_notes.clear()
@@ -771,9 +773,16 @@ func wait_slot() -> void:
 		ts.advance_minutes(TimeSystem.SLOT_MIN)
 
 
+## [0.3.0 ขั้น I] บอทปรับสมดุล/เทสต์: ไม่เล่นบทลูกค้า (รับเครื่องขึ้นชั้นได้ทันที)
+var quiet := false
+
+
 ## ลูกค้าเดินเข้าร้าน → บทพูด · then_repair = จบบทแล้วเปิดมินิเกมต่อเลย
 func play_arrival(then_repair: bool) -> void:
 	if today_case == null:
+		return
+	if quiet and not then_repair:
+		arrived_today = true
 		return
 	_working = true
 	_hide()
@@ -787,7 +796,7 @@ func play_arrival(then_repair: bool) -> void:
 	var bg := today_case.bg
 	if (
 		path != ""
-		and EventManager.play_story_dialog("ลูกค้า: " + today_case.customer, path, bg, DialogUtil.speakers_in(path))
+		and EventManager.play_story_dialog("", path, bg, DialogUtil.speakers_in(path))
 	):
 		_wait_dialog(done)
 	else:
@@ -843,6 +852,39 @@ func _play_break() -> void:
 		_wait_dialog(_after_break)
 	else:
 		_after_break()
+
+
+## [0.3.0 ขั้น J] บทสอนครั้งแรกต่อเกม (เก็บใน GameState.story_flags เข้าเซฟ) · ปิดได้ด้วย tutorials = false (เทสต์/บอท)
+@export var tutorials := true
+const TUTORIALS := {
+	"tut_pickup": "res://Assets/Dialog/Tutorial/pickup_first.txt",
+	"tut_door": "res://Assets/Dialog/Tutorial/door_first.txt",
+	"tut_shelf": "res://Assets/Dialog/Tutorial/shelf_first.txt",
+}
+
+
+## คืน true = เปิดบทสอนแล้ว (เฟรมนี้ไม่ต้องโชว์การ์ด)
+func _maybe_tutorial(want: Card) -> bool:
+	if not tutorials or quiet or _working or not _in_shop() or Global.in_minigame or DialogScene.visible:
+		return false
+	var flag := ""
+	if want == Card.DOOR and not door_queue.is_empty():
+		flag = "tut_pickup" if is_pickup(door_front()) else "tut_door"
+	if (flag == "" or GameState.story_flags.get(flag, false)) and not shelf.orders.is_empty() and want in [Card.DOOR, Card.NONE]:
+		flag = "tut_shelf"
+	if flag == "" or GameState.story_flags.get(flag, false):
+		return false
+	GameState.story_flags[flag] = true
+	var path: String = TUTORIALS[flag]
+	_working = true
+	_hide()
+	if EventManager.play_story_dialog("", path, "res://Assets/Background/bg_shop_open.jpg", DialogUtil.speakers_in(path)):
+		_wait_dialog(func() -> void:
+			_pending_cb = Callable()
+			_working = false)
+	else:
+		_working = false
+	return true
 
 
 func _after_break() -> void:
@@ -1206,6 +1248,7 @@ func _reset_run() -> void:
 	shelf = RepairShelf.new(_econ())
 	_work_order_open = false
 	_pending_repair = null
+	quiet = false
 	last_shelf = { }
 	last_handover = { }
 	shelf_news.clear()
@@ -1227,6 +1270,7 @@ func _reset_run() -> void:
 	force_active = false
 	_break_done = false
 	GameState.reset()
+	shelf.slots = GameState.shelf_slots
 	week_start_money = GameState.money
 	var ts := _ts()
 	if ts:
@@ -1254,6 +1298,9 @@ func _process(delta: float) -> void:
 	# ก่อนลูกค้าคนแรก: บทพัก → เวลาหมุน break_minutes นาที (ครั้งเดียวต่อเกม)
 	if want == Card.JOB_FORCED and not arrived_today and not _break_done and break_dialog != "":
 		_play_break()
+		return
+	# [0.3.0 ขั้น J] บทสอนสั้นครั้งแรก (หน้าประตู · ชั้นวาง · มารับเครื่อง)
+	if _maybe_tutorial(want):
 		return
 	# ลูกค้า forced เดินเข้ามาเองเมื่ออยู่ในร้านครบ forced_delay วินาที
 	if want == Card.JOB_FORCED and not arrived_today:
@@ -1654,6 +1701,13 @@ func _on_door_accept() -> void:
 
 
 # ---------------------------------------------------------------- ชั้นวางเครื่อง (0.3.0 ขั้น D)
+
+
+## [0.3.0 ขั้น F] ซื้ออัปเกรดชั้นวาง/โหลดเซฟ → ชั้นขยาย
+func _on_shelf_slots_changed(n: int) -> void:
+	if shelf:
+		shelf.slots = maxi(n, shelf.used())
+	_board_dirty = true
 
 
 ## ซ่อมเครื่องบนชั้นได้ไหม: &"ok" · &"ot" (ล่วงเวลา) · &"no" (เทิร์นไม่พอ) · &"busy" (มีงาน/การ์ดอื่นค้าง · ไม่ได้อยู่ในร้าน) · &"done" (ซ่อมแล้ว)

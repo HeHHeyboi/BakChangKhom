@@ -6,7 +6,7 @@ class_name ItemDef extends ShopItem
 enum Kind {
 	PART, ## อะไหล่: 1 ชิ้น = 1 ช่อง (ไม่ซ้อน)
 	SUPPLY, ## ของสิ้นเปลือง: ซ้อนในช่องเดียว นับเป็น "ครั้ง"
-	UPGRADE, ## อัปเกรดคลัง: ไม่กินช่อง ซื้อครั้งเดียว
+	UPGRADE, ## อัปเกรดคลัง/ชั้นวางเครื่อง: ไม่กินช่อง ซื้อครั้งเดียว
 }
 
 @export var kind: Kind = Kind.PART
@@ -22,6 +22,8 @@ enum Kind {
 @export var unlock_rank := 0
 ## UPGRADE: ขยายคลังเป็นกี่ช่อง
 @export var storage_slots_to := 0
+## [0.3.0] UPGRADE: ขยายชั้นวางเครื่อง (รับเครื่องไว้ซ่อม) เป็นกี่ช่อง
+@export var shelf_slots_to := 0
 
 
 func condition_text() -> String:
@@ -38,5 +40,5 @@ func card_badge() -> String:
 		Kind.SUPPLY:
 			return "%d ครั้ง" % uses
 		Kind.UPGRADE:
-			return "คลัง %d ช่อง" % storage_slots_to
+			return ("ชั้นวาง %d เครื่อง" % shelf_slots_to) if shelf_slots_to > 0 else ("คลัง %d ช่อง" % storage_slots_to)
 	return ""

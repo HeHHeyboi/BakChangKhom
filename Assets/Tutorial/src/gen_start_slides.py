@@ -83,64 +83,83 @@ def badge(d, c, n):
 
 FONT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../Fonts/Sarabun-Regular.ttf")
 
+# [0.3.0] ทำเฉพาะสไลด์ที่มีภาพแคปอยู่ · ONLY=3,4 = ทำบางสไลด์
+ONLY = set(os.environ.get("ONLY", "1,2,3,4").split(","))
+
+
+def want(n, cap):
+    return str(n) in ONLY and os.path.exists(os.path.join(CAP, cap))
+
+
+k = 800 / 1152  # ภาพแคปกว้าง 800 ในสไลด์ 3–4
+
+
 # ---- 1 คลิกโต้ตอบ (ในบ้าน · ยาย)
-b = frame()
-m, _ = make_mouse(150, -20.0, 5)
-b.alpha_composite(m, (70, 270))
-d = ImageDraw.Draw(b)
-for ang in (-60, -20, 20):
-    a = math.radians(ang)
-    d.line([(150 + 70 * math.cos(a) - 30, 260 + 70 * math.sin(a)), (150 + 100 * math.cos(a) - 30, 260 + 100 * math.sin(a))], fill=ORANGE, width=8)
-s = shot("cap_home.png", (0, 0, 780, 439))
-paste_shot(b, s, (300, 150))
-d = ImageDraw.Draw(b)
-gx, gy = 300 + int(545 * 780 / 1152), 150 + int(450 * 439 / 648)
-ring(d, (gx, gy), 70)
-cursor(b, (gx + 10, gy + 10))
-b.convert("RGB").save(os.path.join(OUT, "tut_new_01.png"))
+if want(1, "cap_home.png"):
+    b = frame()
+    m, _ = make_mouse(150, -20.0, 5)
+    b.alpha_composite(m, (70, 270))
+    d = ImageDraw.Draw(b)
+    for ang in (-60, -20, 20):
+        a = math.radians(ang)
+        d.line([(150 + 70 * math.cos(a) - 30, 260 + 70 * math.sin(a)), (150 + 100 * math.cos(a) - 30, 260 + 100 * math.sin(a))], fill=ORANGE, width=8)
+    s = shot("cap_home.png", (0, 0, 780, 439))
+    paste_shot(b, s, (300, 150))
+    d = ImageDraw.Draw(b)
+    gx, gy = 300 + int(545 * 780 / 1152), 150 + int(450 * 439 / 648)
+    ring(d, (gx, gy), 70)
+    cursor(b, (gx + 10, gy + 10))
+    b.convert("RGB").save(os.path.join(OUT, "tut_new_01.png"))
 
 # ---- 2 เครื่องหมาย !
-b = frame()
-d = ImageDraw.Draw(b)
-d.ellipse([70, 270, 270, 470], fill=(150, 85, 30, 255), outline=INK, width=12)   # เครื่องหมาย ! แบบในเกม
-d.ellipse([92, 292, 248, 448], outline=(110, 60, 20, 255), width=4)
-d.rounded_rectangle([156, 305, 184, 405], 12, fill=(255, 240, 210, 255), outline=INK, width=3)
-d.ellipse([154, 414, 186, 446], fill=(255, 240, 210, 255), outline=INK, width=3)
-s = shot("cap_village.png", (0, 0, 760, 428))
-paste_shot(b, s, (340, 160))
-d = ImageDraw.Draw(b)
-arrow(d, (282, 375), (380, 375))
-ex, ey = 340 + int(884 * 760 / 1152), 160 + int(360 * 428 / 648)
-ring(d, (ex, ey), 34)
-cursor(b, (ex + 8, ey + 14))
-b.convert("RGB").save(os.path.join(OUT, "tut_new_02.png"))
+if want(2, "cap_village.png"):
+    b = frame()
+    d = ImageDraw.Draw(b)
+    d.ellipse([70, 270, 270, 470], fill=(150, 85, 30, 255), outline=INK, width=12)   # เครื่องหมาย ! แบบในเกม
+    d.ellipse([92, 292, 248, 448], outline=(110, 60, 20, 255), width=4)
+    d.rounded_rectangle([156, 305, 184, 405], 12, fill=(255, 240, 210, 255), outline=INK, width=3)
+    d.ellipse([154, 414, 186, 446], fill=(255, 240, 210, 255), outline=INK, width=3)
+    s = shot("cap_village.png", (0, 0, 760, 428))
+    paste_shot(b, s, (340, 160))
+    d = ImageDraw.Draw(b)
+    arrow(d, (282, 375), (380, 375))
+    ex, ey = 340 + int(884 * 760 / 1152), 160 + int(360 * 428 / 648)
+    ring(d, (ex, ey), 34)
+    cursor(b, (ex + 8, ey + 14))
+    b.convert("RGB").save(os.path.join(OUT, "tut_new_02.png"))
 
 # ---- 3 แถบบน: วัน/เวลา/เงิน (ซ้าย) · เควสต์ (ขวา)
-b = frame()
-s = shot("cap_home.png", (0, 0, 800, 450))
-paste_shot(b, s, (176, 145))
-d = ImageDraw.Draw(b)
-k = 800 / 1152
-X0, Y0 = 176, 145
-dashed_box(d, [X0, Y0, X0 + 250 * k, Y0 + 52 * k])
-dashed_box(d, [X0 + 828 * k, Y0, X0 + 1152 * k - 4, Y0 + 40 * k])
-badge(d, (X0 + 125 * k, Y0 + 52 * k + 36), 1)
-badge(d, (X0 + 990 * k, Y0 + 40 * k + 36), 2)
-# ไอคอนช่วงเวลา (ซ้าย) · ปุ่มซ่อน (ขวา)
-for i, col in enumerate([(255, 210, 80, 255), (240, 150, 60, 255), (120, 100, 200, 255)]):
-    c = (100, 260 + i * 90)
-    d.ellipse([c[0] - 24, c[1] - 24, c[0] + 24, c[1] + 24], fill=col, outline=INK, width=3)
-b.convert("RGB").save(os.path.join(OUT, "tut_new_03.png"))
+if want(3, "cap_home.png"):
+    b = frame()
+    s = shot("cap_home.png", (0, 0, 800, 450))
+    paste_shot(b, s, (176, 145))
+    d = ImageDraw.Draw(b)
+    k = 800 / 1152
+    X0, Y0 = 176, 145
+    # [0.3.0] HUD ใหม่: เทิร์น · วันที่ · บท/วันที่ n/4 · เงิน + แถบยศ (ซ้าย) · การ์ดเป้าหมาย (ขวา)
+    dashed_box(d, [X0 + 2, Y0 + 2, X0 + 342 * k, Y0 + 84 * k])
+    dashed_box(d, [X0 + 822 * k, Y0 + 6 * k, X0 + 1146 * k, Y0 + 106 * k])
+    badge(d, (X0 + 170 * k, Y0 + 84 * k + 36), 1)
+    badge(d, (X0 + 984 * k, Y0 + 106 * k + 36), 2)
+    # ไอคอนช่วงเวลา (ซ้าย) · ปุ่มซ่อน (ขวา)
+    for i, col in enumerate([(255, 210, 80, 255), (240, 150, 60, 255), (120, 100, 200, 255)]):
+        c = (100, 260 + i * 90)
+        d.ellipse([c[0] - 24, c[1] - 24, c[0] + 24, c[1] + 24], fill=col, outline=INK, width=3)
+    b.convert("RGB").save(os.path.join(OUT, "tut_new_03.png"))
 
 # ---- 4 กระดานงานในร้าน + ปุ่มย่อ
-b = frame()
-s = shot("cap_shop.png", (0, 0, 800, 450))
-paste_shot(b, s, (176, 145))
-d = ImageDraw.Draw(b)
-X0, Y0 = 176, 145
-dashed_box(d, [X0 + 590 * k, Y0 + 96 * k, X0 + 1140 * k, Y0 + 590 * k])
-ring(d, (X0 + int(1104 * k), Y0 + int(128 * k)), 20, w=5)
-badge(d, (X0 + 560 * k, Y0 + 300 * k), 1)
-badge(d, (X0 + 1104 * k, Y0 + 128 * k - 50), 2)
-b.convert("RGB").save(os.path.join(OUT, "tut_new_04.png"))
+if want(4, "cap_shop.png"):
+    b = frame()
+    s = shot("cap_shop.png", (0, 0, 800, 450))
+    paste_shot(b, s, (176, 145))
+    d = ImageDraw.Draw(b)
+    X0, Y0 = 176, 145
+    # [0.3.0] การ์ดหน้าร้าน (ลูกค้าหน้าประตูทีละคน) · ปุ่มย่อ · ปุ่มชั้นวาง
+    dashed_box(d, [X0 + 594 * k, Y0 + 98 * k, X0 + 1140 * k, Y0 + 438 * k])
+    ring(d, (X0 + int(1101 * k), Y0 + int(128 * k)), 20, w=5)
+    dashed_box(d, [X0 + 334 * k, Y0 + 578 * k, X0 + 510 * k, Y0 + 636 * k - 6])
+    badge(d, (X0 + 564 * k, Y0 + 268 * k), 1)
+    badge(d, (X0 + 1101 * k, Y0 + 128 * k - 50), 2)
+    badge(d, (X0 + 300 * k, Y0 + 606 * k - 6), 3)
+    b.convert("RGB").save(os.path.join(OUT, "tut_new_04.png"))
 print("ok")

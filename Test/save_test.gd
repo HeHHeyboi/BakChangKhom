@@ -131,6 +131,32 @@ func _ready() -> void:
 	DayLoop._pending_summary_week = 0
 	DayLoop._last_month = { }
 	DayLoop._last_bill = { }
+	# [0.3.0 ขั้น G] เซฟ VERSION 4 · เซฟ v3 (0.2.5 กระดานงาน · ไม่มีชั้นวาง) ยังโหลดได้
+	var ram_case: CustomerCase = load("res://Resources/Customers/lv2_teacher_ram.tres")
+	DayLoop.shelf.add(ram_case, 2, 1)
+	GameState.set_shelf_slots(4)
+	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 4, "บันทึกเป็น VERSION 4")
+	DayLoop.shelf = RepairShelf.new(GameState.economy)
+	GameState.shelf_slots = 2
+	SaveGame.load_into()
+	_check(DayLoop.shelf.orders.size() == 1 and DayLoop.shelf.orders[0].case == ram_case and DayLoop.shelf.slots == 4 and GameState.shelf_slots == 4, "โหลด v4 → เครื่องบนชั้น + ชั้นวาง 4 ช่องครบ")
+	var v3: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH))
+	v3["version"] = 3
+	for k in v3:
+		if v3[k] is Dictionary and (v3[k] as Dictionary).has("door"):
+			var lp: Dictionary = v3[k]
+			lp["board"] = [{ "case": "res://Resources/Customers/lv1_girl_wifi.tres", "due_shift": 4, "phone": false, "walkin": true }]
+			lp.erase("door")
+			lp.erase("appointments")
+			lp.erase("accepted_today")
+			lp.erase("shelf")
+		if v3[k] is Dictionary and (v3[k] as Dictionary).has("shelf_slots"):
+			(v3[k] as Dictionary).erase("shelf_slots")
+	var f3 := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
+	f3.store_string(JSON.stringify(v3))
+	f3.close()
+	_check(not SaveGame.is_old_version() and not SaveGame.info().is_empty(), "เซฟ v3 (0.2.5) ไม่นับเป็นเซฟเก่า · ปุ่มเล่นต่อใช้ได้")
+	_check(SaveGame.load_into() >= 0 and DayLoop.door_queue.size() == 1 and (DayLoop.door_queue[0].case as CustomerCase).resource_path.ends_with("lv1_girl_wifi.tres") and DayLoop.shelf.orders.is_empty() and GameState.shelf_slots == GameState.economy.shelf_slots_start and DayLoop.shelf.slots == GameState.shelf_slots, "โหลด v3 → กระดานงานกลายเป็นคนยืนหน้าประตู · ชั้นวางว่าง %d ช่อง" % GameState.shelf_slots)
 	# เซฟเวอร์ชัน 1 (0.1.x) → โหลดไม่ได้ · เมนูบอกให้เริ่มใหม่
 	var old := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
 	old.store_string(JSON.stringify({ "version": 2, "game": { "shift": 3, "money": 99 } })) # [0.2.5] เซฟ v2 (บทละสัปดาห์) ก็เก่าแล้ว

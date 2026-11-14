@@ -8,7 +8,10 @@ class_name SaveGame extends RefCounted
 const PATH := "user://save.json"
 ## [0.2.0-G] 2 = เวลาแบบสัปดาห์ + ledger + ผลสิ้นเดือน · เซฟ 1 (0.1.x) ใช้ไม่ได้ → เมนูบอกให้เริ่มใหม่
 ## [0.2.5] 3 = 1 บท = 1 เดือน (48 วัน) — เซฟ v2 (1 บท = 1 สัปดาห์ · 36 วัน) เลขกะ/บทไม่ตรงกัน → ให้เริ่มใหม่
-const VERSION := 3
+## [0.3.0] VERSION 4 = หน้าประตู (door · appointments · accepted_today) · ชั้นวาง (shelf · shelf_slots) · ลูกค้ามารับ (door[].pickup)
+const VERSION := 4
+## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
+const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
 static var allow_in_tests := false
 
@@ -28,7 +31,7 @@ static func is_old_version() -> bool:
 	if not exists():
 		return false
 	var d = JSON.parse_string(FileAccess.get_file_as_string(PATH))
-	return d is Dictionary and int(d.get("version", 0)) != VERSION
+	return d is Dictionary and not _version_ok(d)
 
 
 ## Dictionary ที่มี StringName/ค่าแปลก → ค่าธรรมดาสำหรับ JSON
@@ -56,7 +59,7 @@ static func save() -> bool:
 		return false
 	var ts: TimeSystem = EventManager.time_system
 	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
-	# [0.3.0] หน้าประตู (คิว · นัด · โควตา) + ชั้นวาง · VERSION 4 ทำในขั้น G
+	# [0.3.0] หน้าประตู (คิว · นัด · โควตา · ลูกค้ามารับ) + ชั้นวาง — VERSION 4
 	var door := []
 	for j in DayLoop.door_queue:
 		var c: CustomerCase = j.get("case")
@@ -103,7 +106,7 @@ static func save() -> bool:
 		"quest": { "task": ev.currentTask if ev else 0, "done": ev.isDone if ev else false },
 		# [13 ต.ค.] คลังของ (STORAGE_SHOP_ECO)
 		"inventory": {
-			"slots": GameState.storage_slots, "items": GameState.inventory, "bought": GameState.shop_bought,
+			"slots": GameState.storage_slots, "shelf_slots": GameState.shelf_slots, "items": GameState.inventory, "bought": GameState.shop_bought,
 			"week": GameState.shop_week, "upgrades": GameState.upgrades.keys().map(func(k): return String(k)),
 		},
 		"location": int(SceneRouter.current_id),
@@ -162,6 +165,7 @@ static func load_into() -> int:
 	GameState.shop_week = int(inv.get("week", 0))
 	for k in inv.get("upgrades", []):
 		GameState.upgrades[StringName(k)] = true
+	GameState.set_shelf_slots(maxi(int(inv.get("shelf_slots", GameState.economy.shelf_slots_start)), GameState.economy.shelf_slots_start))
 	GameState.inventory_changed.emit()
 	GameState.money_changed.emit(GameState.money, 0)
 	GameState.reputation_changed.emit(GameState.reputation, 0)
@@ -189,7 +193,7 @@ static func load_into() -> int:
 		if ResourceLoader.exists(String(a.case)):
 			DayLoop.appointments.append({ "case": load(String(a.case)), "free": bool(a.get("free", false)) })
 	DayLoop.accepted_today = int(l.get("accepted_today", 0))
-	# [0.3.0 ขั้น D] ชั้นวางเครื่อง (ใบรับเครื่องที่ยังไม่ปิด) · VERSION 4 + จำนวนช่องที่อัปเกรด = ขั้น F–G
+	# [0.3.0 ขั้น D] ชั้นวางเครื่อง (ใบรับเครื่องที่ยังไม่ปิด) · เซฟ v3 ไม่มี = ชั้นว่าง
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	DayLoop.shelf.load_save(l.get("shelf", { }))
 	DayLoop.last_shelf = { }
@@ -239,6 +243,11 @@ static func _read() -> Dictionary:
 		return { }
 	var txt := FileAccess.get_file_as_string(PATH)
 	var d = JSON.parse_string(txt)
-	if not d is Dictionary or int(d.get("version", 0)) != VERSION:
+	if not d is Dictionary or not _version_ok(d):
 		return { }
 	return d
+
+
+static func _version_ok(d: Dictionary) -> bool:
+	var v := int(d.get("version", 0))
+	return v >= MIN_VERSION and v <= VERSION

@@ -123,6 +123,8 @@ var hold_next_payment := false
 signal inventory_changed
 ## [13 ต.ค.] ได้ของเข้าคลัง (ซื้อ · ได้จากเนื้อเรื่อง/บทสอน · ชิ้นเก่าจากงานซ่อม) → Storage โชว์ป้าย "ได้ … เข้าคลัง"
 signal item_received(item: ItemDef, qty: int)
+## [0.3.0] ชั้นวางเครื่องขยาย (ซื้ออัปเกรด/โหลดเซฟ) → DayLoop.shelf.slots ตาม
+signal shelf_slots_changed(slots: int)
 ## ข้อความเด้งรวมหลายชิ้น (เช่น ชุดเริ่มต้น) — Storage โชว์ข้อความนี้แทนป้ายทีละชิ้น
 signal inventory_note(text: String)
 
@@ -140,6 +142,8 @@ const STORAGE_START := 8
 const SUPPLY_STACK_MAX := 99
 ## ช่องคลังทั้งหมด (อัปเกรดด้วย ItemDef UPGRADE)
 var storage_slots := STORAGE_START
+## [0.3.0] ช่องชั้นวางเครื่อง (เริ่ม EconomyConfig.shelf_slots_start · อัปเกรดด้วย ItemDef.shelf_slots_to)
+var shelf_slots := 2
 ## ของในคลัง 1 รายการ = 1 ช่อง: { id, path, qty, condition, reserved_for }
 ##   PART qty = 1 เสมอ · SUPPLY qty = จำนวนครั้งที่เหลือ (≤ SUPPLY_STACK_MAX)
 var inventory: Array[Dictionary] = []
@@ -173,6 +177,7 @@ func reset() -> void:
 	debt = 0
 	village_fund = 0
 	storage_slots = STORAGE_START
+	shelf_slots = economy.shelf_slots_start if economy else 2
 	inventory.clear()
 	shop_bought.clear()
 	shop_week = 0
@@ -544,6 +549,8 @@ func add_item(item: ItemDef, qty := 1, force := false, notify := true) -> bool:
 		ItemDef.Kind.UPGRADE:
 			upgrades[item.id] = true
 			storage_slots = maxi(storage_slots, item.storage_slots_to)
+			if item.shelf_slots_to > shelf_slots:
+				set_shelf_slots(item.shelf_slots_to)
 		ItemDef.Kind.PART:
 			for i in qty:
 				inventory.append({ "id": item.id, "path": item.resource_path, "qty": 1, "condition": item.condition, "reserved_for": "" })
@@ -673,11 +680,17 @@ func stock_left(item: ItemDef) -> int:
 	return maxi(item.weekly_stock - int(shop_bought.get(item.id, 0)), 0)
 
 
+## [0.3.0] ตั้งจำนวนช่องชั้นวางเครื่อง (ซื้ออัปเกรด/โหลดเซฟ)
+func set_shelf_slots(n: int) -> void:
+	shelf_slots = n
+	shelf_slots_changed.emit(n)
+
+
 ## ซื้อไม่ได้เพราะอะไร ("" = ซื้อได้)
 func buy_block_reason(item: ItemDef, qty := 1) -> String:
 	if item == null or qty <= 0:
 		return "เลือกจำนวนก่อน"
-	if item.kind == ItemDef.Kind.UPGRADE and (upgrades.has(item.id) or storage_slots >= item.storage_slots_to):
+	if item.kind == ItemDef.Kind.UPGRADE and (upgrades.has(item.id) or (item.shelf_slots_to > 0 and shelf_slots >= item.shelf_slots_to) or (item.shelf_slots_to <= 0 and storage_slots >= item.storage_slots_to)):
 		return "มีแล้ว"
 	if rank() < item.unlock_rank:
 		var e := economy if economy else EconomyConfig.new()

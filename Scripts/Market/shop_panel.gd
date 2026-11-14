@@ -198,7 +198,10 @@ func _refresh_detail() -> void:
 			ItemDef.Kind.SUPPLY:
 				extra = "ของสิ้นเปลือง · แพ็กละ %d ครั้ง · ซ้อนในช่องเดียวได้ (มีอยู่ %d ครั้ง)" % [d.uses, GameState.count_item(d.id)]
 			ItemDef.Kind.UPGRADE:
-				extra = "อัปเกรด · คลังเป็น %d ช่อง (ตอนนี้ %d)" % [d.storage_slots_to, GameState.storage_slots]
+				if d.shelf_slots_to > 0:
+					extra = "อัปเกรด · ชั้นวางเครื่องเป็น %d เครื่อง (ตอนนี้ %d) · รับเครื่องไว้ซ่อมได้มากขึ้น" % [d.shelf_slots_to, GameState.shelf_slots]
+				else:
+					extra = "อัปเกรด · คลังเป็น %d ช่อง (ตอนนี้ %d)" % [d.storage_slots_to, GameState.storage_slots]
 	detail_name.text = _sel.display_name
 	detail_text.text = "\n".join([_sel.description, extra].filter(func(x): return x != ""))
 	qty_label.text = str(_qty)

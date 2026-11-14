@@ -6,6 +6,8 @@ extends Control
 @export var tutorial: TextureRect
 var showTutorial = false
 var _confirm_new := false
+## ข้อความตัวเลือกใน Prolouge.txt ที่แปลว่า "ข้ามบทนำ" (ต้องตรงกับในไฟล์บททุกตัวอักษร)
+const SKIP_INTRO_CHOICE := "ข้ามบทนำ ไปเปิดร้านเลย"
 
 
 func _ready() -> void:
@@ -35,9 +37,12 @@ func _ready() -> void:
 
 
 func dialog_end():
-	SceneRouter.go(SceneRouter.HOME)
-	Fade.set_opacity(1)
 	EventManager.on_dialog_end.disconnect(dialog_end)
+	if DialogScene.last_choice == SKIP_INTRO_CHOICE:
+		_skip_intro()
+	else:
+		SceneRouter.go(SceneRouter.HOME)
+	Fade.set_opacity(1)
 
 
 func tutorial_end():
@@ -72,6 +77,19 @@ func _on_start_button_pressed() -> void:
 	EventManager.hideUI()
 	showTutorial = true
 	EventManager.show_tutorial(EventManager.TutorialState.BASIC_START)
+
+
+## [0.3.0 ขั้น J] ข้ามบทนำ = ตัวเลือกต้นบทนำ (Assets/Dialog/Prolouge.txt) · ไม่ใช่ปุ่มที่เมนู
+## จบเควสต์หลักทั้งหมด + ของติดตัว → ไปหน้าร้าน (บทพักก่อนลูกค้าคนแรกยังเล่นตามปกติ)
+func _skip_intro() -> void:
+	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
+	if ev:
+		EventManager.jump_event(EventManager.EventID.MAIN, 0)
+		EventManager.complete_step(EventManager.EventID.MAIN, ev.totalTask - 1)
+	GameState.ensure_starter_kit()
+	EventManager.showUI()
+	await SceneRouter.go(SceneRouter.ROOM)
+	SaveGame.save()
 
 
 ## ปุ่มขยายนิดหน่อยตอนเอาเมาส์ชี้

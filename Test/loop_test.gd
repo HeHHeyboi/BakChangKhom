@@ -17,6 +17,7 @@ func _ready() -> void:
 	get_parent().remove_child(self)
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
+	DayLoop.tutorials = false # [0.3.0 ขั้น J] บทสอนครั้งแรกทดสอบแยกใน tutorial_j_test
 	DayLoop.demo_shifts = 6 # [0.2.5] เกมจริงจบบทที่ 1 ที่วันที่ 4 (25 ม.ค.) — เทสต์นี้เลื่อนไป 6 เพื่อทดสอบสรุปเดือน + บทที่ 2 ด้วย
 	DayLoop.day_skip_seconds = 0.0 # [0.2.0] ปิดแอนิเมชันข้ามวันระหว่างเดินลูป (ทดสอบแยกในหัวข้อ A2)
 	ts.break_started.connect(func(k: StringName) -> void: _breaks.append(k))
@@ -228,7 +229,7 @@ func _ready() -> void:
 	# [0.2.5] บท 2 วันที่ 1 มีลูกค้าเนื้อเรื่อง (week2.tres) เดินเข้ามาเอง → เล่นให้จบก่อน
 	_check(ts.week() == 2 and DayLoop.forced_case != null and DayLoop.forced_case.id == &"w2_min_ram", "บท 2 วันที่ 1 มีงานเนื้อเรื่อง มิ้น (%s)" % (DayLoop.forced_case.id if DayLoop.forced_case else "ไม่มี"))
 	await _wait(DayLoop.time_skip_seconds + DayLoop.forced_delay + 1.2)
-	_check(DialogScene.visible and DialogScene.Title.text.contains("มิ้น"), "มิ้นเดินเข้ามาเอง (%s)" % DialogScene.Title.text)
+	_check(DialogScene.visible and DialogScene.NameBox.text.contains("มิ้น") and DialogScene.Title.text == "", "มิ้นเดินเข้ามาเอง · ไม่มีหัว \"ลูกค้า:\" แล้ว (%s)" % DialogScene.NameBox.text)
 	DialogScene.dialog_end()
 	await _frames(3)
 	_check(DayLoop._card == DayLoop.Card.JOB_FORCED, "การ์ดงานเนื้อเรื่อง ปุ่มเดียว")

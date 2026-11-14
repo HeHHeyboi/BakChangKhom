@@ -13,6 +13,7 @@ func _ready() -> void:
 	ts = EventManager.time_system
 	e = GameState.economy
 	DayLoop.day_skip_seconds = 0.0
+	DayLoop.tutorials = false # [0.3.0 ขั้น J] บทสอนครั้งแรกทดสอบแยกใน tutorial_j_test
 	DayLoop._reset_run()
 	var ram: CustomerCase = load("res://Resources/Customers/lv2_teacher_ram.tres")
 	var ram2: CustomerCase = load("res://Resources/Customers/lv2_yai_ram.tres")

@@ -91,6 +91,10 @@ func _fill(m: Node) -> void:
 	lines.append("ลูกค้าบอกว่า: \"%s\"" % said)
 	if c.device != "":
 		lines.append("เครื่อง: %s" % c.device)
+	# [0.3.0] งานบนชั้นวาง: ใบรับเครื่อง (นัดรับวันไหน · ค่าแรงที่จะได้ · เลยนัดไหม)
+	var wo := _work_order_line()
+	if wo != "":
+		lines.append(wo)
 	# งานที่มีขั้นคุยกับลูกค้า (ขมOS · โต๊ะหลังเครื่อง): ถามแล้วได้ความว่าอะไร
 	var step = m.get("step")
 	if task != null and step != null:
@@ -109,6 +113,24 @@ func _fill(m: Node) -> void:
 	else:
 		lines.append("ขั้นตอนดูได้ที่แถบบนซ้าย · ไม่แน่ใจกดสมุดคู่มือมุมขวาบน")
 	_body.text = "\n".join(lines)
+
+
+## "ใบรับเครื่อง: นัดรับวันเปิดร้านถัดไป (อา. 11 ม.ค.) · ค่าแรง ฿150 · ได้ตอนลูกค้ามารับ" ("" = ไม่ใช่งานบนชั้น)
+func _work_order_line() -> String:
+	var dl := get_node_or_null(^"/root/DayLoop")
+	if dl == null:
+		return ""
+	var job = dl.get("current_job")
+	var o = job.get("order") if job is Dictionary else null
+	if not o is RepairShelf.Order:
+		return ""
+	var ts = dl._ts()
+	var today: int = ts.shift if ts else 1
+	var e: EconomyConfig = dl._econ()
+	var late: int = o.late_days(today)
+	var fee := roundi(dl._fee(o.case) * e.promise_mult(o.promise) * maxf(1.0 - late * e.late_pay_cut_per_day, 0.0))
+	var when: String = "เลยนัดมา %d วันแล้ว!" % late if late > 0 else "นัดรับ %s" % dl.due_text(o.due)
+	return "ใบรับเครื่อง: %s · ค่าแรง ฿%d · ได้ตอนลูกค้ามารับ" % [when, fee]
 
 
 func _case_now() -> CustomerCase:

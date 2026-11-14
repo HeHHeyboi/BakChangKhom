@@ -31,6 +31,8 @@ var curSprite: CharacterSprite = null
 var charSprite: Array[CharacterSprite]
 
 signal on_dialog_finish
+## [0.3.0] ตัวเลือกล่าสุดที่ผู้เล่นกดในบทนี้ ("" = ไม่มี) · อ่านได้หลังบทจบ เช่น ข้ามบทนำ (start_scene.gd)
+var last_choice := ""
 
 
 func set_title(title: String):
@@ -101,6 +103,7 @@ func read_file(file_path: StringName):
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	var type = DIALOG
 	DialogDict = { DIALOG: [] } # เริ่มใหม่ทุกไฟล์ ไม่ให้ทางเลือกของบทก่อนค้าง
+	last_choice = ""
 
 	var line_num = 0
 
@@ -299,6 +302,7 @@ func dialog_end() -> void:
 
 func click_choice(button: Button) -> void:
 	var select_Choice = button.text
+	last_choice = select_Choice
 	skip_btn.disabled = false
 
 	index_stack[-1] += 1
