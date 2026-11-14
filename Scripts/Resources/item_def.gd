@@ -16,7 +16,7 @@ enum Kind {
 @export_enum("used", "new") var condition := "used"
 ## SUPPLY: ได้กี่ครั้งต่อ 1 แพ็ก
 @export var uses := 0
-## ร้านมีของกี่ชิ้นต่อสัปดาห์ (0 = ไม่จำกัด) · รีทุกต้นสัปดาห์
+## ตลาดมีของกี่ชิ้นต่อรอบ (0 = ไม่จำกัด) · [0.4.0] 1 รอบ = EconomyConfig.market_restock_days วันเปิดร้าน (วันที่ 4 และ 18) · ชื่อเดิมคงไว้ให้ .tres เก่าใช้ได้
 @export var weekly_stock := 0
 ## ยศช่างขั้นต่ำที่ซื้อได้ (GameState.rank())
 @export var unlock_rank := 0
@@ -24,6 +24,21 @@ enum Kind {
 @export var storage_slots_to := 0
 ## [0.3.0] UPGRADE: ขยายชั้นวางเครื่อง (รับเครื่องไว้ซ่อม) เป็นกี่ช่อง
 @export var shelf_slots_to := 0
+
+@export_group("ร้านออนไลน์ (0.4.0)")
+## ราคาในร้านออนไลน์ (ขมOS) · 0 = เท่าราคาตลาด (price)
+@export var online_price := 0
+## วางขายในร้านออนไลน์ไหม (อัปเกรดคลัง/ชั้นวาง = ไม่ขาย)
+@export var online := true
+## ขายในตลาดหมู่บ้านไหม (false = สั่งออนไลน์อย่างเดียว เช่น การ์ดจอมือสอง)
+@export var market := true
+## [0.4.0] อะไหล่ชิ้นนี้ใช้ชดใช้ของลูกค้าที่ทำเสียใน Part ไหน (part_gpu …) · ว่าง = ไม่ใช่ของชดใช้
+@export var replaces: StringName
+
+
+## [0.4.0] ราคาร้านออนไลน์
+func online_cost() -> int:
+	return online_price if online_price > 0 else price
 
 
 func condition_text() -> String:

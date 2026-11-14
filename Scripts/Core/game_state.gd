@@ -127,6 +127,8 @@ signal item_received(item: ItemDef, qty: int)
 signal shelf_slots_changed(slots: int)
 ## ข้อความเด้งรวมหลายชิ้น (เช่น ชุดเริ่มต้น) — Storage โชว์ข้อความนี้แทนป้ายทีละชิ้น
 signal inventory_note(text: String)
+## [0.4.0] มีอะไหล่เข้าคลัง (ซื้อตลาด / พัสดุออนไลน์มาถึง) → DayLoop จองให้เครื่องที่รอของ
+signal parts_arrived
 
 ## [13 ต.ค.] ของติดตัวหลังจบบทสอนประกอบคอม (เล่นจบหรือกดข้ามก็ได้) — ให้ครั้งเดียวต่อเกม (story_flags.starter_kit)
 ## { id ใน Resources/Shop/: จำนวน } · แก้รายการได้ที่นี่
@@ -144,12 +146,16 @@ const SUPPLY_STACK_MAX := 99
 var storage_slots := STORAGE_START
 ## [0.3.0] ช่องชั้นวางเครื่อง (เริ่ม EconomyConfig.shelf_slots_start · อัปเกรดด้วย ItemDef.shelf_slots_to)
 var shelf_slots := 2
-## ของในคลัง 1 รายการ = 1 ช่อง: { id, path, qty, condition, reserved_for }
+## ของในคลัง 1 รายการ = 1 ช่อง: { id, path, qty, condition, reserved_for, cost }
 ##   PART qty = 1 เสมอ · SUPPLY qty = จำนวนครั้งที่เหลือ (≤ SUPPLY_STACK_MAX)
+##   [0.4.0] cost = ราคาที่ขมจ่ายต่อชิ้น (PART · ใช้คิดค่าอะไหล่ที่เก็บลูกค้า · ของได้ฟรี = 0)
 var inventory: Array[Dictionary] = []
-## ร้านขายไปแล้วกี่ชิ้นในสัปดาห์ shop_week (สต็อกร้าน)
+## ร้านขายไปแล้วกี่ชิ้นในรอบ shop_week (สต็อกตลาด · [0.4.0] 1 รอบ = market_restock_days วันเปิดร้าน · ชื่อตัวแปรเดิมคงไว้ให้เซฟเก่า)
 var shop_bought: Dictionary = { }
 var shop_week := 0
+## [0.4.0] ของที่สั่งออนไลน์ ยังไม่มาถึง: { id, path, qty, cost, slots, arrive } · arrive = shift (วันเปิดร้าน) ที่ของมาถึง
+## จองช่องคลังไว้แล้ว (used_slots นับ slots ด้วย)
+var pending_orders: Array[Dictionary] = []
 ## อัปเกรดที่ซื้อแล้ว (id → true)
 var upgrades: Dictionary = { }
 
@@ -179,6 +185,7 @@ func reset() -> void:
 	storage_slots = STORAGE_START
 	shelf_slots = economy.shelf_slots_start if economy else 2
 	inventory.clear()
+	pending_orders.clear()
 	shop_bought.clear()
 	shop_week = 0
 	upgrades.clear()
@@ -221,6 +228,7 @@ func add_money(delta: int, kind: StringName = &"other", note := "", chapter := 0
 ## หมวดเงิน → ชื่อบนจอ
 const MONEY_KINDS := {
 	&"fee": "ค่าแรง",
+	&"part_fee": "ค่าอะไหล่จากลูกค้า",
 	&"tip": "ทิป",
 	&"sell": "ขายของคืน",
 	&"damage": "ชดใช้ของเสียหาย",
@@ -511,11 +519,14 @@ func can_afford(cost: int) -> bool:
 
 
 func used_slots() -> int:
-	return inventory.size()
+	var n := inventory.size()
+	for o in pending_orders:
+		n += int(o.get("slots", 0))
+	return n
 
 
 func free_slots() -> int:
-	return maxi(storage_slots - inventory.size(), 0)
+	return maxi(storage_slots - used_slots(), 0)
 
 
 ## ItemDef ของรายการในคลัง
@@ -542,7 +553,8 @@ func can_store(item: ItemDef, qty := 1) -> bool:
 
 
 ## เก็บเข้าคลัง (ไม่หักเงิน) · ช่องไม่พอ = false · force = ยัดเข้าไปเลยแม้ช่องเต็ม (ใช้กับ give_item)
-func add_item(item: ItemDef, qty := 1, force := false, notify := true) -> bool:
+## [0.4.0] cost = ราคาที่จ่ายต่อชิ้น (PART) · -1 = ของได้ฟรี (0)
+func add_item(item: ItemDef, qty := 1, force := false, notify := true, cost := -1) -> bool:
 	if item == null or (not force and not can_store(item, qty)):
 		return false
 	match item.kind:
@@ -553,7 +565,7 @@ func add_item(item: ItemDef, qty := 1, force := false, notify := true) -> bool:
 				set_shelf_slots(item.shelf_slots_to)
 		ItemDef.Kind.PART:
 			for i in qty:
-				inventory.append({ "id": item.id, "path": item.resource_path, "qty": 1, "condition": item.condition, "reserved_for": "" })
+				inventory.append({ "id": item.id, "path": item.resource_path, "qty": 1, "condition": item.condition, "reserved_for": "", "cost": maxi(cost, 0) })
 		ItemDef.Kind.SUPPLY:
 			var left := item.uses * qty
 			for e in inventory:
@@ -565,7 +577,7 @@ func add_item(item: ItemDef, qty := 1, force := false, notify := true) -> bool:
 					left -= put
 			while left > 0:
 				var put := mini(SUPPLY_STACK_MAX, left)
-				inventory.append({ "id": item.id, "path": item.resource_path, "qty": put, "condition": "", "reserved_for": "" })
+				inventory.append({ "id": item.id, "path": item.resource_path, "qty": put, "condition": "", "reserved_for": "", "cost": 0 })
 				left -= put
 	inventory_changed.emit()
 	if notify:
@@ -664,12 +676,34 @@ func sell_back(index: int) -> int:
 	return got
 
 
-func _shop_week_now() -> int:
+## [0.4.0] วันเปิดร้านที่เท่าไรของทั้งเกม (1–48) · ไม่มี TimeSystem = 1
+func current_shift() -> int:
 	var ts = EventManager.time_system if has_node(^"/root/EventManager") else null
-	return ts.week() if ts else 1
+	return int(ts.shift) if ts else 1
 
 
-## ร้านเหลือของชิ้นนี้กี่ชิ้นสัปดาห์นี้ (-1 = ไม่จำกัด)
+## [0.4.0] รอบสต็อกตลาด: ทุก market_restock_days วันเปิดร้าน (2 = วันที่ 4 · 18 ของทุกเดือน)
+static func restock_period(shift: int, every: int) -> int:
+	return floori((maxi(shift, 1) - 1) / float(maxi(every, 1))) + 1
+
+
+func _shop_week_now() -> int:
+	var e := economy if economy else EconomyConfig.new()
+	return restock_period(current_shift(), e.market_restock_days)
+
+
+## [0.4.0] ข้อความว่าตลาดเติมของเมื่อไร ("วันที่ 18" / "เดือนหน้า")
+func restock_text() -> String:
+	var e := economy if economy else EconomyConfig.new()
+	var s := current_shift()
+	var next := restock_period(s, e.market_restock_days) * maxi(e.market_restock_days, 1) + 1
+	var per_month: int = TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH
+	if (next - 1) / per_month != (s - 1) / per_month:
+		return "เดือนหน้า"
+	return "วันที่ %d" % TimeSystem.PLAY_DATES[(next - 1) % TimeSystem.PLAY_DATES.size()]
+
+
+## ร้านเหลือของชิ้นนี้กี่ชิ้นรอบนี้ (-1 = ไม่จำกัด)
 func stock_left(item: ItemDef) -> int:
 	if item.weekly_stock <= 0:
 		return -1
@@ -697,7 +731,7 @@ func buy_block_reason(item: ItemDef, qty := 1) -> String:
 		return "ล็อก · ต้องเป็น%s" % e.rank_names[clampi(item.unlock_rank, 0, e.rank_names.size() - 1)]
 	var left := stock_left(item)
 	if left == 0:
-		return "ของหมด (มาใหม่เดือนหน้า)"
+		return "ของหมด (มาใหม่%s)" % restock_text()
 	if left > 0 and qty > left:
 		return "ร้านเหลือแค่ %d" % left
 	if not can_afford(item.price * qty):
@@ -714,10 +748,207 @@ func buy(item: ItemDef, qty := 1) -> String:
 		return why
 	# ของที่อยู่ถาวร (อัปเกรดคลัง) = ลงทุน ไม่นับเป็นค่าใช้จ่ายของเดือน
 	add_money(-item.price * qty, &"invest" if item.kind == ItemDef.Kind.UPGRADE else &"buy", "%s ×%d" % [item.display_name, qty])
-	add_item(item, qty)
+	add_item(item, qty, false, true, item.price)
 	if item.weekly_stock > 0:
 		shop_bought[item.id] = int(shop_bought.get(item.id, 0)) + qty
+	if item.kind == ItemDef.Kind.PART:
+		parts_arrived.emit()
 	return ""
+
+# ---------------------------------------------------------------- [0.4.0] ร้านออนไลน์ (PLAN_0_4_0 ข้อ 4)
+
+
+## สั่งออนไลน์ไม่ได้เพราะอะไร ("" = สั่งได้) · lines = [[ItemDef, qty], …] (ตะกร้าเดียว จ่ายค่าส่งครั้งเดียว)
+func order_block_reason(lines: Array) -> String:
+	var e := economy if economy else EconomyConfig.new()
+	if lines.is_empty():
+		return "ยังไม่ได้เลือกของ"
+	var total := e.online_ship_fee
+	var slots := 0
+	for l in lines:
+		var it := l[0] as ItemDef
+		var q := int(l[1])
+		if it == null or q <= 0:
+			return "เลือกจำนวนก่อน"
+		if not it.online or it.kind == ItemDef.Kind.UPGRADE:
+			return "%s ไม่มีขายออนไลน์" % it.display_name
+		if rank() < it.unlock_rank:
+			return "ล็อก · ต้องเป็น%s" % e.rank_names[clampi(it.unlock_rank, 0, e.rank_names.size() - 1)]
+		total += it.online_cost() * q
+		slots += slots_needed(it, q)
+	if not can_afford(total):
+		return "เงินไม่พอ"
+	if slots > free_slots():
+		return "คลังเต็ม %d/%d (ของที่สั่งต้องมีช่องรอ)" % [used_slots(), storage_slots]
+	return ""
+
+
+## ราคารวมตะกร้า (รวมค่าส่ง)
+func order_total(lines: Array) -> int:
+	var e := economy if economy else EconomyConfig.new()
+	var total := e.online_ship_fee if not lines.is_empty() else 0
+	for l in lines:
+		if l[0] is ItemDef:
+			total += (l[0] as ItemDef).online_cost() * int(l[1])
+	return total
+
+
+## สั่งออนไลน์: จ่ายทันที (ของ + ค่าส่ง) · จองช่องคลัง · ของมาถึงตอนเปิดร้านอีก online_delay_days วัน · คืนเหตุผลถ้าสั่งไม่ได้ ("" = สำเร็จ)
+func order_online(lines: Array) -> String:
+	var why := order_block_reason(lines)
+	if why != "":
+		return why
+	var e := economy if economy else EconomyConfig.new()
+	var arrive := current_shift() + maxi(e.online_delay_days, 1)
+	var names: Array[String] = []
+	for l in lines:
+		var it := l[0] as ItemDef
+		var q := int(l[1])
+		pending_orders.append({ "id": it.id, "path": it.resource_path, "qty": q, "cost": it.online_cost(), "slots": slots_needed(it, q), "arrive": arrive })
+		names.append("%s ×%d" % [it.display_name, q])
+	add_money(-order_total(lines), &"buy", "สั่งออนไลน์: " + ", ".join(names))
+	inventory_changed.emit()
+	return ""
+
+
+## ของที่สั่งแล้วยังไม่มา (ไว้โชว์ในแอป/คลัง)
+func pending_count(id: StringName) -> int:
+	var n := 0
+	for o in pending_orders:
+		if o.id == id:
+			n += int(o.qty)
+	return n
+
+
+## เปิดร้านวัน shift → ของที่ถึงกำหนดเข้าคลัง (ยัดเข้าได้เสมอ เพราะจองช่องไว้แล้ว) · คืนรายการที่มาถึง [{item, qty}]
+func deliver_orders(shift: int) -> Array[Dictionary]:
+	var got: Array[Dictionary] = []
+	var due := pending_orders.filter(func(o: Dictionary) -> bool: return int(o.arrive) <= shift)
+	pending_orders = pending_orders.filter(func(o: Dictionary) -> bool: return int(o.arrive) > shift)
+	for o in due:
+		var it: ItemDef = load(String(o.path)) as ItemDef if ResourceLoader.exists(String(o.path)) else null
+		if it == null:
+			continue
+		add_item(it, int(o.qty), true, false, int(o.cost))
+		got.append({ "item": it, "qty": int(o.qty) })
+	if not got.is_empty():
+		parts_arrived.emit()
+	return got
+
+# ---------------------------------------------------------------- [0.4.0] อะไหล่ผูกกับงาน (PLAN_0_4_0 ข้อ 2 · PART_JOB_LINK)
+
+
+## ของ id นี้ที่ยังไม่ถูกจอง (PART = ชิ้น · SUPPLY = ครั้ง)
+func free_count(id: StringName) -> int:
+	var n := 0
+	for e in inventory:
+		if e.id == id and String(e.reserved_for) == "":
+			n += int(e.qty)
+	return n
+
+
+## จองอะไหล่ชิ้นแรกที่ว่างตามลำดับ ids (ตัวหลักก่อน แล้วของแทน) ให้งาน key · จองไว้แล้ว = คืน index เดิม · ไม่มี = -1
+func reserve(ids: Array, key: String) -> int:
+	if key == "":
+		return -1
+	var have := reserved_index(key)
+	if have >= 0:
+		return have
+	for id in ids:
+		for i in inventory.size():
+			var e: Dictionary = inventory[i]
+			if e.id == StringName(id) and String(e.reserved_for) == "":
+				var it := item_of(e)
+				if it and it.kind != ItemDef.Kind.PART:
+					continue
+				e.reserved_for = key
+				inventory_changed.emit()
+				return i
+	return -1
+
+
+## index ของชิ้นที่จองให้งาน key (-1 = ไม่มี)
+func reserved_index(key: String) -> int:
+	if key == "":
+		return -1
+	for i in inventory.size():
+		if String(inventory[i].reserved_for) == key:
+			return i
+	return -1
+
+
+## ปลดจองทุกชิ้นของงาน key (ยอมแพ้ · ปฏิเสธ · ลูกค้าเอาคืน) → กลับเป็นของว่าง
+func release(key: String) -> void:
+	if key == "":
+		return
+	var changed := false
+	for e in inventory:
+		if String(e.reserved_for) == key:
+			e.reserved_for = ""
+			changed = true
+	if changed:
+		inventory_changed.emit()
+
+
+## ใช้ชิ้นที่จองไว้ (ลบออกจากคลัง) · คืน { item, cost } ของชิ้นที่ใช้ (ว่าง = ไม่มีของจอง)
+func consume_reserved(key: String) -> Dictionary:
+	var i := reserved_index(key)
+	if i < 0:
+		return { }
+	var e: Dictionary = inventory[i]
+	var out := { "item": item_of(e), "cost": int(e.get("cost", 0)) }
+	inventory.remove_at(i)
+	inventory_changed.emit()
+	return out
+
+
+## ค่าอะไหล่ที่เก็บลูกค้า = ราคาที่ซื้อ × (1 + ค่าบวกตามยศช่างตอนนี้) ปัดขึ้น
+func part_charge(cost: int) -> int:
+	if cost <= 0:
+		return 0
+	var e := economy if economy else EconomyConfig.new()
+	return ceili(cost * (1.0 + e.part_markup(rank())) - 0.0001)
+
+
+## ของสิ้นเปลืองพอไหม need = { id: ครั้ง }
+func has_supplies(need: Dictionary) -> bool:
+	return missing_supplies(need).is_empty()
+
+
+## ของสิ้นเปลืองที่ขาด { id: ขาดกี่ครั้ง }
+func missing_supplies(need: Dictionary) -> Dictionary:
+	var miss := { }
+	for id in need:
+		var lack := int(need[id]) - free_count(StringName(id))
+		if lack > 0:
+			miss[StringName(id)] = lack
+	return miss
+
+
+## หักของสิ้นเปลือง: หักเท่าที่มี (ชนิดไหนไม่พอ = หักที่เหลือจนหมด) · คืน { id: ขาดกี่ครั้ง } (ว่าง = ครบ)
+func use_supplies(need: Dictionary) -> Dictionary:
+	var miss := missing_supplies(need)
+	for id in need:
+		var want := int(need[id]) - int(miss.get(StringName(id), 0))
+		if want > 0:
+			take_item(StringName(id), want)
+	return miss
+
+
+## มูลค่าของในคลัง (ราคาที่จ่ายจริงของอะไหล่ + ของสิ้นเปลืองคิดตามสัดส่วนครั้งที่เหลือ) — โชว์ในคลัง/สรุปเดือนให้เห็นเงินจม
+func inventory_value() -> int:
+	var v := 0.0
+	for e in inventory:
+		var it := item_of(e)
+		if it == null:
+			continue
+		if it.kind == ItemDef.Kind.PART:
+			v += int(e.get("cost", 0))
+		elif it.kind == ItemDef.Kind.SUPPLY and it.uses > 0:
+			v += it.price * int(e.qty) / float(it.uses)
+	for o in pending_orders:
+		v += int(o.cost) * int(o.qty)
+	return roundi(v)
 
 # ---------------------------------------------------------------- ผลงานซ่อม
 

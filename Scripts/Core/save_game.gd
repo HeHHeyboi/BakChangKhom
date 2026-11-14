@@ -108,6 +108,7 @@ static func save() -> bool:
 		"inventory": {
 			"slots": GameState.storage_slots, "shelf_slots": GameState.shelf_slots, "items": GameState.inventory, "bought": GameState.shop_bought,
 			"week": GameState.shop_week, "upgrades": GameState.upgrades.keys().map(func(k): return String(k)),
+			"pending": GameState.pending_orders,
 		},
 		"location": int(SceneRouter.current_id),
 	}
@@ -159,6 +160,15 @@ static func load_into() -> int:
 			GameState.inventory.append({
 				"id": StringName(e.get("id", "")), "path": String(e.path), "qty": int(e.get("qty", 1)),
 				"condition": String(e.get("condition", "")), "reserved_for": String(e.get("reserved_for", "")),
+				"cost": int(e.get("cost", 0)),
+			})
+	# [0.4.0] ของที่สั่งออนไลน์ยังไม่มาถึง (เซฟ v4 ไม่มี = ว่าง)
+	GameState.pending_orders.clear()
+	for o in inv.get("pending", []):
+		if o is Dictionary and ResourceLoader.exists(String(o.get("path", ""))):
+			GameState.pending_orders.append({
+				"id": StringName(o.get("id", "")), "path": String(o.path), "qty": int(o.get("qty", 1)),
+				"cost": int(o.get("cost", 0)), "slots": int(o.get("slots", 0)), "arrive": int(o.get("arrive", 0)),
 			})
 	for k in inv.get("bought", { }):
 		GameState.shop_bought[StringName(k)] = int(inv.bought[k])

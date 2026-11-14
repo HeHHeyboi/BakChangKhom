@@ -135,6 +135,16 @@ class_name EconomyConfig extends Resource
 ## [0.3.0] ซ่อมเสร็จก่อนนัด → โทรเรียกลูกค้ามารับได้เลย → ความพอใจตอนมารับ +ค่านี้ (บวกกับโบนัสทันนัด)
 @export var early_call_sat_bonus := 5
 
+@export_group("อะไหล่ + สั่งของ (0.4.0 · PLAN_0_4_0 ข้อ 8)")
+## ค่าอะไหล่ที่เก็บลูกค้า = ราคาที่ขมซื้อมา × (1 + ค่านี้ตามยศช่าง) · index = GameState.rank() · ปัดเศษบาทขึ้น
+@export var part_markup_by_rank: PackedFloat32Array = [0.02, 0.025, 0.05, 0.10, 0.10]
+## ตลาดเติมสต็อกทุกกี่วันเปิดร้าน (2 = วันที่ 4 และ 18 ของทุกเดือน · ItemDef.weekly_stock = จำนวนต่อรอบ)
+@export var market_restock_days := 2
+## ร้านออนไลน์: ค่าส่งต่อครั้งที่สั่ง · ของมาถึงอีกกี่วันเปิดร้าน (มาตอนเปิดร้าน)
+@export var online_ship_fee := 20
+@export var online_delay_days := 1
+
+
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")
 @export var ot_cost_per_slot := 30
 ## ล่วงเวลาได้กี่วันต่อบท ([0.2.5] 1 บท = 1 เดือน เปิดร้าน 4 วัน)
@@ -273,3 +283,10 @@ func month_value(arr: PackedInt32Array, month: int) -> int:
 ## [0.3.0] ค่าแรงคูณตามวันนัดที่เลือก (index ของ promise_days)
 func promise_mult(i: int) -> float:
 	return promise_pay_mult[i] if i >= 0 and i < promise_pay_mult.size() else 1.0
+
+
+## [0.4.0] สัดส่วนบวกค่าอะไหล่ตามยศช่าง
+func part_markup(rank: int) -> float:
+	if part_markup_by_rank.is_empty():
+		return 0.0
+	return part_markup_by_rank[clampi(rank, 0, part_markup_by_rank.size() - 1)]
