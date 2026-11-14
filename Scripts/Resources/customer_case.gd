@@ -66,6 +66,8 @@ const PART_BENCH = "part_bench"
 @export var fee := -1
 ## มินิเกมอื่นแทนของ part_id (ปกติเว้นว่าง)
 @export_file("*.tscn") var scene_override: String
+## [0.3.0] ยืนรอหน้าประตูได้กี่เทิร์น · 0 = ค่าเริ่ม (EconomyConfig.door_patience_slots = 2) · ผู้สูงอายุ 3 · คนรีบ 1
+@export_range(0, 6) var patience := 0
 
 @export_group("บทพูด")
 ## บทตอนลูกค้าเข้าร้าน (รูปแบบเดียวกับ Assets/Dialog — ชื่อ,ข้อความ)
@@ -93,6 +95,18 @@ func scene_path() -> String:
 
 func part() -> StringName:
 	return StringName(part_id)
+
+
+## [0.3.0] งานนี้ต้องรับเครื่องไว้ (ฮาร์ดแวร์ → ใบรับเครื่อง + ชั้นวาง) · งานขมOS ทำต่อหน้าลูกค้าจบในวันเดียว
+func takes_machine() -> bool:
+	return part_id != PART_DESKTOP
+
+
+## [0.3.0] รอหน้าประตูได้กี่เทิร์น
+func patience_slots(econ: EconomyConfig = null) -> int:
+	if patience > 0:
+		return patience
+	return econ.door_patience_slots if econ else 2
 
 
 const LEVEL_NAMES := ["ง่าย", "ปกติ", "ปานกลาง", "ยาก", "ชำนาญ"]

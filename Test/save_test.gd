@@ -19,9 +19,13 @@ func _ready() -> void:
 	GameState.xp = 77
 	GameState.reputation = 33
 	GameState.level_stars[1] = 2
-	DayLoop.board.clear()
+	DayLoop.door_queue.clear()
 	var cc: CustomerCase = load("res://Resources/Customers/lv1_girl_wifi.tres")
-	DayLoop.board.append({ "case": cc, "due_shift": 5, "phone": true, "walkin": true })
+	var ca: CustomerCase = load("res://Resources/Customers/w1_d2_headman_mainboard.tres")
+	DayLoop.door_queue.append(DayLoop.door_entry(cc, true, false, false, 30))
+	DayLoop.appointments.clear()
+	DayLoop.appointments.append({ "case": ca, "free": true })
+	DayLoop.accepted_today = 2
 	DayLoop.visitor_waves = [{ "minute": 840, "count": 2 }] as Array[Dictionary]
 	DayLoop.visitors_today = 6
 	DayLoop.visitors_arrived = 4
@@ -33,7 +37,9 @@ func _ready() -> void:
 	# เปลี่ยนทุกอย่าง แล้วโหลดกลับ
 	ts.set_shift(1)
 	GameState.reset()
-	DayLoop.board.clear()
+	DayLoop.door_queue.clear()
+	DayLoop.appointments.clear()
+	DayLoop.accepted_today = 0
 	DayLoop.visitor_waves.clear()
 	DayLoop.visitors_today = 0
 	DayLoop.visitors_arrived = 0
@@ -41,7 +47,8 @@ func _ready() -> void:
 	var loc := SaveGame.load_into()
 	_check(loc == SceneRouter.VILLAGE, "โหลด → กลับฉากหน้าบ้าน")
 	_check(ts.shift == 4 and GameState.money == 1234 and GameState.xp == 77 and GameState.reputation == 33 and GameState.level_stars.get(1, 0) == 2, "โหลด → กะ เงิน XP ชื่อเสียง ดาว ครบ")
-	_check(DayLoop.board.size() == 1 and DayLoop.board[0].case == cc and DayLoop.board[0].due_shift == 5 and DayLoop.board[0].phone and DayLoop.board[0].walkin, "โหลด → กระดานงานครบ")
+	_check(DayLoop.door_queue.size() == 1 and DayLoop.door_queue[0].case == cc and DayLoop.door_queue[0].phone and int(DayLoop.door_queue[0].waited) == 30 and not DayLoop.door_queue[0].appointed, "[0.3.0] โหลด → ลูกค้าหน้าประตูครบ (โทรมา · รอแล้ว 1 เทิร์น)")
+	_check(DayLoop.appointments.size() == 1 and DayLoop.appointments[0].case == ca and DayLoop.appointments[0].free and DayLoop.accepted_today == 2, "[0.3.0] โหลด → นัดวันถัดไป + โควตาที่ใช้ไปครบ")
 	_check(DayLoop.visitor_waves.size() == 1 and int(DayLoop.visitor_waves[0].minute) == 840 and int(DayLoop.visitor_waves[0].count) == 2 and DayLoop.visitors_today == 6 and DayLoop.visitors_arrived == 4, "[0.2.5] โหลด → ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้ครบ")
 	var ev = EventManager.eventMap[EventManager.EventID.MAIN]
 	_check(ev.currentTask == 1 and not ev.isDone, "โหลด → เควสต์ขั้นที่ 2")

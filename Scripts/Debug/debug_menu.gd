@@ -120,7 +120,7 @@ func _goto_no_demo(s: int) -> void:
 func _unlock_levels() -> void:
 	for lv in range(2, 5):
 		GameState.level_stars[lv] = maxi(GameState.level_stars.get(lv, 0), 2)
-	DayLoop.add_jobs(3)
+	DayLoop.add_visitors(3)
 
 
 func _complete_quest(index: int) -> void:

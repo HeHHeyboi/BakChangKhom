@@ -56,11 +56,17 @@ static func save() -> bool:
 		return false
 	var ts: TimeSystem = EventManager.time_system
 	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
-	var board := []
-	for j in DayLoop.board:
+	# [0.3.0 ขั้น B] หน้าประตู (คิว · นัด · โควตา) · ชั้นวาง + VERSION 4 ทำในขั้น G
+	var door := []
+	for j in DayLoop.door_queue:
 		var c: CustomerCase = j.get("case")
 		if c and c.resource_path != "":
-			board.append({ "case": c.resource_path, "due_shift": int(j.get("due_shift", 0)), "phone": bool(j.get("phone", false)), "walkin": bool(j.get("walkin", false)) })
+			door.append({ "case": c.resource_path, "phone": bool(j.get("phone", false)), "appointed": bool(j.get("appointed", false)), "free": bool(j.get("free", false)), "waited": int(j.get("waited", 0)) })
+	var appts := []
+	for a in DayLoop.appointments:
+		var c: CustomerCase = a.get("case")
+		if c and c.resource_path != "":
+			appts.append({ "case": c.resource_path, "free": bool(a.get("free", false)) })
 	var stars := { }
 	for k in GameState.level_stars:
 		stars[str(k)] = GameState.level_stars[k]
@@ -80,7 +86,7 @@ static func save() -> bool:
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
-			"board": board, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
+			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
 			"break_done": DayLoop._break_done, "demo_over": DayLoop.demo_over, "demo_ack": DayLoop._demo_ack,
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
 			# [0.2.0] การ์ดสรุปบท/เดือนที่ยังไม่ได้กด (บันทึกอัตโนมัติตอนเริ่มกะใหม่เกิดก่อนผู้เล่นกด "ไปต่อ")
@@ -162,10 +168,16 @@ static func load_into() -> int:
 		ts.worked_minutes_month = int(t.get("worked", 0))
 
 	var l: Dictionary = d.get("loop", { })
-	DayLoop.board.clear()
-	for j in l.get("board", []):
+	DayLoop.door_queue.clear()
+	for j in l.get("door", l.get("board", [])): # เซฟก่อน 0.3.0 มี "board" (กระดานงาน) → ยืนหน้าประตูแทน
 		if ResourceLoader.exists(String(j.case)):
-			DayLoop.board.append({ "case": load(String(j.case)), "due_shift": int(j.due_shift), "phone": bool(j.phone), "walkin": bool(j.get("walkin", false)) })
+			DayLoop.door_queue.append(DayLoop.door_entry(load(String(j.case)), bool(j.get("phone", false)), bool(j.get("appointed", false)), bool(j.get("free", false)), int(j.get("waited", 0))))
+	DayLoop.appointments.clear()
+	for a in l.get("appointments", []):
+		if ResourceLoader.exists(String(a.case)):
+			DayLoop.appointments.append({ "case": load(String(a.case)), "free": bool(a.get("free", false)) })
+	DayLoop.accepted_today = int(l.get("accepted_today", 0))
+	DayLoop._door_tick = -1
 	# [0.2.5] ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้
 	DayLoop.visitor_waves.clear()
 	for w in l.get("waves", []):

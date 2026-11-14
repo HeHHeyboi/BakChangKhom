@@ -8,6 +8,8 @@ extends CanvasLayer
 ## งานหมดเขต (due_shifts) = ลูกค้าเดินออก ชื่อเสียงลด · งาน Lv n+1 ขึ้นกระดานเมื่อได้ ⭐⭐ ใน Lv n ครบ 2 งาน
 ## [0.2.5] ครบ 4 วัน (วันที่ 4 · 11 · 18 · 25) = จบบท = สิ้นเดือน → บิล + หน้าสรุปเดือน → บท Chapter ถัดไป · ครบ 48 วัน (12 เดือน) = Epilogue + ฉากจบ
 ## งานบังคับรายกะ (WeekPlan.shifts) ที่เป็น forced: ลูกค้าเดินเข้ามาเอง ปฏิเสธไม่ได้ (กะแรก = ลุงอำนวย หลังบทพัก Tutorial)
+## [0.3.0 ขั้น B] กระดานงาน → ลูกค้ายืนหน้าประตูทีละคน (door_queue) · รับเครื่อง / นัดวันเปิดร้านถัดไป / ปฏิเสธ
+##   รับลูกค้าใหม่ได้ daily_cap คน/วัน · รอได้ patience เทิร์นแล้วเดินกลับ · คนนัดมาก่อนรอบ 08:30 วันถัดไป · โทรเข้า = นัดอย่างเดียว
 ## เริ่มทำงานหลังเควสต์หลัก (main.tres) จบ — งานในเควสต์ไม่นับเป็นงานลูกค้า · UI เป็น placeholder สร้างจากโค้ด
 
 ## แผนรายสัปดาห์ (WeekPlan.week = 1–12) · สัปดาห์ที่ไม่มีแผน = สัดส่วนจาก DEFAULT_WEIGHTS
@@ -67,7 +69,7 @@ const GRADE_TEXT := ["ซ่อมถูกทุกอย่าง", "ผ่า
 
 enum Card {
 	NONE,
-	BOARD,
+	DOOR, ## [0.3.0] ลูกค้าหน้าประตู (แทนกระดานงาน)
 	JOB_FORCED,
 	RESULT,
 	SHIFT_END,
@@ -76,9 +78,19 @@ enum Card {
 	DEMO_END,
 }
 
-## งานบนกระดาน: { "case": CustomerCase, "due_shift": int (กะสุดท้ายที่ยังรับได้), "phone": bool, "walkin": bool }
-## [0.2.5] walkin = ลูกค้าเดินเข้าร้าน/โทรเข้าวันนี้ → ไม่รับภายในวัน = กลับบ้านตอนปิดร้าน (rep_left_unserved) · ไม่ใช่ walkin (งานนัด/แก้ตัว) = รอได้ตาม due_shifts
-var board: Array[Dictionary] = []
+## [0.3.0] ลูกค้ายืนหน้าประตู เรียงคิว (คนแรก = คนที่กำลังคุย) — ดู door_entry()
+## { "case": CustomerCase, "phone": bool (โทรเข้า = นัดได้อย่างเดียว), "appointed": bool (นัดไว้ เลื่อนอีกไม่ได้),
+##   "free": bool (ไม่นับโควตา: งานเนื้อเรื่องที่ไม่บังคับ/เอาเครื่องมาลองใหม่), "waited": int (นาทีงานที่ยืนรอแล้ว) }
+## ไม่ได้รับภายในวัน = กลับบ้านตอนปิดร้าน (rep_left_unserved) · รอเกินความอดทน = เดินกลับ (rep_door_walkout)
+var door_queue: Array[Dictionary] = []
+## [0.3.0] ลูกค้าที่นัดวันเปิดร้านถัดไป [{ "case", "free" }] → ยืนหน้าประตูเป็นคิวแรกตอนเปิดร้าน (ก่อนรอบ 08:30)
+var appointments: Array[Dictionary] = []
+## [0.3.0] วันนี้รับลูกค้าใหม่ไปแล้วกี่คน (เทียบ EconomyConfig.daily_cap · คนนัดนับวันที่เขามา · งานเนื้อเรื่อง/free ไม่นับ)
+var accepted_today := 0
+## [0.3.0] ใบรับเครื่อง + ชั้นวาง (ข้อมูลล้วน · UI ขั้น D) · door_accept(promise >= 0) วางเครื่องงานฮาร์ดแวร์ไว้ที่นี่
+var shelf: RepairShelf
+## นาทีล่าสุดที่นับความอดทนของคนหน้าประตู (-1 = ยังไม่เริ่ม)
+var _door_tick := -1
 ## งานที่กำลังทำ (ลูกค้าคนนี้)
 var today_case: CustomerCase
 var current_job: Dictionary = { }
@@ -92,6 +104,7 @@ var week_results: Array[Dictionary] = []
 var week_start_money := 0
 ## ล่วงเวลาไปแล้วกี่กะในสัปดาห์นี้
 var ot_this_week := 0
+## [0.3.0] วันนี้ใครยืนรอหน้าประตูนานเกินจนเดินกลับ
 var walkouts: PackedStringArray = []
 ## [0.2.5] ลูกค้าที่ไม่ได้รับงานเมื่อวันก่อน กลับบ้านไปแล้ว (แสดงบนกระดานวันถัดไป)
 var left_home: PackedStringArray = []
@@ -179,7 +192,7 @@ var _card := Card.NONE
 ## [10 ต.ค.] ย่อกระดาษงาน (กระดานงาน · การ์ดงานด่วน/ผลงาน/ปิดร้าน) → เหลือแถบ "กระดานงาน" ให้กดเปิดคืน
 var cards_hidden := false
 var _cards_tab: Button
-const HIDEABLE := [Card.BOARD, Card.JOB_FORCED, Card.RESULT, Card.SHIFT_END]
+const HIDEABLE := [Card.DOOR, Card.JOB_FORCED, Card.RESULT, Card.SHIFT_END]
 
 
 func _ready() -> void:
@@ -214,6 +227,8 @@ func _connect() -> void:
 		if not (l[0] as Signal).is_connected(l[1]):
 			(l[0] as Signal).connect(l[1])
 	week_start_money = GameState.money
+	if shelf == null:
+		shelf = RepairShelf.new(_econ())
 	_on_shift_started(ts.month(), ts.week(), ts.shift_in_week())
 	_day_skip_pending = false # เริ่มเกม/โหลดเซฟ ไม่ต้องเล่นข้ามวัน
 
@@ -324,17 +339,17 @@ func _cases_of_level(lv: int, exclude_board := true) -> Array[CustomerCase]:
 	for c in random_pool:
 		if c == null or c.forced or c.level != lv or not c.in_month(m): # [0.2.5] งานตามฤดู
 			continue
-		if exclude_board and (_on_board(c) or c == today_case):
+		if exclude_board and (is_case_busy(c) or c == today_case):
 			continue
 		out.append(c)
 	return out
 
 
-## [0.2.5] เลือกงานจากคลังให้หลากหลาย: ไม่เอาคนที่ยืนรออยู่แล้ว · ไม่เอางานที่เพิ่งขึ้นกระดานไม่นาน (_recent) · ไม่มีให้เลือกค่อยยอมซ้ำ
+## [0.2.5] เลือกงานจากคลังให้หลากหลาย: ไม่เอาคนที่ยืนรอ/นัดไว้/มีเครื่องบนชั้นอยู่แล้ว · ไม่เอางานที่เพิ่งมาไม่นาน (_recent) · ไม่มีให้เลือกค่อยยอมซ้ำ
 func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 	var waiting := { }
-	for j in board:
-		waiting[(j["case"] as CustomerCase).customer] = true
+	for c in busy_cases():
+		waiting[c.customer] = true
 	var best: Array[CustomerCase] = pool.filter(func(c: CustomerCase) -> bool: return not waiting.has(c.customer) and not _recent.has(c))
 	if best.is_empty():
 		best = pool.filter(func(c: CustomerCase) -> bool: return not _recent.has(c))
@@ -347,22 +362,38 @@ func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 	return c
 
 
-func _on_board(c: CustomerCase) -> bool:
-	for j in board:
-		if j["case"] == c:
-			return true
-	return false
+## [0.3.0] เคสที่มีเจ้าของอยู่ในร้านแล้ว (ยืนหน้าประตู · นัดไว้ · เครื่องอยู่บนชั้น) — ไม่สุ่มซ้ำ
+func busy_cases() -> Array[CustomerCase]:
+	var out: Array[CustomerCase] = []
+	for j in door_queue:
+		out.append(j["case"] as CustomerCase)
+	for a in appointments:
+		out.append(a["case"] as CustomerCase)
+	if shelf:
+		for o: RepairShelf.Order in shelf.orders:
+			out.append(o.case)
+	return out
 
 
-## สุ่มงานใหม่ n ใบขึ้นกระดาน (ไม่ซ้ำกับที่อยู่บนกระดาน) · คืนจำนวนที่เพิ่มได้จริง
-func add_jobs(n: int, phone := false) -> int:
+func is_case_busy(c: CustomerCase) -> bool:
+	return busy_cases().has(c)
+
+
+## [0.3.0] ลูกค้า 1 คนหน้าประตู
+func door_entry(c: CustomerCase, phone := false, appointed := false, free := false, waited := 0) -> Dictionary:
+	return { "case": c, "phone": phone, "appointed": appointed, "free": free, "waited": waited }
+
+
+## [0.3.0] สุ่มลูกค้าใหม่ n คนมายืนต่อคิวหน้าประตู (ไม่ซ้ำคนที่อยู่ในร้าน · คิวยาวสุด board_max) · คืนจำนวนที่มาได้จริง
+## waited = มาถึงก่อนตอนนี้กี่นาทีงาน (รอบที่มาระหว่างผู้เล่นทำงานอยู่) · ทุกคนได้ยืนให้เห็นอย่างน้อย 1 เทิร์น
+func add_visitors(n: int, phone := false, waited := 0) -> int:
 	var ts := _ts()
 	if ts == null:
 		return 0
 	var e := _econ()
 	var added := 0
 	for k in n:
-		if board.size() >= e.board_max:
+		if door_queue.size() >= e.board_max:
 			break
 		var w := effective_weights(ts.week())
 		# ระดับที่เคสถูกใช้หมดแล้ว (อยู่บนกระดานครบ) ตัดออก
@@ -385,8 +416,8 @@ func add_jobs(n: int, phone := false) -> int:
 		if pool.is_empty():
 			continue
 		var c := _pick_case(pool)
-		# [0.2.5] 1 บท = 1 เดือน วันเปิดร้านห่างกัน 7 วัน → ลูกค้าเดินเข้า/โทรเข้า รอได้แค่ในวันนั้น (เดิมรอ due_shifts กะ)
-		board.append({ "case": c, "due_shift": ts.shift, "phone": phone, "walkin": true })
+		var cap_wait := maxi(c.patience_slots(e) - 1, 0) * TimeSystem.SLOT_MIN
+		door_queue.append(door_entry(c, phone, false, false, clampi(waited, 0, cap_wait)))
 		added += 1
 	_board_dirty = true
 	return added
@@ -404,27 +435,27 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	shift_results.clear()
 	shift_start_money = GameState.money
 	_day_skip_pending = ts.shift > 1 and day_skip_seconds > 0.0
-	# งานหมดเขต = ลูกค้าเดินออก · [0.2.5] ลูกค้าวันก่อนที่ไม่ได้รับงาน = กลับบ้านตอนปิดร้าน (ชื่อเสียงลดน้อยกว่า)
+	# [0.3.0] ลูกค้าที่ยังยืนหน้าประตูตอนปิดร้านเมื่อวันก่อน = กลับบ้าน · ล้างโควตา
 	walkouts.clear()
 	left_home.clear()
-	for j in board.duplicate():
-		if int(j["due_shift"]) < ts.shift:
-			board.erase(j)
-			var who := (j["case"] as CustomerCase).customer
-			if bool(j.get("walkin", false)):
-				left_home.append(who)
-				GameState.add_reputation(_econ().rep_left_unserved)
-			else:
-				walkouts.append(who)
-				GameState.add_reputation(_econ().rep_walkout)
+	for j in door_queue:
+		left_home.append((j["case"] as CustomerCase).customer)
+		GameState.add_reputation(_econ().rep_left_unserved)
+	door_queue.clear()
+	accepted_today = 0
+	# คิวแรกของวัน (ก่อนรอบ 08:30): คนที่นัดไว้ → งานเนื้อเรื่องที่ไม่บังคับ → คนเอาเครื่องมาลองใหม่
+	for a in appointments:
+		door_queue.append(door_entry(a["case"], false, true, bool(a.get("free", false))))
+	appointments.clear()
 	var fc := case_for(week, shift_in_week)
 	forced_case = fc if fc and fc.forced else null
-	if fc and not fc.forced and not _on_board(fc):
-		board.append({ "case": fc, "due_shift": ts.shift + fc.due_shifts, "phone": false })
+	if fc and not fc.forced and not is_case_busy(fc):
+		door_queue.append(door_entry(fc, false, false, true))
 	for rc in retry_cases:
-		if rc and not _on_board(rc):
-			board.append({ "case": rc, "due_shift": ts.shift + rc.due_shifts, "phone": false, "retry": true })
+		if rc and not is_case_busy(rc):
+			door_queue.append(door_entry(rc, false, false, true))
 	retry_cases.clear()
+	_door_tick = ts.current_minute
 	_plan_visitors(ts)
 	_board_dirty = true
 	autosave.call_deferred()
@@ -464,13 +495,14 @@ func _check_waves(ts: TimeSystem, notify := true) -> void:
 	var came := 0
 	while not visitor_waves.is_empty() and int(visitor_waves[0]["minute"]) <= ts.current_minute:
 		var w: Dictionary = visitor_waves.pop_front()
-		came += add_jobs(int(w["count"]))
+		var late := TimeSystem.work_minutes_between(int(w["minute"]), ts.current_minute) if int(w["minute"]) > TimeSystem.OPEN else 0
+		came += add_visitors(int(w["count"]), false, late)
 	if came <= 0:
 		return
 	visitors_arrived += came
 	_board_dirty = true
 	if notify and visitor_toast:
-		visitor_toast.show_message("ลูกค้าเดินเข้าร้าน %d คน" % came, "ดูงานใหม่ที่กระดานงาน")
+		visitor_toast.show_message("มีลูกค้ามารอหน้าร้าน %d คน" % came, door_toast_note())
 
 
 ## [0.2.5] รอบถัดไปมาอีกกี่เทิร์น (-1 = ไม่มีแล้ว)
@@ -493,12 +525,57 @@ func autosave() -> bool:
 
 func _on_break_started(kind: StringName) -> void:
 	if kind == &"afternoon":
-		add_jobs(_econ().board_phone_jobs, true)
+		var n := add_visitors(_econ().board_phone_jobs, true)
+		if n > 0 and visitor_toast:
+			visitor_toast.show_message("โทรศัพท์ดัง! ลูกค้าโทรมา %d สาย" % n, "โทรมาขอนัดเอาเครื่องมาวันเปิดร้านถัดไป")
 
 
 func _on_clock_changed(_minute: int) -> void:
 	_board_dirty = true
+	_tick_door(_ts())
 	_check_waves(_ts())
+
+
+## [0.3.0] "ยืนรอหน้าประตู · วันนี้รับได้อีก 2 คน" / "วันนี้คิวเต็มแล้ว นัดวันถัดไปได้"
+func door_toast_note() -> String:
+	var left := quota_left()
+	return "ยืนรอหน้าประตู · วันนี้รับได้อีก %d คน" % left if left > 0 else "วันนี้รับครบแล้ว — นัดวันเปิดร้านถัดไปได้"
+
+
+## [0.3.0] ความอดทนเดินตามเวลางาน (ไม่นับพักเที่ยง/พักบ่าย) · ระหว่างงานเนื้อเรื่องบังคับ/บทพักไม่นับ (ผู้เล่นเลือกไม่ได้)
+## รอครบ patience เทิร์น → เดินกลับ ชื่อเสียง rep_door_walkout · เวลาถอยหลัง (Debug/เทส set_clock) = เริ่มนับใหม่
+func _tick_door(ts: TimeSystem) -> void:
+	if ts == null:
+		return
+	var now := ts.current_minute
+	var prev := _door_tick
+	_door_tick = now
+	if prev < 0 or now <= prev or forced_case != null or door_queue.is_empty():
+		return
+	var dt := TimeSystem.work_minutes_between(prev, now)
+	if dt <= 0:
+		return
+	var e := _econ()
+	var gone: Array[Dictionary] = []
+	for j in door_queue:
+		j["waited"] = int(j.get("waited", 0)) + dt
+		if int(j["waited"]) >= (j["case"] as CustomerCase).patience_slots(e) * TimeSystem.SLOT_MIN:
+			gone.append(j)
+	for j in gone:
+		door_queue.erase(j)
+		var who := (j["case"] as CustomerCase).customer
+		walkouts.append(who)
+		GameState.add_reputation(e.rep_door_walkout)
+		if visitor_toast:
+			visitor_toast.show_message("%s รอนานเกินไป เดินกลับแล้ว" % who, "ชื่อเสียง %d" % e.rep_door_walkout)
+	if not gone.is_empty():
+		_board_dirty = true
+
+
+## [0.3.0] รอได้อีกกี่เทิร์น (ปัดลง)
+func door_patience_left(j: Dictionary) -> int:
+	var c: CustomerCase = j["case"]
+	return maxi(c.patience_slots(_econ()) - floori(int(j.get("waited", 0)) / float(TimeSystem.SLOT_MIN)), 0)
 
 
 func _on_week_ended(week: int) -> void:
@@ -566,33 +643,90 @@ func job_fit(c: CustomerCase) -> StringName:
 	return &"no"
 
 
-func accept_job(i: int) -> void:
-	if i < 0 or i >= board.size() or _working:
-		return
-	var job: Dictionary = board[i]
-	var c: CustomerCase = job["case"]
-	var fit := job_fit(c)
-	if fit == &"no":
-		return
-	if fit == &"ot":
+# ---------------------------------------------------------------- หน้าประตู (0.3.0)
+
+
+## คนที่ยืนหน้าประตูตอนนี้ ({} = ไม่มี)
+func door_front() -> Dictionary:
+	return door_queue[0] if not door_queue.is_empty() else { }
+
+
+## วันนี้รับลูกค้าใหม่ได้อีกกี่คน
+func quota_left() -> int:
+	return maxi(_econ().daily_cap - accepted_today, 0)
+
+
+## รับคนหน้าประตูได้ไหม: promise < 0 = ซ่อมเลยตอนนี้ · promise >= 0 = ออกใบรับเครื่อง (index ของ promise_days) วางบนชั้น
+## &"ok" · &"ot" (ต้องล่วงเวลา) · &"no" (เทิร์นไม่พอ) · &"full" (ครบโควตาวันนี้) · &"phone" (โทรมา นัดได้อย่างเดียว) · &"shelf_full" · &"none"
+func door_accept_state(promise := -1) -> StringName:
+	var j := door_front()
+	if j.is_empty() or _working:
+		return &"none"
+	if bool(j.get("phone", false)):
+		return &"phone"
+	if not bool(j.get("free", false)) and quota_left() <= 0:
+		return &"full"
+	var c: CustomerCase = j["case"]
+	if promise >= 0 and c.takes_machine():
+		return &"shelf_full" if shelf == null or shelf.is_full() else &"ok"
+	return job_fit(c)
+
+
+## รับเครื่องคนหน้าประตู → นับโควตา (ยกเว้น free)
+## promise < 0 หรืองานขมOS: บทลูกค้า → มินิเกมเลย (เหมือนกระดานงานเดิม) · promise >= 0 + งานฮาร์ดแวร์: ใบรับเครื่องขึ้นชั้น แล้วบทลูกค้า (ไม่ซ่อมตอนนี้)
+func door_accept(promise := -1) -> bool:
+	var st := door_accept_state(promise)
+	if st not in [&"ok", &"ot"]:
+		return false
+	var j: Dictionary = door_queue.pop_front()
+	var c: CustomerCase = j["case"]
+	if not bool(j.get("free", false)):
+		accepted_today += 1
+	_board_dirty = true
+	if promise >= 0 and c.takes_machine():
+		var ts := _ts()
+		var o := shelf.add(c, ts.shift if ts else 1, promise)
+		if o == null:
+			return false
+		today_case = c
+		play_arrival(false)
+		return true
+	if st == &"ot":
 		var ts := _ts()
 		ts.overtime = true
 		if not _ot_this_shift:
 			_ot_this_shift = true
 			ot_this_week += 1
-	board.remove_at(i)
-	current_job = job
+	current_job = j
 	today_case = c
-	_board_dirty = true
 	play_arrival(true)
+	return true
 
 
-func reject_job(i: int) -> void:
-	if i < 0 or i >= board.size():
-		return
-	board.remove_at(i)
+## นัดคนหน้าประตูมาเป็นคิวแรกของวันเปิดร้านถัดไป · ไม่กินโควตาวันนี้ ไม่หักชื่อเสียง · คนที่นัดไว้แล้วเลื่อนอีกไม่ได้ · วันสุดท้ายของเกมนัดไม่ได้
+func door_can_appoint() -> bool:
+	var j := door_front()
+	var ts := _ts()
+	return not j.is_empty() and not _working and not bool(j.get("appointed", false)) and ts != null and ts.shift < TimeSystem.TOTAL_SHIFTS
+
+
+func door_appoint() -> bool:
+	if not door_can_appoint():
+		return false
+	var j: Dictionary = door_queue.pop_front()
+	appointments.append({ "case": j["case"], "free": bool(j.get("free", false)) })
+	_board_dirty = true
+	return true
+
+
+## ปฏิเสธคนหน้าประตู → ชื่อเสียง rep_reject
+func door_reject() -> bool:
+	if door_queue.is_empty() or _working:
+		return false
+	door_queue.pop_front()
 	GameState.add_reputation(_econ().rep_reject)
 	_board_dirty = true
+	return true
 
 
 ## ไม่มีงานที่อยากรับ — รอลูกค้า 30 นาที
@@ -1028,7 +1162,11 @@ func _reset_run() -> void:
 	_show_demo_banner(false)
 	_pending_summary_week = 0
 	week_results.clear()
-	board.clear()
+	door_queue.clear()
+	appointments.clear()
+	accepted_today = 0
+	_door_tick = -1
+	shelf = RepairShelf.new(_econ())
 	retry_cases.clear()
 	_retried.clear()
 	walkouts.clear()
@@ -1064,7 +1202,7 @@ func _process(delta: float) -> void:
 	_watchdog(delta)
 	var want := _decide_card()
 	# [0.2.0] วันใหม่: ปิ๊บบอก "ผ่านไป n วัน" ก่อนการ์ดแรกของวัน (หลังสรุปเดือน/บทเนื้อเรื่องจบแล้ว)
-	if _day_skip_pending and want in [Card.BOARD, Card.JOB_FORCED, Card.SHIFT_END]:
+	if _day_skip_pending and want in [Card.DOOR, Card.JOB_FORCED, Card.SHIFT_END]:
 		_day_skip_pending = false
 		_play_day_skip()
 		return
@@ -1090,12 +1228,12 @@ func _process(delta: float) -> void:
 		_panel.visible = false
 		_board_panel.visible = false
 		_cards_tab.visible = true
-		_cards_tab.text = "กระดานงาน (%d)" % board.size() if want == Card.BOARD else "ดูการ์ดงาน"
+		_cards_tab.text = "หน้าร้าน (%d)" % door_queue.size() if want == Card.DOOR else "ดูการ์ดงาน"
 		_place_cards_tab()
 		return
 	_cards_tab.visible = false
 	_avoid_goal_card()
-	if want != _card or (want == Card.BOARD and _board_dirty) or not (_board_panel.visible or _panel.visible or (month_summary and month_summary.visible)):
+	if want != _card or (want == Card.DOOR and _board_dirty) or not (_board_panel.visible or _panel.visible or (month_summary and month_summary.visible)):
 		_show_card(want)
 
 
@@ -1139,7 +1277,7 @@ func _decide_card() -> Card:
 	var ts := _ts()
 	if _close_requested or ts.current_minute >= TimeSystem.CLOSE:
 		return Card.SHIFT_END
-	return Card.BOARD
+	return Card.DOOR
 
 
 func _loop_active() -> bool:
@@ -1168,10 +1306,10 @@ func _stars(level: int) -> String:
 func _show_card(card: Card) -> void:
 	_card = card
 	_board_dirty = false
-	if card == Card.BOARD:
+	if card == Card.DOOR:
 		_panel.visible = false
 		_board_panel.visible = true
-		_fill_board()
+		_fill_door()
 		return
 	_board_panel.visible = false
 	_panel.visible = true
@@ -1221,17 +1359,18 @@ func _show_card(card: Card) -> void:
 			if r.get("gave_up", false):
 				_title.text = "Task Fail · ส่งเครื่องคืนตามสภาพ"
 				_body.text += "\n\nไม่เป็นไรนะ! ลูกค้าจะเอาเครื่องกลับมาให้ลองใหม่วันพรุ่งนี้" if c and not c.forced else ""
-			_primary.text = "กลับกระดานงาน"
+			_primary.text = "กลับหน้าร้าน"
 		Card.SHIFT_END:
 			var earned := GameState.money - shift_start_money
 			var ot := ot_slots_now()
 			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · " + TimeSystem.clock_text(ts.current_minute) + " น.") if ts.show_clock else ""]
-			# [0.2.5] ลูกค้าวันนี้ที่ยังไม่ได้รับงาน → กลับบ้านตอนปิดร้าน · งานนัด/แก้ตัวยังรอต่อได้
-			var unserved := board.filter(func(j: Dictionary) -> bool: return bool(j.get("walkin", false)) and int(j.get("due_shift", 0)) <= ts.shift).size()
-			var carried := board.size() - unserved
-			var board_line := "ลูกค้าที่ยังไม่ได้รับ %d คน จะกลับบ้าน (ชื่อเสียง %d)" % [unserved, unserved * _econ().rep_left_unserved] if unserved > 0 else "รับลูกค้าครบทุกคน"
-			if carried > 0:
-				board_line += " · งานนัดค้าง %d ใบ (ต่อวันเปิดร้านถัดไป)" % carried
+			# [0.3.0] คนที่ยังยืนหน้าประตู → กลับบ้านตอนปิดร้าน · คนที่นัดไว้มาวันเปิดร้านถัดไป
+			var unserved := door_queue.size()
+			var board_line := "ลูกค้าหน้าร้าน %d คนยังไม่ได้คุย จะกลับบ้าน (ชื่อเสียง %d)" % [unserved, unserved * _econ().rep_left_unserved] if unserved > 0 else "คุยกับลูกค้าหน้าร้านครบทุกคน"
+			if not walkouts.is_empty():
+				board_line += "\nรอนานจนเดินกลับ %d คน" % walkouts.size()
+			if not appointments.is_empty():
+				board_line += "\nนัดไว้วันเปิดร้านถัดไป %d คน" % appointments.size()
 			_body.text = "งานเสร็จวันนี้ %d งาน · รายได้ %s฿%d\n%s%s\nชื่อเสียง %d · %s" % [
 				shift_results.size(),
 				"+" if earned >= 0 else "−",
@@ -1295,93 +1434,135 @@ func _show_card(card: Card) -> void:
 			_primary.text = "กลับบ้าน"
 
 
-## กระดานงาน — แถวละ 1 งาน: ลูกค้า · ระดับ · อาการ (ไม่บอก Part) · เวลา · ค่าแรง · กำหนดรับ · [รับงาน] [ปฏิเสธ]
-func _fill_board() -> void:
+## [0.3.0 ขั้น B] หน้าประตู (ยังใช้กระดาษงานเดิม · ฉากจริง door_card.tscn ขั้น C)
+## หัว: วัน/เทิร์นที่เหลือ · โน้ต: ลูกค้าวันนี้ · รับแล้ว n/3 · คนที่กลับไป · แถวคนหน้าประตู + [รับเครื่อง] [นัดวันเปิดร้านถัดไป] [ปฏิเสธ] · คิวที่รอ
+func _fill_door() -> void:
 	var ts := _ts()
 	for n in _board_list.get_children():
 		_board_list.remove_child(n)
 		n.queue_free()
 	if ts.show_clock:
-		_board_title.text = "กระดานงาน · กะ %d/%d · %s น. · เหลือ %s" % [
+		_board_title.text = "หน้าร้าน · กะ %d/%d · %s น. · เหลือ %s" % [
 			ts.shift_in_week(),
 			TimeSystem.SHIFTS_PER_WEEK,
 			TimeSystem.clock_text(ts.current_minute),
 			TimeSystem.slots_text(floori(ts.remaining_work_minutes() / float(TimeSystem.SLOT_MIN))),
 		]
 	else:
-		_board_title.text = "กระดานงาน · บทที่ %d วันที่ %d/%d · เหลือ %s" % [
+		_board_title.text = "หน้าร้าน · บทที่ %d วันที่ %d/%d · เหลือ %s" % [
 			ts.chapter(),
 			ts.shift_in_week(),
 			TimeSystem.SHIFTS_PER_WEEK,
 			TimeSystem.turns_text(ts.turns_left()),
 		]
+	var e := _econ()
 	var note := visitors_line()
+	note += "\nวันนี้รับเครื่องแล้ว %d/%d คน%s" % [accepted_today, e.daily_cap, " · วันนี้คิวเต็ม (นัดวันถัดไปได้)" if quota_left() <= 0 else ""]
 	if not left_home.is_empty():
-		note += "\nวันก่อนไม่ได้รับงาน กลับบ้านไป: %s (ชื่อเสียง %d/คน)" % [", ".join(left_home), _econ().rep_left_unserved]
+		note += "\nวันก่อนไม่ได้คุย กลับบ้านไป: %s (ชื่อเสียง %d/คน)" % [", ".join(left_home), e.rep_left_unserved]
 	if not walkouts.is_empty():
-		note += "\nลูกค้าเดินออกเพราะรอนานเกิน: %s" % ", ".join(walkouts)
-	if board.is_empty():
-		note += "\nยังไม่มีงานรอ — รอลูกค้ารอบถัดไป หรือปิดร้าน (ช่วงพักบ่ายมักมีโทรเข้า)"
+		note += "\nรอนานเกินจนเดินกลับ: %s" % ", ".join(walkouts)
+	if door_queue.is_empty():
+		note += "\nยังไม่มีลูกค้าหน้าร้าน — รอรอบถัดไป หรือปิดร้าน (ช่วงพักบ่ายมักมีโทรเข้า)"
 	_board_note.text = note
 	_board_note.visible = note != ""
-	for i in board.size():
-		var job: Dictionary = board[i]
-		var c: CustomerCase = job["case"]
-		var row := PanelContainer.new()
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(1, 1, 1, 0.55)
-		sb.set_corner_radius_all(8)
-		sb.set_content_margin_all(8)
-		row.add_theme_stylebox_override("panel", sb)
-		_board_list.add_child(row)
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 8)
-		row.add_child(h)
-		var text := VBoxContainer.new()
-		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		h.add_child(text)
-		var head := Label.new()
-		head.text = "%s · %s %s" % [c.customer, c.level_name(), _stars(c.level)]
-		head.add_theme_font_size_override("font_size", 17)
-		head.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
-		# [20 ต.ค.] ไอคอนโทรศัพท์วาดเอง แทนอีโมจิ 📞 (เว็บไม่มีฟอนต์อีโมจิ)
-		if job["phone"]:
-			text.add_child(Icons.row(&"phone", head, 18))
-		else:
-			text.add_child(head)
-		var due: int = int(job["due_shift"]) - ts.shift
-		var body := Label.new()
-		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		body.add_theme_font_size_override("font_size", 14)
-		body.add_theme_color_override("font_color", Color(0.15, 0.12, 0.1))
-		body.text = "อาการ: %s\nมาเพราะ: %s\nใช้ %s · ฿%d · %s" % [
-			c.symptom,
-			c.reason,
-			_cost_text(job_slots(c)),
-			_fee(c),
-			"ต้องเสร็จวันนี้" if due <= 0 else "รับภายใน %d วัน" % due,
-		]
-		text.add_child(body)
-		var btns := VBoxContainer.new()
-		h.add_child(btns)
-		var take := Button.new()
-		take.focus_mode = Control.FOCUS_NONE
-		match job_fit(c):
-			&"ok":
-				take.text = "รับงาน"
-			&"ot":
-				take.text = "รับงาน\n(ล่วงเวลา)"
-			_:
-				take.text = "เทิร์นไม่พอ"
-				take.disabled = true
-		take.pressed.connect(accept_job.bind(i))
-		btns.add_child(take)
-		var no := Button.new()
-		no.focus_mode = Control.FOCUS_NONE
-		no.text = "ปฏิเสธ"
-		no.pressed.connect(reject_job.bind(i))
-		btns.add_child(no)
+	if not door_queue.is_empty():
+		_board_list.add_child(_door_row(door_queue[0]))
+	if door_queue.size() > 1:
+		var rest := PackedStringArray()
+		for k in range(1, door_queue.size()):
+			var j: Dictionary = door_queue[k]
+			rest.append("%s%s (รอได้อีก %s)" % [
+				(j["case"] as CustomerCase).customer,
+				" [โทรมา]" if bool(j.get("phone", false)) else (" [นัดไว้]" if bool(j.get("appointed", false)) else ""),
+				TimeSystem.turns_text(door_patience_left(j)),
+			])
+		var q := Label.new()
+		q.name = "Queue"
+		q.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		q.add_theme_font_size_override("font_size", 14)
+		q.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
+		q.text = "รอคิวอีก %d คน: %s" % [door_queue.size() - 1, " · ".join(rest)]
+		_board_list.add_child(q)
 	_board_wait.disabled = ts.remaining_work_minutes() <= 0
+
+
+## แถวคนหน้าประตู: ลูกค้า · ระดับ · เครื่อง · อาการ (ไม่บอก Part) · เวลา · ค่าแรง · รอได้อีก · ปุ่ม 3 ปุ่ม
+func _door_row(j: Dictionary) -> PanelContainer:
+	var c: CustomerCase = j["case"]
+	var phone := bool(j.get("phone", false))
+	var row := PanelContainer.new()
+	row.name = "Front"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 1, 1, 0.55)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(8)
+	row.add_theme_stylebox_override("panel", sb)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 8)
+	row.add_child(h)
+	var text := VBoxContainer.new()
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h.add_child(text)
+	var head := Label.new()
+	head.text = "%s · %s %s%s" % [c.customer, c.level_name(), _stars(c.level), "  · นัดไว้" if bool(j.get("appointed", false)) else ""]
+	head.add_theme_font_size_override("font_size", 17)
+	head.add_theme_color_override("font_color", Color(0.35, 0.2, 0.08))
+	# [20 ต.ค.] ไอคอนโทรศัพท์วาดเอง แทนอีโมจิ 📞 (เว็บไม่มีฟอนต์อีโมจิ)
+	if phone:
+		text.add_child(Icons.row(&"phone", head, 18))
+	else:
+		text.add_child(head)
+	var body := Label.new()
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_theme_font_size_override("font_size", 14)
+	body.add_theme_color_override("font_color", Color(0.15, 0.12, 0.1))
+	body.text = "%sอาการ: %s\nมาเพราะ: %s\nใช้ %s · ฿%d · %s\n%s" % [
+		("เครื่อง: %s\n" % c.device) if c.device != "" else "",
+		c.symptom,
+		c.reason,
+		_cost_text(job_slots(c)),
+		_fee(c),
+		"ทำต่อหน้าลูกค้า" if not c.takes_machine() else "ต้องรับเครื่องไว้",
+		"โทรมาขอนัดเอาเครื่องมาวันเปิดร้านถัดไป" if phone else "รอได้อีก %s" % TimeSystem.turns_text(door_patience_left(j)),
+	]
+	text.add_child(body)
+	var btns := VBoxContainer.new()
+	h.add_child(btns)
+	var take := Button.new()
+	take.name = "Accept"
+	take.focus_mode = Control.FOCUS_NONE
+	match door_accept_state():
+		&"ok":
+			take.text = "รับเครื่อง"
+		&"ot":
+			take.text = "รับเครื่อง\n(ล่วงเวลา)"
+		&"full":
+			take.text = "วันนี้คิวเต็ม"
+			take.disabled = true
+		&"phone":
+			take.visible = false
+		_:
+			take.text = "เทิร์นไม่พอ"
+			take.disabled = true
+	take.pressed.connect(func() -> void: door_accept())
+	btns.add_child(take)
+	var appoint := Button.new()
+	appoint.name = "Appoint"
+	appoint.focus_mode = Control.FOCUS_NONE
+	appoint.text = "นัดวันเปิด\nร้านถัดไป"
+	appoint.disabled = not door_can_appoint()
+	if bool(j.get("appointed", false)):
+		appoint.tooltip_text = "นัดไว้แล้ว เลื่อนอีกไม่ได้"
+	appoint.pressed.connect(func() -> void: door_appoint())
+	btns.add_child(appoint)
+	var no := Button.new()
+	no.name = "Reject"
+	no.focus_mode = Control.FOCUS_NONE
+	no.text = "ปฏิเสธ"
+	no.pressed.connect(func() -> void: door_reject())
+	btns.add_child(no)
+	return row
 
 
 func _on_primary() -> void:
@@ -1549,7 +1730,9 @@ func _build_ui() -> void:
 	_board_note.add_theme_color_override("font_color", Color(0.6, 0.2, 0.1))
 	bbox.add_child(_board_note)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(508, 380)
+	scroll.name = "List"
+	scroll.custom_minimum_size = Vector2(508, BOARD_LIST_MAX)
+	_board_scroll = scroll
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	bbox.add_child(scroll)
 	_board_list = VBoxContainer.new()
@@ -1593,29 +1776,53 @@ func _build_ui() -> void:
 ## [14 พ.ย.] การ์ดงาน/กระดานงาน (ชั้น 90) วางต่อใต้การ์ดเป้าหมาย (ชั้น 100) ไม่ให้ถูกทับ
 ## สูงไม่พอ → พับการ์ดเป้าหมายให้ชั่วคราว แล้วกางคืนเมื่อการ์ดงานปิด (ถ้าผู้เล่นไม่ได้พับเอง)
 const CARD_Y := { "DayCard": 120.0, "JobBoard": 100.0 }
+## ขอบล่างที่การ์ดงานห้ามเลย (จอ 648 เว้น 8)
+const CARD_BOTTOM := 640.0
+## [14 พ.ย.] ความสูงรายการในการ์ดหน้าร้าน: สูงตามเนื้อหา ไม่เกินที่เหลือบนจอ (เดิมตายตัว 380 → ปุ่มล่างล้นจอ)
+const BOARD_LIST_MIN := 90.0
+const BOARD_LIST_MAX := 380.0
+var _board_scroll: ScrollContainer
 var _goal_auto_collapsed := false
 
 
 func _avoid_goal_card() -> void:
 	var qb = EventManager.questboard if EventManager and "questboard" in EventManager else null
-	if qb == null or not qb.has_method(&"bottom_y"):
-		return
+	var has_qb: bool = qb != null and qb.has_method(&"bottom_y")
 	var any := false
 	for p: Control in [_panel, _board_panel]:
 		if p == null or not p.visible:
 			continue
 		any = true
 		var base: float = CARD_Y.get(String(p.name), 100.0)
-		var y := maxf(base, qb.bottom_y() + 10.0)
-		if y + p.size.y > 640.0 and not qb.collapsed:
+		var y := maxf(base, qb.bottom_y() + 10.0) if has_qb else base
+		if p == _board_panel:
+			_fit_board(y)
+		if has_qb and y + p.get_combined_minimum_size().y > CARD_BOTTOM and not qb.collapsed:
 			qb.set_collapsed(true)
 			_goal_auto_collapsed = true
 			y = maxf(base, qb.bottom_y() + 10.0)
+			if p == _board_panel:
+				_fit_board(y)
 		p.position.y = y
+	if not has_qb:
+		return
 	if not any and _goal_auto_collapsed:
 		_goal_auto_collapsed = false
 		if qb.collapsed:
 			qb.set_collapsed(false)
+
+
+## รายการในการ์ดหน้าร้านสูงเท่าเนื้อหา (BOARD_LIST_MIN–MAX) แต่ไม่ให้การ์ดทั้งใบเลย CARD_BOTTOM เมื่อวางที่ top (ล้นก็เลื่อนดูในรายการ)
+func _fit_board(top: float) -> void:
+	if _board_scroll == null or _board_list == null:
+		return
+	var chrome := _board_panel.get_combined_minimum_size().y - _board_scroll.custom_minimum_size.y
+	var room := CARD_BOTTOM - top - chrome
+	var want := clampf(_board_list.get_combined_minimum_size().y, BOARD_LIST_MIN, BOARD_LIST_MAX)
+	var h := clampf(want, BOARD_LIST_MIN, maxf(room, BOARD_LIST_MIN))
+	if absf(_board_scroll.custom_minimum_size.y - h) > 0.5:
+		_board_scroll.custom_minimum_size.y = h
+		_board_panel.reset_size()
 
 
 ## [13 พ.ย.] ปุ่ม "ดูการ์ดงาน" ชิดขวา ต่อใต้การ์ดเป้าหมาย (QuestBoard) — การ์ดสูงเปลี่ยนตามจำนวนเควสต์

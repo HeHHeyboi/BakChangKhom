@@ -1,5 +1,5 @@
 extends Node
-## [Claude 9 ต.ค. 2569 · 0.2.5 1 บท = 1 เดือน] ทดสอบลูปกะ/บท/เดือน (LEVEL_DESIGN ข้อ 4–7): TimeSystem · ปลดระดับ · กระดานงาน · ล่วงเวลา · สรุปสัปดาห์
+## [Claude 9 ต.ค. 2569 · 0.2.5 1 บท = 1 เดือน] ทดสอบลูปกะ/บท/เดือน (LEVEL_DESIGN ข้อ 4–7): TimeSystem · ปลดระดับ · หน้าประตู (0.3.0) · ล่วงเวลา · สรุปสัปดาห์
 ## เปิด Test/loop_test.tscn → F6 → Output ต้องจบด้วย "T DONE fails=0" · มินิเกมเปิดจริงแล้วปิดทันที (คะแนนสมมติ)
 
 var fails := 0
@@ -99,14 +99,14 @@ func _ready() -> void:
 	_check(w1[0] == 70.0 and w1[1] == 30.0, "สัปดาห์ 1: Lv1 70 · Lv2 30 (มีงานขมOS แล้ว) (%s)" % w1)
 	var w3 := DayLoop.effective_weights(3)
 	_check(w3[2] == 0.0, "สัปดาห์ 3 ก่อนได้ ⭐⭐: Lv3 ยังไม่ขึ้น (%s)" % w3)
-	var ids := DayLoop.board.map(func(j: Dictionary) -> StringName: return j["case"].id)
+	var ids := DayLoop.door_queue.map(func(j: Dictionary) -> StringName: return j["case"].id)
 	var uniq := { }
 	for i in ids:
 		uniq[i] = true
 	# [0.2.5] ลูกค้า 5 คน (ชื่อเสียง 20 = ปกติ) ทยอยมา 3 รอบ: เปิดร้าน 3 · 11:00 1 · 14:00 1
 	_check(DayLoop.visitors_today == 5 and GameState.economy.split_waves(5) == PackedInt32Array([3, 1, 1]) and DayLoop.visitor_waves.size() == 2, "ลูกค้าวันนี้ 5 คน แบ่ง 3 · 1 · 1 (%s)" % [DayLoop.visitor_waves])
-	_check(DayLoop.board.size() == 3 and uniq.size() == 3 and DayLoop.board.all(func(j: Dictionary) -> bool: return j["case"].level <= 2 and j.get("walkin", false)),
-		"กะ 1 เปิดร้านมีลูกค้า Lv1–2 %d คน (ไม่ซ้ำ · รอได้แค่วันนี้) %s" % [DayLoop.board.size(), ids])
+	_check(DayLoop.door_queue.size() == 3 and uniq.size() == 3 and DayLoop.door_queue.all(func(j: Dictionary) -> bool: return j["case"].level <= 2 and not j.phone and not j.appointed),
+		"[0.3.0] กะ 1 เปิดร้านมีลูกค้า Lv1–2 ยืนหน้าประตู %d คน (ไม่ซ้ำ) %s" % [DayLoop.door_queue.size(), ids])
 	var e := GameState.economy
 	_check(e.visitors_for(1, 10) == 4 and e.visitors_for(1, 20) == 5 and e.visitors_for(1, 45) == 6 and e.visitors_for(1, 80) == 7 and e.visitors_for(9, 0) == 2 and e.visitors_for(8, 0) == 2, "[0.2.5] ชื่อเสียงคุมจำนวนลูกค้า: <20 → 4 · 20 → 5 · 45 → 6 · 80 → 7 · ก.ย./ส.ค. ชื่อเสียง 0 → ขั้นต่ำ 2")
 	_check(e.visitors_for(2, 20) == 6 and e.visitors_for(6, 20) == 3 and String(e.month_event(4).name) == "สงกรานต์" and e.month_events.size() == 12 and e.month_event_notes.size() == 12 and e.month_visitor_bonus.size() == 12, "[0.2.5] เทศกาล: ตรุษจีน +1 · บุญบั้งไฟ −1 · เม.ย. = สงกรานต์ · ครบ 12 เดือน")
@@ -139,23 +139,24 @@ func _ready() -> void:
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
 	DayLoop._on_primary()
 	await _frames(3)
-	_check(DayLoop._card == DayLoop.Card.BOARD and DayLoop._board_list.get_child_count() == DayLoop.board.size(), "กลับกระดานงาน (%d ใบ)" % DayLoop.board.size())
+	_check(DayLoop._card == DayLoop.Card.DOOR and DayLoop.door_queue.size() == 4 and DayLoop._board_list.get_child_count() == 2, "[0.3.0] กลับหน้าร้าน · ระหว่างงานเนื้อเรื่องลูกค้าไม่หมดความอดทน (%d คน)" % DayLoop.door_queue.size())
 	var job_text: String = ""
 	for n in DayLoop._board_list.get_children():
 		job_text += _all_text(n)
-	_check(not job_text.contains("ทำความสะอาดแรม") and job_text.contains("อาการ"), "การ์ดบนกระดานบอกอาการ ไม่บอก Part/ชื่องาน")
+	_check(not job_text.contains("ทำความสะอาดแรม") and job_text.contains("อาการ") and job_text.contains("รอคิวอีก 3 คน"), "การ์ดหน้าประตูบอกอาการ ไม่บอก Part/ชื่องาน · บอกคิวที่รอ")
 	# [Claude 9 ต.ค.] กระดานสัปดาห์ 1 มี Lv1 (ขมOS) ปน → เลือกงาน Lv2 ใบแรก (ไม่มีก็เติมงาน)
 	var j2 := -1
 	for tries in 60: # งาน Lv2 ซ่อมแรม (เคยทำแล้ว → ไม่บวกช่องครั้งแรก · เวลาคาดได้)
-		for i in DayLoop.board.size():
-			if DayLoop.board[i]["case"].level == 2 and DayLoop.board[i]["case"].part_id == "part_ram":
+		for i in DayLoop.door_queue.size():
+			if DayLoop.door_queue[i]["case"].level == 2 and DayLoop.door_queue[i]["case"].part_id == "part_ram":
 				j2 = i
 				break
 		if j2 >= 0:
 			break
 		_swap_job()
-	var c0: CustomerCase = DayLoop.board[j2]["case"]
-	DayLoop.accept_job(j2)
+	var c0: CustomerCase = _to_front(j2)["case"]
+	_check(DayLoop.door_accept(), "รับเครื่องคนหน้าประตู (ซ่อมเลย)")
+	_check(DayLoop.accepted_today == 1, "[0.3.0] รับแล้ววันนี้ 1/3")
 	await _frames(2)
 	_check(DialogScene.visible and DayLoop.today_case == c0, "รับงาน → บทลูกค้า %s" % c0.customer)
 	DialogScene.dialog_end()
@@ -164,18 +165,20 @@ func _ready() -> void:
 	_check(GameState.level_unlocked(3), "ได้ ⭐⭐ Lv2 ครบ 2 งาน → ปลด Lv3")
 	DayLoop._on_primary()
 	await _frames(2)
+	_check(DayLoop.walkouts.size() == 3 and DayLoop.door_queue.is_empty(), "[0.3.0] ซ่อม 3 เทิร์น → คนที่ยืนรอ 3 คนหมดความอดทน เดินกลับ (%s)" % [DayLoop.walkouts])
+	DayLoop.add_visitors(1)
 	var rep := GameState.reputation
-	var n_before := DayLoop.board.size()
-	DayLoop.reject_job(0)
-	_check(DayLoop.board.size() == n_before - 1 and GameState.reputation == rep + GameState.economy.rep_reject, "ปฏิเสธงาน → หายจากกระดาน ชื่อเสียง −1")
+	var n_before := DayLoop.door_queue.size()
+	DayLoop.door_reject()
+	_check(DayLoop.door_queue.size() == n_before - 1 and GameState.reputation == rep + GameState.economy.rep_reject, "ปฏิเสธ → ลูกค้าหน้าประตูกลับไป ชื่อเสียง −1")
 
 	# ล่วงเวลา
-	DayLoop.add_jobs(2)
 	ts.set_clock(17 * 60 + 30)
+	DayLoop.add_visitors(2)
 	var j_ot := -1
 	for tries in 30: # งาน Lv1 (1 ช่อง) ไม่ล่วงเวลา → เติมงานจนมี Lv2
-		for i in DayLoop.board.size():
-			if DayLoop.job_fit(DayLoop.board[i]["case"]) == &"ot" and DayLoop.job_slots(DayLoop.board[i]["case"]) == 3: # [10 ต.ค.] งานโต๊ะช่าง 4 ช่องทำให้สุ่มพลาด
+		for i in DayLoop.door_queue.size():
+			if not DayLoop.door_queue[i].phone and DayLoop.job_fit(DayLoop.door_queue[i]["case"]) == &"ot" and DayLoop.job_slots(DayLoop.door_queue[i]["case"]) == 3: # [10 ต.ค.] งานโต๊ะช่าง 4 ช่องทำให้สุ่มพลาด
 				j_ot = i
 				break
 		if j_ot >= 0:
@@ -183,7 +186,8 @@ func _ready() -> void:
 		_swap_job()
 	_check(j_ot >= 0, "17:30 งาน 3 ช่อง → ต้องล่วงเวลา")
 	if j_ot >= 0:
-		DayLoop.accept_job(j_ot)
+		_to_front(j_ot)
+		_check(DayLoop.door_accept_state() == &"ot" and DayLoop.door_accept(), "รับเครื่อง (ล่วงเวลา)")
 		await _frames(2)
 		DialogScene.dialog_end()
 		await _finish_minigame(70)
@@ -197,12 +201,12 @@ func _ready() -> void:
 	await _frames(3)
 	_check(ts.shift == 2 and GameState.money == money_before - DayLoop.ot_slots_now() - 1 * GameState.economy.ot_cost_per_slot,
 		"ปิดร้าน → กะ 2 · จ่ายค่าไฟล่วงเวลา 1 ช่อง ฿30")
-	_check(DayLoop._card == DayLoop.Card.BOARD and DayLoop.board.size() > 0, "กะ 2 กระดานมีงาน (%d ใบ)" % DayLoop.board.size())
+	_check(DayLoop._card == DayLoop.Card.DOOR and DayLoop.door_queue.size() > 0 and DayLoop.accepted_today == 0, "กะ 2 มีลูกค้าหน้าประตู (%d คน) · โควตาเริ่มใหม่" % DayLoop.door_queue.size())
 
 	# [10 ต.ค.] ย่อกระดาษงาน → เหลือแถบ · กดแถบ → กลับมา
 	DayLoop.set_cards_hidden(true)
 	await _frames(3)
-	_check(not DayLoop._board_panel.visible and DayLoop._cards_tab.visible and DayLoop._cards_tab.text.contains("กระดานงาน"), "ย่อกระดานงาน → เหลือแถบมุมขวา")
+	_check(not DayLoop._board_panel.visible and DayLoop._cards_tab.visible and DayLoop._cards_tab.text.contains("หน้าร้าน"), "ย่อการ์ดหน้าร้าน → เหลือแถบมุมขวา")
 	DayLoop._cards_tab.pressed.emit()
 	await _frames(3)
 	_check(DayLoop._board_panel.visible and not DayLoop._cards_tab.visible, "กดแถบ → กระดานงานกลับมา")
@@ -234,7 +238,7 @@ func _ready() -> void:
 	await _finish_minigame(90)
 	DayLoop._on_primary()
 	await _frames(3)
-	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.BOARD, "สัปดาห์ 2 กะ 1 → กระดานงาน")
+	_check(ts.week() == 2 and DayLoop._card == DayLoop.Card.DOOR, "สัปดาห์ 2 กะ 1 → หน้าร้าน")
 	_check(DayLoop.effective_weights(2)[2] > 0.0, "สัปดาห์ 2 มีสัดส่วน Lv3 แล้ว (%s)" % DayLoop.effective_weights(2))
 
 	# [10 ต.ค.] จบบท (demo_shifts): ปิดร้านกะสุดท้าย → การ์ดจบบท → กลับบ้าน → บทยาย → ป้าย "กำลังพัฒนา"
@@ -270,11 +274,11 @@ func _ready() -> void:
 	_check(toast != null and toast.get_parent().name == "ToastLayer" and (toast.get_parent() as CanvasLayer).layer == 104, "ป้ายลูกค้าเข้าร้านอยู่ใน day_loop.tscn → ToastLayer ชั้น 104")
 	toast.clear()
 	ts.set_clock(11 * 60)
-	_check(DayLoop.visitors_arrived == 4 and DayLoop.board.size() == 4 and toast._queue.size() == 1 and toast._queue[0][0] == "ลูกค้าเดินเข้าร้าน 1 คน", "11:00 ลูกค้ารอบ 2 เข้าร้าน + ป้ายแจ้ง")
+	_check(DayLoop.visitors_arrived == 4 and DayLoop.door_queue.size() == 4 and toast._queue.size() == 1 and toast._queue[0][0] == "มีลูกค้ามารอหน้าร้าน 1 คน", "11:00 ลูกค้ารอบ 2 มารอหน้าร้าน + ป้ายแจ้ง (ลุงอำนวยยังไม่มา ความอดทนไม่เดิน)")
 	ts.set_clock(14 * 60 + 30)
 	_check(DayLoop.visitors_arrived == 5 and DayLoop.visitor_waves.is_empty(), "14:00 ครบ 5 คน")
 	var rep_close := GameState.reputation
-	var n_left := DayLoop.board.size()
+	var n_left := DayLoop.door_queue.size()
 	ts.end_shift()
 	await _frames(2)
 	_check(DayLoop.left_home.size() == n_left and GameState.reputation == rep_close + n_left * GameState.economy.rep_left_unserved and DayLoop.walkouts.is_empty(), "ปิดร้าน → ลูกค้า %d คนกลับบ้าน ชื่อเสียง −1/คน (%d → %d)" % [n_left, rep_close, GameState.reputation])
@@ -364,13 +368,22 @@ func _finish_minigame(score: int) -> void:
 
 ## เอางาน Lv1 ใบแรกออกจากกระดาน (ไม่หักชื่อเสียง) แล้วสุ่มใบใหม่ — ใช้หางาน Lv2 ในสัปดาห์ที่ Lv1 70%
 func _swap_job() -> void:
-	for i in DayLoop.board.size():
-		var c: CustomerCase = DayLoop.board[i]["case"]
+	for i in DayLoop.door_queue.size():
+		var c: CustomerCase = DayLoop.door_queue[i]["case"]
 		if not (c.level == 2 and c.part_id == "part_ram"):
-			DayLoop.board.remove_at(i)
+			DayLoop.door_queue.remove_at(i)
 			break
-	DayLoop.add_jobs(1)
+	DayLoop.add_visitors(1)
 	DayLoop._board_dirty = true
+
+
+## [0.3.0] ย้ายลูกค้าคิวที่ i ขึ้นมายืนหน้าประตู (เทสต์เลือกงานที่ต้องการ)
+func _to_front(i: int) -> Dictionary:
+	var j: Dictionary = DayLoop.door_queue[i]
+	DayLoop.door_queue.remove_at(i)
+	DayLoop.door_queue.push_front(j)
+	DayLoop._board_dirty = true
+	return j
 
 
 func _all_text(n: Node) -> String:
