@@ -1,0 +1,154 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/repair_shelf_panel.gd" id="1_shelf"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Icons/icon_shelf.png" id="2_icon"]
+
+[sub_resource type="StyleBoxFlat" id="SB_btn"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.88, 0.68, 0.44, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_window"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.97, 0.94, 0.87, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_row"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="RepairShelfPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_shelf")
+row_style = SubResource("SB_row")
+
+[node name="OpenButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 336.0
+offset_top = 582.0
+offset_right = 506.0
+offset_bottom = 632.0
+tooltip_text = "ชั้นวางเครื่องที่รับไว้ซ่อม"
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_hover_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 34
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_btn")
+theme_override_styles/hover = SubResource("SB_btn_hover")
+theme_override_styles/pressed = SubResource("SB_btn_hover")
+text = "ชั้นวาง 0/2"
+icon = ExtResource("2_icon")
+
+[node name="Window" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -268.0
+offset_right = 576.0
+offset_bottom = -74.0
+grow_vertical = 0
+custom_minimum_size = Vector2(564, 0)
+theme_override_styles/panel = SubResource("SB_window")
+
+[node name="Box" type="VBoxContainer" parent="Window"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Head" type="HBoxContainer" parent="Window/Box"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Window/Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 19
+text = "ชั้นวางเครื่อง 0/2"
+
+[node name="CloseButton" type="Button" parent="Window/Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+focus_mode = 0
+text = "ปิด ✕"
+
+[node name="Note" type="Label" parent="Window/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.2, 0.1, 1)
+theme_override_font_sizes/font_size = 13
+text = "ซ่อมเสร็จก่อนวันนัด → ลูกค้ามารับตอนเปิดร้านวันนัด · เงินเข้าตอนลูกค้ามารับ"
+autowrap_mode = 3
+
+[node name="List" type="VBoxContainer" parent="Window/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Empty" type="Label" parent="Window/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.18, 1)
+theme_override_font_sizes/font_size = 15
+text = "ชั้นว่าง — รับเครื่องจากลูกค้าหน้าร้านแล้วเครื่องจะมาวางที่นี่"
+horizontal_alignment = 1
+autowrap_mode = 3

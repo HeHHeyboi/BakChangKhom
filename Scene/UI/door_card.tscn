@@ -1,0 +1,227 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/door_card.gd" id="1_door"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+bg_color = Color(0.97, 0.94, 0.87, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="SB_front"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 1, 1, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_portrait"]
+bg_color = Color(0.86, 0.78, 0.62, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.82, 0.74, 0.6, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.36, 0.62, 0.3, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="DoorCard" type="PanelContainer"]
+offset_left = 596.0
+offset_top = 100.0
+offset_right = 1136.0
+offset_bottom = 420.0
+custom_minimum_size = Vector2(540, 0)
+theme_override_styles/panel = SubResource("SB_card")
+script = ExtResource("1_door")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Head" type="HBoxContainer" parent="Box"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 19
+text = "หน้าร้าน · บทที่ 1 วันที่ 1/4 · เหลือ 16 เทิร์น"
+
+[node name="Quota" type="Label" parent="Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "รับลูกค้าใหม่ได้วันละ 3 คน (คนที่นัดไว้นับวันที่เขามา)"
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 15
+text = "รับแล้ว 0/3"
+
+[node name="HideButton" type="Button" parent="Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "ซ่อนการ์ดหน้าร้าน (กดแถบมุมขวาเพื่อเปิดคืน)"
+focus_mode = 0
+text = "ย่อ ▾"
+
+[node name="Note" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.2, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "ชื่อเสียง 20 (ปกติ) · ลูกค้าวันนี้มาแล้ว 3/5 คน"
+autowrap_mode = 3
+
+[node name="Front" type="PanelContainer" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_front")
+
+[node name="Row" type="HBoxContainer" parent="Box/Front"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitBox" type="PanelContainer" parent="Box/Front/Row"]
+custom_minimum_size = Vector2(92, 92)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("SB_portrait")
+
+[node name="Portrait" type="TextureRect" parent="Box/Front/Row/PortraitBox"]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Box/Front/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Name" type="Label" parent="Box/Front/Row/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 17
+text = "ครู · Lv2 ปกติ ★★☆☆☆"
+
+[node name="Detail" type="Label" parent="Box/Front/Row/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.12, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "เครื่อง: คอมห้องพักครู
+อาการ: จอแตก
+ใช้ 3 เทิร์น · ฿150 · ต้องรับเครื่องไว้"
+autowrap_mode = 3
+
+[node name="PatienceRow" type="HBoxContainer" parent="Box/Front/Row/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PatienceBar" type="ProgressBar" parent="Box/Front/Row/Info/PatienceRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 12)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+max_value = 2.0
+step = 1.0
+value = 2.0
+show_percentage = false
+
+[node name="PatienceLabel" type="Label" parent="Box/Front/Row/Info/PatienceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 13
+text = "รอได้อีก 2 เทิร์น"
+
+[node name="Buttons" type="VBoxContainer" parent="Box/Front/Row"]
+custom_minimum_size = Vector2(118, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Accept" type="Button" parent="Box/Front/Row/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "รับเครื่อง"
+
+[node name="Appoint" type="Button" parent="Box/Front/Row/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "นัดวันเปิด
+ร้านถัดไป"
+
+[node name="Reject" type="Button" parent="Box/Front/Row/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "ปฏิเสธ"
+
+[node name="Empty" type="Label" parent="Box"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.18, 1)
+theme_override_font_sizes/font_size = 15
+text = "ยังไม่มีลูกค้าหน้าร้าน"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Queue" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 14
+text = "รอคิวอีก 2 คน: ..."
+autowrap_mode = 3
+
+[node name="Footer" type="HBoxContainer" parent="Box"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Wait" type="Button" parent="Box/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "รอลูกค้า (+30 นาที)"
+
+[node name="Close" type="Button" parent="Box/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "ปิดร้าน"

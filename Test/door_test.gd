@@ -35,15 +35,15 @@ func _ready() -> void:
 		DayLoop.door_queue.append(DayLoop.door_entry(hw[i]))
 	_check(DayLoop.door_front().case == hw[0] and DayLoop.quota_left() == 3, "คนแรกยืนหน้าประตู · วันนี้รับได้อีก 3")
 	await _show_door()
-	_check(_btn("Accept").text == "รับเครื่อง" and not _btn("Accept").disabled and not _btn("Appoint").disabled and DayLoop._board_note.text.contains("วันนี้รับเครื่องแล้ว 0/3"), "การ์ดหน้าประตู: ปุ่มรับเครื่อง/นัด/ปฏิเสธ · ตัวนับ 0/3")
-	_check(DayLoop._board_list.get_child_count() == 2 and _all_text(DayLoop._board_list).contains("รอคิวอีก 4 คน"), "เห็นจำนวนคนที่รอคิว")
+	_check(_btn("Accept").text == "รับเครื่อง" and not _btn("Accept").disabled and not _btn("Appoint").disabled and _ui("Quota").text == "รับแล้ว 0/3", "การ์ดหน้าประตู (ฉาก DoorCard): ปุ่มรับเครื่อง/นัด/ปฏิเสธ · ตัวนับ 0/3")
+	_check(_ui("Queue").visible and _ui("Queue").text.contains("รอคิวอีก 4 คน") and _ui("PatienceBar").max_value == 2 and _ui("PatienceBar").value == 2, "เห็นจำนวนคนที่รอคิว · แถบความอดทน 2/2")
 	for i in 3:
 		_check(DayLoop.door_accept_state(1) == &"ok" and DayLoop.door_accept(1), "รับเครื่องคนที่ %d → ใบรับเครื่อง (นัดวันถัดไป)" % (i + 1))
 		await _end_dialog()
 	_check(DayLoop.accepted_today == 3 and DayLoop.shelf.used() == 3 and DayLoop.shelf.orders[0].case == hw[0] and DayLoop.shelf.orders[0].due == ts.shift + 1, "รับครบ 3 คน · เครื่องขึ้นชั้น 3 เครื่อง · นัดวันที่ %d" % (ts.shift + 1))
 	_check(DayLoop.door_accept_state(1) == &"full" and not DayLoop.door_accept(1) and DayLoop.door_queue.size() == 2, "ครบโควตา → รับคนที่ 4 ไม่ได้")
 	await _show_door()
-	_check(_btn("Accept").disabled and _btn("Accept").text == "วันนี้คิวเต็ม" and not _btn("Appoint").disabled and DayLoop._board_note.text.contains("วันนี้คิวเต็ม"), "การ์ด: \"วันนี้คิวเต็ม\" เหลือปุ่มนัด/ปฏิเสธ")
+	_check(_btn("Accept").disabled and _btn("Accept").text == "วันนี้คิวเต็ม" and not _btn("Appoint").disabled and _ui("Note").text.contains("วันนี้คิวเต็ม"), "การ์ด: \"วันนี้คิวเต็ม\" เหลือปุ่มนัด/ปฏิเสธ")
 	# งานเนื้อเรื่อง/เอาเครื่องมาลองใหม่ (free) ไม่นับโควตา
 	DayLoop.door_queue.push_front(DayLoop.door_entry(hw[5], false, false, true))
 	_check(DayLoop.door_accept_state(1) == &"ok" and DayLoop.door_accept(1) and DayLoop.accepted_today == 3, "งานเนื้อเรื่อง (free) รับได้แม้คิวเต็ม · ไม่นับโควตา")
@@ -60,7 +60,7 @@ func _ready() -> void:
 	DayLoop.door_queue.push_front(DayLoop.door_entry(hw[1], true))
 	_check(DayLoop.door_accept_state() == &"phone" and DayLoop.door_accept_state(1) == &"phone" and not DayLoop.door_accept(), "โทรเข้า → รับเครื่องไม่ได้ (ยังไม่มีเครื่อง)")
 	await _show_door()
-	_check(not _btn("Accept").visible and not _btn("Appoint").disabled and _all_text(DayLoop._board_list).contains("โทรมาขอนัด"), "การ์ดโทรเข้า: เหลือปุ่มนัด/ปฏิเสธ")
+	_check(not _btn("Accept").visible and not _btn("Appoint").disabled and _ui("PatienceLabel").text.contains("โทรมาขอนัด") and not _ui("PatienceBar").visible, "การ์ดโทรเข้า: เหลือปุ่มนัด/ปฏิเสธ")
 	_check(DayLoop.door_appoint() and DayLoop.appointments.size() == 2, "โทรเข้า → นัดเอาเครื่องมาวันถัดไป")
 	var n_before := DayLoop.door_queue.size()
 	_check(DayLoop.door_reject() and DayLoop.door_queue.size() == n_before - 1 and GameState.reputation == rep + e.rep_reject, "ปฏิเสธ → ชื่อเสียง %d" % e.rep_reject)
@@ -78,7 +78,7 @@ func _ready() -> void:
 	_check(DayLoop.appointments.is_empty() and DayLoop.door_queue.size() >= 2 and DayLoop.door_queue[0].case == who and DayLoop.door_queue[0].appointed and DayLoop.door_queue[1].case == hw[1] and DayLoop.door_queue[1].appointed and not DayLoop.door_queue[1].phone, "คนนัด 2 คนยืนหน้าประตูเป็นคิวแรก (คนโทรมาเอาเครื่องมาแล้ว)")
 	_check(not DayLoop.door_can_appoint(), "คนที่นัดไว้แล้วเลื่อนอีกไม่ได้")
 	await _show_door()
-	_check(_btn("Appoint").disabled and _all_text(DayLoop._board_list).contains("นัดไว้"), "การ์ดบอกว่านัดไว้ · ปุ่มนัดกดไม่ได้")
+	_check(_btn("Appoint").disabled and _ui("Name").text.contains("นัดไว้"), "การ์ดบอกว่านัดไว้ · ปุ่มนัดกดไม่ได้")
 	DayLoop.shelf.slots = 6
 	_check(DayLoop.door_accept(1) and DayLoop.accepted_today == 1, "รับเครื่องคนที่นัดไว้ → นับโควตาของวันนี้ (1/3)")
 	await _end_dialog()
@@ -106,7 +106,7 @@ func _ready() -> void:
 	ts.set_clock(9 * 60 + 30)
 	_check(DayLoop.door_queue.is_empty() and DayLoop.walkouts.size() == 3 and GameState.reputation == rep + 3 * e.rep_door_walkout, "เดินต่อ 1 เทิร์น → ผู้สูงอายุครบ 3 เทิร์น เดินกลับ (รวม 3 คน)")
 	await _show_door()
-	_check(DayLoop._board_note.text.contains("รอนานเกินจนเดินกลับ"), "การ์ดบอกคนที่เดินกลับ")
+	_check(_ui("Note").text.contains("รอนานเกินจนเดินกลับ"), "การ์ดบอกคนที่เดินกลับ")
 	_reset_door(11 * 60 + 30)
 	DayLoop.door_queue.append(DayLoop.door_entry(normal))
 	ts.set_clock(13 * 60)
@@ -156,7 +156,12 @@ func _show_card(card: DayLoop.Card) -> void:
 
 
 func _btn(n: String) -> Button:
-	return DayLoop._board_list.find_child(n, true, false) as Button
+	return _ui(n) as Button
+
+
+## โหนดในฉาก DoorCard (%ชื่อ)
+func _ui(n: String) -> Control:
+	return DayLoop.door_card.get_node("%" + n) as Control
 
 
 ## บทลูกค้าตอนรับเครื่อง → ปิด

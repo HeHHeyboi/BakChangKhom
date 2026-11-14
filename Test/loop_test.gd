@@ -139,10 +139,8 @@ func _ready() -> void:
 	print("T   ", DayLoop._body.text.replace("\n", " | "))
 	DayLoop._on_primary()
 	await _frames(3)
-	_check(DayLoop._card == DayLoop.Card.DOOR and DayLoop.door_queue.size() == 4 and DayLoop._board_list.get_child_count() == 2, "[0.3.0] กลับหน้าร้าน · ระหว่างงานเนื้อเรื่องลูกค้าไม่หมดความอดทน (%d คน)" % DayLoop.door_queue.size())
-	var job_text: String = ""
-	for n in DayLoop._board_list.get_children():
-		job_text += _all_text(n)
+	_check(DayLoop._card == DayLoop.Card.DOOR and DayLoop.door_queue.size() == 4 and DayLoop.door_card.visible and DayLoop.door_card.get_node("%Front").visible, "[0.3.0] กลับหน้าร้าน (ฉาก DoorCard) · ระหว่างงานเนื้อเรื่องลูกค้าไม่หมดความอดทน (%d คน)" % DayLoop.door_queue.size())
+	var job_text: String = _all_text(DayLoop.door_card)
 	_check(not job_text.contains("ทำความสะอาดแรม") and job_text.contains("อาการ") and job_text.contains("รอคิวอีก 3 คน"), "การ์ดหน้าประตูบอกอาการ ไม่บอก Part/ชื่องาน · บอกคิวที่รอ")
 	# [Claude 9 ต.ค.] กระดานสัปดาห์ 1 มี Lv1 (ขมOS) ปน → เลือกงาน Lv2 ใบแรก (ไม่มีก็เติมงาน)
 	var j2 := -1

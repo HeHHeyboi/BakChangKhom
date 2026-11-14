@@ -69,6 +69,9 @@
 [ext_resource type="PackedScene" path="res://Scene/UI/visitor_toast.tscn" id="ui_toast"]
 [ext_resource type="PackedScene" path="res://Scene/UI/job_reminder.tscn" id="ui_reminder"]
 [ext_resource type="PackedScene" path="res://Scene/UI/reward_popup.tscn" id="ui_popup"]
+[ext_resource type="PackedScene" path="res://Scene/UI/door_card.tscn" id="ui_door"]
+[ext_resource type="PackedScene" path="res://Scene/UI/work_order_card.tscn" id="ui_workorder"]
+[ext_resource type="PackedScene" path="res://Scene/UI/repair_shelf.tscn" id="ui_shelf"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
@@ -105,3 +108,19 @@ layer = 11
 layer = 106
 
 [node name="RewardPopup" parent="PopupLayer" instance=ExtResource("ui_popup")]
+
+[node name="DoorLayer" type="CanvasLayer" parent="."]
+layer = 90
+
+[node name="DoorCard" parent="DoorLayer" instance=ExtResource("ui_door")]
+visible = false
+
+[node name="WorkOrderLayer" type="CanvasLayer" parent="."]
+layer = 91
+
+[node name="WorkOrderCard" parent="WorkOrderLayer" instance=ExtResource("ui_workorder")]
+
+[node name="ShelfLayer" type="CanvasLayer" parent="."]
+layer = 95
+
+[node name="RepairShelfPanel" parent="ShelfLayer" instance=ExtResource("ui_shelf")]

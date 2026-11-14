@@ -1,0 +1,277 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/work_order_card.gd" id="1_wo"]
+
+[sub_resource type="StyleBoxFlat" id="SB_paper"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+bg_color = Color(1, 0.99, 0.94, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 6
+shadow_offset = Vector2(2, 3)
+
+[sub_resource type="StyleBoxFlat" id="SB_line"]
+bg_color = Color(0.45, 0.3, 0.15, 0.5)
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxFlat" id="SB_opt"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 0.97, 0.88, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.45, 0.28, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_opt_hover"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 0.92, 0.72, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_opt_sel"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(0.98, 0.76, 0.4, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.35, 0.2, 0.08, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_opt_off"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(0.92, 0.9, 0.86, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.7, 0.62, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_ok"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_ok_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.88, 0.68, 0.44, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_ok_off"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.85, 0.8, 0.72, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.6, 0.55, 0.48, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_back"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(1, 0.97, 0.88, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_back_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(1, 0.92, 0.72, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.3, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="WorkOrderCard" type="PanelContainer"]
+visible = false
+offset_left = 596.0
+offset_top = 100.0
+offset_right = 1136.0
+offset_bottom = 460.0
+custom_minimum_size = Vector2(540, 0)
+theme_override_styles/panel = SubResource("SB_paper")
+script = ExtResource("1_wo")
+option_normal = SubResource("SB_opt")
+option_hover = SubResource("SB_opt_hover")
+option_selected = SubResource("SB_opt_sel")
+option_disabled = SubResource("SB_opt_off")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Head" type="HBoxContainer" parent="Box"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 21
+text = "ใบรับเครื่อง"
+
+[node name="Shelf" type="Label" parent="Box/Head"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.18, 1)
+theme_override_font_sizes/font_size = 14
+text = "ชั้นวาง 0/2"
+
+[node name="Line" type="PanelContainer" parent="Box"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_line")
+
+[node name="Detail" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.12, 0.1, 1)
+theme_override_font_sizes/font_size = 15
+text = "ลูกค้า: ครู
+เครื่อง: คอมห้องพักครู
+อาการ: จอแตก
+งาน Lv2 · ใช้ 3 เทิร์น · ค่าแรงตั้งต้น ฿150"
+autowrap_mode = 3
+
+[node name="Ask" type="Label" parent="Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 16
+text = "นัดลูกค้ามารับเครื่อง:"
+
+[node name="Options" type="VBoxContainer" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Hint" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.2, 0.1, 1)
+theme_override_font_sizes/font_size = 13
+text = "เลยนัดได้อีก 2 วันเปิดร้าน (ค่าแรง −10% และความพอใจ −15 ต่อวัน) · เลยกว่านั้นลูกค้ามาเอาเครื่องคืน ชื่อเสียง −3"
+autowrap_mode = 3
+
+[node name="Footer" type="HBoxContainer" parent="Box"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Cancel" type="Button" parent="Box/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("SB_back")
+theme_override_styles/hover = SubResource("SB_back_hover")
+theme_override_styles/pressed = SubResource("SB_back_hover")
+text = "กลับ"
+
+[node name="Confirm" type="Button" parent="Box/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_hover_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_pressed_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.46, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("SB_ok")
+theme_override_styles/hover = SubResource("SB_ok_hover")
+theme_override_styles/pressed = SubResource("SB_ok_hover")
+theme_override_styles/disabled = SubResource("SB_ok_off")
+text = "ออกใบรับเครื่อง"

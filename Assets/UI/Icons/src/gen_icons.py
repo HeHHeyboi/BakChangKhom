@@ -70,6 +70,13 @@ ICONS = {
 <path d="M8 12v36c9-2 17-1 24 4v-36c-7-5-15-6-24-4z" fill="{CREAM}"/>
 <path d="M56 12v36c-9-2-17-1-24 4v-36c7-5 15-6 24-4z" fill="{CREAM}"/>
 <g stroke-width="2.2"><path d="M13 22c5-1 10 0 14 2M13 30c5-1 10 0 14 2M13 38c5-1 10 0 14 2"/><path d="M51 22c-5-1-10 0-14 2M51 30c-5-1-10 0-14 2M51 38c-5-1-10 0-14 2"/></g>''',
+    # [0.3.0] ชั้นวางเครื่อง (ชั้นไม้ 2 ชั้น · เครื่องคอม 2 เครื่อง)
+    "shelf": f'''<rect x="8" y="6" width="6" height="54" rx="2" fill="{BROWN}"/><rect x="50" y="6" width="6" height="54" rx="2" fill="{BROWN}"/>
+<rect x="15" y="12" width="13" height="17" rx="2" fill="{METAL}"/><circle cx="21.5" cy="17" r="1.6" fill="{GREEN}" stroke-width="1.5"/>
+<rect x="31" y="15" width="16" height="14" rx="2" fill="{CREAM}"/><line x1="35" y1="20" x2="43" y2="20" stroke-width="2.5"/>
+<rect x="15" y="38" width="16" height="15" rx="2" fill="{CREAM}"/><line x1="19" y1="44" x2="27" y2="44" stroke-width="2.5"/>
+<rect x="34" y="35" width="13" height="18" rx="2" fill="{METAL}"/><circle cx="40.5" cy="40" r="1.6" fill="{ORANGE}" stroke-width="1.5"/>
+<rect x="6" y="29" width="52" height="6" rx="2" fill="{ORANGE}"/><rect x="6" y="53" width="52" height="6" rx="2" fill="{ORANGE}"/>''',
 }
 
 os.makedirs(OUT, exist_ok=True)

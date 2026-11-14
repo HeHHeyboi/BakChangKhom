@@ -115,6 +115,9 @@ var debt_streak := 0
 var shop_closed := false
 ## โหมดช่วย: เป้าเดือนลดลง (help_target_mult) · ไม่มีค่าปรับค้างชำระ
 var help_mode := false
+## [0.3.0 ขั้น D] งานบนชั้นวาง: ผลซ่อมครั้งถัดไปยังไม่จ่ายเงิน/ความพอใจ/ชื่อเสียง (ลูกค้ามารับเครื่องทีหลัง → pay_pickup)
+## DayLoop ตั้งก่อนเปิดมินิเกมงานบนชั้น · record_repair ล้างให้เองทุกครั้ง · XP/สถิติ Part ได้ตอนซ่อมเสร็จเลย
+var hold_next_payment := false
 
 # ---- คลังของ (Docs/STORAGE_SHOP_ECO.md ข้อ 1) [Claude 13 ต.ค. 2569]
 signal inventory_changed
@@ -159,6 +162,7 @@ func _ready() -> void:
 
 func reset() -> void:
 	money = economy.start_money
+	hold_next_payment = false
 	satisfaction_history.clear()
 	xp = 0
 	part_clears.clear()
@@ -746,12 +750,15 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 	# [0.2.0-C] จดแยกหมวด: ค่าแรง · ทิป · ชดใช้ของเสีย (รวมกันเท่ากับ delta เดิม)
 	var tip := e.tip_three_star if grade == Grade.GOOD and score >= e.three_star_score else 0
 	var label := String(part_id)
-	if delta > 0:
-		add_money(delta - tip, &"fee", label)
-		add_money(tip, &"tip", label)
-	elif delta < 0:
-		add_money(delta, &"damage", label)
-	satisfaction_history.append(sat)
+	var hold := hold_next_payment
+	hold_next_payment = false
+	if not hold:
+		if delta > 0:
+			add_money(delta - tip, &"fee", label)
+			add_money(tip, &"tip", label)
+		elif delta < 0:
+			add_money(delta, &"damage", label)
+		satisfaction_history.append(sat)
 	add_xp(gained)
 	var rep := 0
 	match grade:
@@ -759,7 +766,8 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 			rep = e.rep_three_star if score >= e.three_star_score else e.rep_good
 		Grade.FAIL:
 			rep = e.rep_damaged if damaged else e.rep_fail
-	add_reputation(rep)
+	if not hold:
+		add_reputation(rep)
 	if level > 0 and grade == Grade.GOOD:
 		level_stars[level] = level_stars.get(level, 0) + 1
 	if grade != Grade.FAIL:
@@ -777,9 +785,41 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 		"reputation": rep,
 		"gave_up": gave_up,
 	}
+	if hold:
+		# [0.3.0] งานบนชั้น: เก็บยอดไว้จ่ายตอนลูกค้ามารับ (pay_pickup) · ผลที่ส่งออกไปยังไม่มีเงิน/ชื่อเสียง
+		result["held"] = true
+		result["money_due"] = delta
+		result["tip_due"] = tip
+		result["rep_due"] = rep
+		result["money"] = 0
+		result["reputation"] = 0
 	repair_recorded.emit(result)
 	# [9 ต.ค.] เวลาไม่เดินที่นี่แล้ว — DayLoop เดินนาฬิกาตามช่องของงาน (LEVEL_DESIGN 4.2)
 	return result
+
+
+## [0.3.0 ขั้น D] ลูกค้ามารับเครื่องจากชั้นวาง → จ่ายยอดที่เก็บไว้ (record_repair แบบ hold)
+## mult = ค่าแรงคูณจากวันนัด/ความช้า (RepairShelf.pickup) — คูณเฉพาะค่าแรง+ทิป ไม่คูณค่าชดใช้ของเสีย
+## sat_delta = ทันนัด +/ช้า − บวกกับความพอใจของงาน · คืน { money, reputation, satisfaction }
+func pay_pickup(held: Dictionary, mult := 1.0, sat_delta := 0, label := "") -> Dictionary:
+	var due := int(held.get("money_due", held.get("money", 0)))
+	var tip := int(held.get("tip_due", 0))
+	var lbl := label if label != "" else String(held.get("part_id", ""))
+	var paid := 0
+	if due > 0:
+		var fee := roundi((due - tip) * mult)
+		var t := roundi(tip * mult)
+		add_money(fee, &"fee", lbl)
+		add_money(t, &"tip", lbl)
+		paid = fee + t
+	elif due < 0:
+		add_money(due, &"damage", lbl)
+		paid = due
+	var sat := clampi(int(held.get("satisfaction", 0)) + sat_delta, 0, 100)
+	satisfaction_history.append(sat)
+	var rep := int(held.get("rep_due", held.get("reputation", 0)))
+	add_reputation(rep)
+	return { "money": paid, "reputation": rep, "satisfaction": sat }
 
 
 func average_satisfaction() -> float:

@@ -2,7 +2,7 @@ class_name Icons
 extends RefCounted
 ## ไอคอนเล็กวาดเอง แทนอีโมจิ (เวอร์ชันเว็บไม่มีฟอนต์อีโมจิ → อีโมจิขึ้นเป็นกล่อง) · [Claude 20 ต.ค. 2569]
 ## ภาพ: Assets/UI/Icons/icon_<id>.png 64×64 · ต้นฉบับ SVG + ตัวสร้าง: Assets/UI/Icons/src/gen_icons.py
-## id: clock · clipboard · phone · star · lock · download · speaker · book
+## id: clock · clipboard · phone · star · lock · download · speaker · book · shelf
 ## ขนาด: ส่ง px = ขนาดฟอนต์ของข้อความข้าง ๆ → ไอคอนสูงเท่าตัวอักษร (เท่าอีโมจิเดิม)
 
 const DIR := "res://Assets/UI/Icons/"

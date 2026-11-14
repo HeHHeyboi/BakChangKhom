@@ -56,7 +56,7 @@ static func save() -> bool:
 		return false
 	var ts: TimeSystem = EventManager.time_system
 	var ev = EventManager.eventMap.get(EventManager.EventID.MAIN)
-	# [0.3.0 ขั้น B] หน้าประตู (คิว · นัด · โควตา) · ชั้นวาง + VERSION 4 ทำในขั้น G
+	# [0.3.0] หน้าประตู (คิว · นัด · โควตา) + ชั้นวาง · VERSION 4 ทำในขั้น G
 	var door := []
 	for j in DayLoop.door_queue:
 		var c: CustomerCase = j.get("case")
@@ -86,7 +86,8 @@ static func save() -> bool:
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
-			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
+			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today,
+			"shelf": DayLoop.shelf.to_save() if DayLoop.shelf else { }, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
 			"break_done": DayLoop._break_done, "demo_over": DayLoop.demo_over, "demo_ack": DayLoop._demo_ack,
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
 			# [0.2.0] การ์ดสรุปบท/เดือนที่ยังไม่ได้กด (บันทึกอัตโนมัติตอนเริ่มกะใหม่เกิดก่อนผู้เล่นกด "ไปต่อ")
@@ -177,6 +178,10 @@ static func load_into() -> int:
 		if ResourceLoader.exists(String(a.case)):
 			DayLoop.appointments.append({ "case": load(String(a.case)), "free": bool(a.get("free", false)) })
 	DayLoop.accepted_today = int(l.get("accepted_today", 0))
+	# [0.3.0 ขั้น D] ชั้นวางเครื่อง (ใบรับเครื่องที่ยังไม่ปิด) · VERSION 4 + จำนวนช่องที่อัปเกรด = ขั้น F–G
+	DayLoop.shelf = RepairShelf.new(GameState.economy)
+	DayLoop.shelf.load_save(l.get("shelf", { }))
+	DayLoop.last_shelf = { }
 	DayLoop._door_tick = -1
 	# [0.2.5] ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้
 	DayLoop.visitor_waves.clear()
