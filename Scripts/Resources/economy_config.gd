@@ -130,6 +130,10 @@ class_name EconomyConfig extends Resource
 ## เลยช่วงผ่อนผัน → ลูกค้ามาเอาเครื่องคืนตามสภาพ
 @export var rep_returned := -3
 @export var returned_satisfaction := 25
+## [0.3.0] แอปงานซ่อมในคอมของขม: โทรเลื่อนนัด +1 วันเปิดร้าน (ก่อนถึงนัด · ครั้งเดียวต่อเครื่อง) → ความพอใจตอนมารับ −ค่านี้
+@export var postpone_sat_penalty := 5
+## [0.3.0] ซ่อมเสร็จก่อนนัด → โทรเรียกลูกค้ามารับได้เลย → ความพอใจตอนมารับ +ค่านี้ (บวกกับโบนัสทันนัด)
+@export var early_call_sat_bonus := 5
 
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")
 @export var ot_cost_per_slot := 30

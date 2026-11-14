@@ -61,7 +61,11 @@ static func save() -> bool:
 	for j in DayLoop.door_queue:
 		var c: CustomerCase = j.get("case")
 		if c and c.resource_path != "":
-			door.append({ "case": c.resource_path, "phone": bool(j.get("phone", false)), "appointed": bool(j.get("appointed", false)), "free": bool(j.get("free", false)), "waited": int(j.get("waited", 0)) })
+			var d := { "case": c.resource_path, "phone": bool(j.get("phone", false)), "appointed": bool(j.get("appointed", false)), "free": bool(j.get("free", false)), "waited": int(j.get("waited", 0)) }
+			if DayLoop.is_pickup(j): # [0.3.0 ขั้น E] ลูกค้ามารับเครื่อง (ใบรับเครื่องที่ปิดแล้ว + ค่าที่คิดไว้ตอนมาถึง)
+				var p: Dictionary = j["pickup"]
+				d["pickup"] = { "order": (p["order"] as RepairShelf.Order).to_dict(), "late": p["late"], "mult": p["mult"], "sat_delta": p["sat_delta"], "on_time": p["on_time"] }
+			door.append(d)
 	var appts := []
 	for a in DayLoop.appointments:
 		var c: CustomerCase = a.get("case")
@@ -171,8 +175,15 @@ static func load_into() -> int:
 	var l: Dictionary = d.get("loop", { })
 	DayLoop.door_queue.clear()
 	for j in l.get("door", l.get("board", [])): # เซฟก่อน 0.3.0 มี "board" (กระดานงาน) → ยืนหน้าประตูแทน
-		if ResourceLoader.exists(String(j.case)):
-			DayLoop.door_queue.append(DayLoop.door_entry(load(String(j.case)), bool(j.get("phone", false)), bool(j.get("appointed", false)), bool(j.get("free", false)), int(j.get("waited", 0))))
+		if not ResourceLoader.exists(String(j.case)):
+			continue
+		if j.has("pickup"):
+			var pd: Dictionary = j["pickup"]
+			var o := RepairShelf.Order.from_dict(pd.get("order", { }))
+			if o:
+				DayLoop.door_queue.append(DayLoop.pickup_entry({ "order": o, "late": int(pd.get("late", 0)), "mult": float(pd.get("mult", 1.0)), "sat_delta": int(pd.get("sat_delta", 0)), "on_time": bool(pd.get("on_time", true)) }))
+			continue
+		DayLoop.door_queue.append(DayLoop.door_entry(load(String(j.case)), bool(j.get("phone", false)), bool(j.get("appointed", false)), bool(j.get("free", false)), int(j.get("waited", 0))))
 	DayLoop.appointments.clear()
 	for a in l.get("appointments", []):
 		if ResourceLoader.exists(String(a.case)):

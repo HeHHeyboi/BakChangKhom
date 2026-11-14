@@ -742,6 +742,61 @@ func _open_program(pname: String) -> void:
 		_show_info(pname, "%s\nผู้พัฒนา: %s" % [pname, app.data.publisher], app.icon)
 
 
+# NOTE: [Claude 15 พ.ย. 2569] แอปจากภายนอก — คอมของขมใส่แอปของร้านเพิ่ม (เช่น "งานซ่อม" = Scene/UI/work_order_app.tscn)
+## ไอคอนบนเดสก์ท็อป → หน้าต่าง os_window_base ใส่ฉาก content ไว้ใน %Content · เรียกหลัง _ready (ShopPC ต่อ signal ready)
+var _custom_apps := { } # ชื่อแอป -> { scene, icon, size }
+
+
+func add_custom_app(app_name: String, icon: Texture2D, content: PackedScene, win_size := Vector2(560, 420), win_pos := Vector2(-1, -1)) -> DesktopShortcut:
+	var s := SHORTCUT_SCENE.instantiate() as DesktopShortcut
+	s.name = "App_" + app_name.validate_node_name()
+	s.icon = icon if icon else TEX_EXE
+	s.shortcut_name = app_name
+	desktop.add_child(s)
+	s.button.pressed.connect(open_custom_app.bind(app_name))
+	_custom_apps[app_name] = { "scene": content, "icon": s.icon, "size": win_size, "pos": win_pos }
+	return s
+
+
+## เปิดหน้าต่างแอปภายนอก (เปิดอยู่แล้ว = ดึงขึ้นมา) · คืนหน้าต่าง
+func open_custom_app(app_name: String) -> OsWindow2:
+	var info: Dictionary = _custom_apps.get(app_name, { })
+	if info.is_empty():
+		return null
+	for w: OsWindow2 in os.instances:
+		if is_instance_valid(w) and not w.is_queued_for_deletion() and w.get_meta("custom_app", "") == app_name:
+			w.restore()
+			return w
+	var win := WINDOW_BASE.instantiate() as OsWindow2
+	win.set_meta("custom_app", app_name)
+	win.set_title(app_name)
+	win.set_icon(info["icon"])
+	win.size = info["size"]
+	var body: Control = win.get_node("%Content")
+	var c := (info["scene"] as PackedScene).instantiate()
+	if c is Control:
+		(c as Control).size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(c)
+	win.closed.connect(
+		func():
+			os.instances.erase(win)
+			win.queue_free.call_deferred(),
+	)
+	win.restore(true)
+	screen.add_child(win)
+	var pos: Vector2 = info.get("pos", Vector2(-1, -1))
+	if pos.x >= 0.0:
+		win.position = pos
+	os.add_instance(win)
+	_ensure_process(win, app_name)
+	return win
+
+
+## ปิดเครื่อง (ใช้จากแอปภายนอก เช่นกด "ไปซ่อม" ในแอปงานซ่อม) — เหมือนเมนูปิดเครื่องของโหมดเล่นอิสระ
+func shut_down() -> void:
+	_shut_down()
+
+
 func _refresh_explorer() -> void:
 	if not is_instance_valid(_explorer_list):
 		return

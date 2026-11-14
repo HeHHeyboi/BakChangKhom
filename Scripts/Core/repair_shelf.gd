@@ -24,6 +24,10 @@ class Order extends RefCounted:
 	var result: Dictionary = { }
 	## วันที่ลูกค้ามารับ/มาเอาคืน (-1 = ยัง)
 	var closed_on: int = -1
+	## [0.3.0] เลื่อนนัดไปแล้ว (เลื่อนได้ครั้งเดียว)
+	var postponed := false
+	## [0.3.0] ความพอใจที่บวก/ลบเพิ่มตอนมารับ (เลื่อนนัด − · โทรเรียกมารับก่อน +)
+	var sat_adjust := 0
 
 	func late_days(day: int) -> int:
 		return maxi(day - due, 0)
@@ -33,6 +37,7 @@ class Order extends RefCounted:
 			"case": case.resource_path if case else "",
 			"accepted": accepted, "due": due, "promise": promise,
 			"state": state, "result": result, "closed_on": closed_on,
+			"postponed": postponed, "sat_adjust": sat_adjust,
 		}
 
 	static func from_dict(d: Dictionary) -> Order:
@@ -47,6 +52,8 @@ class Order extends RefCounted:
 		o.state = int(d.get("state", State.WAITING))
 		o.result = d.get("result", { })
 		o.closed_on = int(d.get("closed_on", -1))
+		o.postponed = bool(d.get("postponed", false))
+		o.sat_adjust = int(d.get("sat_adjust", 0))
 		return o
 
 
@@ -128,11 +135,40 @@ func pickup(o: Order, today: int) -> Dictionary:
 		return { }
 	var late := o.late_days(today)
 	var mult := econ.promise_mult(o.promise) * maxf(1.0 - late * econ.late_pay_cut_per_day, 0.0)
-	var sat := econ.on_time_sat_bonus if late == 0 else -late * econ.late_sat_per_day
+	var sat := (econ.on_time_sat_bonus if late == 0 else -late * econ.late_sat_per_day) + o.sat_adjust
 	o.state = State.PICKED
 	o.closed_on = today
 	_close(o)
 	return { "order": o, "late": late, "mult": mult, "sat_delta": sat, "on_time": late == 0 }
+
+
+## [0.3.0] เลื่อนนัดได้ไหม: ยังไม่ซ่อม · ยังไม่เลยนัด · ยังไม่เคยเลื่อน · วันนัดใหม่ไม่เกิน last_day
+func can_postpone(o: Order, today: int, last_day := 1 << 20) -> bool:
+	return o != null and orders.has(o) and o.state == State.WAITING and not o.postponed and today <= o.due and o.due + 1 <= last_day
+
+
+## โทรเลื่อนนัด +1 วันเปิดร้าน → ความพอใจตอนมารับ −postpone_sat_penalty
+func postpone(o: Order, today: int, last_day := 1 << 20) -> bool:
+	if not can_postpone(o, today, last_day):
+		return false
+	o.due += 1
+	o.postponed = true
+	o.sat_adjust -= econ.postpone_sat_penalty
+	return true
+
+
+## [0.3.0] โทรเรียกมารับก่อนนัดได้ไหม: ซ่อมเสร็จแล้ว · วันนัดยังไม่ถึง
+func can_call_early(o: Order, today: int) -> bool:
+	return o != null and orders.has(o) and o.state == State.DONE and o.due > today
+
+
+## โทรเรียกมารับวันนี้ → ปิดใบรับเครื่อง คืนผล pickup (ทันนัด + early_call_sat_bonus) · ผู้เรียกให้ลูกค้าเดินมาหน้าประตูเอง
+func call_early(o: Order, today: int) -> Dictionary:
+	if not can_call_early(o, today):
+		return { }
+	o.sat_adjust += econ.early_call_sat_bonus
+	o.due = today
+	return pickup(o, today)
 
 
 ## เปิดร้านวัน today: ลูกค้าเครื่องเสร็จที่ถึงนัดมารับ · งานค้างเลยช่วงผ่อนผันมาเอาคืน

@@ -140,6 +140,8 @@ var _shelf_rows: Array[RepairShelf.Order] = []
 var last_shelf: Dictionary = { }
 ## [0.3.0] เช้านี้ใครมารับเครื่อง/มาเอาคืน (ข้อความสั้น ไว้โชว์ในการ์ดหน้าร้าน)
 var shelf_news: PackedStringArray = []
+## [0.3.0 ขั้น E] ส่งมอบเครื่องล่าสุด { order, pickup, paid }
+var last_handover: Dictionary = { }
 var reward_popup: RewardPopup
 var _result_popped := false
 var _ot_this_shift := false
@@ -242,6 +244,7 @@ func _connect() -> void:
 		shelf = RepairShelf.new(_econ())
 	_on_shift_started(ts.month(), ts.week(), ts.shift_in_week())
 	_day_skip_pending = false # เริ่มเกม/โหลดเซฟ ไม่ต้องเล่นข้ามวัน
+	day_skip_notes.clear()
 
 
 ## [0.2.5] "ชื่อเสียง 25 (ปกติ) · ลูกค้าวันนี้ 3/5 คน · รอบถัดไปอีก 4 เทิร์น"
@@ -449,6 +452,7 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	# [0.3.0] ลูกค้าที่ยังยืนหน้าประตูตอนปิดร้านเมื่อวันก่อน = กลับบ้าน · ล้างโควตา
 	walkouts.clear()
 	left_home.clear()
+	_auto_handover()
 	for j in door_queue:
 		left_home.append((j["case"] as CustomerCase).customer)
 		GameState.add_reputation(_econ().rep_left_unserved)
@@ -571,6 +575,8 @@ func _tick_door(ts: TimeSystem) -> void:
 	var e := _econ()
 	var gone: Array[Dictionary] = []
 	for j in door_queue:
+		if is_pickup(j):
+			continue
 		j["waited"] = int(j.get("waited", 0)) + dt
 		if int(j["waited"]) >= (j["case"] as CustomerCase).patience_slots(e) * TimeSystem.SLOT_MIN:
 			gone.append(j)
@@ -689,6 +695,8 @@ func door_accept_state(promise := -1) -> StringName:
 	var j := door_front()
 	if j.is_empty() or _working:
 		return &"none"
+	if is_pickup(j):
+		return &"pickup"
 	if bool(j.get("phone", false)):
 		return &"phone"
 	if not bool(j.get("free", false)) and quota_left() <= 0:
@@ -734,7 +742,7 @@ func door_accept(promise := -1) -> bool:
 func door_can_appoint() -> bool:
 	var j := door_front()
 	var ts := _ts()
-	return not j.is_empty() and not _working and not bool(j.get("appointed", false)) and ts != null and ts.shift < TimeSystem.TOTAL_SHIFTS
+	return not j.is_empty() and not _working and not is_pickup(j) and not bool(j.get("appointed", false)) and ts != null and ts.shift < TimeSystem.TOTAL_SHIFTS
 
 
 func door_appoint() -> bool:
@@ -748,7 +756,7 @@ func door_appoint() -> bool:
 
 ## ปฏิเสธคนหน้าประตู → ชื่อเสียง rep_reject
 func door_reject() -> bool:
-	if door_queue.is_empty() or _working:
+	if door_queue.is_empty() or _working or is_pickup(door_front()):
 		return false
 	door_queue.pop_front()
 	GameState.add_reputation(_econ().rep_reject)
@@ -1014,6 +1022,7 @@ func end_shift() -> void:
 	var ts := _ts()
 	if ts == null:
 		return
+	_auto_handover()
 	var ot := ot_slots_now()
 	if ot > 0:
 		GameState.add_money(-ot * _econ().ot_cost_per_slot, &"ot_power", "ล่วงเวลา %d เทิร์น" % ot)
@@ -1196,7 +1205,9 @@ func _reset_run() -> void:
 	_door_tick = -1
 	shelf = RepairShelf.new(_econ())
 	_work_order_open = false
+	_pending_repair = null
 	last_shelf = { }
+	last_handover = { }
 	shelf_news.clear()
 	retry_cases.clear()
 	_retried.clear()
@@ -1233,6 +1244,7 @@ func _process(delta: float) -> void:
 	_watchdog(delta)
 	if shelf_panel:
 		shelf_panel.show_view(shelf_view())
+	_run_pending_repair(delta)
 	var want := _decide_card()
 	# [0.2.0] วันใหม่: ปิ๊บบอก "ผ่านไป n วัน" ก่อนการ์ดแรกของวัน (หลังสรุปเดือน/บทเนื้อเรื่องจบแล้ว)
 	if _day_skip_pending and want in [Card.DOOR, Card.JOB_FORCED, Card.SHIFT_END]:
@@ -1430,8 +1442,11 @@ func _show_card(card: Card) -> void:
 			var ot := ot_slots_now()
 			_title.text = "ปิดร้าน · %s %d/%d%s" % ["กะ" if ts.show_clock else "วันที่", ts.shift_in_week(), TimeSystem.SHIFTS_PER_WEEK, (" · " + TimeSystem.clock_text(ts.current_minute) + " น.") if ts.show_clock else ""]
 			# [0.3.0] คนที่ยังยืนหน้าประตู → กลับบ้านตอนปิดร้าน · คนที่นัดไว้มาวันเปิดร้านถัดไป
-			var unserved := door_queue.size()
+			var unserved := door_queue.filter(func(q: Dictionary) -> bool: return not is_pickup(q)).size()
+			var waiting_pickup := door_queue.size() - unserved
 			var board_line := "ลูกค้าหน้าร้าน %d คนยังไม่ได้คุย จะกลับบ้าน (ชื่อเสียง %d)" % [unserved, unserved * _econ().rep_left_unserved] if unserved > 0 else "คุยกับลูกค้าหน้าร้านครบทุกคน"
+			if waiting_pickup > 0:
+				board_line += "\nลูกค้ารอรับเครื่อง %d คน — ปิดร้านแล้วส่งมอบให้เลย" % waiting_pickup
 			if not walkouts.is_empty():
 				board_line += "\nรอนานจนเดินกลับ %d คน" % walkouts.size()
 			if not appointments.is_empty():
@@ -1540,7 +1555,7 @@ func door_view() -> Dictionary:
 				(j["case"] as CustomerCase).customer,
 				" [โทรมา]" if bool(j.get("phone", false)) else (" [นัดไว้]" if bool(j.get("appointed", false)) else ""),
 				TimeSystem.turns_text(door_patience_left(j)),
-			])
+			] if not is_pickup(j) else "%s [มารับเครื่อง]" % (j["case"] as CustomerCase).customer)
 		v["queue"] = "รอคิวอีก %d คน: %s" % [door_queue.size() - 1, " · ".join(rest)]
 	else:
 		v["queue"] = ""
@@ -1551,6 +1566,8 @@ func door_view() -> Dictionary:
 func _door_front_view(j: Dictionary) -> Dictionary:
 	if j.is_empty():
 		return { }
+	if is_pickup(j):
+		return _pickup_front_view(j)
 	var c: CustomerCase = j["case"]
 	var phone := bool(j.get("phone", false))
 	var f := { }
@@ -1597,13 +1614,40 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 	return f
 
 
+## [0.3.0 ขั้น E] ลูกค้ามารับเครื่อง: บอกผลซ่อม · ค่าแรงที่จะได้ (ทันนัด/ช้า) · ปุ่ม "ส่งมอบเครื่อง" อย่างเดียว
+func _pickup_front_view(j: Dictionary) -> Dictionary:
+	var p: Dictionary = j["pickup"]
+	var o: RepairShelf.Order = p["order"]
+	var c := o.case
+	var failed := int(o.result.get("grade", 0)) == GameState.Grade.FAIL
+	var m := pickup_money(p)
+	var when := "ทันนัด ความพอใจ +%d" % int(p["sat_delta"]) if p["on_time"] else "ช้ากว่านัด %d วัน ค่าแรง ×%.2f ความพอใจ %d" % [int(p["late"]), float(p["mult"]), int(p["sat_delta"])]
+	return {
+		"name": "%s · มารับเครื่อง" % c.customer,
+		"detail": "%s%s\n%s\n%s" % [
+			("เครื่อง: %s\n" % c.device) if c.device != "" else "",
+			"งานไม่ผ่าน — คืนเครื่องตามสภาพ" if failed else "ซ่อมเสร็จแล้ว (คะแนน %d/100)" % int(o.result.get("score", 0)),
+			("ค่าแรง ฿%d" % m) if m >= 0 else ("ชดใช้ของเสีย −฿%d" % -m),
+			when,
+		],
+		"portrait": Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null,
+		"phone": false,
+		"patience_text": "รอรับเครื่องอยู่หน้าร้าน",
+		"accept": { "text": "ส่งมอบเครื่อง", "disabled": _working, "visible": true, "tooltip": "ส่งเครื่องคืนลูกค้า แล้วรับค่าแรง" },
+		"appoint": { "visible": false },
+		"reject_hidden": true,
+	}
+
+
 ## ปุ่ม "รับเครื่อง" ที่การ์ดหน้าประตู: งานฮาร์ดแวร์ → เปิดใบรับเครื่อง · งานขมOS → ทำเลย
 func _on_door_accept() -> void:
 	var j := door_front()
 	if j.is_empty():
 		return
 	var c: CustomerCase = j["case"]
-	if c.takes_machine():
+	if is_pickup(j):
+		door_handover()
+	elif c.takes_machine():
 		open_work_order()
 	else:
 		door_accept(-1)
@@ -1665,29 +1709,94 @@ func _pay_pickup(p: Dictionary) -> Dictionary:
 	return paid
 
 
-## เปิดร้าน: ลูกค้ามารับเครื่องที่ซ่อมเสร็จ (จ่ายเงิน) · เครื่องค้างเลยผ่อนผัน → มาเอาคืน (ชื่อเสียง rep_returned) · บอกงานที่ครบนัด/เลยนัด
+## เปิดร้าน: ลูกค้าที่เครื่องซ่อมเสร็จและถึงนัด → เดินมายืนหน้าประตูเป็นคิวแรก (กด "ส่งมอบเครื่อง" ถึงได้เงิน)
+## เครื่องค้างเลยผ่อนผัน → มาเอาคืน (ชื่อเสียง rep_returned) · บอกงานที่ครบนัด/เลยนัด · ปิ๊บบอกตอนข้ามวัน (day_skip_notes)
 func _open_shelf_day(ts: TimeSystem) -> void:
 	shelf_news.clear()
 	if shelf == null or ts == null:
 		return
 	var e := _econ()
 	var od := shelf.open_day(ts.shift)
-	var total := 0
-	for p: Dictionary in od["picked"]:
-		var paid := _pay_pickup(p)
-		total += int(paid["money"])
-		shelf_news.append(String(paid["text"]))
+	var picked: Array = od["picked"]
+	var front: Array[Dictionary] = []
+	for p: Dictionary in picked:
+		var o: RepairShelf.Order = p["order"]
+		front.append(pickup_entry(p))
+		_skip_note("วันนี้%sจะมารับเครื่อง" % o.case.customer)
+	for k in range(front.size() - 1, -1, -1):
+		door_queue.push_front(front[k])
 	for o: RepairShelf.Order in od["returned"]:
 		GameState.add_reputation(e.rep_returned)
 		GameState.satisfaction_history.append(e.returned_satisfaction)
 		shelf_news.append("%s มาเอาเครื่องคืน (ไม่ได้ซ่อม เลยนัด) ชื่อเสียง %d" % [o.case.customer, e.rep_returned])
+		_skip_note("%sรอไม่ไหว มาเอาเครื่องคืนแล้ว…" % o.case.customer)
 	for o: RepairShelf.Order in od["late_waiting"]:
 		shelf_news.append("เลยนัด %s %d วัน! ซ่อมให้เสร็จวันนี้" % [o.case.customer, o.late_days(ts.shift)])
+		_skip_note("เครื่องของ%sเลยนัดมา %d วันแล้ว!" % [o.case.customer, o.late_days(ts.shift)])
 	for o: RepairShelf.Order in od["due_today"]:
 		shelf_news.append("วันนี้ครบนัด %s — ซ่อมเสร็จลูกค้ามารับเลย" % o.case.customer)
-	var picked: Array = od["picked"]
+		_skip_note("วันนี้ครบนัด%s แต่เครื่องยังไม่ได้ซ่อมนะ" % o.case.customer)
 	if not picked.is_empty() and visitor_toast:
-		visitor_toast.show_message("ลูกค้ามารับเครื่อง %d คน" % picked.size(), "ได้ค่าแรง %s฿%d" % ["+" if total >= 0 else "−", absi(total)])
+		visitor_toast.show_message("ลูกค้ามารับเครื่อง %d คน" % picked.size(), "ยืนรอหน้าร้าน — กด \"ส่งมอบเครื่อง\"")
+
+
+## ปิ๊บบอกตอนข้ามวัน (เฉพาะวันที่เล่นแอนิเมชันข้ามวัน)
+func _skip_note(s: String) -> void:
+	if _day_skip_pending:
+		day_skip_notes.append(s)
+
+
+## [0.3.0 ขั้น E] ลูกค้ามารับเครื่องที่หน้าประตู (ไม่นับโควตา · ไม่หมดความอดทน) · p = RepairShelf.pickup()
+func pickup_entry(p: Dictionary) -> Dictionary:
+	var o: RepairShelf.Order = p["order"]
+	var j := door_entry(o.case, false, false, true)
+	j["kind"] = &"pickup"
+	j["pickup"] = p
+	return j
+
+
+static func is_pickup(j: Dictionary) -> bool:
+	return j.get("kind", &"") == &"pickup"
+
+
+## เงินที่จะได้ตอนส่งมอบ (คิดแบบเดียวกับ GameState.pay_pickup)
+static func pickup_money(p: Dictionary) -> int:
+	var o: RepairShelf.Order = p["order"]
+	var due := int(o.result.get("money_due", 0))
+	var tip := int(o.result.get("tip_due", 0))
+	if due <= 0:
+		return due
+	var m := float(p["mult"])
+	return roundi((due - tip) * m) + roundi(tip * m)
+
+
+## ส่งมอบเครื่องให้คนหน้าประตู (ลูกค้ามารับ) → จ่ายเงิน · ป้าย/ตัวเลขเด้ง · คำขอบคุณ/บ่นของลูกค้า
+func door_handover() -> bool:
+	var j := door_front()
+	if j.is_empty() or not is_pickup(j) or _working:
+		return false
+	door_queue.pop_front()
+	_board_dirty = true
+	var p: Dictionary = j["pickup"]
+	var o: RepairShelf.Order = p["order"]
+	var paid := _pay_pickup(p)
+	last_handover = { "order": o, "pickup": p, "paid": paid }
+	if reward_popup:
+		reward_popup.pop_result({ "money": paid["money"], "reputation": paid["reputation"] })
+	if visitor_toast:
+		var failed := int(o.result.get("grade", 0)) == GameState.Grade.FAIL
+		var line := o.case.complain_text if failed else o.case.thanks_text
+		visitor_toast.show_message(String(paid["text"]), ("%s: \"%s\"" % [o.case.customer, line]) if line.strip_edges() != "" else "")
+	autosave.call_deferred()
+	return true
+
+
+## ปิดร้าน/เปิดวันใหม่: ลูกค้ามารับที่ยังไม่ได้ส่งมอบ → ส่งให้อัตโนมัติ (เงินเข้าวันนั้น)
+func _auto_handover() -> void:
+	for j: Dictionary in door_queue.duplicate():
+		if is_pickup(j):
+			door_queue.erase(j)
+			_pay_pickup(j["pickup"])
 
 
 ## ข้อมูลแผงชั้นวาง (ดู RepairShelfPanel.show_view)
@@ -1747,6 +1856,172 @@ func shelf_view() -> Dictionary:
 		"empty": "ชั้นว่าง — รับเครื่องจากลูกค้าหน้าร้านแล้วเครื่องจะมาวางที่นี่",
 		"rows": rows,
 	}
+
+
+# ---------------------------------------------------------------- แอปงานซ่อมในคอมของขม (0.3.0)
+
+
+## แถวในแอปตอนนี้ (index = แถว) → กดปุ่มแถวไหน
+var _app_rows: Array[RepairShelf.Order] = []
+## กด "ไปซ่อม" ในแอป → ปิดคอมแล้วเปิดมินิเกมเครื่องนี้ (รอจนกลับมาที่หน้าร้าน)
+var _pending_repair: RepairShelf.Order
+var _pending_repair_time := 0.0
+
+
+## ซ่อมได้ไหม (ไม่สนว่าคอมเปิดอยู่) · &"ok" · &"ot" · &"no" · &"busy" · &"done"
+func app_repair_state(o: RepairShelf.Order) -> StringName:
+	if o == null or not shelf.orders.has(o):
+		return &"busy"
+	if o.state != RepairShelf.State.WAITING:
+		return &"done"
+	var ts := _ts()
+	if forced_case or _result_pending or _close_requested or ts == null or ts.current_minute >= TimeSystem.CLOSE:
+		return &"busy"
+	return job_fit(o.case)
+
+
+## กด "ไปซ่อม" จากแอป: จำไว้ → ปิดคอม (ผู้เรียก) → _process เปิดมินิเกมเมื่อกลับมาที่หน้าร้าน
+func request_shelf_repair(o: RepairShelf.Order) -> bool:
+	if app_repair_state(o) not in [&"ok", &"ot"]:
+		return false
+	_pending_repair = o
+	_pending_repair_time = 0.0
+	return true
+
+
+func _run_pending_repair(delta: float) -> void:
+	if _pending_repair == null:
+		return
+	_pending_repair_time += delta
+	if _pending_repair_time > 6.0: # รอนานเกิน (เช่นมีบทขึ้น) → ยกเลิก
+		_pending_repair = null
+		return
+	if Global.in_minigame or DialogScene.visible or _working or _decide_card() != Card.DOOR:
+		return
+	var o := _pending_repair
+	_pending_repair = null
+	shelf_repair(o)
+
+
+## เลื่อนนัด +1 วันเปิดร้าน (โทรหาลูกค้า)
+func shelf_postpone(o: RepairShelf.Order) -> bool:
+	var ts := _ts()
+	if ts == null or not shelf.postpone(o, ts.shift, TimeSystem.TOTAL_SHIFTS):
+		return false
+	if visitor_toast:
+		visitor_toast.show_message("โทรขอเลื่อนนัด%sแล้ว" % o.case.customer, "นัดรับใหม่ %s · ความพอใจ −%d" % [due_text(o.due), _econ().postpone_sat_penalty])
+	_board_dirty = true
+	autosave.call_deferred()
+	return true
+
+
+## ซ่อมเสร็จก่อนนัด → โทรเรียกมารับวันนี้ (ลูกค้าเดินมายืนหน้าประตู · กดส่งมอบได้เงิน)
+func shelf_call_early(o: RepairShelf.Order) -> bool:
+	var ts := _ts()
+	if ts == null or ts.current_minute >= TimeSystem.CLOSE:
+		return false
+	var p := shelf.call_early(o, ts.shift)
+	if p.is_empty():
+		return false
+	door_queue.push_front(pickup_entry(p))
+	if visitor_toast:
+		visitor_toast.show_message("โทรบอก%sแล้ว" % o.case.customer, "กำลังมารับเครื่องที่หน้าร้าน · ความพอใจ +%d" % _econ().early_call_sat_bonus)
+	_board_dirty = true
+	autosave.call_deferred()
+	return true
+
+
+## กดปุ่มในแอป: id = &"repair" · &"postpone" · &"call" · คืน true = สำเร็จ (repair = ผู้เรียกต้องปิดคอม)
+func work_app_action(i: int, id: StringName) -> bool:
+	if i < 0 or i >= _app_rows.size():
+		return false
+	var o := _app_rows[i]
+	match id:
+		&"repair":
+			return request_shelf_repair(o)
+		&"postpone":
+			return shelf_postpone(o)
+		&"call":
+			return shelf_call_early(o)
+	return false
+
+
+## ข้อมูลแอปงานซ่อม (ดู WorkOrderApp.show_view): แบ่งตามวันนัด · เลยนัดอยู่บนสุด · คนนัดมาหน้าร้าน/คนรอรับหน้าร้านด้วย
+func work_app_view() -> Dictionary:
+	var ts := _ts()
+	var e := _econ()
+	var today := ts.shift if ts else 1
+	_app_rows.clear()
+	var list: Array = shelf.orders.duplicate()
+	list.sort_custom(func(a: RepairShelf.Order, b: RepairShelf.Order) -> bool: return a.due < b.due or (a.due == b.due and a.state > b.state))
+	var groups := { } # วันนัด -> แถว
+	var order_keys: Array[int] = []
+	for o: RepairShelf.Order in list:
+		var key := today - 1 if o.due < today else o.due
+		if not groups.has(key):
+			groups[key] = []
+			order_keys.append(key)
+		var i := _app_rows.size()
+		_app_rows.append(o)
+		groups[key].append(_app_row(i, o, today))
+	var sections: Array[Dictionary] = []
+	for k in order_keys:
+		var t := "เลยนัดแล้ว!" if k < today else ("วันนี้ · %s" % shift_date_text(k) if k == today else due_text(k))
+		sections.append({ "title": t, "warn": k <= today, "rows": groups[k] })
+	# คนรอรับหน้าร้านตอนนี้ / คนที่นัดมาหน้าร้านวันเปิดร้านถัดไป (ไม่มีปุ่ม)
+	var at_door := door_queue.filter(func(q: Dictionary) -> bool: return is_pickup(q))
+	if not at_door.is_empty():
+		var rows: Array[Dictionary] = []
+		for q: Dictionary in at_door:
+			rows.append({ "name": "%s · รอรับเครื่องอยู่หน้าร้าน" % (q["case"] as CustomerCase).customer, "status": "ไปกด \"ส่งมอบเครื่อง\" ที่การ์ดหน้าร้าน · ได้ ฿%d" % pickup_money(q["pickup"]), "state": &"done", "actions": [] })
+		sections.push_front({ "title": "รอรับเครื่องหน้าร้านตอนนี้", "warn": false, "rows": rows })
+	if not appointments.is_empty():
+		var rows2: Array[Dictionary] = []
+		for a in appointments:
+			var c: CustomerCase = a["case"]
+			rows2.append({ "name": "%s · นัดมาหน้าร้าน" % c.customer, "status": "%s · %s" % [c.device if c.device != "" else c.symptom, due_text(today + 1)], "state": &"wait", "actions": [] })
+		sections.append({ "title": "นัดมาหน้าร้าน %s" % due_text(today + 1), "warn": false, "rows": rows2 })
+	return {
+		"title": "ใบรับเครื่องทั้งหมด · วันนี้ %s" % shift_date_text(today),
+		"shelf": "ชั้นวาง %d/%d" % [shelf.used(), shelf.slots],
+		"sections": sections,
+		"empty": "ยังไม่มีเครื่องที่รับไว้ — รับเครื่องจากลูกค้าหน้าร้านก่อนนะ",
+		"note": "ซ่อมก่อนนัดได้เสมอ · เลื่อนนัดได้ครั้งเดียวต่อเครื่อง (ความพอใจ −%d) · ซ่อมเสร็จแล้วโทรเรียกมารับก่อนได้ (ความพอใจ +%d)" % [e.postpone_sat_penalty, e.early_call_sat_bonus],
+	}
+
+
+func _app_row(i: int, o: RepairShelf.Order, today: int) -> Dictionary:
+	var c := o.case
+	var e := _econ()
+	var late := o.late_days(today)
+	var fee := roundi(_fee(c) * e.promise_mult(o.promise) * maxf(1.0 - late * e.late_pay_cut_per_day, 0.0))
+	var r := { "index": i, "name": "%s · %s" % [c.customer, c.device if c.device != "" else c.symptom], "state": &"wait", "warn": late > 0, "actions": [] }
+	var actions: Array[Dictionary] = []
+	if o.state == RepairShelf.State.DONE:
+		r["state"] = &"done"
+		r["status"] = "ซ่อมเสร็จแล้ว · ลูกค้ามารับ %s" % due_text(o.due)
+		actions.append({ "id": &"call", "text": "โทรเรียกมารับเลย", "disabled": not shelf.can_call_early(o, today), "tooltip": "ลูกค้ามารับวันนี้ ได้เงินเร็วขึ้น ความพอใจ +%d" % e.early_call_sat_bonus })
+	else:
+		var st := "เลยนัดมา %d วัน! ค่าแรงเหลือ ฿%d" % [late, fee] if late > 0 else "รอซ่อม · ค่าแรง ฿%d · ใช้ %s" % [fee, _cost_text(job_slots(c))]
+		if o.postponed:
+			st += " · เลื่อนนัดแล้ว"
+		r["status"] = st
+		var rs := app_repair_state(o)
+		actions.append({
+			"id": &"repair",
+			"text": "ไปซ่อม" if rs == &"ok" else ("ไปซ่อม (ล่วงเวลา)" if rs == &"ot" else ("เทิร์นไม่พอ" if rs == &"no" else "ไปซ่อม")),
+			"disabled": rs not in [&"ok", &"ot"],
+			"tooltip": "ปิดคอมแล้วเปิดเครื่องนี้ซ่อมเลย" if rs in [&"ok", &"ot"] else "ทำงานที่ค้างอยู่ให้เสร็จก่อน",
+		})
+		var can := shelf.can_postpone(o, today, TimeSystem.TOTAL_SHIFTS)
+		actions.append({
+			"id": &"postpone",
+			"text": "เลื่อนนัด +1 วัน",
+			"disabled": not can,
+			"tooltip": ("โทรขอเลื่อนเป็น %s · ความพอใจ −%d" % [due_text(o.due + 1), e.postpone_sat_penalty]) if can else ("เลื่อนไปแล้ว" if o.postponed else "เลยนัดแล้ว เลื่อนไม่ได้"),
+		})
+	r["actions"] = actions
+	return r
 
 
 # ---------------------------------------------------------------- ใบรับเครื่อง (0.3.0 ขั้น C)
@@ -2053,7 +2328,9 @@ func _avoid_goal_card() -> void:
 		p.position.y = maxf(minf(y, CARD_BOTTOM - p.get_combined_minimum_size().y), 60.0)
 	if not has_qb:
 		return
-	if not any and _goal_auto_collapsed:
+	# [15 พ.ย.] ไม่มีการ์ดชั่วครู่ (เวลาหมุน · บทพัก · บทลูกค้า · มินิเกม) ยังอยู่ในร้าน → คงพับไว้ ไม่งั้นการ์ดเป้าหมายกาง-พับกระพริบ
+	# กางคืนเมื่อออกจากร้าน/ร้านไม่ได้เปิด (การ์ดงานจะไม่กลับมาอีกพักใหญ่)
+	if not any and _goal_auto_collapsed and not (_loop_active() and _in_shop()):
 		_goal_auto_collapsed = false
 		if qb.collapsed:
 			qb.set_collapsed(false)

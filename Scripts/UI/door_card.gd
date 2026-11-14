@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 ## v = DayLoop.door_view(): { title, quota, quota_full, note, front: {} (ว่าง = ไม่มีคน), queue, empty, wait_disabled }
-## front = { name, detail, portrait: Texture2D|null, patience_left, patience_max, phone,
+## front = { name, detail, portrait: Texture2D|null, patience_left, patience_max, phone, patience_text (แทนแถบความอดทน), reject_hidden,
 ##           accept: {text, disabled, visible, tooltip}, appoint: {text, disabled, tooltip}, reject_disabled }
 func show_view(v: Dictionary) -> void:
 	%Title.text = String(v.get("title", ""))
@@ -66,9 +66,13 @@ func _show_front(f: Dictionary) -> void:
 		fill.bg_color = patience_low if left <= 1 else patience_ok
 		%PatienceBar.add_theme_stylebox_override(&"fill", fill)
 	%PatienceLabel.text = "โทรมาขอนัดเอาเครื่องมาวันเปิดร้านถัดไป" if phone else "รอได้อีก %s" % TimeSystem.turns_text(left)
+	if f.has("patience_text"): # ลูกค้ามารับเครื่อง: ไม่มีแถบความอดทน
+		%PatienceBar.visible = false
+		%PatienceLabel.text = String(f["patience_text"])
 	_apply_button(%Accept, f.get("accept", { }))
 	_apply_button(%Appoint, f.get("appoint", { }))
 	%Reject.disabled = bool(f.get("reject_disabled", false))
+	%Reject.visible = not bool(f.get("reject_hidden", false))
 
 
 func _apply_button(b: Button, d: Dictionary) -> void:

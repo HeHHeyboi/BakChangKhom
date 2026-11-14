@@ -75,12 +75,52 @@ func _ready() -> void:
 	DayLoop._result_pending = false
 	var sat_n := GameState.satisfaction_history.size()
 	var expect := _expected_pay(r, e.promise_mult(1))
+	DayLoop._day_skip_pending = true # ให้จดข้อความข้ามวันเหมือนเล่นจริง
+	DayLoop.day_skip_notes.clear()
+	DayLoop.day_skip_seconds = 0.01
 	ts.end_shift()
 	await _frames(2)
+	DayLoop.day_skip_seconds = 0.0
 	DayLoop.forced_case = null
-	_check(GameState.money == money0 + expect and DayLoop.shelf.orders.is_empty() and o.state == RepairShelf.State.PICKED, "เปิดร้านวันนัด → ลูกค้ามารับ จ่าย ฿%d (เงิน %d → %d)" % [expect, money0, GameState.money])
+	_check(DayLoop.day_skip_notes.has("วันนี้ครูจะมารับเครื่อง"), "[ขั้น E] ข้ามวัน: ปิ๊บบอกว่าครูจะมารับเครื่องวันนี้ (%s)" % ", ".join(DayLoop.day_skip_notes))
+	DayLoop.day_skip_notes.clear()
+	DayLoop._day_skip_pending = false
+	var pj := DayLoop.door_front()
+	_check(GameState.money == money0 and DayLoop.shelf.orders.is_empty() and o.state == RepairShelf.State.PICKED and DayLoop.is_pickup(pj) and pj["case"] == ram, "[ขั้น E] เปิดร้านวันนัด → ครูยืนหน้าประตูเป็นคิวแรก (ยังไม่จ่าย · ชั้นว่าง)")
+	_check(DayLoop.door_accept_state() == &"pickup" and not DayLoop.door_can_appoint() and not DayLoop.door_reject() and DayLoop.accepted_today == 0, "ลูกค้ามารับ: นัด/ปฏิเสธไม่ได้ · ไม่นับโควตา")
+	_show(DayLoop.Card.DOOR)
+	_check(_door("Accept").text == "ส่งมอบเครื่อง" and not _door("Appoint").visible and not _door("Reject").visible and not _door("PatienceBar").visible and _door("Detail").text.contains("฿%d" % expect) and _door("Name").text.contains("มารับเครื่อง"), "การ์ด: \"ส่งมอบเครื่อง\" · บอกค่าแรง ฿%d · ไม่มีแถบความอดทน" % expect)
+	ts.set_clock(ts.current_minute + 120)
+	_check(DayLoop.is_pickup(DayLoop.door_front()) and not DayLoop.walkouts.has("ครู"), "ลูกค้ามารับไม่หมดความอดทน (คนอื่นเดินกลับได้: %s)" % [DayLoop.walkouts])
+	_door("Accept").pressed.emit()
+	_check(GameState.money == money0 + expect and not DayLoop.is_pickup(DayLoop.door_front()) and DayLoop.last_handover["order"] == o, "กดส่งมอบ → จ่าย ฿%d (เงิน %d → %d)" % [expect, money0, GameState.money])
 	_check(GameState.satisfaction_history.size() == sat_n + 1 and GameState.satisfaction_history[-1] == mini(int(r["satisfaction"]) + e.on_time_sat_bonus, 100), "ทันนัด → ความพอใจ +%d" % e.on_time_sat_bonus)
-	_check(DayLoop.shelf_news.size() == 1 and DayLoop.shelf_news[0].contains("มารับเครื่อง") and DayLoop.shelf_news[0].contains("ทันนัด") and DayLoop.door_view()["note"].contains("มารับเครื่อง"), "การ์ดหน้าร้านบอกว่าใครมารับเครื่อง (%s)" % ", ".join(DayLoop.shelf_news))
+	_check(DayLoop.visitor_toast._queue.any(func(q: PackedStringArray) -> bool: return q[0].contains("ครู มารับเครื่อง") and q[0].contains("ทันนัด")), "ป้าย \"ครู มารับเครื่อง +฿ (ทันนัด)\"")
+	# ไม่ได้ส่งมอบจนปิดร้าน → ส่งให้อัตโนมัติ · เซฟ/โหลดลูกค้ามารับได้
+	var oa: RepairShelf.Order = DayLoop.shelf.add(ram3, ts.shift, 1)
+	var ra := _fake_repair(oa, 95)
+	DayLoop._result_pending = false
+	_check(oa.state == RepairShelf.State.DONE, "ซ่อมเสร็จก่อนนัด (เครื่องผู้ใหญ่บ้าน)")
+	DayLoop.door_queue.push_front(DayLoop.pickup_entry(DayLoop.shelf.pickup(oa, oa.due)))
+	SaveGame.allow_in_tests = true
+	var backup := FileAccess.get_file_as_string(SaveGame.PATH) if SaveGame.exists() else ""
+	_check(SaveGame.save(), "บันทึกเกมตอนมีลูกค้ารอรับเครื่อง")
+	DayLoop.door_queue.clear()
+	SaveGame.load_into()
+	var lj := DayLoop.door_front()
+	_check(DayLoop.is_pickup(lj) and lj["case"] == ram3 and int((lj["pickup"]["order"] as RepairShelf.Order).result.get("money_due", 0)) == int(ra["money_due"]) and lj["pickup"]["on_time"], "โหลดเซฟ → ลูกค้ารอรับเครื่องกลับมาครบ (ยอดที่เก็บไว้ไม่หาย)")
+	if backup != "":
+		var f := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
+		f.store_string(backup)
+	else:
+		SaveGame.clear()
+	SaveGame.allow_in_tests = false
+	var m5 := GameState.money
+	var exp_a := _expected_pay(ra, e.promise_mult(1))
+	DayLoop.end_shift()
+	await _frames(2)
+	DayLoop.forced_case = null
+	_check(GameState.money == m5 + exp_a and not DayLoop.door_queue.any(func(q: Dictionary) -> bool: return DayLoop.is_pickup(q)), "ปิดร้านโดยยังไม่ส่งมอบ → ส่งให้อัตโนมัติ ได้ ฿%d" % exp_a)
 
 	# ---------------- D · ด่วน วันนี้ → ซ่อมเสร็จลูกค้ามารับเลย ×1.2
 	_reset_door(9 * 60)
@@ -149,10 +189,96 @@ func _ready() -> void:
 	_check(not r2.get("held", false) and GameState.money > m4, "งานปกติจ่ายทันทีเหมือนเดิม")
 	DayLoop._result_pending = false
 
+	# ---------------- G · แอปงานซ่อมในคอมของขม: ตารางตามวัน · เลื่อนนัด · โทรเรียกมารับ · ไปซ่อม
+	_reset_door(9 * 60)
+	DayLoop.shelf = RepairShelf.new(e)
+	DayLoop.shelf.slots = 4
+	var g1: RepairShelf.Order = DayLoop.shelf.add(ram, ts.shift, 1)
+	var g2: RepairShelf.Order = DayLoop.shelf.add(ram2, ts.shift - 2, 1)
+	var g3: RepairShelf.Order = DayLoop.shelf.add(ram3, ts.shift, 2)
+	var rg3 := _fake_repair(g3, 95)
+	DayLoop._result_pending = false
+	DayLoop.appointments.append({ "case": os_case, "free": false })
+	var app := (load("res://Scene/UI/work_order_app.tscn") as PackedScene).instantiate() as WorkOrderApp
+	add_child(app)
+	await _frames(2)
+	var av := DayLoop.work_app_view()
+	var titles: Array = (av["sections"] as Array).map(func(s: Dictionary) -> String: return String(s["title"]))
+	_check(titles.size() == 4 and titles[0] == "เลยนัดแล้ว!" and String(titles[1]).begins_with("วันเปิดร้านถัดไป") and String(titles[2]).begins_with("อีก 2 วัน") and String(titles[3]).begins_with("นัดมาหน้าร้าน"), "แอป: แบ่งตามวันนัด เลยนัดอยู่บนสุด + คนนัดมาหน้าร้าน (%s)" % ", ".join(titles))
+	_check(DayLoop._app_rows == [g2, g1, g3], "แถวเรียงตามวันนัด")
+	var pb := _app_btn(app, "Btn_postpone", 1)
+	_check(pb != null and not pb.disabled and _app_btn(app, "Btn_postpone", 0).disabled and _app_btn(app, "Btn_call", 2) != null and not _app_btn(app, "Btn_call", 2).disabled, "ปุ่ม: เลื่อนนัดได้ (เลยนัดแล้วเลื่อนไม่ได้) · ซ่อมเสร็จแล้วโทรเรียกมารับได้")
+	var due1 := g1.due
+	pb.pressed.emit()
+	await _frames(2)
+	_check(g1.due == due1 + 1 and g1.postponed and g1.sat_adjust == -e.postpone_sat_penalty and not DayLoop.shelf.can_postpone(g1, ts.shift, TimeSystem.TOTAL_SHIFTS), "กดเลื่อนนัด → นัด +1 วัน · ความพอใจตอนรับ −%d · เลื่อนอีกไม่ได้" % e.postpone_sat_penalty)
+	app.refresh()
+	_check(_app_btn(app, "Btn_postpone", DayLoop._app_rows.find(g1)).disabled, "ปุ่มเลื่อนนัดกดไม่ได้แล้ว")
+	_app_btn(app, "Btn_call", DayLoop._app_rows.find(g3)).pressed.emit()
+	await _frames(2)
+	var cj := DayLoop.door_front()
+	_check(DayLoop.is_pickup(cj) and cj["case"] == ram3 and cj["pickup"]["on_time"] and int(cj["pickup"]["sat_delta"]) == e.on_time_sat_bonus + e.early_call_sat_bonus and float(cj["pickup"]["mult"]) == e.promise_mult(2), "โทรเรียกมารับ → ผู้ใหญ่บ้านมายืนหน้าประตู (ทันนัด · ความพอใจ +%d)" % (e.on_time_sat_bonus + e.early_call_sat_bonus))
+	var m6 := GameState.money
+	DayLoop.door_handover()
+	_check(GameState.money == m6 + _expected_pay(rg3, e.promise_mult(2)) and GameState.satisfaction_history[-1] == mini(int(rg3["satisfaction"]) + e.on_time_sat_bonus + e.early_call_sat_bonus, 100), "ส่งมอบ → ได้เงินวันนี้ (ไม่ต้องรอนัด)")
+	# ไปซ่อม: จำไว้แล้วเปิดมินิเกมเมื่อกลับมาที่หน้าร้าน
+	app.refresh()
+	var rb := _app_btn(app, "Btn_repair", DayLoop._app_rows.find(g1))
+	_check(rb != null and not rb.disabled, "ปุ่มไปซ่อมกดได้")
+	app.queue_free()
+	_check(DayLoop.request_shelf_repair(g1) and DayLoop._pending_repair == g1, "กดไปซ่อม → จำงานไว้ (รอปิดคอม)")
+	await get_tree().create_timer(1.0).timeout
+	_check(is_instance_valid(DayLoop._minigame) and DayLoop.current_job.get("order") == g1 and GameState.hold_next_payment and DayLoop._pending_repair == null, "กลับมาหน้าร้าน → เปิดมินิเกมเครื่องครูเอง")
+	while is_instance_valid(DayLoop._minigame) and not DayLoop._minigame.is_inside_tree():
+		await get_tree().process_frame # รอ Fade ของ SceneRouter.push_node ให้มินิเกมเข้าฉากก่อน
+	GameState.record_repair(g1.case.part(), 95, false, g1.case.fee, g1.case.level)
+	SceneRouter.pop()
+	await _frames(3)
+	_check(not Global.in_minigame, "ปิดมินิเกม → กลับร้าน")
+	DayLoop._result_pending = false
+	_check(g1.state == RepairShelf.State.DONE and not GameState.hold_next_payment, "ซ่อมเสร็จก่อนนัด → รอบนชั้น")
+	var gp := DayLoop.shelf.pickup(g1, g1.due)
+	_check(int(gp["sat_delta"]) == e.on_time_sat_bonus - e.postpone_sat_penalty, "เครื่องที่เลื่อนนัด: มารับทันนัดได้ความพอใจ +%d −%d" % [e.on_time_sat_bonus, e.postpone_sat_penalty])
+	DayLoop.appointments.clear()
+
+	# ---------------- H · การ์ดเป้าหมายไม่กาง-พับกระพริบตอนไม่มีการ์ดชั่วครู่ (15 พ.ย. ผู้ใช้เจอตอนเวลาหมุน)
+	_reset_door(9 * 60)
+	EventManager.showUI() # มินิเกมจริงเรียกเองตอนจบ (เทสต์ปิดมินิเกมตรง ๆ)
+	var qb = EventManager.questboard
+	qb.set_collapsed(false)
+	DayLoop._goal_auto_collapsed = false
+	for i in 6:
+		DayLoop.shelf_news.append("ข้อความยาว ๆ บรรทัดที่ %d ของการ์ดหน้าร้าน ทำให้การ์ดสูงเกินพื้นที่" % i)
+	DayLoop.add_visitors(4)
+	DayLoop._board_dirty = true
+	await _frames(20)
+	_check(qb.collapsed and DayLoop._goal_auto_collapsed, "การ์ดหน้าร้านสูง → พับการ์ดเป้าหมายให้")
+	DayLoop.time_skip(30, 0.8)
+	var flick := false
+	for i in 70:
+		await get_tree().process_frame
+		flick = flick or not qb.collapsed
+	_check(not flick and qb.collapsed, "เวลาหมุน (ไม่มีการ์ดชั่วครู่) → การ์ดเป้าหมายไม่กางกระพริบ")
+	DayLoop.shelf_news.clear()
+	DayLoop.force_active = false
+	await _frames(10)
+	_check(not qb.collapsed and not DayLoop._goal_auto_collapsed, "ร้านไม่ได้เปิดแล้ว → กางการ์ดเป้าหมายคืนให้")
+
 	DayLoop.force_active = false
 	DayLoop._reset_run()
 	print("T DONE fails=", fails)
 	get_tree().quit()
+
+
+## ปุ่ม id ในแถวที่ row (index ใน DayLoop._app_rows) ของแอปงานซ่อม
+func _app_btn(app: WorkOrderApp, id: String, row: int) -> Button:
+	var rows_with_btns: Array = []
+	for p in app.get_node("%List").get_children():
+		if p is PanelContainer and p.find_child("Btn_*", true, false) != null:
+			rows_with_btns.append(p)
+	if row < 0 or row >= rows_with_btns.size():
+		return null
+	return (rows_with_btns[row] as Node).find_child(id, true, false) as Button
 
 
 ## ซ่อมงานบนชั้นแบบไม่เปิดมินิเกม (เหมือน shelf_repair แต่ส่งผลเอง)
