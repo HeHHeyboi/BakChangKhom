@@ -107,6 +107,30 @@ class_name EconomyConfig extends Resource
 ## ลูกค้าเพิ่ม/ลดต่อวันจากเทศกาล (บวกกับฐาน board_new_per_shift + โบนัสชื่อเสียง)
 @export var month_visitor_bonus: PackedInt32Array = [0, 1, 0, 1, 1, -1, -1, -1, 0, 1, -1, 1]
 
+@export_group("หน้าประตู + ใบรับเครื่อง + ชั้นวาง (0.3.0 · PLAN_0_3_0 ข้อ 2–4)")
+## รับลูกค้าใหม่ได้กี่คนต่อวัน (ลูกค้าที่นัดไว้นับโควตาของวันที่เขามา · งานเนื้อเรื่องไม่นับ)
+@export var daily_cap := 3
+## ลูกค้ายืนรอหน้าประตูได้กี่เทิร์น (ผู้สูงอายุ/รีบ ใช้ CustomerCase.patience แทน)
+@export var door_patience_slots := 2
+## ปล่อยรอหน้าประตูจนเดินกลับ
+@export var rep_door_walkout := -1
+## ชั้นวางเครื่องเริ่มกี่ช่อง (อัปเกรดด้วย ItemDef.shelf_slots_to)
+@export var shelf_slots_start := 2
+## ตัวเลือกวันนัดรับเครื่อง = อีกกี่วันเปิดร้าน (0 = วันนี้) · ค่าแรงคูณตามความเร็ว
+@export var promise_days: PackedInt32Array = [0, 1, 2]
+@export var promise_pay_mult: PackedFloat32Array = [1.2, 1.0, 0.9]
+@export var promise_names: PackedStringArray = ["ด่วน วันนี้", "วันเปิดร้านถัดไป", "อีก 2 วันเปิดร้าน"]
+## ส่งทันนัด → ความพอใจ +
+@export var on_time_sat_bonus := 10
+## ช้ากว่านัด — ลูกค้ายอมรอเพิ่มได้กี่วันเปิดร้าน ("ล่วงเวลา" ของใบรับเครื่อง) · หักความพอใจต่อวัน
+@export var late_grace_days := 2
+@export var late_sat_per_day := 15
+## ค่าแรงลดต่อวันที่ช้า (สัดส่วน)
+@export var late_pay_cut_per_day := 0.1
+## เลยช่วงผ่อนผัน → ลูกค้ามาเอาเครื่องคืนตามสภาพ
+@export var rep_returned := -3
+@export var returned_satisfaction := 25
+
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")
 @export var ot_cost_per_slot := 30
 ## ล่วงเวลาได้กี่วันต่อบท ([0.2.5] 1 บท = 1 เดือน เปิดร้าน 4 วัน)
@@ -237,3 +261,8 @@ func target_for(m: int) -> int:
 
 func month_value(arr: PackedInt32Array, month: int) -> int:
 	return arr[clampi(month, 1, arr.size()) - 1] if not arr.is_empty() else 0
+
+
+## [0.3.0] ค่าแรงคูณตามวันนัดที่เลือก (index ของ promise_days)
+func promise_mult(i: int) -> float:
+	return promise_pay_mult[i] if i >= 0 and i < promise_pay_mult.size() else 1.0
