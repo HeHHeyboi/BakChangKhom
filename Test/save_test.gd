@@ -131,7 +131,7 @@ func _ready() -> void:
 	DayLoop._pending_summary_week = 0
 	DayLoop._last_month = { }
 	DayLoop._last_bill = { }
-	# [0.3.0 ขั้น G · 0.4.0 ขั้น H] เซฟ VERSION 5 · เซฟ v4/v3 (0.2.5 กระดานงาน · ไม่มีชั้นวาง) ยังโหลดได้
+	# [0.3.0 ขั้น G · 0.4.0 ขั้น H] เซฟ VERSION 5–6 · เซฟ v4/v3 (0.2.5 กระดานงาน · ไม่มีชั้นวาง) ยังโหลดได้
 	var ram_case: CustomerCase = load("res://Resources/Customers/lv2_teacher_ram.tres")
 	DayLoop.shelf.add(ram_case, 2, 1)
 	GameState.set_shelf_slots(4)
@@ -144,7 +144,7 @@ func _ready() -> void:
 	DayLoop.assign_parts(false)
 	GameState.order_online([[load("res://Resources/Shop/fan_cpu.tres"), 1]])
 	var key_b := ob.key
-	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 5, "บันทึกเป็น VERSION 5")
+	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 6, "บันทึกเป็น VERSION 6 (0.5.0)")
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	GameState.shelf_slots = 2
 	GameState.inventory.clear()

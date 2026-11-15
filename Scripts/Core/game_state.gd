@@ -161,6 +161,22 @@ var pending_orders: Array[Dictionary] = []
 ## อัปเกรดที่ซื้อแล้ว (id → true)
 var upgrades: Dictionary = { }
 
+# ---- [0.5.0] ลูกค้าประจำ + ความสนิท (PLAN_0_5_0 ข้อ 2) · รายชื่อ = NpcBook (Resources/NPC/)
+## ความสนิทเปลี่ยน (id ของ CustomerNPC · ค่าใหม่ 0–100 · ส่วนต่าง · เหตุการณ์)
+signal affinity_changed(id: StringName, value: int, delta: int, reason: StringName)
+## ขึ้นระดับความสนิท (tier 1–4 = รู้จัก … ขาประจำ)
+signal affinity_tier_up(id: StringName, tier: int)
+## id → ค่า 0–100 (ยังไม่มี = start_affinity ของ NPC)
+var npc_affinity: Dictionary[StringName, int] = { }
+## id → [{ ch, day, text }] เคยซ่อมอะไร (ล่าสุดอยู่ท้าย · ไม่เกิน npc_history_max)
+var npc_history: Dictionary = { }
+## id → shift ที่มาร้านล่าสุด (ใช้ลดโอกาสมาซ้ำ)
+var npc_last_visit: Dictionary = { }
+## id → [at, ...] เรื่องส่วนตัวที่ฟังแล้ว
+var npc_stories_seen: Dictionary = { }
+## [{ ch, id, delta }] ความสนิทที่ได้/เสียแต่ละครั้ง (สรุปเดือน)
+var affinity_log: Array[Dictionary] = []
+
 
 func _ready() -> void:
 	if has_node(^"/root/EventManager"):
@@ -191,6 +207,11 @@ func reset() -> void:
 	shop_bought.clear()
 	shop_week = 0
 	upgrades.clear()
+	npc_affinity.clear()
+	npc_history.clear()
+	npc_last_visit.clear()
+	npc_stories_seen.clear()
+	affinity_log.clear()
 	ledger.clear()
 	month_results.clear()
 	missed_months = 0
@@ -460,6 +481,113 @@ func _month_hint(rep: Dictionary) -> String:
 	if -int(by.get(&"ot_power", 0)) > income * 0.1:
 		return "ทำงานล่วงเวลาบ่อย ค่าไฟเลยแพง ลองเลือกงานให้พอดีกับเวลาในวันนะ"
 	return "รายได้ยังน้อย ลองรับงานให้มากขึ้น หรือทำให้ได้ 3 ดาวจะได้ทิปด้วยนะ"
+
+
+## ---------------------------------------------------------------- [0.5.0] ความสนิท
+
+
+func _econ() -> EconomyConfig:
+	return economy if economy else EconomyConfig.new()
+
+
+## ค่าความสนิท 0–100 (ลูกค้าขาจร/ไม่มีค่าความสนิท = 0)
+func affinity(id: StringName) -> int:
+	if npc_affinity.has(id):
+		return npc_affinity[id]
+	var n := NpcBook.by_id(id)
+	return n.start_affinity if n and n.has_affinity else 0
+
+
+## ระดับ 0–4 (แปลกหน้า … ขาประจำ)
+func affinity_tier(id: StringName) -> int:
+	return _econ().affinity_tier(affinity(id))
+
+
+func affinity_tier_name(id: StringName) -> String:
+	return _econ().affinity_tier_name(affinity_tier(id))
+
+
+## หัวใจ 0–5 ดวง (ครึ่งดวงได้)
+func affinity_hearts(id: StringName) -> float:
+	return snappedf(affinity(id) / 20.0, 0.5)
+
+
+func has_affinity(id: StringName) -> bool:
+	var n := NpcBook.by_id(id)
+	return n != null and n.has_affinity
+
+
+## เปลี่ยนความสนิท · คืนส่วนต่างที่เปลี่ยนจริง (ชนเพดาน/ไม่มีค่าความสนิท = 0)
+func add_affinity(id: StringName, delta: int, reason: StringName = &"") -> int:
+	if delta == 0 or not has_affinity(id):
+		return 0
+	var before := affinity(id)
+	var after := clampi(before + delta, 0, 100)
+	if after == before:
+		return 0
+	npc_affinity[id] = after
+	var when := _ledger_when()
+	affinity_log.append({ "ch": when.x, "id": String(id), "delta": after - before })
+	affinity_changed.emit(id, after, after - before, reason)
+	var e := _econ()
+	if e.affinity_tier(after) > e.affinity_tier(before):
+		affinity_tier_up.emit(id, e.affinity_tier(after))
+	return after - before
+
+
+## ความสนิทตามเหตุการณ์ (EconomyConfig.affinity_gain) · times = จำนวนครั้ง (เช่น เลยนัดกี่วัน)
+func affinity_event(id: StringName, event: StringName, times := 1) -> int:
+	return add_affinity(id, int(_econ().affinity_gain.get(event, 0)) * times, event)
+
+
+## ความสนิทที่ได้/เสียในบท ch: { id: delta }
+func affinity_gains(ch: int) -> Dictionary:
+	var out := { }
+	for r in affinity_log:
+		if int(r.ch) == ch:
+			out[StringName(r.id)] = int(out.get(StringName(r.id), 0)) + int(r.delta)
+	return out
+
+
+## จดว่ามาร้าน (shift = วันเปิดร้านที่มา)
+func note_visit(id: StringName, shift: int) -> void:
+	if id != &"":
+		npc_last_visit[id] = shift
+
+
+func met(id: StringName) -> bool:
+	return npc_last_visit.has(id)
+
+
+## มาร้านภายใน affinity_recent_days วันเปิดร้านก่อน shift นี้ไหม
+func visited_recently(id: StringName, shift: int) -> bool:
+	if not npc_last_visit.has(id):
+		return false
+	var gap := shift - int(npc_last_visit[id])
+	return gap >= 0 and gap <= _econ().affinity_recent_days
+
+
+## จดประวัติเครื่อง ("แรม · ม.ค.")
+func add_npc_history(id: StringName, text: String) -> void:
+	if id == &"" or text.is_empty():
+		return
+	var when := _ledger_when()
+	var arr: Array = npc_history.get(id, [])
+	arr.append({ "ch": when.x, "day": when.y, "text": text })
+	while arr.size() > _econ().npc_history_max:
+		arr.pop_front()
+	npc_history[id] = arr
+
+
+func story_seen(id: StringName, at: int) -> bool:
+	return (npc_stories_seen.get(id, []) as Array).has(at)
+
+
+func mark_story_seen(id: StringName, at: int) -> void:
+	var arr: Array = npc_stories_seen.get(id, [])
+	if not arr.has(at):
+		arr.append(at)
+	npc_stories_seen[id] = arr
 
 
 ## ยศช่าง 0–4 จาก XP

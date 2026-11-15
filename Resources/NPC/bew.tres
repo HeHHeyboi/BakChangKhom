@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bew"
+display_name = "น้องบิว"
+char_key = "เด็ก"
+start_affinity = 0
+base_weight = 1.0
+has_affinity = true
+bio = "เด็กข้างบ้านที่ชอบเล่นเกม เครื่องของบิวมักเจอโฆษณาเด้งกับโปรแกรมแปลก ๆ"

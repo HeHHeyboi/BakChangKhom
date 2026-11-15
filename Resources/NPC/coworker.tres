@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"coworker"
+display_name = "เพื่อนร่วมงานเก่า"
+char_key = "เพื่อนร่วมงาน"
+start_affinity = 30
+base_weight = 1.0
+has_affinity = true
+bio = "เพื่อนร่วมงานจากบริษัทเก่าในเมือง แวะมาเที่ยวหาขมพร้อมคอมที่มีปัญหา"

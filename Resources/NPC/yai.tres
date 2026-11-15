@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"yai"
+display_name = "ยาย"
+char_key = "ยาย"
+start_affinity = 0
+base_weight = 1.0
+has_affinity = false
+bio = "ยายของขม เจ้าของบ้านที่แบ่งหน้าบ้านให้เปิดร้าน ใครในหมู่บ้านคอมเสียก็มักได้ยินเรื่องร้านจากยาย"

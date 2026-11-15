@@ -10,7 +10,8 @@ const PATH := "user://save.json"
 ## [0.2.5] 3 = 1 บท = 1 เดือน (48 วัน) — เซฟ v2 (1 บท = 1 สัปดาห์ · 36 วัน) เลขกะ/บทไม่ตรงกัน → ให้เริ่มใหม่
 ## [0.3.0] VERSION 4 = หน้าประตู (door · appointments · accepted_today) · ชั้นวาง (shelf · shelf_slots) · ลูกค้ามารับ (door[].pickup)
 ## [0.4.0] VERSION 5 = อะไหล่ผูกกับงาน: ราคาทุนในคลัง (items[].cost) · พัสดุออนไลน์ (inventory.pending) · ใบรับเครื่องมีรหัส/ของชดใช้ (shelf.orders[].key · replace_part) · สต็อกตลาดรอบ 2 สัปดาห์ (inventory.week = รอบ)
-const VERSION := 5
+## [0.5.0] VERSION 6 = ลูกค้าประจำ: ความสนิท · ประวัติเครื่อง · มาร้านล่าสุด · เรื่องส่วนตัวที่ฟังแล้ว (game.npc)
+const VERSION := 6
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -91,6 +92,7 @@ static func save() -> bool:
 			"month_results": GameState.month_results.map(func(r: Dictionary) -> Dictionary: return _plain(r)), # [0.2.0-G]
 			"missed_months": GameState.missed_months, "debt_streak": GameState.debt_streak, "shop_closed": GameState.shop_closed, "help_mode": GameState.help_mode,
 			"ledger": GameState.ledger.map(func(e: Dictionary) -> Dictionary: return { "ch": e.ch, "day": e.day, "kind": String(e.kind), "amount": e.amount, "note": e.note }), # [0.2.0-C]
+			"npc": _npc_save(), # [0.5.0]
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
@@ -154,6 +156,7 @@ static func load_into() -> int:
 	for e in g.get("ledger", []):
 		if e is Dictionary:
 			GameState.ledger.append({ "ch": int(e.get("ch", 0)), "day": int(e.get("day", 0)), "kind": StringName(e.get("kind", "other")), "amount": int(e.get("amount", 0)), "note": String(e.get("note", "")) })
+	_npc_load(g.get("npc", { })) # [0.5.0] เซฟ v3–v5 ไม่มี = ค่าเริ่มของแต่ละคน
 	var inv: Dictionary = d.get("inventory", { })
 	GameState.storage_slots = int(inv.get("slots", GameState.STORAGE_START))
 	for e in inv.get("items", []):
@@ -268,3 +271,42 @@ static func _read() -> Dictionary:
 static func _version_ok(d: Dictionary) -> bool:
 	var v := int(d.get("version", 0))
 	return v >= MIN_VERSION and v <= VERSION
+
+
+## [0.5.0] ลูกค้าประจำ → JSON
+static func _npc_save() -> Dictionary:
+	var aff := { }
+	for k in GameState.npc_affinity:
+		aff[String(k)] = GameState.npc_affinity[k]
+	var hist := { }
+	for k in GameState.npc_history:
+		hist[String(k)] = GameState.npc_history[k]
+	var last := { }
+	for k in GameState.npc_last_visit:
+		last[String(k)] = GameState.npc_last_visit[k]
+	var seen := { }
+	for k in GameState.npc_stories_seen:
+		seen[String(k)] = GameState.npc_stories_seen[k]
+	return { "affinity": aff, "history": hist, "last_visit": last, "stories": seen, "log": GameState.affinity_log }
+
+
+static func _npc_load(n: Dictionary) -> void:
+	var aff: Dictionary = n.get("affinity", { })
+	for k in aff:
+		GameState.npc_affinity[StringName(k)] = int(aff[k])
+	var hist: Dictionary = n.get("history", { })
+	for k in hist:
+		var arr := []
+		for h in hist[k]:
+			if h is Dictionary:
+				arr.append({ "ch": int(h.get("ch", 0)), "day": int(h.get("day", 0)), "text": String(h.get("text", "")) })
+		GameState.npc_history[StringName(k)] = arr
+	var last: Dictionary = n.get("last_visit", { })
+	for k in last:
+		GameState.npc_last_visit[StringName(k)] = int(last[k])
+	var seen: Dictionary = n.get("stories", { })
+	for k in seen:
+		GameState.npc_stories_seen[StringName(k)] = Array(seen[k]).map(func(v): return int(v))
+	for r in n.get("log", []):
+		if r is Dictionary:
+			GameState.affinity_log.append({ "ch": int(r.get("ch", 0)), "id": String(r.get("id", "")), "delta": int(r.get("delta", 0)) })

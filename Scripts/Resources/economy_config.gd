@@ -215,6 +215,28 @@ class_name EconomyConfig extends Resource
 @export var rank_xp: PackedInt32Array = [0, 500, 1500, 3500, 7000]
 @export var rank_names: PackedStringArray = ["ช่างมือใหม่", "ช่างฝึกหัด", "ช่างประจำหมู่บ้าน", "ช่างเชี่ยวชาญ", "ช่างมือโปร"]
 
+@export_group("ลูกค้าประจำ + ความสนิท (0.5.0 · PLAN_0_5_0 ข้อ 2 · 8)")
+## เกณฑ์ขึ้นระดับ รู้จัก / คุ้นเคย / สนิท / ขาประจำ (ต่ำกว่าช่องแรก = แปลกหน้า)
+@export var affinity_tiers: PackedInt32Array = [20, 40, 60, 80]
+@export var affinity_tier_names: PackedStringArray = ["แปลกหน้า", "รู้จัก", "คุ้นเคย", "สนิท", "ขาประจำ"]
+## ตัวคูณโอกาสมาร้านตามระดับ (index = ระดับ 0–4)
+@export var affinity_visit_mult: PackedFloat32Array = [1.0, 1.2, 1.5, 2.0, 2.5]
+## มาร้านภายใน n วันเปิดร้านที่ผ่านมา → โอกาสมาอีก × affinity_recent_mult
+@export var affinity_recent_days := 2
+@export var affinity_recent_mult := 0.3
+## ได้/เสียความสนิทตามเหตุการณ์ (ข้อ 2.4)
+@export var affinity_gain: Dictionary[StringName, int] = {
+	&"pass": 5, &"three_star": 3, &"on_time": 3, &"kept_appointment": 2, &"call_early": 1, &"story_good": 10, &"story_plain": 3,
+	&"fail": -4, &"damage": -8, &"late_day": -3, &"reject": -3, &"walk_out": -4, &"reclaimed": -10,
+}
+## ระดับที่ลูกค้ารอหน้าประตูได้ +1 เทิร์น (คุ้นเคย)
+@export var affinity_patience_tier := 2
+## ระดับที่ให้ทิปเพิ่มตอนมารับ (สนิท) · จำนวน
+@export var affinity_tip_tier := 3
+@export var affinity_tip := 20
+## ประวัติเครื่องที่จำต่อคน
+@export var npc_history_max := 5
+
 
 func fee_for_level(level: int) -> int:
 	return level_fee[clampi(level, 1, level_fee.size()) - 1] if not level_fee.is_empty() else default_fee
@@ -307,3 +329,20 @@ func part_markup(rank: int) -> float:
 	if part_markup_by_rank.is_empty():
 		return 0.0
 	return part_markup_by_rank[clampi(rank, 0, part_markup_by_rank.size() - 1)]
+
+
+## [0.5.0] ระดับความสนิท 0–4 จากค่า 0–100
+func affinity_tier(value: int) -> int:
+	var t := 0
+	for i in affinity_tiers.size():
+		if value >= affinity_tiers[i]:
+			t = i + 1
+	return t
+
+
+func affinity_tier_name(tier: int) -> String:
+	return affinity_tier_names[clampi(tier, 0, affinity_tier_names.size() - 1)] if not affinity_tier_names.is_empty() else ""
+
+
+func affinity_mult(tier: int) -> float:
+	return affinity_visit_mult[clampi(tier, 0, affinity_visit_mult.size() - 1)] if not affinity_visit_mult.is_empty() else 1.0

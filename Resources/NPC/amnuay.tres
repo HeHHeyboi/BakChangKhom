@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"amnuay"
+display_name = "ลุงอำนวย"
+char_key = "ลุงอำนวย"
+start_affinity = 20
+base_weight = 1.0
+has_affinity = true
+bio = "ลูกค้าคนแรกของร้าน ใช้คอมเครื่องเดิมมาหลายปี ชอบมาตอนเช้า"
