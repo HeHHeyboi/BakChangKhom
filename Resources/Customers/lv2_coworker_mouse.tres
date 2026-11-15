@@ -18,3 +18,4 @@ job_title = "เมาส์/คีย์บอร์ดไม่ทำงาน
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_coworker_mouse.txt"
 thanks_text = "ขยับแล้ว! เสียดายเงินค่าเมาส์ใหม่จัง ฮ่า ๆ"
 complain_text = "ยังไม่ขยับเลยนะขม…"
+patience = 1

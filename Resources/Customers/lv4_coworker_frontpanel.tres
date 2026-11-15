@@ -17,3 +17,4 @@ job_title = "เสียบสายหน้าเคส + จัดแรม 
 arrive_dialog = "res://Assets/Dialog/Customer/lv4_coworker_frontpanel.txt"
 thanks_text = "เปิดติดแล้ว เร็วขึ้นเหมือนได้เครื่องใหม่ ไว้แนะนำเพื่อนให้นะ"
 complain_text = "ยังไม่ติดเลยว่ะขม ไว้ค่อยว่ากันนะ"
+patience = 1

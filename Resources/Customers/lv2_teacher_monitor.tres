@@ -19,3 +19,5 @@ bench_task = ExtResource("2_task")
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_teacher_monitor.txt"
 thanks_text = "ขึ้นภาพแล้ว! เด็ก ๆ ได้เรียนคอมพิวเตอร์พรุ่งนี้แน่"
 complain_text = "จอก็ยังมืดอยู่นะขม…"
+needs_part = &"cable_hdmi"
+part_hint = "สายจอเดิมหักใน ต้องใช้สาย HDMI เส้นใหม่ แล้วเสียบให้ถูกช่อง"

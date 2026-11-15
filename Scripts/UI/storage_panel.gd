@@ -125,6 +125,10 @@ func _refresh() -> void:
 	count_label.add_theme_color_override("font_color", Color(0.8, 0.15, 0.1) if over else Color(0.4, 0.3, 0.2))
 	if over:
 		count_label.text += " (เกิน! ขายหรือใช้ออกก่อนซื้อเพิ่ม)"
+	# [0.4.0] มูลค่าของในคลัง (เงินที่จมอยู่ในของ)
+	var value := GameState.inventory_value()
+	if value > 0:
+		count_label.text += " · มูลค่าของ ฿%d" % value
 	for c in grid.get_children():
 		grid.remove_child(c)
 		c.queue_free()
@@ -139,13 +143,24 @@ func _refresh() -> void:
 		slot.button_group = _group
 		var top := ("ใหม่" if String(e.condition) == "new" else "มือสอง") if it.kind == ItemDef.Kind.PART else "เหลือ %d ครั้ง" % int(e.qty)
 		var reserved := String(e.get("reserved_for", ""))
-		var price := ("฿%d" % it.price) if it.kind == ItemDef.Kind.PART else ("฿%d/แพ็ก" % it.price)
+		var paid := int(e.get("cost", 0))
+		var price := ("฿%d" % paid if paid > 0 else "ได้ฟรี") if it.kind == ItemDef.Kind.PART else ("฿%d/แพ็ก" % it.price)
 		slot.set_item(it, top, price, "จอง" if reserved != "" else "")
 		slot.index = i
 		slot.pressed.connect(_select.bind(i))
 		if i == _sel:
 			slot.set_pressed_no_signal(true)
 		shown += 1
+	# [0.4.0] ของที่สั่งออนไลน์ยังไม่มาถึง (จองช่องไว้แล้ว)
+	for o in GameState.pending_orders:
+		var pit: ItemDef = load(String(o.path)) as ItemDef if ResourceLoader.exists(String(o.path)) else null
+		if pit == null or (_filter != -1 and pit.kind != _filter):
+			continue
+		var ps := SLOT_SCENE.instantiate() as ItemSlot
+		grid.add_child(ps)
+		ps.set_item(pit, "รอส่ง ×%d" % int(o.qty), "มาวันเปิดร้านถัดไป", "📦")
+		ps.disabled = true
+		ps.modulate = Color(1, 1, 1, 0.75)
 	if _filter == -1:
 		for k in GameState.free_slots():
 			var slot := SLOT_SCENE.instantiate() as ItemSlot
@@ -177,10 +192,13 @@ func _refresh_detail() -> void:
 	if it and it.description != "":
 		lines.append(it.description)
 	if String(e.get("reserved_for", "")) != "":
-		lines.append("จองไว้ให้งานของ %s — ขาย/ทิ้งไม่ได้" % e.reserved_for)
+		var dl := get_node_or_null(^"/root/DayLoop")
+		var who: String = dl.reservation_owner(String(e.reserved_for)) if dl and dl.has_method("reservation_owner") else String(e.reserved_for)
+		lines.append("จองไว้ให้เครื่องของ %s — ขาย/ทิ้งไม่ได้" % who)
 	detail_text.text = "\n".join(lines)
 	if it:
-		lines.append(("ราคาซื้อ ฿%d" % it.price) + ((" · ขายคืนได้ ฿%d" % GameState.sell_price(_sel)) if GameState.sell_price(_sel) > 0 else ""))
+		var paid := int(e.get("cost", 0)) if it.kind == ItemDef.Kind.PART else it.price
+		lines.append(("ซื้อมา ฿%d" % paid if paid > 0 else "ได้มาฟรี") + ((" · ขายคืนได้ ฿%d" % GameState.sell_price(_sel)) if GameState.sell_price(_sel) > 0 else ""))
 		detail_text.text = "\n".join(lines)
 	var price := GameState.sell_price(_sel)
 	sell_button.visible = true

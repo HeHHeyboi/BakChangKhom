@@ -11,6 +11,7 @@ condition = "used"
 uses = 0
 weekly_stock = 0
 unlock_rank = 1
+online = false
 storage_slots_to = 24
 display_name = "ตู้ลิ้นชักแยกชิ้น"
 icon = ExtResource("2_icon")

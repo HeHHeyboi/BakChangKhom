@@ -21,10 +21,10 @@ class_name EconomyConfig extends Resource
 ## ค่าของที่เสีย (หักเงิน) เมื่อทำของลูกค้าเสียระหว่างซ่อม
 @export var damage_penalty: Dictionary[StringName, int] = {
 	&"part_ram": 300,
-	&"part_mainboard": 1500,
-	&"part_gpu": 2500,
+	&"part_mainboard": 700, # [0.4.0] เท่าเมนบอร์ดมือสองออนไลน์ (เดิม 1,500) · งานบนชั้นต้องหาของมาชดใช้แทน (DayLoop._order_damaged)
+	&"part_gpu": 900, # [0.4.0] เท่าการ์ดจอมือสองออนไลน์ (เดิม 2,500)
 	&"part_front_panel": 200,
-	&"part_bios": 500,
+	&"part_bios": 300, # [0.4.0] ราวค่าแรงงาน BIOS (เดิม 500)
 	&"part_desktop": 100, # ล้างถังขยะทั้งที่มีไฟล์ลูกค้า = ของหาย (ค่ากู้ข้อมูล/ชดเชย)
 	&"part_bench": 200, # คีย์บอร์ดเปียก/ช่องเสีย
 }
@@ -141,8 +141,25 @@ class_name EconomyConfig extends Resource
 ## ตลาดเติมสต็อกทุกกี่วันเปิดร้าน (2 = วันที่ 4 และ 18 ของทุกเดือน · ItemDef.weekly_stock = จำนวนต่อรอบ)
 @export var market_restock_days := 2
 ## ร้านออนไลน์: ค่าส่งต่อครั้งที่สั่ง · ของมาถึงอีกกี่วันเปิดร้าน (มาตอนเปิดร้าน)
+## ไปตลาดระหว่างเปิดร้าน (เดินไปกลับ) ใช้กี่เทิร์น · 0 = ไม่เสียเวลา
+@export var market_walk_slots := 1
 @export var online_ship_fee := 20
 @export var online_delay_days := 1
+## รถขายของ: โอกาสมาต่อวันเปิดร้าน (ไม่มาวันแรกของบท) · ลดจากราคาออนไลน์ · ของกี่ชิ้น · มากี่โมง · จอดกี่เทิร์น
+@export var vendor_chance := 0.25
+@export var vendor_discount := 0.3
+@export var vendor_items := 3
+@export var vendor_arrive_minute := 11 * 60
+@export var vendor_stay_slots := 4
+## ของสิ้นเปลืองที่ใช้ต่อ Part (เคสตั้ง CustomerCase.supplies เองได้) · ขาด = ซ่อมได้แต่ช้าลง no_supply_extra_slots
+@export var part_supplies: Dictionary[StringName, Dictionary] = {
+	&"part_mainboard": { &"ipa90": 1, &"paste_grey": 1 },
+	&"part_gpu": { &"air_can": 1, &"cable_tie": 2 },
+	&"part_front_panel": { &"cable_tie": 1 },
+}
+@export var no_supply_extra_slots := 1
+## ทำของลูกค้าเสียแล้วต้องหาอะไหล่มาชดใช้ (ItemDef.replaces) → ความพอใจตอนมารับลดเพิ่ม
+@export var damage_replace_sat := 10
 
 
 @export_group("ล่วงเวลา (LEVEL_DESIGN 4.2)")

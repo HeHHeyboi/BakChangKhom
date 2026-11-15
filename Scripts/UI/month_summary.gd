@@ -19,7 +19,7 @@ signal continue_pressed
 @export var mark_on := "●"
 @export var mark_off := "○"
 
-const INCOME_KINDS := [&"fee", &"tip", &"sell", &"other"]
+const INCOME_KINDS := [&"fee", &"part_fee", &"tip", &"sell", &"other"]
 const EXPENSE_KINDS := [&"bill", &"buy", &"ot_power", &"damage", &"other"]
 
 @onready var _title: Label = %Title
@@ -78,8 +78,15 @@ func show_report(title: String, sub: String, rep: Dictionary, bill: Dictionary, 
 		_row(_expense_grid, empty_text, 0, true)
 	_expense_total.text = _baht(int(rep.get("expense", 0)))
 	var inv := int(rep.get("invest", 0))
-	_invest.visible = inv > 0
-	_invest.text = "ลงทุนกับร้าน %s (ไม่นับในกำไร)" % _baht(inv)
+	# [0.4.0] มูลค่าของในคลัง = เงินที่จมอยู่ในอะไหล่ (ซื้อแล้วยังไม่ได้ใช้ · ได้คืนตอนลูกค้าจ่ายค่าอะไหล่)
+	var stock := GameState.inventory_value()
+	var notes := PackedStringArray()
+	if inv > 0:
+		notes.append("ลงทุนกับร้าน %s (ไม่นับในกำไร)" % _baht(inv))
+	if stock > 0:
+		notes.append("ของในคลังมูลค่า %s (ซื้อไว้ยังไม่ได้ใช้)" % _baht(stock))
+	_invest.visible = not notes.is_empty()
+	_invest.text = "\n".join(notes)
 	# กำไรเทียบเป้า
 	var profit := int(rep.get("profit", 0))
 	var target := maxi(int(rep.get("target", 1)), 1)

@@ -85,7 +85,8 @@ func _ready() -> void:
 
 	# ---------------- E · ความอดทน: ปกติ 2 · ผู้สูงอายุ 3 · รีบ 1 · ไม่นับพักเที่ยง
 	_reset_door(9 * 60)
-	var normal: CustomerCase = hw[3]
+	var normal: CustomerCase = hw[3].duplicate()
+	normal.patience = 0
 	var elder: CustomerCase = hw[4].duplicate()
 	elder.patience = 3
 	var rush: CustomerCase = hw[5].duplicate()

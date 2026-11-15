@@ -17,3 +17,4 @@ job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮี
 arrive_dialog = "res://Assets/Dialog/Customer/lv3_coworker_mainboard.txt"
 thanks_text = "ประชุมจบไม่ดับสักรอบ ขอบใจมากขม คนในทีมถามถึงนายด้วยนะ"
 complain_text = "ยังดับกลางประชุมอยู่เลย… ไม่เป็นไร ส่งกลับมาก่อนก็ได้"
+patience = 1

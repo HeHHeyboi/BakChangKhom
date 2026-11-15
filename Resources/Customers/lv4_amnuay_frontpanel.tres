@@ -16,3 +16,5 @@ job_title = "เสียบสายหน้าเคส + จัดแรม 
 arrive_dialog = "res://Assets/Dialog/Customer/lv4_amnuay_frontpanel.txt"
 thanks_text = "ติดแล้ว เร็วจริงด้วย ลุงจะบอกลูกชายว่าเสียบใหม่แล้ว"
 complain_text = "ยังไม่ติดเลยขม ลุงคงเช็ดแรงไป"
+needs_part = &"fp_switch"
+part_hint = "สวิตช์เปิดเครื่องหน้าเคสพัง ต้องเปลี่ยนสวิตช์"

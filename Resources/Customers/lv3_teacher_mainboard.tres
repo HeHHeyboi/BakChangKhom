@@ -17,3 +17,5 @@ job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮี
 arrive_dialog = "res://Assets/Dialog/Customer/lv3_teacher_mainboard.txt"
 thanks_text = "พิมพ์ข้อสอบเสร็จแล้ว ไม่ดับอีกเลย ขอบใจจ้ะ"
 complain_text = "ยังดับระหว่างพิมพ์อยู่เลยขม ครูต้องพิมพ์มือแล้วล่ะ"
+needs_part = &"fan_cpu"
+part_hint = "พัดลม CPU ใกล้ตาย ต้องเปลี่ยนพัดลมก่อนเครื่องจะร้อนอีก"

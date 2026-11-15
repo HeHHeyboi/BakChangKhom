@@ -11,6 +11,7 @@ condition = "used"
 uses = 0
 weekly_stock = 0
 unlock_rank = 0
+online = false
 storage_slots_to = 14
 display_name = "ชั้นเหล็กเก็บอะไหล่"
 icon = ExtResource("2_icon")

@@ -15,3 +15,6 @@ job_title = "ทำความสะอาดแรม"
 arrive_dialog = "res://Assets/Dialog/Customer/lv2_yai_ram.txt"
 thanks_text = "ดูละครต่อได้แล้ว หลานยายเก่งที่สุด"
 complain_text = "ยังไม่มีภาพเลยลูก ไม่เป็นไร ค่อย ๆ ทำ"
+needs_part = &"ram_ddr3_4gb_used"
+part_hint = "เครื่องเก่าใช้แรม DDR3 แท่งเดิมเสีย ต้องเปลี่ยน"
+patience = 3

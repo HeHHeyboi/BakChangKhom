@@ -11,6 +11,11 @@ const WORK_APP_NAME := "งานซ่อม"
 const WORK_APP_SIZE := Vector2(470, 440)
 ## เปิดชิดซ้ายบน ถัดจากไอคอนเดสก์ท็อป
 const WORK_APP_POS := Vector2(205, 24)
+## [0.4.0 ขั้น E] แอปร้านออนไลน์ (สั่งอะไหล่ มาถึงวันเปิดร้านถัดไป)
+const SHOP_APP_SCENE := preload("res://Scene/UI/online_shop_app.tscn")
+const SHOP_APP_NAME := "ร้านออนไลน์"
+const SHOP_APP_SIZE := Vector2(470, 450)
+const SHOP_APP_POS := Vector2(205, 40)
 ## ข้อมูลเครื่อง (DesktopTask)
 @export var task: DesktopTask = preload("res://Resources/Desktop/Free/khom_pc.tres")
 
@@ -33,7 +38,9 @@ func open_pc() -> Node:
 	m.set("task", task)
 	m.set("free_mode", true)
 	if m.has_method(&"add_custom_app"):
-		m.ready.connect(func() -> void: m.add_custom_app(WORK_APP_NAME, Icons.tex(&"clipboard"), WORK_APP_SCENE, WORK_APP_SIZE, WORK_APP_POS), CONNECT_ONE_SHOT)
+		m.ready.connect(func() -> void:
+			m.add_custom_app(WORK_APP_NAME, Icons.tex(&"clipboard"), WORK_APP_SCENE, WORK_APP_SIZE, WORK_APP_POS)
+			m.add_custom_app(SHOP_APP_NAME, Icons.tex(&"cart"), SHOP_APP_SCENE, SHOP_APP_SIZE, SHOP_APP_POS), CONNECT_ONE_SHOT)
 	Global.in_minigame = true
 	SceneRouter.push_node(m)
 	return m

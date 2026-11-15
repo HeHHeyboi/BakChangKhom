@@ -131,15 +131,51 @@ func _ready() -> void:
 	DayLoop._pending_summary_week = 0
 	DayLoop._last_month = { }
 	DayLoop._last_bill = { }
-	# [0.3.0 ขั้น G] เซฟ VERSION 4 · เซฟ v3 (0.2.5 กระดานงาน · ไม่มีชั้นวาง) ยังโหลดได้
+	# [0.3.0 ขั้น G · 0.4.0 ขั้น H] เซฟ VERSION 5 · เซฟ v4/v3 (0.2.5 กระดานงาน · ไม่มีชั้นวาง) ยังโหลดได้
 	var ram_case: CustomerCase = load("res://Resources/Customers/lv2_teacher_ram.tres")
 	DayLoop.shelf.add(ram_case, 2, 1)
 	GameState.set_shelf_slots(4)
-	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 4, "บันทึกเป็น VERSION 4")
+	# [0.4.0 ขั้น H] VERSION 5: อะไหล่จองให้เครื่อง (รหัสใบรับเครื่อง) · ราคาทุน · พัสดุออนไลน์ · ของชดใช้
+	var bios_case: CustomerCase = load("res://Resources/Customers/lv5_teacher_bios.tres")
+	var ob: RepairShelf.Order = DayLoop.shelf.add(bios_case, 2, 1)
+	ob.replace_part = &"gpu_used"
+	GameState.money = maxi(GameState.money, 2000)
+	GameState.buy(load("res://Resources/Shop/cmos_cr2032.tres"), 1)
+	DayLoop.assign_parts(false)
+	GameState.order_online([[load("res://Resources/Shop/fan_cpu.tres"), 1]])
+	var key_b := ob.key
+	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 5, "บันทึกเป็น VERSION 5")
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	GameState.shelf_slots = 2
+	GameState.inventory.clear()
+	GameState.pending_orders.clear()
 	SaveGame.load_into()
-	_check(DayLoop.shelf.orders.size() == 1 and DayLoop.shelf.orders[0].case == ram_case and DayLoop.shelf.slots == 4 and GameState.shelf_slots == 4, "โหลด v4 → เครื่องบนชั้น + ชั้นวาง 4 ช่องครบ")
+	_check(DayLoop.shelf.orders.size() == 2 and DayLoop.shelf.orders[0].case == ram_case and DayLoop.shelf.slots == 4 and GameState.shelf_slots == 4, "โหลด → เครื่องบนชั้น + ชั้นวาง 4 ช่องครบ")
+	var ob2: RepairShelf.Order = DayLoop.shelf.orders[1]
+	_check(ob2.key == key_b and ob2.replace_part == &"gpu_used" and DayLoop.order_missing_parts(ob2).size() == 1 and GameState.reserved_index(key_b) >= 0 and int(GameState.inventory[GameState.reserved_index(key_b)].cost) == 30, "โหลด v5 → ถ่านยังจองให้เครื่องครู (ราคาทุน ฿30) · ยังรอการ์ดจอชดใช้")
+	_check(GameState.pending_orders.size() == 1 and GameState.pending_count(&"fan_cpu") == 1, "โหลด v5 → พัสดุพัดลม CPU ยังรอส่ง")
+	var o_new := DayLoop.shelf.add(ram_case, 3, 1)
+	_check(o_new.key != key_b and o_new.key != DayLoop.shelf.orders[0].key, "รหัสใบรับเครื่องใหม่ไม่ซ้ำของเดิมหลังโหลด")
+	DayLoop.shelf.orders.erase(o_new)
+	DayLoop.shelf.orders.erase(ob2)
+	GameState.inventory.clear()
+	GameState.pending_orders.clear()
+	_check(SaveGame.save(), "-")
+	var v4: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH))
+	v4["version"] = 4
+	for k in v4:
+		if v4[k] is Dictionary and (v4[k] as Dictionary).has("shelf"):
+			var sh: Dictionary = v4[k]["shelf"]
+			sh.erase("next_key")
+			for od in sh.get("orders", []):
+				(od as Dictionary).erase("key")
+				(od as Dictionary).erase("replace_part")
+		if v4[k] is Dictionary and (v4[k] as Dictionary).has("pending"):
+			(v4[k] as Dictionary).erase("pending")
+	var f4 := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
+	f4.store_string(JSON.stringify(v4))
+	f4.close()
+	_check(not SaveGame.is_old_version() and SaveGame.load_into() >= 0 and DayLoop.shelf.orders.size() == 1 and DayLoop.shelf.orders[0].key != "", "เซฟ v4 (0.3.0) ยังโหลดได้ · ใบรับเครื่องเดิมได้รหัสใหม่")
 	var v3: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH))
 	v3["version"] = 3
 	for k in v3:

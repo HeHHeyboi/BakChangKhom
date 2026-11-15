@@ -9,7 +9,8 @@ const PATH := "user://save.json"
 ## [0.2.0-G] 2 = เวลาแบบสัปดาห์ + ledger + ผลสิ้นเดือน · เซฟ 1 (0.1.x) ใช้ไม่ได้ → เมนูบอกให้เริ่มใหม่
 ## [0.2.5] 3 = 1 บท = 1 เดือน (48 วัน) — เซฟ v2 (1 บท = 1 สัปดาห์ · 36 วัน) เลขกะ/บทไม่ตรงกัน → ให้เริ่มใหม่
 ## [0.3.0] VERSION 4 = หน้าประตู (door · appointments · accepted_today) · ชั้นวาง (shelf · shelf_slots) · ลูกค้ามารับ (door[].pickup)
-const VERSION := 4
+## [0.4.0] VERSION 5 = อะไหล่ผูกกับงาน: ราคาทุนในคลัง (items[].cost) · พัสดุออนไลน์ (inventory.pending) · ใบรับเครื่องมีรหัส/ของชดใช้ (shelf.orders[].key · replace_part) · สต็อกตลาดรอบ 2 สัปดาห์ (inventory.week = รอบ)
+const VERSION := 5
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -94,7 +95,7 @@ static func save() -> bool:
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
 			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today,
-			"shelf": DayLoop.shelf.to_save() if DayLoop.shelf else { }, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
+			"shelf": DayLoop.shelf.to_save() if DayLoop.shelf else { }, "vendor": DayLoop.vendor, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
 			"break_done": DayLoop._break_done, "demo_over": DayLoop.demo_over, "demo_ack": DayLoop._demo_ack,
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
 			# [0.2.0] การ์ดสรุปบท/เดือนที่ยังไม่ได้กด (บันทึกอัตโนมัติตอนเริ่มกะใหม่เกิดก่อนผู้เล่นกด "ไปต่อ")
@@ -206,6 +207,12 @@ static func load_into() -> int:
 	# [0.3.0 ขั้น D] ชั้นวางเครื่อง (ใบรับเครื่องที่ยังไม่ปิด) · เซฟ v3 ไม่มี = ชั้นว่าง
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	DayLoop.shelf.load_save(l.get("shelf", { }))
+	DayLoop._last_location = -1 # โหลดเซฟที่ตลาด → ไม่คิดเวลาเดินไปตลาด
+	# [0.4.0 ขั้น J] รถขายของวันนี้
+	DayLoop.vendor = l.get("vendor", { }) if l.get("vendor") is Dictionary else { }
+	for k in ["arrive", "leave"]:
+		if DayLoop.vendor.has(k):
+			DayLoop.vendor[k] = int(DayLoop.vendor[k])
 	DayLoop.last_shelf = { }
 	DayLoop._door_tick = -1
 	# [0.2.5] ลูกค้ารอบที่ยังไม่มา + จำนวนลูกค้าวันนี้

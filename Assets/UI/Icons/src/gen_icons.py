@@ -77,6 +77,15 @@ ICONS = {
 <rect x="15" y="38" width="16" height="15" rx="2" fill="{CREAM}"/><line x1="19" y1="44" x2="27" y2="44" stroke-width="2.5"/>
 <rect x="34" y="35" width="13" height="18" rx="2" fill="{METAL}"/><circle cx="40.5" cy="40" r="1.6" fill="{ORANGE}" stroke-width="1.5"/>
 <rect x="6" y="29" width="52" height="6" rx="2" fill="{ORANGE}"/><rect x="6" y="53" width="52" height="6" rx="2" fill="{ORANGE}"/>''',
+    # [0.4.0] ร้านออนไลน์: กล่องพัสดุ + รถเข็น
+    "cart": f'''<path d="M4 10h8l7 30h32l6-22h-41" fill="none"/>
+<rect x="22" y="12" width="26" height="20" rx="2" fill="{BROWN}"/><path d="M22 20h26M35 12v8" stroke-width="2.5"/>
+<path d="M19 40h32" fill="none"/><circle cx="24" cy="51" r="5" fill="{CREAM}"/><circle cx="46" cy="51" r="5" fill="{CREAM}"/>''',
+    # [0.4.0] รถขายของ (กระบะขายของเร่ + ลำโพง)
+    "truck": f'''<rect x="4" y="22" width="34" height="22" rx="3" fill="{ORANGE}"/><path d="M38 28h12l9 9v7h-21z" fill="{CREAM}"/>
+<path d="M42 31h7l5 5h-12z" fill="{METAL}" stroke-width="2"/><path d="M8 22l4-10h18l4 10" fill="{GREEN}"/>
+<path d="M18 12v-6l-6 -2" fill="none" stroke-width="2.5"/><path d="M12 2l-5 4h-3v4h3l5 4z" fill="{GOLD}" stroke-width="2"/>
+<circle cx="14" cy="47" r="6" fill="{METAL}"/><circle cx="48" cy="47" r="6" fill="{METAL}"/>''',
 }
 
 os.makedirs(OUT, exist_ok=True)

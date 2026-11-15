@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CustomerCase" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+[ext_resource type="Resource" path="res://Resources/Bench/bench_monitor_teacher.tres" id="2_task"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"w1_d2_teacher_hdmi"
+customer = "ครู"
+reason = "ได้ยินว่าขมเปิดร้าน เลยเอาเครื่องห้องคอมพิวเตอร์มาให้ดู ไม่รีบ"
+device = "คอมพิวเตอร์ห้องคอมพิวเตอร์โรงเรียน"
+symptom = "เครื่องติด แต่จอขึ้นว่าไม่มีสัญญาณ"
+level = 2
+est_slots = 2
+due_shifts = 2
+patience = 3
+part_id = "part_bench"
+job_title = "จอไม่ขึ้น (สายจอผิดช่อง)"
+bench_task = ExtResource("2_task")
+arrive_dialog = "res://Assets/Dialog/Customer/lv2_teacher_monitor.txt"
+thanks_text = "ขึ้นภาพแล้ว! เด็ก ๆ ได้เรียนคอมพิวเตอร์พรุ่งนี้แน่"
+complain_text = "จอก็ยังมืดอยู่นะขม…"
+needs_part = &"cable_hdmi"
+part_hint = "สายจอเดิมหักใน ต้องใช้สาย HDMI เส้นใหม่ แล้วเสียบให้ถูกช่อง"

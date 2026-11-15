@@ -28,9 +28,20 @@ class Order extends RefCounted:
 	var postponed := false
 	## [0.3.0] ความพอใจที่บวก/ลบเพิ่มตอนมารับ (เลื่อนนัด − · โทรเรียกมารับก่อน +)
 	var sat_adjust := 0
+	## [0.4.0] รหัสใบรับเครื่อง (ไม่ซ้ำ) — ใช้จองอะไหล่ในคลัง (GameState.reserve(ids, key))
+	var key := ""
+	## [0.4.0] ทำของลูกค้าเสีย → ต้องหาอะไหล่ชิ้นนี้มาชดใช้ก่อนซ่อมใหม่ (จองด้วย replace_key()) · ว่าง = ไม่มี
+	var replace_part: StringName
 
 	func late_days(day: int) -> int:
 		return maxi(day - due, 0)
+
+	## [0.4.0] อะไหล่ที่งานนี้ต้องใช้ (ตามเคส) — จองด้วย key
+	func part_ids() -> Array[StringName]:
+		return case.part_ids() if case else ([] as Array[StringName])
+
+	func replace_key() -> String:
+		return key + "!r"
 
 	func to_dict() -> Dictionary:
 		return {
@@ -38,6 +49,7 @@ class Order extends RefCounted:
 			"accepted": accepted, "due": due, "promise": promise,
 			"state": state, "result": result, "closed_on": closed_on,
 			"postponed": postponed, "sat_adjust": sat_adjust,
+			"key": key, "replace_part": String(replace_part),
 		}
 
 	static func from_dict(d: Dictionary) -> Order:
@@ -54,6 +66,8 @@ class Order extends RefCounted:
 		o.closed_on = int(d.get("closed_on", -1))
 		o.postponed = bool(d.get("postponed", false))
 		o.sat_adjust = int(d.get("sat_adjust", 0))
+		o.key = String(d.get("key", ""))
+		o.replace_part = StringName(d.get("replace_part", ""))
 		return o
 
 
@@ -64,6 +78,8 @@ var slots := 2
 var orders: Array[Order] = []
 ## ใบที่ปิดแล้ว (PICKED/RETURNED) ล่าสุดก่อน · ไว้ทำสรุปเดือน/ข้อความข้ามวัน
 var history: Array[Order] = []
+## [0.4.0] ตัวนับรหัสใบรับเครื่อง (Order.key = "wo<n>")
+var next_key := 1
 
 
 func _init(e: EconomyConfig = null) -> void:
@@ -103,8 +119,15 @@ func add(c: CustomerCase, today: int, promise_index := 1) -> Order:
 	o.accepted = today
 	o.promise = clampi(promise_index, 0, maxi(econ.promise_days.size() - 1, 0))
 	o.due = today + (econ.promise_days[o.promise] if econ.promise_days.size() > 0 else 1)
+	o.key = _new_key()
 	orders.append(o)
 	return o
+
+
+func _new_key() -> String:
+	var k := "wo%d" % next_key
+	next_key += 1
+	return k
 
 
 ## งานที่ยังไม่ซ่อม เรียงวันนัดใกล้สุดก่อน
@@ -205,14 +228,18 @@ func _close(o: Order) -> void:
 func to_save() -> Dictionary:
 	return {
 		"slots": slots,
+		"next_key": next_key,
 		"orders": orders.map(func(o: Order) -> Dictionary: return o.to_dict()),
 	}
 
 
 func load_save(d: Dictionary) -> void:
 	slots = int(d.get("slots", econ.shelf_slots_start))
+	next_key = maxi(int(d.get("next_key", 1)), 1)
 	orders.clear()
 	for od in d.get("orders", []):
 		var o := Order.from_dict(od)
 		if o:
+			if o.key == "": # เซฟ v4 ไม่มีรหัส
+				o.key = _new_key()
 			orders.append(o)

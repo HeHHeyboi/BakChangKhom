@@ -72,6 +72,7 @@
 [ext_resource type="PackedScene" path="res://Scene/UI/door_card.tscn" id="ui_door"]
 [ext_resource type="PackedScene" path="res://Scene/UI/work_order_card.tscn" id="ui_workorder"]
 [ext_resource type="PackedScene" path="res://Scene/UI/repair_shelf.tscn" id="ui_shelf"]
+[ext_resource type="PackedScene" path="res://Scene/UI/vendor_panel.tscn" id="ui_vendor"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
@@ -124,3 +125,8 @@ layer = 91
 layer = 95
 
 [node name="RepairShelfPanel" parent="ShelfLayer" instance=ExtResource("ui_shelf")]
+
+[node name="VendorLayer" type="CanvasLayer" parent="."]
+layer = 92
+
+[node name="VendorPanel" parent="VendorLayer" instance=ExtResource("ui_vendor")]

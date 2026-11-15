@@ -129,9 +129,14 @@ const REWARD_POPUP_SCENE := preload("res://Scene/UI/reward_popup.tscn")
 const DOOR_CARD_SCENE := preload("res://Scene/UI/door_card.tscn")
 const WORK_ORDER_SCENE := preload("res://Scene/UI/work_order_card.tscn")
 const SHELF_PANEL_SCENE := preload("res://Scene/UI/repair_shelf.tscn")
+## [0.4.0 ขั้น J] รถขายของ (VendorLayer ชั้น 92)
+const VENDOR_PANEL_SCENE := preload("res://Scene/UI/vendor_panel.tscn")
+var vendor_panel: VendorPanel
+## รถขายของวันนี้ { items: [id], sold: [bool], arrive: นาที, leave: นาที, told: bool } · ว่าง = ไม่มา
 var door_card: DoorCard
 var work_order: WorkOrderCard
 var shelf_panel: RepairShelfPanel
+var vendor: Dictionary = { }
 ## ใบรับเครื่องเปิดอยู่ (ของคนหน้าประตูตอนนี้)
 var _work_order_open := false
 ## แถวในแผงชั้นวางตอนนี้ (index = แถว) → กด "ซ่อม" แถวไหน
@@ -235,7 +240,8 @@ func _connect() -> void:
 		[ts.clock_changed, _on_clock_changed],
 		[GameState.repair_recorded, _on_repair_recorded],
 		[GameState.shelf_slots_changed, _on_shelf_slots_changed],
-		[SceneRouter.location_changed, func(_id): autosave()],
+		[GameState.parts_arrived, _on_parts_arrived],
+		[SceneRouter.location_changed, _on_location_changed],
 	]
 	for l in links:
 		if not (l[0] as Signal).is_connected(l[1]):
@@ -473,7 +479,10 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 			door_queue.append(door_entry(rc, false, false, true))
 	retry_cases.clear()
 	close_work_order()
+	_deliver_parcels(ts)
 	_open_shelf_day(ts)
+	assign_parts()
+	_plan_vendor(ts)
 	_door_tick = ts.current_minute
 	_plan_visitors(ts)
 	_board_dirty = true
@@ -553,6 +562,7 @@ func _on_clock_changed(_minute: int) -> void:
 	_board_dirty = true
 	_tick_door(_ts())
 	_check_waves(_ts())
+	_check_vendor(_ts())
 
 
 ## [0.3.0] "ยืนรอหน้าประตู · วันนี้รับได้อีก 2 คน" / "วันนี้คิวเต็มแล้ว นัดวันถัดไปได้"
@@ -632,10 +642,20 @@ func _on_repair_recorded(result: Dictionary) -> void:
 		_parts_seen[c.part_id] = true
 		if c == forced_case:
 			forced_case = null
+	# [0.4.0 ขั้น F] ของสิ้นเปลืองหักจริงตอนซ่อมจบ (เวลาเดินไปแล้วตาม job_slots ซึ่งนับ +เทิร์นถ้าของขาด)
+	if c and not result.get("gave_up", false):
+		GameState.use_supplies(c.supply_need(_econ()))
 	# [0.3.0 ขั้น D] งานบนชั้น: เก็บผลไว้ · ถึง/เลยนัดแล้ว → ลูกค้ามารับเลย จ่ายเงินตอนนี้
 	last_shelf = { }
-	if order:
+	if order and _order_damaged(order, result):
+		# [0.4.0 ขั้น G] ทำของเสีย + มีอะไหล่ชดใช้ → เครื่องกลับไปรอของ ไม่ปิดงาน
+		result = result.duplicate()
+		result["replace"] = order.replace_part
+		result["reputation"] = int(result.get("rep_due", 0))
+		last_shelf = { "order": order, "pickup": { }, "paid": { }, "replace": order.replace_part }
+	elif order:
 		var ts := _ts()
+		result = _settle_parts(order, result)
 		var p := shelf.finish(order, result, ts.shift if ts else 1)
 		last_shelf = { "order": order, "pickup": p, "paid": { } }
 		if not p.is_empty():
@@ -661,7 +681,8 @@ func job_slots(c: CustomerCase) -> int:
 	if c == null:
 		return 0
 	var e := _econ()
-	return c.slots(e) + (e.first_time_extra_slots if not _parts_seen.has(c.part_id) else 0)
+	var extra := e.no_supply_extra_slots if not GameState.has_supplies(c.supply_need(e)) else 0
+	return c.slots(e) + (e.first_time_extra_slots if not _parts_seen.has(c.part_id) else 0) + extra
 
 
 ## สถานะเวลาของงาน: &"ok" · &"ot" (ต้องล่วงเวลา) · &"no" (ไม่ทันกะนี้)
@@ -725,6 +746,7 @@ func door_accept(promise := -1) -> bool:
 		var o := shelf.add(c, ts.shift if ts else 1, promise)
 		if o == null:
 			return false
+		assign_parts(false)
 		today_case = c
 		play_arrival(false)
 		return true
@@ -860,6 +882,12 @@ const TUTORIALS := {
 	"tut_pickup": "res://Assets/Dialog/Tutorial/pickup_first.txt",
 	"tut_door": "res://Assets/Dialog/Tutorial/door_first.txt",
 	"tut_shelf": "res://Assets/Dialog/Tutorial/shelf_first.txt",
+	# [0.4.0 ขั้น K] อะไหล่
+	"tut_part_missing": "res://Assets/Dialog/Tutorial/part_missing_first.txt",
+	"tut_parcel": "res://Assets/Dialog/Tutorial/parcel_first.txt",
+	"tut_part_pay": "res://Assets/Dialog/Tutorial/part_pay_first.txt",
+	"tut_damage_replace": "res://Assets/Dialog/Tutorial/damage_replace_first.txt",
+	"tut_vendor": "res://Assets/Dialog/Tutorial/vendor_first.txt",
 }
 
 
@@ -872,6 +900,12 @@ func _maybe_tutorial(want: Card) -> bool:
 		flag = "tut_pickup" if is_pickup(door_front()) else "tut_door"
 	if (flag == "" or GameState.story_flags.get(flag, false)) and not shelf.orders.is_empty() and want in [Card.DOOR, Card.NONE]:
 		flag = "tut_shelf"
+	# [0.4.0 ขั้น K] อะไหล่: เครื่องรอของครั้งแรก · พัสดุมาครั้งแรก · ลูกค้ามารับพร้อมจ่ายค่าอะไหล่ครั้งแรก · ทำของเสียต้องชดใช้ · รถขายของ
+	if want in [Card.DOOR, Card.NONE] and (flag == "" or GameState.story_flags.get(flag, false)):
+		for f in _part_tutorials():
+			if not GameState.story_flags.get(f, false):
+				flag = f
+				break
 	if flag == "" or GameState.story_flags.get(flag, false):
 		return false
 	GameState.story_flags[flag] = true
@@ -885,6 +919,25 @@ func _maybe_tutorial(want: Card) -> bool:
 	else:
 		_working = false
 	return true
+
+
+## บทสอนอะไหล่ที่ถึงเงื่อนไขตอนนี้ (เรียงตามลำดับที่ควรเจอ)
+func _part_tutorials() -> Array[String]:
+	var out: Array[String] = []
+	if not last_shelf.is_empty() and last_shelf.get("replace", &"") != &"" and not _result_pending:
+		out.append("tut_damage_replace")
+	for o in shelf.orders:
+		if not order_has_parts(o) and o.replace_part == &"":
+			out.append("tut_part_missing")
+			break
+	if shelf_news.size() > 0 and Array(shelf_news).any(func(n: String) -> bool: return n.begins_with("พัสดุมาส่ง")):
+		out.append("tut_parcel")
+	var j := door_front()
+	if not j.is_empty() and is_pickup(j) and int((j["pickup"]["order"] as RepairShelf.Order).result.get("part_due", 0)) > 0:
+		out.append("tut_part_pay")
+	if vendor_here():
+		out.append("tut_vendor")
+	return out
 
 
 func _after_break() -> void:
@@ -929,7 +982,7 @@ func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
 	var b := func(n: int) -> String: return MonthGoalBar._baht(n)
 	var parts_in := PackedStringArray()
 	var parts_out := PackedStringArray()
-	for k in [&"fee", &"tip", &"sell", &"other"]:
+	for k in [&"fee", &"part_fee", &"tip", &"sell", &"other"]:
 		if int(by.get(k, 0)) > 0:
 			parts_in.append("%s %s" % [GameState.MONEY_KINDS[k], b.call(int(by[k]))])
 	for k in [&"bill", &"buy", &"ot_power", &"damage", &"other"]:
@@ -946,6 +999,8 @@ func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
 		])
 	if int(rep.invest) > 0:
 		lines.append("ลงทุน %s (ไม่นับในกำไร)" % b.call(int(rep.invest)))
+	if GameState.inventory_value() > 0:
+		lines.append("ของในคลังมูลค่า %s (ซื้อไว้ยังไม่ได้ใช้)" % b.call(GameState.inventory_value()))
 	var result := ""
 	if bool(rep.get("over", false)):
 		result = "เกินเป้า!"
@@ -1246,6 +1301,8 @@ func _reset_run() -> void:
 	accepted_today = 0
 	_door_tick = -1
 	shelf = RepairShelf.new(_econ())
+	vendor = { }
+	_last_location = -1
 	_work_order_open = false
 	_pending_repair = null
 	quiet = false
@@ -1288,6 +1345,8 @@ func _process(delta: float) -> void:
 	_watchdog(delta)
 	if shelf_panel:
 		shelf_panel.show_view(shelf_view())
+	if vendor_panel:
+		vendor_panel.show_view(vendor_view())
 	_run_pending_repair(delta)
 	var want := _decide_card()
 	# [0.2.0] วันใหม่: ปิ๊บบอก "ผ่านไป n วัน" ก่อนการ์ดแรกของวัน (หลังสรุปเดือน/บทเนื้อเรื่องจบแล้ว)
@@ -1468,7 +1527,19 @@ func _show_card(card: Card) -> void:
 			if not last_shelf.is_empty():
 				var o: RepairShelf.Order = last_shelf["order"]
 				var p: Dictionary = last_shelf["pickup"]
-				if p.is_empty():
+				if last_shelf.get("replace", &"") != &"":
+					# [0.4.0 ขั้น G] ทำของเสีย → ต้องหาอะไหล่มาชดใช้ก่อนซ่อมใหม่
+					_title.text = "ทำของลูกค้าเสีย · ต้องหาของมาชดใช้"
+					_body.text = "%sคะแนน %d/100 · ชื่อเสียง %d · XP +%d\n\nต้องหา %s มาเปลี่ยนให้%s (ขมจ่ายเอง ลูกค้าไม่จ่ายค่าชิ้นนี้)\nได้ของแล้วซ่อมใหม่ได้ · นัดรับเดิม %s\nถ้าไม่หาของจนลูกค้ามาเอาคืน ต้องจ่ายค่าเสียหายเท่าราคาของ" % [
+						(c.job_title + " — ") if c and c.job_title != "" else "",
+						int(r.get("score", 0)),
+						int(r.get("rep_due", 0)),
+						int(r.get("xp", 0)),
+						part_name(last_shelf["replace"]),
+						o.case.customer,
+						due_text(o.due),
+					]
+				elif p.is_empty():
 					_title.text = "ซ่อมเสร็จ · วางรอบนชั้น" if not r.get("gave_up", false) else "Task Fail · วางเครื่องคืนบนชั้น"
 					_body.text = "%s%s\nคะแนน %d/100%s · XP +%d\n\n%s มารับเครื่อง %s\nค่าแรง ~฿%d ได้ตอนลูกค้ามารับ" % [
 						(c.job_title + " — ") if c and c.job_title != "" else "",
@@ -1480,6 +1551,8 @@ func _show_card(card: Card) -> void:
 						due_text(o.due),
 						roundi(maxi(int(r.get("money_due", 0)), 0) * _econ().promise_mult(o.promise)),
 					]
+					if int(r.get("part_due", 0)) > 0:
+						_body.text += " + ค่าอะไหล่ ฿%d" % int(r.get("part_due", 0))
 				else:
 					_title.text = "%s มารับเครื่อง · %s" % [o.case.customer, "ทันนัด" if p["on_time"] else "ช้า %d วัน" % int(p["late"])]
 					_body.text += "\n%s" % ("ทันนัด ความพอใจ +%d" % int(p["sat_delta"]) if p["on_time"] else "ช้ากว่านัด ค่าแรง ×%.2f · ความพอใจ %d" % [float(p["mult"]), int(p["sat_delta"])])
@@ -1627,6 +1700,9 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 		_fee(c),
 		"รับเครื่องไว้ซ่อมบนชั้น" if c.takes_machine() else "ทำต่อหน้าลูกค้า (ขมOS)",
 	]
+	var pl := part_line(c)
+	if pl != "":
+		f["detail"] += "\n" + pl
 	f["portrait"] = Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null
 	f["patience_left"] = door_patience_left(j)
 	f["patience_max"] = c.patience_slots(_econ())
@@ -1674,7 +1750,7 @@ func _pickup_front_view(j: Dictionary) -> Dictionary:
 		"detail": "%s%s\n%s\n%s" % [
 			("เครื่อง: %s\n" % c.device) if c.device != "" else "",
 			"งานไม่ผ่าน — คืนเครื่องตามสภาพ" if failed else "ซ่อมเสร็จแล้ว (คะแนน %d/100)" % int(o.result.get("score", 0)),
-			("ค่าแรง ฿%d" % m) if m >= 0 else ("ชดใช้ของเสีย −฿%d" % -m),
+			(("ค่าแรง ฿%d" % (m - int(o.result.get("part_due", 0)))) + ((" + ค่าอะไหล่ ฿%d" % int(o.result.get("part_due", 0))) if int(o.result.get("part_due", 0)) > 0 else "")) if m >= 0 else ("ชดใช้ของเสีย −฿%d" % -m),
 			when,
 		],
 		"portrait": Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null,
@@ -1716,6 +1792,8 @@ func shelf_repair_state(o: RepairShelf.Order) -> StringName:
 		return &"busy"
 	if o.state != RepairShelf.State.WAITING:
 		return &"done"
+	if not order_has_parts(o):
+		return &"no_part"
 	if _working or _work_order_open or _decide_card() != Card.DOOR:
 		return &"busy"
 	return job_fit(o.case)
@@ -1754,6 +1832,13 @@ func _on_shelf_repair_pressed(i: int) -> void:
 func _pay_pickup(p: Dictionary) -> Dictionary:
 	var o: RepairShelf.Order = p["order"]
 	var paid := GameState.pay_pickup(o.result, float(p["mult"]), int(p["sat_delta"]), String(o.case.part_id))
+	# [0.4.0] ค่าอะไหล่ (ราคาที่ซื้อ + ค่าบวกตามยศ) — ลูกค้าจ่ายเต็ม ไม่คูณตามความช้า
+	var part_due := int(o.result.get("part_due", 0))
+	if part_due > 0:
+		GameState.add_money(part_due, &"part_fee", String(o.result.get("part_name", "")))
+		paid["money"] = int(paid["money"]) + part_due
+	paid["part"] = part_due
+	_release_order(o)
 	var m := int(paid["money"])
 	paid["text"] = "%s มารับเครื่อง %s (%s)" % [
 		o.case.customer,
@@ -1780,6 +1865,13 @@ func _open_shelf_day(ts: TimeSystem) -> void:
 	for k in range(front.size() - 1, -1, -1):
 		door_queue.push_front(front[k])
 	for o: RepairShelf.Order in od["returned"]:
+		if o.replace_part != &"":
+			# [0.4.0 ขั้น G] ทำของเสียแล้วไม่หาของมาชดใช้ → ลูกค้ามาเอาคืน + จ่ายค่าของแทน
+			var rep_item := part_item(o.replace_part)
+			var pen := rep_item.online_cost() if rep_item else e.default_penalty
+			GameState.add_money(-pen, &"damage", "ชดใช้%s" % (rep_item.display_name if rep_item else ""))
+			shelf_news.append("%s มาเอาเครื่องคืน ไม่ได้ของชดใช้ — จ่ายค่าเสียหาย ฿%d" % [o.case.customer, pen])
+		_release_order(o)
 		GameState.add_reputation(e.rep_returned)
 		GameState.satisfaction_history.append(e.returned_satisfaction)
 		shelf_news.append("%s มาเอาเครื่องคืน (ไม่ได้ซ่อม เลยนัด) ชื่อเสียง %d" % [o.case.customer, e.rep_returned])
@@ -1792,6 +1884,357 @@ func _open_shelf_day(ts: TimeSystem) -> void:
 		_skip_note("วันนี้ครบนัด%s แต่เครื่องยังไม่ได้ซ่อมนะ" % o.case.customer)
 	if not picked.is_empty() and visitor_toast:
 		visitor_toast.show_message("ลูกค้ามารับเครื่อง %d คน" % picked.size(), "ยืนรอหน้าร้าน — กด \"ส่งมอบเครื่อง\"")
+
+
+# ---------------------------------------------------------------- อะไหล่ผูกกับงาน (0.4.0 · PLAN_0_4_0 ข้อ 2)
+
+
+static func part_item(id: StringName) -> ItemDef:
+	if id == &"":
+		return null
+	var p := "res://Resources/Shop/%s.tres" % id
+	return load(p) as ItemDef if ResourceLoader.exists(p) else null
+
+
+## ชื่ออะไหล่สั้น ๆ (ตัดวงเล็บท้าย)
+static func part_name(id: StringName) -> String:
+	var it := part_item(id)
+	return it.display_name if it else String(id)
+
+
+## ของชดใช้เมื่อทำของลูกค้าเสียใน Part นี้ (ItemDef.replaces) · null = ไม่มี (หักค่าปรับแบบเดิม)
+static func replacement_for(part_id: StringName) -> ItemDef:
+	for f in DirAccess.get_files_at("res://Resources/Shop/"):
+		var path := "res://Resources/Shop/" + f.trim_suffix(".remap")
+		if not path.ends_with(".tres"):
+			continue
+		var it := load(path) as ItemDef
+		if it and it.replaces == part_id and it.kind == ItemDef.Kind.PART:
+			return it
+	return null
+
+
+## เครื่องนี้มีอะไหล่ครบ (จองไว้แล้ว / ไม่ต้องใช้) พร้อมซ่อมไหม
+func order_has_parts(o: RepairShelf.Order) -> bool:
+	if o == null:
+		return false
+	if not o.part_ids().is_empty() and GameState.reserved_index(o.key) < 0:
+		return false
+	if o.replace_part != &"" and GameState.reserved_index(o.replace_key()) < 0:
+		return false
+	return true
+
+
+## อะไหล่ที่เครื่องนี้ยังขาด (ชื่อ) · ว่าง = ครบ
+func order_missing_parts(o: RepairShelf.Order) -> PackedStringArray:
+	var out := PackedStringArray()
+	if o == null:
+		return out
+	var ids := o.part_ids()
+	if not ids.is_empty() and GameState.reserved_index(o.key) < 0:
+		out.append(part_name(ids[0]))
+	if o.replace_part != &"" and GameState.reserved_index(o.replace_key()) < 0:
+		out.append("%s (ชดใช้)" % part_name(o.replace_part))
+	return out
+
+
+## ข้อความรอของ: "ถ่าน CMOS (สั่งแล้ว มาวันเปิดร้านถัดไป)" / "การ์ดจอมือสอง (ชดใช้) — สั่งออนไลน์" / "… — ซื้อที่ตลาดหรือสั่งออนไลน์"
+func missing_note(o: RepairShelf.Order) -> String:
+	var ids := waiting_ids(o)
+	if ids.is_empty():
+		return ""
+	var it := part_item(ids[0])
+	var name := (it.display_name if it else String(ids[0])) + (" (ชดใช้)" if o.replace_part == ids[0] else "")
+	for id in ids:
+		if GameState.pending_count(id) > 0:
+			return "%s · สั่งแล้ว มาวันเปิดร้านถัดไป" % name
+	if it and not it.market:
+		return "%s — สั่งในแอปร้านออนไลน์" % name
+	return "%s — ซื้อที่ตลาดหรือสั่งออนไลน์" % name
+
+
+## จองอะไหล่ในคลังให้เครื่องที่ยังรอของ (นัดใกล้สุดก่อน) · คืนข้อความที่จองได้
+func assign_parts(notify := true) -> PackedStringArray:
+	var done := PackedStringArray()
+	if shelf == null:
+		return done
+	for o in shelf.waiting():
+		var ids := o.part_ids()
+		if not ids.is_empty() and GameState.reserved_index(o.key) < 0:
+			var i := GameState.reserve(ids, o.key)
+			if i >= 0:
+				done.append("จอง%sให้เครื่อง%sแล้ว" % [part_name(GameState.inventory[i].id), o.case.customer])
+		if o.replace_part != &"" and GameState.reserved_index(o.replace_key()) < 0:
+			if GameState.reserve([o.replace_part], o.replace_key()) >= 0:
+				done.append("ได้%sมาชดใช้ให้%sแล้ว ซ่อมใหม่ได้" % [part_name(o.replace_part), o.case.customer])
+	if not done.is_empty():
+		_board_dirty = true
+		if notify and visitor_toast and not quiet:
+			visitor_toast.show_message("อะไหล่พร้อมแล้ว", " · ".join(done))
+	return done
+
+
+# ---------------------------------------------------------------- รถขายของ (0.4.0 ขั้น J · PLAN_0_4_0 ข้อ 6)
+
+
+## เปิดร้าน: สุ่มว่ารถขายของมาไหม (ไม่มาวันแรกของบท) · ของสุ่ม vendor_items ชิ้นจากอะไหล่ที่ขายออนไลน์
+func _plan_vendor(ts: TimeSystem) -> void:
+	vendor = { }
+	var e := _econ()
+	if ts == null or ts.shift_in_week() == 1 or e.vendor_chance <= 0.0 or _rng.randf() >= e.vendor_chance:
+		return
+	var pool: Array[ItemDef] = online_catalog().filter(func(it: ItemDef) -> bool: return it.kind == ItemDef.Kind.PART)
+	var ids: Array = []
+	while not pool.is_empty() and ids.size() < e.vendor_items:
+		var it: ItemDef = pool.pop_at(_rng.randi_range(0, pool.size() - 1))
+		ids.append(String(it.id))
+	if ids.is_empty():
+		return
+	vendor = { "items": ids, "sold": ids.map(func(_x) -> bool: return false), "arrive": e.vendor_arrive_minute, "leave": e.vendor_arrive_minute + e.vendor_stay_slots * TimeSystem.SLOT_MIN, "told": false }
+
+
+## รถจอดหน้าร้านตอนนี้ไหม
+func vendor_here() -> bool:
+	var ts := _ts()
+	return not vendor.is_empty() and ts != null and ts.current_minute >= int(vendor.arrive) and ts.current_minute < int(vendor.leave)
+
+
+## ราคารถขายของ = ราคาออนไลน์ − vendor_discount
+func vendor_price(it: ItemDef) -> int:
+	return maxi(roundi(it.online_cost() * (1.0 - _econ().vendor_discount)), 1)
+
+
+func _check_vendor(ts: TimeSystem) -> void:
+	if vendor_here() and not bool(vendor.get("told", false)):
+		vendor["told"] = true
+		if visitor_toast and not quiet:
+			visitor_toast.show_message("รถขายของมาจอดหน้าร้าน!", "อะไหล่ลดราคา %d%% อยู่ %s · กดปุ่มรถที่มุมล่าง" % [roundi(_econ().vendor_discount * 100.0), TimeSystem.turns_text(_econ().vendor_stay_slots)])
+
+
+## ซื้อของชิ้นที่ i จากรถ · คืนเหตุผล ("" = สำเร็จ)
+func vendor_buy(i: int) -> String:
+	if not vendor_here():
+		return "รถไปแล้ว"
+	var ids: Array = vendor.get("items", [])
+	if i < 0 or i >= ids.size() or bool(vendor.sold[i]):
+		return "ขายไปแล้ว"
+	var it := part_item(StringName(ids[i]))
+	if it == null:
+		return "ไม่มีของ"
+	var price := vendor_price(it)
+	if not GameState.can_afford(price):
+		return "เงินไม่พอ"
+	if not GameState.can_store(it):
+		return "คลังเต็ม"
+	GameState.add_money(-price, &"buy", "รถขายของ: %s" % it.display_name)
+	GameState.add_item(it, 1, false, true, price)
+	vendor.sold[i] = true
+	GameState.parts_arrived.emit()
+	_board_dirty = true
+	return ""
+
+
+## ข้อมูลแผงรถขายของ (ดู VendorPanel.show_view)
+func vendor_view() -> Dictionary:
+	var ts := _ts()
+	var show := (
+		vendor_here() and _loop_active() and _in_shop() and not Global.in_minigame and not DialogScene.visible
+		and not _skipping and not _game_over and not demo_over and not (_day_skip and _day_skip.visible)
+	)
+	if not show:
+		return { "show": false }
+	var left := floori((int(vendor.leave) - ts.current_minute) / float(TimeSystem.SLOT_MIN))
+	var rows: Array[Dictionary] = []
+	var ids: Array = vendor.get("items", [])
+	for i in ids.size():
+		var it := part_item(StringName(ids[i]))
+		if it == null:
+			continue
+		var price := vendor_price(it)
+		var sold := bool(vendor.sold[i])
+		var wait := waiting_for(it.id)
+		var why := ""
+		if sold:
+			why = "ขายแล้ว"
+		elif not GameState.can_afford(price):
+			why = "เงินไม่พอ"
+		elif not GameState.can_store(it):
+			why = "คลังเต็ม"
+		rows.append({
+			"name": "%s · ฿%d" % [it.display_name, price],
+			"status": "ออนไลน์ ฿%d%s · ในคลัง %d%s" % [it.online_cost(), (" · ตลาด ฿%d" % it.price) if it.market else "", GameState.count_item(it.id), (" · เครื่องของ%sรอชิ้นนี้" % ", ".join(wait)) if not wait.is_empty() else ""],
+			"warn": not wait.is_empty(),
+			"icon": it.icon,
+			"buy": { "text": why if why != "" else "ซื้อ", "disabled": why != "" },
+		})
+	return {
+		"show": true,
+		"button": "รถขายของ · อีก %s" % TimeSystem.turns_text(left),
+		"title": "รถขายของลุงสมพร",
+		"note": "ของมือสองลด %d%% จากราคาออนไลน์ · มีชิ้นละ 1 · ไม่ซื้อตอนนี้ รถไปแล้วไม่รู้จะมาอีกเมื่อไร" % roundi(_econ().vendor_discount * 100.0),
+		"rows": rows,
+	}
+
+
+## [0.4.0 ขั้น E] ของในร้านออนไลน์ (อะไหล่ก่อน แล้วของสิ้นเปลือง · ไม่รวมอัปเกรด)
+static func online_catalog() -> Array[ItemDef]:
+	var out: Array[ItemDef] = []
+	for f in DirAccess.get_files_at("res://Resources/Shop/"):
+		var path := "res://Resources/Shop/" + f.trim_suffix(".remap")
+		if not path.ends_with(".tres"):
+			continue
+		var it := load(path) as ItemDef
+		if it and it.online and it.kind != ItemDef.Kind.UPGRADE:
+			out.append(it)
+	out.sort_custom(func(a: ItemDef, b: ItemDef) -> bool: return a.kind < b.kind or (a.kind == b.kind and a.online_cost() < b.online_cost()))
+	return out
+
+
+## เครื่องบนชั้นที่ยังรอของชิ้นนี้ (ชื่อลูกค้า)
+func waiting_for(id: StringName) -> PackedStringArray:
+	var out := PackedStringArray()
+	if shelf == null:
+		return out
+	for o in shelf.waiting():
+		var ids := o.part_ids()
+		if ids.has(id) and GameState.reserved_index(o.key) < 0:
+			out.append(o.case.customer)
+		elif o.replace_part == id and GameState.reserved_index(o.replace_key()) < 0:
+			out.append(o.case.customer + " (ชดใช้)")
+	return out
+
+
+## [0.4.0 ขั้น H] ไปตลาดระหว่างเปิดร้าน = เดินไปกลับ market_walk_slots เทิร์น (ลูกค้าหน้าประตูรอต่อตามความอดทน)
+## สถานที่ก่อนหน้า (-1 = เพิ่งโหลดเซฟ/เริ่มเกม → ไม่คิดเวลาเดิน)
+var _last_location := -1
+
+
+func _on_location_changed(id) -> void:
+	var prev := _last_location
+	_last_location = int(id)
+	if id == SceneRouter.MARKET and prev >= 0 and prev in shop_locations:
+		market_trip()
+	autosave()
+
+
+## หักเวลาไปตลาด · คืนจำนวนเทิร์นที่ใช้ (0 = ร้านไม่ได้เปิดอยู่ ไม่เสียเวลา)
+func market_trip() -> int:
+	var ts := _ts()
+	var e := _econ()
+	if ts == null or e.market_walk_slots <= 0 or not _loop_active() or _game_over or demo_over:
+		return 0
+	if _close_requested or ts.current_minute >= TimeSystem.CLOSE or ts.remaining_work_minutes(false) <= 0:
+		return 0
+	var n := mini(e.market_walk_slots, floori(ts.remaining_work_minutes(false) / float(TimeSystem.SLOT_MIN)))
+	if n <= 0:
+		return 0
+	ts.advance_minutes(n * TimeSystem.SLOT_MIN)
+	ts.snap_to_slot()
+	if visitor_toast:
+		visitor_toast.show_message("เดินไปตลาด ใช้ %s" % TimeSystem.turns_text(n), "ลูกค้าหน้าร้านยังรออยู่ — ซื้อเสร็จรีบกลับนะ")
+	return n
+
+
+## id อะไหล่ที่เครื่องนี้ยังรอ (ตัวหลัก/ของแทน หรือของชดใช้) · ว่าง = ครบแล้ว
+func waiting_ids(o: RepairShelf.Order) -> Array[StringName]:
+	var out: Array[StringName] = []
+	if o.replace_part != &"" and GameState.reserved_index(o.replace_key()) < 0:
+		out.append(o.replace_part)
+	elif not o.part_ids().is_empty() and GameState.reserved_index(o.key) < 0:
+		out.append_array(o.part_ids())
+	return out
+
+
+## ชื่อลูกค้าของรหัสใบรับเครื่อง (ใช้ในหน้าคลัง "จองไว้ให้…")
+func reservation_owner(key: String) -> String:
+	if shelf:
+		for o in shelf.orders:
+			if key == o.key or key == o.replace_key():
+				return o.case.customer
+	return "งานอื่น"
+
+
+func _on_parts_arrived() -> void:
+	assign_parts.call_deferred()
+
+
+## ปลดอะไหล่ที่จองไว้ให้เครื่องนี้ (ส่งคืนลูกค้าแล้ว/มาเอาคืน)
+func _release_order(o: RepairShelf.Order) -> void:
+	GameState.release(o.key)
+	GameState.release(o.replace_key())
+
+
+## ซ่อมเสร็จ: ผ่าน → ใช้อะไหล่ที่จอง (ลูกค้าจ่ายราคาซื้อ + ค่าบวกตามยศตอนมารับ) · ของชดใช้ใช้ไปฟรี · ไม่ผ่าน/ยอมแพ้ → ปลดจอง
+func _settle_parts(o: RepairShelf.Order, result: Dictionary) -> Dictionary:
+	var r := result.duplicate()
+	var ok: bool = int(r.get("grade", GameState.Grade.FAIL)) != GameState.Grade.FAIL and not r.get("gave_up", false)
+	if not ok:
+		_release_order(o)
+		return r
+	var used := GameState.consume_reserved(o.key)
+	if not used.is_empty():
+		var it: ItemDef = used.get("item")
+		r["part_cost"] = int(used.get("cost", 0))
+		r["part_due"] = GameState.part_charge(int(used.get("cost", 0)))
+		r["part_name"] = it.display_name if it else ""
+	if o.replace_part != &"":
+		GameState.consume_reserved(o.replace_key())
+		o.replace_part = &""
+	return r
+
+
+## ทำของลูกค้าเสีย และมีอะไหล่ชดใช้ → ใบรับเครื่องกลับไปรอของชดใช้ (ชื่อเสียงหักตอนนี้ · ความพอใจตอนมารับลด) · true = จัดการแล้ว
+func _order_damaged(o: RepairShelf.Order, result: Dictionary) -> bool:
+	if not result.get("damaged", false) or o.replace_part != &"":
+		return false
+	var it := replacement_for(StringName(o.case.part_id))
+	if it == null:
+		return false
+	o.replace_part = it.id
+	o.sat_adjust -= _econ().damage_replace_sat
+	GameState.add_reputation(int(result.get("rep_due", _econ().rep_damaged)))
+	GameState.satisfaction_history.append(_econ().satisfaction_fail)
+	assign_parts(false)
+	shelf_news.append("ทำ%sของ%sเสีย — ต้องหา%sมาเปลี่ยนให้ก่อน" % [o.case.job_title if o.case.job_title != "" else "ของ", o.case.customer, it.display_name])
+	_board_dirty = true
+	return true
+
+
+## เปิดร้าน: พัสดุที่สั่งออนไลน์มาส่ง
+func _deliver_parcels(ts: TimeSystem) -> void:
+	var got := GameState.deliver_orders(ts.shift)
+	if got.is_empty():
+		return
+	var names := PackedStringArray()
+	for g in got:
+		names.append("%s ×%d" % [(g["item"] as ItemDef).display_name, int(g["qty"])])
+	shelf_news.append("พัสดุมาส่ง: " + ", ".join(names))
+	_skip_note("พัสดุที่สั่งไว้มาถึงแล้ว: " + ", ".join(names))
+	if visitor_toast:
+		visitor_toast.show_message("พัสดุมาส่ง", ", ".join(names))
+
+
+## บรรทัดอะไหล่บนการ์ด: "ต้องใช้: ถ่าน CMOS · ในคลังมี ✓" / "✗ ยังไม่มี — ตลาด ฿30 (เหลือ 2) · ออนไลน์ ฿25"
+func part_line(c: CustomerCase) -> String:
+	var ids := c.part_ids() if c else ([] as Array[StringName])
+	if ids.is_empty():
+		return ""
+	var it := part_item(ids[0])
+	var have := 0
+	for id in ids:
+		have += GameState.free_count(id)
+	var head := "ต้องเปลี่ยน: %s" % (it.display_name if it else String(ids[0]))
+	if c.part_hint.strip_edges() != "":
+		head = "ปิ๊บ: %s" % c.part_hint
+	if have > 0:
+		return "%s\nอะไหล่: มีในคลัง ✓ (ว่าง %d) · ลูกค้าจ่ายค่าอะไหล่ตอนมารับ" % [head, have]
+	var where := PackedStringArray()
+	if it and it.market:
+		var left := GameState.stock_left(it)
+		where.append("ตลาด ฿%d%s" % [it.price, (" (เหลือ %d)" % left) if left > 0 else (" (หมด · มาใหม่%s)" % GameState.restock_text() if left == 0 else "")])
+	if it and it.online:
+		where.append("ออนไลน์ ฿%d (ถึงวันเปิดร้านถัดไป)" % it.online_cost())
+	return "%s\nอะไหล่: ✗ ยังไม่มีในคลัง — %s" % [head, " · ".join(where)]
 
 
 ## ปิ๊บบอกตอนข้ามวัน (เฉพาะวันที่เล่นแอนิเมชันข้ามวัน)
@@ -1818,10 +2261,11 @@ static func pickup_money(p: Dictionary) -> int:
 	var o: RepairShelf.Order = p["order"]
 	var due := int(o.result.get("money_due", 0))
 	var tip := int(o.result.get("tip_due", 0))
+	var part := int(o.result.get("part_due", 0))
 	if due <= 0:
-		return due
+		return due + part
 	var m := float(p["mult"])
-	return roundi((due - tip) * m) + roundi(tip * m)
+	return roundi((due - tip) * m) + roundi(tip * m) + part
 
 
 ## ส่งมอบเครื่องให้คนหน้าประตู (ลูกค้ามารับ) → จ่ายเงิน · ป้าย/ตัวเลขเด้ง · คำขอบคุณ/บ่นของลูกค้า
@@ -1889,8 +2333,18 @@ func shelf_view() -> Dictionary:
 			else:
 				r["status"] = "รอซ่อม · นัดรับ %s · ค่าแรง ฿%d" % [due_text(o.due), fee]
 			alert = alert or bool(r["warn"])
+			var miss := order_missing_parts(o)
+			if not miss.is_empty():
+				r["status"] = "รอของ: %s · %s" % [missing_note(o), r["status"]]
+				r["warn"] = true
+			elif not o.part_ids().is_empty():
+				r["status"] += " · อะไหล่พร้อม ✓"
 			var rp := { "text": "ซ่อม (%s)" % _cost_text(job_slots(c)), "disabled": false, "tooltip": "" }
 			match shelf_repair_state(o):
+				&"no_part":
+					rp["text"] = "รอของ"
+					rp["disabled"] = true
+					rp["tooltip"] = "ยังไม่มี %s ในคลัง — ซื้อแล้วระบบจองให้เครื่องนี้เอง" % ", ".join(miss)
 				&"ot":
 					rp["text"] = "ซ่อม\n(ล่วงเวลา)"
 				&"no":
@@ -1928,6 +2382,8 @@ func app_repair_state(o: RepairShelf.Order) -> StringName:
 		return &"busy"
 	if o.state != RepairShelf.State.WAITING:
 		return &"done"
+	if not order_has_parts(o):
+		return &"no_part"
 	var ts := _ts()
 	if forced_case or _result_pending or _close_requested or ts == null or ts.current_minute >= TimeSystem.CLOSE:
 		return &"busy"
@@ -2060,12 +2516,16 @@ func _app_row(i: int, o: RepairShelf.Order, today: int) -> Dictionary:
 		if o.postponed:
 			st += " · เลื่อนนัดแล้ว"
 		r["status"] = st
+		var miss := order_missing_parts(o)
+		if not miss.is_empty():
+			r["status"] = "รอของ: %s · %s" % [missing_note(o), r["status"]]
+			r["warn"] = true
 		var rs := app_repair_state(o)
 		actions.append({
 			"id": &"repair",
-			"text": "ไปซ่อม" if rs == &"ok" else ("ไปซ่อม (ล่วงเวลา)" if rs == &"ot" else ("เทิร์นไม่พอ" if rs == &"no" else "ไปซ่อม")),
+			"text": "รอของ" if rs == &"no_part" else ("ไปซ่อม" if rs == &"ok" else ("ไปซ่อม (ล่วงเวลา)" if rs == &"ot" else ("เทิร์นไม่พอ" if rs == &"no" else "ไปซ่อม"))),
 			"disabled": rs not in [&"ok", &"ot"],
-			"tooltip": "ปิดคอมแล้วเปิดเครื่องนี้ซ่อมเลย" if rs in [&"ok", &"ot"] else "ทำงานที่ค้างอยู่ให้เสร็จก่อน",
+			"tooltip": "ปิดคอมแล้วเปิดเครื่องนี้ซ่อมเลย" if rs in [&"ok", &"ot"] else ("สั่งอะไหล่ในแอปร้านออนไลน์ หรือซื้อที่ตลาด" if rs == &"no_part" else "ทำงานที่ค้างอยู่ให้เสร็จก่อน"),
 		})
 		var can := shelf.can_postpone(o, today, TimeSystem.TOTAL_SHIFTS)
 		actions.append({
@@ -2127,19 +2587,22 @@ func work_order_view() -> Dictionary:
 	var e := _econ()
 	var opts: Array[Dictionary] = []
 	var sel := -1
+	var have_part := c.part_ids().is_empty()
+	for id in c.part_ids():
+		have_part = have_part or GameState.free_count(id) > 0
 	for o in promise_options_for(c):
 		var i := int(o["index"])
 		opts.append({
 			"index": i,
 			"label": "%s · ค่าแรง ฿%d%s" % [o["name"], roundi(_fee(c) * float(o["mult"])), (" (×%.1f)" % float(o["mult"])) if not is_equal_approx(float(o["mult"]), 1.0) else ""],
-			"sub": "ลูกค้ามารับ %s" % due_text(int(o["due"])) + (" — ต้องซ่อมให้เสร็จวันนี้" if int(o["days"]) == 0 else ""),
+			"sub": "ลูกค้ามารับ %s" % due_text(int(o["due"])) + (" — ต้องซ่อมให้เสร็จวันนี้" if int(o["days"]) == 0 else "") + (" · ยังไม่มีอะไหล่ ต้องไปซื้อที่ตลาดวันนี้" if int(o["days"]) == 0 and not have_part else ""),
 		})
 		if sel < 0 or int(o["days"]) == 1:
 			sel = i
 	return {
 		"title": "ใบรับเครื่อง · %s" % c.customer,
 		"shelf": "ชั้นวาง %d/%d" % [shelf.used(), shelf.slots],
-		"detail": "เครื่อง: %s\nอาการ: %s\nงาน %s · ใช้ %s · ค่าแรงตั้งต้น ฿%d" % [c.device if c.device != "" else "-", c.symptom, c.level_name(), _cost_text(job_slots(c)), _fee(c)],
+		"detail": "เครื่อง: %s\nอาการ: %s\nงาน %s · ใช้ %s · ค่าแรงตั้งต้น ฿%d" % [c.device if c.device != "" else "-", c.symptom, c.level_name(), _cost_text(job_slots(c)), _fee(c)] + (("\n" + part_line(c)) if part_line(c) != "" else ""),
 		"hint": "เงินเข้าตอนลูกค้ามารับเครื่อง · เลยนัดได้อีก %d วันเปิดร้าน (ค่าแรง −%d%% และความพอใจ −%d ต่อวัน) · เลยกว่านั้นลูกค้ามาเอาเครื่องคืน ชื่อเสียง %d" % [
 			e.late_grace_days, roundi(e.late_pay_cut_per_day * 100.0), e.late_sat_per_day, e.rep_returned,
 		],
@@ -2267,6 +2730,10 @@ func _build_time_skip() -> void:
 	# [0.3.0 ขั้น D] ShelfLayer ชั้น 95 แผงชั้นวางเครื่อง (เหนือการ์ดงาน 90–91 · ใต้ HUD 100)
 	shelf_panel = _ensure_ui(^"ShelfLayer", 95, SHELF_PANEL_SCENE) as RepairShelfPanel
 	shelf_panel.repair_pressed.connect(_on_shelf_repair_pressed)
+	# [0.4.0 ขั้น J] VendorLayer ชั้น 92 รถขายของ (ปุ่มลอยข้างปุ่มชั้นวาง + แผงของ 3 ชิ้น)
+	vendor_panel = _ensure_ui(^"VendorLayer", 92, VENDOR_PANEL_SCENE) as VendorPanel
+	if not vendor_panel.buy_pressed.is_connected(vendor_buy):
+		vendor_panel.buy_pressed.connect(func(i: int) -> void: vendor_buy(i))
 	if not month_summary.continue_pressed.is_connected(_on_primary):
 		month_summary.continue_pressed.connect(_on_primary)
 

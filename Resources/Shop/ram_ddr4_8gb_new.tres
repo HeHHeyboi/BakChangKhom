@@ -12,6 +12,7 @@ uses = 0
 weekly_stock = 1
 unlock_rank = 0
 storage_slots_to = 0
+online_price = 640
 display_name = "แรม DDR4 8GB (ใหม่)"
 icon = ExtResource("2_icon")
 price = 750

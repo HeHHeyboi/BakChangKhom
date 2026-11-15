@@ -19,3 +19,4 @@ desktop_task = ExtResource("2_task")
 arrive_dialog = "res://Assets/Dialog/Customer/lv1_yai_backup.txt"
 thanks_text = "มีสองที่แล้ว ยายสบายใจแล้วจ้ะ"
 complain_text = "รูปในเครื่องยายหายไปไหน…"
+patience = 3

@@ -91,6 +91,8 @@ func _ready() -> void:
 	_check(DayLoop.door_accept_state() == &"pickup" and not DayLoop.door_can_appoint() and not DayLoop.door_reject() and DayLoop.accepted_today == 0, "ลูกค้ามารับ: นัด/ปฏิเสธไม่ได้ · ไม่นับโควตา")
 	_show(DayLoop.Card.DOOR)
 	_check(_door("Accept").text == "ส่งมอบเครื่อง" and not _door("Appoint").visible and not _door("Reject").visible and not _door("PatienceBar").visible and _door("Detail").text.contains("฿%d" % expect) and _door("Name").text.contains("มารับเครื่อง"), "การ์ด: \"ส่งมอบเครื่อง\" · บอกค่าแรง ฿%d · ไม่มีแถบความอดทน" % expect)
+	# [0.4.0] บท 1 วันที่ 2 มีครูอีกคน (งานสอนเรื่องอะไหล่) ยืนหน้าประตูด้วย → เอาออกก่อน ไม่ให้ชื่อซ้ำกับคนมารับ
+	DayLoop.door_queue = DayLoop.door_queue.filter(func(q: Dictionary) -> bool: return DayLoop.is_pickup(q) or (q["case"] as CustomerCase).id != &"w1_d2_teacher_hdmi")
 	ts.set_clock(ts.current_minute + 120)
 	_check(DayLoop.is_pickup(DayLoop.door_front()) and not DayLoop.walkouts.has("ครู"), "ลูกค้ามารับไม่หมดความอดทน (คนอื่นเดินกลับได้: %s)" % [DayLoop.walkouts])
 	_door("Accept").pressed.emit()
@@ -159,6 +161,8 @@ func _ready() -> void:
 	DayLoop.shelf = RepairShelf.new(e)
 	var o1: RepairShelf.Order = DayLoop.shelf.add(ram, ts.shift, 1)
 	var o2: RepairShelf.Order = DayLoop.shelf.add(ram2, ts.shift - 2, 1)
+	GameState.give_item(&"ram_ddr3_4gb_used", 1, false) # [0.4.0] งานแรมยายต้องใช้แรม DDR3
+	DayLoop.assign_parts(false)
 	await _frames(3)
 	var v := DayLoop.shelf_view()
 	_check(v["show"] and v["button"] == "ชั้นวาง 2/2" and v["alert"] and (v["rows"] as Array).size() == 2, "แผงชั้นวาง: ปุ่ม \"ชั้นวาง 2/2\" · มีงานเลยนัด (เตือน)")

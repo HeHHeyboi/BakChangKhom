@@ -67,7 +67,7 @@ func _ready() -> void:
 	gs.reset()
 	ts.shift = 3
 	gs.money = 2000
-	_check(ram.online_cost() == ram.price, "ยังไม่ตั้งราคาออนไลน์ = ราคาตลาด")
+	_check(ipa.online_cost() == ipa.price and ram.online_cost() < ram.price, "ไม่ตั้งราคาออนไลน์ = ราคาตลาด · แรมออนไลน์ถูกกว่าตลาด")
 	var lines := [[ram, 2], [ipa, 1]]
 	var total := ram.online_cost() * 2 + ipa.online_cost() + e.online_ship_fee
 	_check(gs.order_total(lines) == total, "ราคาตะกร้า = ของ + ค่าส่ง ฿%d" % e.online_ship_fee)
@@ -112,6 +112,42 @@ func _ready() -> void:
 	gs.order_online([[ram_new, 1]])
 	var data: Dictionary = JSON.parse_string(JSON.stringify({ "items": gs.inventory, "pending": gs.pending_orders }))
 	_check(int(data.items[0].cost) == ram.price and String(data.items[0].reserved_for) == "jobS" and int(data.pending[0].arrive) == 7, "ข้อมูลเซฟมี ราคาทุน · จอง · พัสดุ (มาถึงวันที่ 7)")
+
+	# H · [ขั้น B] เคสที่ต้องใช้อะไหล่ในคลังงานสุ่ม
+	var bad := PackedStringArray()
+	var month_ok := true
+	var month_line := PackedStringArray()
+	for m in range(1, 13):
+		var hw := 0
+		var need := 0
+		for c: CustomerCase in DayLoop.random_pool:
+			if c.forced or not c.in_month(m) or not c.takes_machine():
+				continue
+			hw += 1
+			if c.needs_part != &"":
+				need += 1
+		month_line.append("%d:%d/%d" % [m, need, hw])
+		month_ok = month_ok and need >= 2 and need <= roundi(hw * 0.4)
+	for c: CustomerCase in DayLoop.random_pool:
+		for id in c.part_ids():
+			var it := load("res://Resources/Shop/%s.tres" % id) as ItemDef
+			if it == null or it.kind != ItemDef.Kind.PART or not it.online:
+				bad.append("%s→%s" % [c.id, id])
+		if c.needs_part != &"" and c.part_hint.strip_edges() == "":
+			bad.append("%s ไม่มี part_hint" % c.id)
+		if not c.takes_machine() and c.needs_part != &"":
+			bad.append("%s งานขมOS ใช้อะไหล่ไม่ได้" % c.id)
+	_check(bad.is_empty(), "อะไหล่ของทุกเคสมีจริง · มีคำใบ้ · ไม่มีงานขมOS ใช้อะไหล่ %s" % str(bad))
+	_check(month_ok, "ทุกเดือนมีงานต้องใช้อะไหล่ ≥ 2 และไม่เกิน 40%% ของงานฮาร์ดแวร์ (%s)" % " ".join(month_line))
+	var mb_need := (load("res://Resources/Customers/lv3_min_mainboard.tres") as CustomerCase).supply_need(e)
+	_check(int(mb_need.get(&"ipa90", 0)) == 1 and int(mb_need.get(&"paste_grey", 0)) == 1, "งานเมนบอร์ดใช้ IPA 1 + ซิลิโคน 1 (ค่าตาม Part)")
+	var gpu_rep := 0
+	for f in DirAccess.get_files_at("res://Resources/Shop/"):
+		var it := load("res://Resources/Shop/" + f.trim_suffix(".remap")) as ItemDef
+		if it and it.replaces == &"part_gpu":
+			gpu_rep += 1
+			_check(not it.market and it.online_cost() < it.price, "การ์ดจอมือสองชดใช้: ออนไลน์อย่างเดียว ฿%d" % it.online_cost())
+	_check(gpu_rep == 1, "มีของชดใช้การ์ดจอ 1 ชิ้น")
 
 	gs.reset()
 	ts.shift = 1

@@ -19,3 +19,4 @@ desktop_task = ExtResource("2_task")
 arrive_dialog = "res://Assets/Dialog/Customer/lv1_yai_chat.txt"
 thanks_text = "เห็นหน้าหลานแล้ว! ขมเก่งจริง ๆ"
 complain_text = "มันเด้งอะไรไม่รู้เต็มจอเลยลูก…"
+patience = 3

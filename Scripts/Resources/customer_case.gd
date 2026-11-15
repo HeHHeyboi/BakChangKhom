@@ -69,6 +69,16 @@ const PART_BENCH = "part_bench"
 ## [0.3.0] ยืนรอหน้าประตูได้กี่เทิร์น · 0 = ค่าเริ่ม (EconomyConfig.door_patience_slots = 2) · ผู้สูงอายุ 3 · คนรีบ 1
 @export_range(0, 6) var patience := 0
 
+@export_group("อะไหล่ (0.4.0 · PLAN_0_4_0 ข้อ 2)")
+## อะไหล่ที่ต้องเปลี่ยน (id ใน Resources/Shop/) · ว่าง = ไม่ต้องใช้ · มีแล้วต้องมีของในคลังก่อนถึงซ่อมได้
+@export var needs_part: StringName
+## ใช้ของแทนได้ (เช่น แรมใหม่แทนมือสอง) — ลองตามลำดับหลัง needs_part
+@export var part_alternatives: Array[StringName] = []
+## ปิ๊บสรุปบนการ์ด เช่น "ถ่าน CMOS หมด เวลาเครื่องเลยเพี้ยน" · ว่าง = "ต้องเปลี่ยน: ชื่ออะไหล่"
+@export var part_hint: String
+## ของสิ้นเปลืองที่ใช้ { id: ครั้ง } · ว่าง = ใช้ค่าตาม Part (EconomyConfig.part_supplies)
+@export var supplies: Dictionary[StringName, int] = {}
+
 @export_group("บทพูด")
 ## บทตอนลูกค้าเข้าร้าน (รูปแบบเดียวกับ Assets/Dialog — ชื่อ,ข้อความ)
 @export_file("*.txt") var arrive_dialog: String
@@ -170,3 +180,23 @@ func problems() -> PackedStringArray:
 	if thanks_text.strip_edges() == "" or complain_text.strip_edges() == "":
 		out.append("ไม่มีคำพูดตอนรับเครื่อง (thanks_text / complain_text)")
 	return out
+
+
+## [0.4.0] อะไหล่ที่ใช้ได้กับงานนี้ (ตัวหลักก่อน แล้วของแทน) · ว่าง = ไม่ต้องใช้อะไหล่
+func part_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	if needs_part != &"":
+		out.append(needs_part)
+		for a in part_alternatives:
+			if a != &"" and not out.has(a):
+				out.append(a)
+	return out
+
+
+## [0.4.0] ของสิ้นเปลืองที่งานนี้ใช้ { id: ครั้ง }
+func supply_need(econ: EconomyConfig = null) -> Dictionary:
+	if not supplies.is_empty():
+		return supplies
+	if econ and econ.part_supplies.has(StringName(part_id)):
+		return econ.part_supplies[StringName(part_id)]
+	return { }

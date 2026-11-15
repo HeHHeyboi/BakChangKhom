@@ -17,3 +17,4 @@ job_title = "เปลี่ยนซิลิโคน CPU + ล้างฮี
 arrive_dialog = "res://Assets/Dialog/Customer/w1_d7_amnuay_mainboard.txt"
 thanks_text = "ฝีมือขมนี่ไว้ใจได้จริง ๆ"
 complain_text = "ยังดับอยู่เลยขม ไม่เป็นไรนะ ค่อย ๆ ไป"
+patience = 3

@@ -130,7 +130,15 @@ func _work_order_line() -> String:
 	var late: int = o.late_days(today)
 	var fee := roundi(dl._fee(o.case) * e.promise_mult(o.promise) * maxf(1.0 - late * e.late_pay_cut_per_day, 0.0))
 	var when: String = "เลยนัดมา %d วันแล้ว!" % late if late > 0 else "นัดรับ %s" % dl.due_text(o.due)
-	return "ใบรับเครื่อง: %s · ค่าแรง ฿%d · ได้ตอนลูกค้ามารับ" % [when, fee]
+	var line := "ใบรับเครื่อง: %s · ค่าแรง ฿%d · ได้ตอนลูกค้ามารับ" % [when, fee]
+	# [0.4.0] อะไหล่ที่จองไว้ให้เครื่องนี้
+	var i := GameState.reserved_index(o.key)
+	if i >= 0:
+		var it := GameState.item_of(GameState.inventory[i])
+		line += "\nอะไหล่: %s (จองไว้แล้ว) · ลูกค้าจ่ายค่าอะไหล่ ฿%d ตอนมารับ" % [it.display_name if it else "-", GameState.part_charge(int(GameState.inventory[i].get("cost", 0)))]
+	if o.replace_part != &"" and GameState.reserved_index(o.replace_key()) >= 0:
+		line += "\nของชดใช้: %s (ขมจ่ายเอง)" % dl.part_name(o.replace_part)
+	return line
 
 
 func _case_now() -> CustomerCase:
