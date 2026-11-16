@@ -30,19 +30,9 @@ func _ready() -> void:
 		$Menu/Continue_Button.disabled = true
 		$Menu/Continue_Button.text = "เซฟเวอร์ชันเก่าใช้ไม่ได้ · เริ่มใหม่"
 		$Menu/Continue_Button.tooltip_text = "ระบบเวลาในเกมเปลี่ยนแล้ว เซฟจากเวอร์ชัน 0.1.x จึงโหลดไม่ได้"
-	# [0.7.0] ใบประกาศรวมทุกเซฟ (user://achievements.cfg)
-	var ach := get_node_or_null(^"/root/Achievements")
-	if ach and ach.profile_count() > 0:
-		var al := Label.new()
-		al.name = "AchievementCount"
-		al.text = "ใบประกาศที่เคยได้ (ทุกเซฟ) %d/%d" % [ach.profile_count(), ach.all().size()]
-		al.add_theme_font_size_override(&"font_size", 15)
-		al.add_theme_color_override(&"font_color", Color(1, 0.93, 0.75))
-		al.add_theme_color_override(&"font_outline_color", Color(0.2, 0.12, 0.05))
-		al.add_theme_constant_override(&"outline_size", 4)
-		al.position = Vector2(16, 612)
-		add_child(al)
-	_add_export_button() # [0.9.0 ขั้น A]
+	# [0.9.5] เมนูหลักเหลือแค่ปุ่มหลัก · ใบประกาศ + ส่งออกข้อมูลการเล่น + คำแนะนำ Esc ย้ายไปอยู่ในปุ่มถ้วยมุมขวาบน (_add_stats_button)
+	$Version.hide()
+	_add_stats_button()
 	for b in $Menu.get_children():
 		if b is Button:
 			_hover_bounce(b)
@@ -73,7 +63,7 @@ func _show_intro_choice() -> void:
 	add_child(intro_layer)
 	var dim := ColorRect.new()
 	dim.color = Color(0.06, 0.04, 0.02, 0.88)
-	for n in ["Menu", "Title", "Subtitle", "Logo", "Version", "ExportButton", "AchievementCount"]: # เหลือแค่ภาพพื้นหลัง + ตัวละคร
+	for n in ["Menu", "Title", "Subtitle", "Logo", "Version", "VersionTag", "StatsButton", "StatsPanel"]: # เหลือแค่ภาพพื้นหลัง + ตัวละคร
 		var c := get_node_or_null(NodePath(n)) as CanvasItem
 		if c:
 			c.hide()
@@ -271,19 +261,72 @@ func _on_continue_button_pressed() -> void:
 	SceneRouter.go(loc)
 
 
-## [0.9.0] ปุ่ม "ส่งออกข้อมูลการเล่น" มุมขวาล่าง (มีข้อมูลการเล่นแล้วเท่านั้น)
-func _add_export_button() -> void:
-	if not Playlog.has_data():
-		return
-	var b := Button.new()
-	b.name = "ExportButton"
-	b.text = "ส่งออกข้อมูลการเล่น"
-	b.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร"
-	b.add_theme_font_size_override(&"font_size", 18)
-	b.custom_minimum_size = Vector2(250, 44)
-	b.position = Vector2(1152 - 250 - 16, 648 - 44 - 40)
-	b.pressed.connect(func() -> void:
-		var msg := Playlog.export_and_show()
-		b.text = "ส่งออกแล้ว ✓"
-		b.tooltip_text = msg)
-	add_child(b)
+## [0.9.5] ปุ่มถ้วยมุมขวาบน → หน้าความสำเร็จ (รวมทุกเซฟ) แยก 5 หมวด (AchievementApp · source_profile)
+## เดิม (0.7.0–0.9.0) ป้ายใบประกาศมุมซ้ายล่าง + ปุ่มส่งออกมุมขวาล่าง + ป้าย Esc → ผู้ใช้ 16 พ.ย.: รก · ส่งออกข้อมูลการเล่นอยู่ในเมนูพัก (Esc) ที่เดียว
+const ACH_APP := preload("res://Scene/UI/achievement_app.tscn")
+
+
+func _add_stats_button() -> void:
+	var t := Button.new()
+	t.name = "StatsButton"
+	t.icon = load("res://Assets/UI/Icons/icon_trophy.png") as Texture2D
+	t.expand_icon = true
+	t.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.tooltip_text = "ความสำเร็จ"
+	t.custom_minimum_size = Vector2(60, 60)
+	t.size = Vector2(60, 60)
+	t.position = Vector2(1152 - 60 - 18, 18)
+	t.focus_mode = Control.FOCUS_NONE
+	for st in [&"normal", &"hover", &"pressed"]: # ปุ่มกลมเล็ก (ธีมเมนูมีขอบไม้หนา ไอคอนเหลือนิดเดียว)
+		var rs := StyleBoxFlat.new()
+		rs.bg_color = Color(1, 0.95, 0.82) if st == &"normal" else Color(1, 0.86, 0.55)
+		rs.border_color = Color(0.45, 0.28, 0.12)
+		rs.set_border_width_all(3)
+		rs.set_corner_radius_all(30)
+		rs.set_content_margin_all(9)
+		t.add_theme_stylebox_override(st, rs)
+	var overlay := Control.new() # พื้นมืด + หน้าความสำเร็จ (กดพื้นมืดเพื่อปิด)
+	overlay.name = "StatsPanel"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.hide()
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.5)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			overlay.hide())
+	overlay.add_child(dim)
+	var page := PanelContainer.new()
+	page.name = "Page"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 0.97, 0.9)
+	sb.border_color = Color(0.6, 0.42, 0.2)
+	sb.set_border_width_all(3)
+	sb.set_corner_radius_all(12)
+	sb.set_content_margin_all(16)
+	page.add_theme_stylebox_override(&"panel", sb)
+	page.position = Vector2(226, 44)
+	page.size = Vector2(700, 560)
+	page.custom_minimum_size = Vector2(700, 560)
+	overlay.add_child(page)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override(&"separation", 8)
+	page.add_child(box)
+	var app := ACH_APP.instantiate()
+	app.source_profile = true
+	app.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(app)
+	var close := Button.new()
+	close.name = "Close"
+	close.text = "กลับ"
+	close.custom_minimum_size = Vector2(180, 40)
+	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	close.add_theme_font_size_override(&"font_size", 18)
+	close.pressed.connect(overlay.hide)
+	box.add_child(close)
+	t.pressed.connect(func() -> void:
+		overlay.visible = not overlay.visible
+		if overlay.visible:
+			app.refresh(true))
+	add_child(t) # ปุ่มถ้วยอยู่บนสุด (กดซ้ำเพื่อปิด)

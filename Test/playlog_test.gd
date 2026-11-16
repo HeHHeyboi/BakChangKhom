@@ -105,7 +105,11 @@ func _ready() -> void:
 	pm.open_achievements()
 	await get_tree().process_frame
 	_check(pm.ach_page.visible and not pm.panel.visible, "เปิดหน้าความสำเร็จ")
-	_check(pm.ach_page.find_child("Row_A01", true, false) != null and pm.ach_page.find_child("GiftHead", true, false) != null and pm.ach_page.find_child("Row_gift_amnuay", true, false) != null, "ใบประกาศ + ของขวัญท้ายหน้า")
+	var papp: Node = pm.ach_page.find_child("AchievementApp", true, false)
+	papp.select_category(0)
+	var row_a01 := pm.ach_page.find_child("Row_A01", true, false) != null
+	papp.select_category(Achievement.Category.PEOPLE)
+	_check(row_a01 and pm.ach_page.find_child("GiftHead", true, false) != null and pm.ach_page.find_child("Row_gift_amnuay", true, false) != null, "ความสำเร็จ + ของขวัญท้ายหมวดลูกค้าและชุมชน")
 	_check(pm.ach_page.find_child("Pin", true, false) == null, "ไม่มีปุ่มติดผนัง")
 	pm.close_achievements()
 	_check(not pm.ach_page.visible and pm.panel.visible, "กลับเมนูพัก")

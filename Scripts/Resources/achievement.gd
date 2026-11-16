@@ -4,8 +4,9 @@ extends Resource
 ## ไฟล์ Resources/Achievement/*.tres · เงื่อนไขคิดในโค้ด Achievements.progress(check) — check = ชื่อเงื่อนไข · target = ค่าที่ต้องถึง
 ## รางวัลเป็นของตกแต่ง/ฉายาเท่านั้น (ไม่มีเงิน → ไม่กระทบเป้าเดือน) · hidden = ใบลับ โชว์ ??? จนกว่าจะได้
 
-enum Category { REPAIR, BUSINESS, COMMUNITY, RELATION, EVENT, SECRET }
-const CATEGORY_NAME := ["ช่างซ่อม", "ธุรกิจ", "ชุมชน", "ความสัมพันธ์", "อีเวนต์", "ลับ"]
+## [0.9.5] 5 หมวด (ผู้ใช้ 16 พ.ย.: แยกหมวดชัด ๆ · เรียก "ความสำเร็จ" แทน "ใบประกาศ") · ใบลับใช้ hidden แทนหมวดลับ
+enum Category { REPAIR, SHOP, PEOPLE, EVENT, STORY }
+const CATEGORY_NAME := ["ซ่อมฮาร์ดแวร์", "ร้านและการเงิน", "ลูกค้าและชุมชน", "อีเวนต์ในหมู่บ้าน", "เรื่องราวและฉากจบ"]
 
 @export var id: StringName
 @export var title: String

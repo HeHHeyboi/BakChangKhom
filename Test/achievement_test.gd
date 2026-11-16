@@ -85,7 +85,12 @@ func _ready() -> void:
 	add_child(app)
 	await get_tree().process_frame
 	app.refresh(true)
-	_check(app.find_child("Row_A01", true, false) != null and app.find_child("Row_H01", true, false) != null, "แอปใบประกาศขึ้นทุกใบ")
+	var seen_rows := 0
+	for ci in Achievement.CATEGORY_NAME.size():
+		app.select_category(ci)
+		seen_rows += app.find_child("List", true, false).get_child_count()
+	app.select_category(2)
+	_check(seen_rows == A.all().size() and app.find_child("Row_H01", true, false) != null and Achievement.CATEGORY_NAME.size() == 5, "หน้าความสำเร็จ 5 หมวด รวมแล้วขึ้นทุกอัน (%d)" % seen_rows)
 	var v: Dictionary = A.view()
 	var h01: Dictionary = (v.rows as Array).filter(func(r: Dictionary) -> bool: return r.id == "H01")[0]
 	_check(h01.title == "???", "ใบลับยังไม่ได้ = ???")

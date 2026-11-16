@@ -81,7 +81,7 @@ static func recap_lines() -> PackedStringArray:
 	var hit := gs.month_results.filter(func(r: Dictionary) -> bool: return bool(r.get("reached", false))).size()
 	var out: PackedStringArray = []
 	out.append("ปิ๊บ,ปีนี้ร้านเราซ่อมไปทั้งหมด %d งาน ถึงเป้า %d จาก %d เดือนค่ะ" % [gs.satisfaction_history.size(), hit, gs.month_results.size()])
-	var extra := "พี่ขมเป็น%sแล้ว ได้ใบประกาศ %d ใบ" % [gs.rank_name(), gs.achievements.size()]
+	var extra := "พี่ขมเป็น%sแล้ว ได้ความสำเร็จ %d อย่าง" % [gs.rank_name(), gs.achievements.size()]
 	var gifts := gs.gifts_received.size()
 	if gifts > 0:
 		extra += " แล้วก็ได้ของขวัญจากคนในหมู่บ้าน %d ชิ้น" % gifts

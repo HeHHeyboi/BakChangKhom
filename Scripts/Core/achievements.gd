@@ -244,19 +244,31 @@ func bump(stat: String, n := 1) -> void:
 	GameState.ach_stats[stat] = int(GameState.ach_stats.get(stat, 0)) + n
 
 
-## แอป "ใบประกาศ" ← { title, rows: [{ id, title, desc, category, got, when, hidden, cur, target, reward }] }
-func view() -> Dictionary:
+## หน้า "ความสำเร็จ" ← { title, got, total, cats: [{ name, got, total }], rows: [{ id, title, desc, category, cat, got, when, hidden, cur, target, reward }] }
+## profile = true → ดูจาก user://achievements.cfg (ทุกเซฟรวม · ใช้ที่เมนูหลัก ไม่มีความคืบหน้า)
+func view(profile := false) -> Dictionary:
 	var rows: Array = []
+	var ids := profile_ids() if profile else PackedStringArray()
+	var cats: Array = []
+	for n in Achievement.CATEGORY_NAME:
+		cats.append({ "name": n, "got": 0, "total": 0 })
+	var got_n := 0
 	for a in all():
-		var got := has(a.id)
-		var p := progress(a)
+		var got := ids.has(String(a.id)) if profile else has(a.id)
+		var p := progress(a) if not profile else Vector2i(0, 1) # โปรไฟล์ไม่มีความคืบหน้า (ไม่โชว์ 0/n)
 		var w: Dictionary = GameState.achievements.get(String(a.id), { })
+		var ci := clampi(int(a.category), 0, cats.size() - 1)
+		cats[ci].total += 1
+		if got:
+			cats[ci].got += 1
+			got_n += 1
 		rows.append({
-			"id": String(a.id), "title": a.title if got or not a.hidden else "???", "desc": a.desc if got or not a.hidden else "ใบลับ — ลองเล่นแบบต่าง ๆ ดูนะ",
-			"category": a.category_name(), "cat": int(a.category), "got": got, "hidden": a.hidden,
-			"when": ("ได้เมื่อ %s" % _when_text(w)) if got else "", "cur": p.x, "target": p.y, "reward": a.reward_text,
+			"id": String(a.id), "title": a.title if got or not a.hidden else "???", "desc": a.desc if got or not a.hidden else "ความสำเร็จลับ — ลองเล่นแบบต่าง ๆ ดูนะ",
+			"category": a.category_name(), "cat": ci, "got": got, "hidden": a.hidden,
+			"when": ("ได้เมื่อ %s" % _when_text(w)) if got and not profile else "", "cur": p.x, "target": p.y, "reward": a.reward_text,
 		})
-	return { "title": "ใบประกาศ · ได้แล้ว %d/%d · ทุกเซฟรวม %d" % [count(), all().size(), profile_count()], "rows": rows }
+	var title := ("ความสำเร็จ · ได้แล้ว %d/%d (รวมทุกเซฟ)" % [got_n, all().size()]) if profile else ("ความสำเร็จ · ได้แล้ว %d/%d · ทุกเซฟรวม %d" % [got_n, all().size(), profile_count()])
+	return { "title": title, "got": got_n, "total": all().size(), "cats": cats, "rows": rows }
 
 
 func _when_text(w: Dictionary) -> String:
@@ -273,6 +285,13 @@ func _save_profile(a: Achievement) -> void:
 	if not cf.has_section_key("unlocked", String(a.id)):
 		cf.set_value("unlocked", String(a.id), Time.get_datetime_string_from_system())
 		cf.save(PROFILE)
+
+
+func profile_ids() -> PackedStringArray:
+	var cf := ConfigFile.new()
+	if cf.load(PROFILE) != OK or not cf.has_section("unlocked"):
+		return PackedStringArray()
+	return cf.get_section_keys("unlocked")
 
 
 func profile_count() -> int:
@@ -322,7 +341,7 @@ func _build_popup() -> void:
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(vb)
 	var head := Label.new()
-	head.text = "ได้ใบประกาศใหม่!"
+	head.text = "ได้ความสำเร็จใหม่!"
 	head.add_theme_font_size_override(&"font_size", 14)
 	head.add_theme_color_override(&"font_color", Color(0.55, 0.35, 0.1))
 	vb.add_child(head)

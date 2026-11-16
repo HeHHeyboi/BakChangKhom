@@ -91,7 +91,9 @@ func open_achievements() -> void:
 		var close := Button.new()
 		close.name = "Close"
 		close.text = "กลับ"
-		close.custom_minimum_size = Vector2(0, 48)
+		close.custom_minimum_size = Vector2(180, 40)
+		close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		close.add_theme_font_size_override(&"font_size", 18)
 		close.pressed.connect(close_achievements)
 		box.add_child(close)
 		panel.get_parent().add_child(ach_page)

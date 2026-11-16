@@ -11,4 +11,4 @@ category = 0
 hidden = false
 check = &"passes"
 target = 1
-reward_text = "ใบประกาศใบแรก"
+reward_text = "ความสำเร็จแรก"

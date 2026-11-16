@@ -18,6 +18,37 @@ func _ready() -> void:
 	await _frames(3)
 	var btns: Array = start.get_node("Menu").get_children().filter(func(b): return b.name != "Continue_Button").map(func(b): return b.text)
 	_check(btns == ["เริ่มเกม", "ตั้งค่า", "ออกจากเกม"], "เมนูหลัก: ปุ่ม เริ่มเกม · ตั้งค่า · ออกจากเกม (%s)" % [btns])
+	# [0.9.5] เมนูหลักเหลือแค่ปุ่มหลัก · ใบประกาศ/ส่งออกอยู่ในปุ่มถ้วยมุมขวาบน
+	var sbtn: Button = start.get_node_or_null("StatsButton")
+	var spanel: Control = start.get_node_or_null("StatsPanel")
+	_check(sbtn != null and spanel != null and not spanel.visible and not start.get_node("Version").visible and start.get_node_or_null("ExportButton") == null, "เมนูหลักไม่มีป้ายความสำเร็จ/ปุ่มส่งออก/ป้าย Esc · มีปุ่มถ้วย")
+	await _shot("main_menu_clean")
+	sbtn.pressed.emit()
+	await _frames(2)
+	var mapp: Node = spanel.find_child("AchievementApp", true, false)
+	_check(spanel.visible and mapp != null and mapp.source_profile and (mapp.get_node("Tabs") as Container).get_child_count() == 6 and spanel.find_child("ExportButton", true, false) == null, "กดถ้วย → หน้าความสำเร็จ ทั้งหมด + 5 หมวด (ไม่มีปุ่มส่งออก)")
+	_check(mapp.category == -1 and mapp.find_child("Row_A01", true, false) != null and mapp.find_child("Row_E01", true, false) != null, "เปิดมา = ทั้งหมด")
+	mapp.select_category(0)
+	await _frames(1)
+	_check(mapp.find_child("Row_A01", true, false) != null and mapp.find_child("Row_B01", true, false) == null, "แถบซ่อมฮาร์ดแวร์ = เฉพาะหมวดนั้น")
+	var cb: Button = spanel.find_child("Close", true, false)
+	_check(cb.size.x < 300, "ปุ่มกลับไม่ยืดเต็มแผง (%d)" % cb.size.x)
+	mapp.select_category(1)
+	await _frames(1)
+	_check(mapp.find_child("Row_B01", true, false) != null, "กดแถบ → เปลี่ยนหมวด")
+	var tabs: Control = mapp.get_node("Tabs")
+	_check(tabs is HBoxContainer and tabs.get_child(5).position.y == tabs.get_child(0).position.y, "แถบหมวด 6 อันอยู่บรรทัดเดียว")
+	var rb: Control = mapp.find_child("Row_B01", true, false)
+	var desc: Label = rb.find_child("Desc", true, false)
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	var hid := not desc.visible
+	rb.gui_input.emit(click)
+	_check(hid and desc.visible, "แถวโชว์แค่ชื่อ · กดแล้วขึ้นคำอธิบาย")
+	await _shot("main_menu_stats")
+	sbtn.pressed.emit()
+	_check(not spanel.visible, "กดถ้วยอีกครั้ง → ปิดแผง")
 	# [0.9.0] ดู/ข้ามบทนำ = หน้าเลือกการ์ด 2 ใบ (ไม่ใช่ตัวเลือกในบท) · ทั้งสองทางมีบท
 	DialogScene.read_file(Constant.PROLOUGE_TEXT)
 	var lines: Array = DialogScene.DialogDict["dialog"]

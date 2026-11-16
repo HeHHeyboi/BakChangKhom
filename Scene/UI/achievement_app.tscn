@@ -33,8 +33,8 @@ row_style = SubResource("SB_row")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
-theme_override_font_sizes/font_size = 15
-text = "ใบประกาศ"
+theme_override_font_sizes/font_size = 18
+text = "ความสำเร็จ"
 autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="."]
@@ -52,5 +52,5 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.5, 0.44, 1)
 theme_override_font_sizes/font_size = 12
-text = "ใบประกาศให้กับการทำงานแบบช่างที่ดี · วินิจฉัยก่อนลงมือ ปลอดภัย ซื่อตรง วางแผนเงิน ใส่ใจคน"
+text = "ความสำเร็จให้กับการทำงานแบบช่างที่ดี · วินิจฉัยก่อนลงมือ ปลอดภัย ซื่อตรง วางแผนเงิน ใส่ใจคน"
 autowrap_mode = 3
