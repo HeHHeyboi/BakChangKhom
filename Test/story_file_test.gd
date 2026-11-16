@@ -9,7 +9,7 @@ func _ready() -> void:
 	for ch in GameState.CHAPTERS:
 		files.append(ch["file"])
 	files.append(GameState.EPILOGUE["file"])
-	for d in ["res://Assets/Dialog/Ending/", "res://Assets/Dialog/NPC/"]:
+	for d in ["res://Assets/Dialog/Ending/", "res://Assets/Dialog/NPC/", "res://Assets/Dialog/City/"]: # [0.9.5] + บทในเมือง
 		var da := DirAccess.open(d)
 		if da == null:
 			continue

@@ -162,10 +162,11 @@ offset_top = 270.0
 offset_right = 985.0
 offset_bottom = 420.0
 title = "เมือง"
-location = 4
+location = 6
 thumbnail = ExtResource("t4")
-hint = "ในเมืองมีออฟฟิศกับงานใหญ่ ๆ รอขมอยู่"
+hint = "ในเมืองมีออฟฟิศเก่าของขม ร้านอะไหล่ใหญ่ กับร้านกาแฟที่คนทำงานออนไลน์ ไปแล้วร้านปิดทั้งวันนะ"
 locked = true
+locked_text = "ขมยังไม่พร้อมกลับไป"
 
 [node name="Speech" type="PanelContainer" parent="Root" unique_id=800969832]
 layout_mode = 0

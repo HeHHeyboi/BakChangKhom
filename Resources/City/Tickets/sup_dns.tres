@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_dns"
+category = 0
+title = "เว็บระบบขายเปิดไม่ขึ้น"
+from = "ฝ่ายขาย"
+ask = "เว็บข่าวเปิดได้ปกติ แต่เว็บระบบขายของบริษัทขึ้นว่าหาเซิร์ฟเวอร์ไม่เจอ"
+actions = PackedStringArray("ping 8.8.8.8", "ping sales.company.local", "nslookup")
+results = PackedStringArray("C:\\> ping 8.8.8.8
+Reply from 8.8.8.8: time=21ms", "C:\\> ping sales.company.local
+Ping request could not find host.", "C:\\> nslookup sales.company.local
+DNS request timed out.")
+question = "ปัญหาอยู่ที่อะไร"
+choices = PackedStringArray("DNS แปลงชื่อเว็บไม่ได้ ลอง ipconfig /flushdns แล้วเช็กค่า DNS", "สายแลนขาด", "จอเสีย", "เว็บระบบขายถูกลบไปแล้ว")
+explain = "ping ไปที่เลข IP ได้ แปลว่าเน็ตใช้ได้ แต่ใช้ชื่อเว็บไม่ได้ แปลว่าตัวแปลงชื่อ (DNS) มีปัญหา ไล่เช็กทีละชั้นแบบนี้จะไม่ต้องเดา"
+skill = "ping + nslookup"

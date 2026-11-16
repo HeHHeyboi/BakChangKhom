@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_apipa"
+category = 0
+title = "เครื่องเข้าเน็ตไม่ได้"
+from = "ฝ่ายบัญชี"
+ask = "เครื่องอื่นในห้องใช้ได้ มีเครื่องหนูเครื่องเดียวที่ขึ้นว่าไม่มีอินเทอร์เน็ต"
+actions = PackedStringArray("ipconfig", "ping 8.8.8.8", "ดูไฟพอร์ตแลน")
+results = PackedStringArray("C:\\> ipconfig
+IPv4 Address . . : 169.254.12.7
+Default Gateway  :", "C:\\> ping 8.8.8.8
+PING: transmit failed. General failure.", "> ส่องหลังเครื่อง
+ไฟ LINK ที่พอร์ตแลนดับ สายแลนหลวมคาช่อง")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("เสียบสายแลนให้แน่น แล้ว ipconfig /renew", "ลงวินโดวส์ใหม่", "เปลี่ยนเมาส์", "รอพรุ่งนี้เน็ตกลับมาเอง")
+explain = "IP ขึ้นต้น 169.254 แปลว่าเครื่องขอเลข IP ไม่ได้ เริ่มเช็กจากของง่ายสุดก่อน สายกับไฟที่พอร์ต แล้วค่อยขอ IP ใหม่"
+skill = "ipconfig + เช็กสาย"

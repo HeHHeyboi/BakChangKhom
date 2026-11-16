@@ -7,6 +7,7 @@ enum LocationID {
 	WORKBENCH,
 	MARKET,
 	VILLAGE, ## [Claude 9 ต.ค. 2569] หน้าบ้าน (ทางผ่านบ้าน ↔ ร้าน) — ต่อท้าย enum ไม่ให้เลขเดิมเลื่อน
+	CITY, ## [0.9.5] เมือง (ไปได้ตั้งแต่บท 11 · ใช้ทั้งวันเปิดร้าน — DayLoop.city_trip)
 }
 const HOME = LocationID.HOME
 const ROOM = LocationID.ROOM
@@ -14,6 +15,7 @@ const WORKSHOP = LocationID.WORKSHOP
 const WORKBENCH = LocationID.WORKBENCH
 const MARKET = LocationID.MARKET
 const VILLAGE = LocationID.VILLAGE
+const CITY = LocationID.CITY
 
 signal location_changed(id: LocationID)
 signal overlay_closed(scene_path: String, result: Variant)
@@ -25,6 +27,7 @@ const LOCATIONS := {
 	WORKBENCH: "res://Scene/Location/Workbench.tscn",
 	MARKET: "res://Scene/Location/Market.tscn",
 	VILLAGE: "res://Scene/Location/Village.tscn",
+	CITY: "res://Scene/Location/City.tscn",
 }
 
 var overlay_stack: CanvasLayer

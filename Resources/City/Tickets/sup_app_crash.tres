@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_app_crash"
+category = 3
+title = "โปรแกรมบัญชีเปิดแล้วเด้ง"
+from = "ฝ่ายบัญชี"
+ask = "เปิดโปรแกรมบัญชีแล้วปิดเองทุกครั้ง เมื่อวานยังใช้ได้"
+actions = PackedStringArray("ดู Event Viewer", "ถามผู้ใช้", "เปิดโปรแกรมอื่น")
+results = PackedStringArray("> Event Viewer
+Application Error
+ไฟล์ที่พัง : pdf_plugin.dll", "> คุยกับผู้ใช้
+เมื่อเช้าเพิ่งลงปลั๊กอินพิมพ์ PDF ตัวใหม่", "> ลองเปิด Excel
+เปิดได้ปกติ")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ถอนปลั๊กอิน PDF ที่เพิ่งลง แล้วลองเปิดโปรแกรมบัญชีใหม่", "ลงวินโดวส์ใหม่", "เปลี่ยนเครื่องให้ผู้ใช้", "ปิดเครื่องทิ้งไว้ทั้งคืน")
+explain = "ถามว่าเพิ่งเปลี่ยนอะไรไปเป็นคำถามสำคัญที่สุดของไอทีซัพพอร์ต ประกอบกับ Event Viewer ที่ชี้ไฟล์ปลั๊กอิน ถอยสิ่งที่เพิ่งเปลี่ยนออกก่อน"
+skill = "ถามว่าเพิ่งเปลี่ยนอะไร"

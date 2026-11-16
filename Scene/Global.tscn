@@ -28,6 +28,7 @@
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_fern.png" id="c24"]
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_oat.png" id="c25"]
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_namwan.png" id="c26"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_city_nan.png" id="c27"]
 
 [node name="Global" type="Node2D" unique_id=280335373]
 scale = Vector2(0.998061, 0.994891)
@@ -65,5 +66,6 @@ _CharacterMap = {
 "เฟิร์น": ExtResource("c24"),
 "โอ๊ต": ExtResource("c25"),
 "น้ำหวาน": ExtResource("c26"),
-"ชมรมคอม": ExtResource("c23")
+"ชมรมคอม": ExtResource("c23"),
+"พี่แนน": ExtResource("c27")
 }

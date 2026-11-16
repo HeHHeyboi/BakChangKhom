@@ -132,6 +132,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	_flip_wait.clear()
 	helper_runs = 0
 	helper_money = 0
+	city_pay = 0
 	requests_done = 0
 	request_money = 0
 	inspections = 0
@@ -179,7 +180,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	var returned := 0
 	for o: RepairShelf.Order in DayLoop.shelf.history:
 		returned += 1 if o.state == RepairShelf.State.RETURNED else 0
-	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)), "gifts": GameState.gifts_received.size(), "club": [&"phum", &"fern", &"oat", &"namwan"].map(func(id: StringName) -> int: return GameState.affinity(id)).max(), "min_tier": String(EndingBook.min_report().tier), "rank_end": GameState.rank(), "ex": ex_stats.duplicate() }
+	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)), "gifts": GameState.gifts_received.size(), "club": [&"phum", &"fern", &"oat", &"namwan"].map(func(id: StringName) -> int: return GameState.affinity(id)).max(), "min_tier": String(EndingBook.min_report().tier), "rank_end": GameState.rank(), "ex": ex_stats.duplicate(), "city": int(GameState.city.get("visits", 0)), "city_pay": city_pay }
 
 
 ## 1 วันเปิดร้าน · คืนจำนวนงานที่ซ่อม
@@ -193,6 +194,8 @@ func _play_day(lv: StringName) -> int:
 		_exploit_day()
 	if lv == &"idle":
 		DayLoop.forced_case = null
+		return 0
+	if OS.has_environment("BAL_CITY") and _city_day(lv): # [0.9.5] เข้าเมืองวันที่ 2 ของเดือน 11–12
 		return 0
 	if DayLoop.forced_case:
 		_repair(DayLoop.forced_case, null, lv)
@@ -217,6 +220,20 @@ func _play_day(lv: StringName) -> int:
 	_handle_door(lv)
 	_order_after_close()
 	return done
+
+
+## [0.9.5] BAL_CITY=1: เดือน 11–12 เข้าเมืองวันที่ 2 (ร้านปิดทั้งวัน · ลองงานออฟฟิศ ถูก 100%/70% · ร้านกาแฟ) → ดูว่าเป้าเดือนยังถึงไหม
+func _city_day(lv: StringName) -> bool:
+	if ts.month() >= 11:
+		GameState.story_flags["city_open"] = true
+	if ts.shift_in_week() != 2 or DayLoop.city_state() != &"ok":
+		return false
+	DayLoop.city_trip()
+	var r := DayLoop.city_office_auto(1.0 if _g(lv) else 0.7, rng)
+	city_pay += int(r.get("pay", 0))
+	DayLoop.city_cafe()
+	DayLoop.city_return()
+	return true
 
 
 ## เครื่องที่ถึง/เลยนัดแต่ยังไม่มีของ → เดินไปตลาด (1 เทิร์น) ซื้อถ้ามีของ
@@ -426,6 +443,7 @@ var inspections := 0
 var rank_months := { }
 var helper_runs := 0
 var helper_money := 0
+var city_pay := 0 ## [0.9.5] ค่าแรงลองงานออฟฟิศรวม (BAL_CITY)
 
 
 ## ปิดร้านวันที่ XP ครบ → สอบ (เก่งตอบถูก 90% · ปกติ 70%) · ผ่านแล้วเลือกความสามารถทาง A
@@ -629,6 +647,19 @@ func _report(res: Dictionary) -> void:
 	for lv in res:
 		for r: Dictionary in res[lv]:
 			print("BAL %-14s อีเวนต์ %d ครั้ง · หลงเชื่อมิจฉาชีพ %d · ใบประกาศ %d/%d · [0.8.0] ของขวัญ %d · ชมรม♥สูงสุด %d · ยศสิ้นปี %d · ถ้ากลับเมือง มิ้น=%s" % ["%s#%d" % [lv, r.seed], int(r.get("events", 0)), int(r.get("scam", 0)), int(r.get("ach", 0)), Achievements.all().size(), int(r.get("gifts", 0)), int(r.get("club", 0)), int(r.get("rank_end", 0)), String(r.get("min_tier", ""))])
+	if OS.has_environment("BAL_CITY"):
+		print("BAL ===== [0.9.5] เข้าเมือง (เดือน 11–12 วันที่ 2) =====")
+		for lv in res:
+			var hit := 0
+			var n := 0
+			for r: Dictionary in res[lv]:
+				var rows: Array = r.rows
+				for m in [10, 11]:
+					if m < rows.size():
+						n += 1
+						hit += 1 if bool(rows[m].reached) else 0
+				print("BAL %-14s เข้าเมือง %d ครั้ง · ค่าแรงออฟฟิศ ฿%d · พ.ย. %s · ธ.ค. %s" % ["%s#%d" % [lv, r.seed], int(r.get("city", 0)), int(r.get("city_pay", 0)), str(rows[10].profit) + ("" if rows[10].reached else "*") if rows.size() > 10 else "-", str(rows[11].profit) + ("" if rows[11].reached else "*") if rows.size() > 11 else "-"])
+			print("BAL %-14s ถึงเป้า พ.ย.–ธ.ค. %d/%d" % [lv, hit, n])
 	# มัธยฐานกำไรรายเดือนของบอทปกติ (ร้านปิดไปแล้ว = ไม่นับเดือนนั้น) + 70% ไว้ใช้ตั้งเป้า
 	var med := "BAL %-14s" % "มัธยฐานปกติ"
 	var sug := "BAL %-14s" % "70% (ปัด 50)"

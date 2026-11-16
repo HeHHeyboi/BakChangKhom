@@ -2733,6 +2733,7 @@ func _continue_after_summary() -> void:
 ## เริ่มเกมใหม่หลังฉากจบ: เงิน/คะแนน/เวลา กลับค่าเริ่มต้น
 func _reset_run() -> void:
 	gift_pending = { }
+	office_state = { } # [0.9.5]
 	exam = { }
 	pending_story = { }
 	story_today = false
@@ -3599,6 +3600,8 @@ var _last_location := -1
 func _on_location_changed(id) -> void:
 	var prev := _last_location
 	_last_location = int(id)
+	if prev == SceneRouter.CITY and id != SceneRouter.CITY: # [0.9.5] ออกจากเมือง (ปุ่มกลับบ้าน/แผนที่) = ปิดร้านวันนั้น
+		city_return()
 	if id == SceneRouter.MARKET and prev >= 0 and prev in shop_locations:
 		market_trip()
 	autosave()
@@ -4951,3 +4954,280 @@ func _npc_tutorials() -> Array[String]:
 	if not GameState.achievements.is_empty():
 		out.append("tut_achievement")
 	return out
+
+
+# ---------------------------------------------------------------- [0.9.5] เมือง (PLAN_0_9_5 · CityBook · Scene/Location/City.tscn)
+# ปลดหลังบทต้นเดือนบท 11 (GameState.story_flags.city_open) · ไปได้เดือนละครั้ง · ใช้ทั้งวันเปิดร้าน (ลูกค้าวันนั้นไม่มา คนที่นัดเลื่อนไปวันถัดไป) + ค่ารถ
+# ในเมือง: ออฟฟิศเก่า = ลองงานไอทีซัพพอร์ต (ตั๋ว OfficeTicket: กดตรวจ → เลือกวิธีแก้) · ร้านอะไหล่ (MarketStall ใน City.tscn) · ร้านกาแฟ (พี่แนน ทำงานออนไลน์)
+# กลับบ้าน (city_return) = ปิดร้านวันนั้น → การ์ดสรุปวัน · ข้อมูลวิจัย user://playlog/city.csv
+
+## สถานะงานออฟฟิศที่กำลังทำ { tickets, step (0..), right, answered, last_ok, checked (ปุ่มตรวจที่กดในตั๋วนี้) }
+var office_state: Dictionary = { }
+
+const CITY_STATE_TEXT := {
+	&"locked": "ขมยังไม่พร้อมกลับไป",
+	&"closed": "ไปได้เฉพาะวันเปิดร้าน",
+	&"used": "เดือนนี้เข้าเมืองไปแล้ว",
+	&"last_day": "วันสุดท้ายของปี อยู่ร้านกับทุกคนเถอะ",
+	&"busy": "ทำงานตรงหน้าให้เสร็จก่อน",
+	&"event": "วันนี้มีงานในหมู่บ้าน",
+	&"late": "รถเข้าเมืองเที่ยวสุดท้ายออกไปแล้ว",
+	&"here": "อยู่ในเมืองแล้ว",
+}
+
+
+func city_unlocked() -> bool:
+	return bool(GameState.story_flags.get("city_open", false))
+
+
+## วันนี้คือวันที่ไปเมือง
+func city_today() -> bool:
+	var ts := _ts()
+	return ts != null and int(GameState.city.get("last_shift", -1)) == ts.shift
+
+
+## ไปเมืองตอนนี้ได้ไหม → &"ok" หรือเหตุผล (คีย์ใน CITY_STATE_TEXT)
+func city_state() -> StringName:
+	if not city_unlocked():
+		return &"locked"
+	var ts := _ts()
+	if ts == null or not _loop_active() or _game_over or demo_over:
+		return &"closed"
+	if city_today():
+		return &"here"
+	if (GameState.city.get("months", []) as Array).has(ts.month()):
+		return &"used"
+	if ts.shift >= TimeSystem.TOTAL_SHIFTS:
+		return &"last_day"
+	if forced_case or _working or _result_pending:
+		return &"busy"
+	if booth_today or contract_today or not event_cards.is_empty():
+		return &"event"
+	if _close_requested or ts.current_minute > _econ().city_leave_by:
+		return &"late"
+	return &"ok"
+
+
+func city_state_text(st: StringName) -> String:
+	return CITY_STATE_TEXT.get(st, "")
+
+
+## ข้อความยืนยันก่อนไป (แผนที่)
+func city_confirm_text() -> String:
+	var e := _econ()
+	var n := door_queue.filter(func(j: Dictionary) -> bool: return not is_pickup(j)).size()
+	var due := 0
+	var ts := _ts()
+	if shelf and ts:
+		due = shelf.orders.filter(func(o: RepairShelf.Order) -> bool: return o.state == RepairShelf.State.WAITING and o.due == ts.shift).size()
+	var t := "ไปเมืองวันนี้ร้านจะปิดทั้งวัน · ค่ารถไป–กลับ ฿%d" % e.city_fare
+	if n > 0:
+		t += "\nลูกค้าที่รออยู่ %d คนจะกลับไปก่อน (คนที่นัดไว้เลื่อนเป็นรอบหน้า)" % n
+	if due > 0:
+		t += "\nเครื่องบนชั้นที่ครบนัดวันนี้ %d เครื่อง ขมจะโทรขอเลื่อนเป็นรอบหน้า" % due
+	if ts:
+		var m := ts.month()
+		t += "\nเป้าเดือนนี้ ฿%d · ทำได้แล้ว ฿%d" % [e.target_for(m), GameState.month_profit(m)]
+		if GameState.missed_months >= e.fail_missed_months - 1:
+			t += "\nระวัง! พลาดเป้ามา %d เดือนติดแล้ว ถ้าเดือนนี้พลาดอีกร้านจะปิด" % GameState.missed_months
+	return t
+
+
+## ออกเดินทาง: จ่ายค่ารถ · ล้างลูกค้าวันนี้ · นาฬิกาเดินถึงเวลาถึงเมือง · จด GameState.city · คืน false ถ้าไปไม่ได้ (ไม่เปลี่ยนฉาก — คนเรียกพาไป SceneRouter.CITY)
+func city_trip() -> bool:
+	if city_state() != &"ok":
+		return false
+	var ts := _ts()
+	var e := _econ()
+	var c := GameState.city
+	c["ledger_from"] = GameState.ledger.size()
+	GameState.add_money(-e.city_fare, &"city", "ค่ารถเข้าเมือง")
+	_clear_day_visitors(TimeSystem.CLOSE) # คนที่ยืนรอกลับบ้านไม่เสียชื่อเสียง (ป้ายปิดร้าน) · คนที่นัดเลื่อนเป็นรอบหน้า · คนมารับเครื่องยังรอ
+	# เครื่องบนชั้นที่ครบนัดวันนี้: ขมโทรบอกเลื่อน 1 รอบ (ไม่นับว่าช้า) — ครั้งละไม่เกินวันนี้ ที่เลยนัดแล้วยังนับช้าตามเดิม
+	var moved := 0
+	if shelf:
+		for o: RepairShelf.Order in shelf.orders:
+			if o.state == RepairShelf.State.WAITING and o.due == ts.shift:
+				o.due += 1
+				moved += 1
+	c["moved_orders"] = moved
+	c["visits"] = int(c.get("visits", 0)) + 1
+	(c["months"] as Array).append(ts.month())
+	c["last_shift"] = ts.shift
+	_work_order_open = false
+	if ts.current_minute < e.city_arrive_minute:
+		ts.set_clock(e.city_arrive_minute)
+	_door_tick = ts.current_minute
+	_board_dirty = true
+	city_log(&"go", "visit %d" % int(c.visits))
+	return true
+
+
+## ทำออฟฟิศได้ไหม (วันละครั้ง)
+func city_office_can() -> bool:
+	var ts := _ts()
+	return city_today() and int(GameState.city.get("office_shift", -1)) != ts.shift and office_state.is_empty()
+
+
+## เริ่มลองงาน → ตั๋วที่สุ่มได้
+func city_office_begin() -> Array[OfficeTicket]:
+	var out: Array[OfficeTicket] = []
+	if not city_office_can():
+		return out
+	out = CityBook.pick_tickets(GameState.city.get("seen_tickets", []), rng(&"city"))
+	GameState.city["office_shift"] = _ts().shift
+	office_state = { "tickets": out, "step": 0, "right": 0, "answered": false, "last_ok": false, "checked": [] }
+	return out
+
+
+## ตั๋วปัจจุบัน { kind (หมวด), who, title, ask, actions (ปุ่มตรวจ), question, choices (สลับแล้ว), step (1..), steps }
+func city_ticket_view() -> Dictionary:
+	if office_state.is_empty():
+		return { }
+	var list: Array = office_state.tickets
+	var step := int(office_state.step)
+	if step >= list.size():
+		return { }
+	var t: OfficeTicket = list[step]
+	var opts := Array(t.choices)
+	var r := RandomNumberGenerator.new()
+	r.seed = hash([GameState.run_seed, String(t.id)])
+	for i in range(opts.size() - 1, 0, -1):
+		var j := r.randi_range(0, i)
+		var tmp = opts[i]
+		opts[i] = opts[j]
+		opts[j] = tmp
+	return {
+		"kind": t.category_name(), "who": t.from, "title": t.title, "ask": t.ask, "actions": Array(t.actions),
+		"question": t.question, "choices": opts, "step": step + 1, "steps": list.size(), "skill": t.skill,
+	}
+
+
+## กดปุ่มตรวจ i ของตั๋วปัจจุบัน → ข้อความที่จอพิมพ์ (คำสั่ง + ผล) · "" = ไม่มีปุ่มนี้/ตอบแล้ว
+func city_ticket_check(i: int) -> String:
+	if office_state.is_empty() or bool(office_state.answered):
+		return ""
+	var t: OfficeTicket = office_state.tickets[int(office_state.step)]
+	if i < 0 or i >= t.actions.size():
+		return ""
+	var ch: Array = office_state.checked
+	if not ch.has(i):
+		ch.append(i)
+	return t.results[i] if i < t.results.size() else t.actions[i]
+
+
+## ตอบตั๋วปัจจุบัน → { correct, answer, explain, more }
+func city_ticket_answer(text: String) -> Dictionary:
+	if office_state.is_empty() or bool(office_state.answered):
+		return { }
+	var list: Array = office_state.tickets
+	var t: OfficeTicket = list[int(office_state.step)]
+	var ok := t.choices.size() > 0 and text == t.choices[0]
+	office_state["answered"] = true
+	office_state["last_ok"] = ok
+	if ok:
+		office_state["right"] = int(office_state.right) + 1
+	var seen: Array = GameState.city.get("seen_tickets", [])
+	if not seen.has(String(t.id)):
+		seen.append(String(t.id))
+	GameState.city["seen_tickets"] = seen
+	city_log(&"ticket", "%s %s ตรวจ %d/%d" % [String(t.id), t.skill, (office_state.checked as Array).size(), t.actions.size()], 1 if ok else 0, 1)
+	return { "correct": ok, "answer": t.choices[0] if t.choices.size() > 0 else "", "explain": t.explain, "more": int(office_state.step) + 1 < list.size() }
+
+
+## ไปตั๋วถัดไป · คืน false = หมดแล้ว (เรียก city_office_finish)
+func city_ticket_next() -> bool:
+	if office_state.is_empty():
+		return false
+	office_state["step"] = int(office_state.step) + 1
+	office_state["answered"] = false
+	office_state["checked"] = []
+	return int(office_state.step) < (office_state.tickets as Array).size()
+
+
+## จบลองงาน: ค่าแรงตามตั๋วที่ปิดได้ · เวลา city_office_slots เทิร์น → { right, total, pay }
+func city_office_finish() -> Dictionary:
+	if office_state.is_empty():
+		return { }
+	var e := _econ()
+	var right := int(office_state.right)
+	var total := (office_state.tickets as Array).size()
+	var pay := right * e.city_ticket_pay + (e.city_full_bonus if right >= total and total > 0 else 0)
+	if pay > 0:
+		GameState.add_money(pay, &"city", "ลองงานออฟฟิศ %d/%d ตั๋ว" % [right, total])
+	var c := GameState.city
+	c["tried_office"] = true
+	c["office_right"] = int(c.get("office_right", 0)) + right
+	c["office_total"] = int(c.get("office_total", 0)) + total
+	_city_spend(e.city_office_slots)
+	office_state = { }
+	city_log(&"office", CityBook.lean(), right, total, pay)
+	if reward_popup and not quiet and pay > 0:
+		reward_popup.pop_result({ "money": pay, "reputation": 0 })
+	return { "right": right, "total": total, "pay": pay }
+
+
+## บอท/เทสต์: ทำออฟฟิศทั้งชุดโดยตอบถูกด้วยโอกาส p
+func city_office_auto(p: float, r: RandomNumberGenerator) -> Dictionary:
+	if city_office_begin().is_empty():
+		return { }
+	while true:
+		var t: OfficeTicket = office_state.tickets[int(office_state.step)]
+		city_ticket_check(0)
+		city_ticket_answer(t.choices[0] if r.randf() < p else t.choices[t.choices.size() - 1])
+		if not city_ticket_next():
+			break
+	return city_office_finish()
+
+
+## แวะร้านกาแฟ (วันละครั้ง) · ค่ากาแฟ · เวลา city_cafe_slots เทิร์น · จดว่าเจอพี่แนนแล้ว
+func city_cafe_can() -> bool:
+	return city_today() and int(GameState.city.get("cafe_shift", -1)) != _ts().shift
+
+
+func city_cafe(choice := "") -> bool:
+	if not city_cafe_can():
+		return false
+	var e := _econ()
+	var c := GameState.city
+	c["cafe_shift"] = _ts().shift
+	c["met_cowork"] = true
+	GameState.add_money(-e.city_coffee, &"city", "กาแฟในเมือง")
+	_city_spend(e.city_cafe_slots)
+	city_log(&"cafe", choice)
+	return true
+
+
+## กลับบ้าน = ปิดร้านวันนั้น (นาฬิกาไป 18:30 → การ์ดสรุปวันตอนถึงบ้าน) · คืน false ถ้าวันนี้ไม่ได้ไปเมือง/กลับแล้ว
+func city_return() -> bool:
+	var ts := _ts()
+	if not city_today() or ts.current_minute >= TimeSystem.CLOSE:
+		return false
+	var spent := 0
+	for i in range(int(GameState.city.get("ledger_from", 0)), GameState.ledger.size()):
+		var en: Dictionary = GameState.ledger[i]
+		if en.kind == &"buy":
+			spent -= int(en.amount)
+	if not office_state.is_empty():
+		city_office_finish()
+	ts.set_clock(TimeSystem.CLOSE)
+	_door_tick = ts.current_minute
+	_board_dirty = true
+	city_log(&"return", "office %s cafe %s" % [int(GameState.city.office_shift) == ts.shift, int(GameState.city.cafe_shift) == ts.shift], 0, 0, -spent)
+	return true
+
+
+func _city_spend(slots: int) -> void:
+	var ts := _ts()
+	if ts and slots > 0:
+		ts.set_clock(mini(ts.current_minute + slots * TimeSystem.SLOT_MIN, TimeSystem.CLOSE - TimeSystem.SLOT_MIN))
+
+
+## แถวใน user://playlog/city.csv (event = go · ticket · office · cafe · return)
+func city_log(event: StringName, detail := "", right := 0, total := 0, money := 0) -> void:
+	if quiet:
+		return
+	var ts := _ts()
+	Playlog.append("city.csv", ["event", "month", "day", "lean", "detail", "right", "total", "money", "money_now"], [
+		String(event), ts.month() if ts else 0, ts.shift_in_week() if ts else 0, CityBook.lean(), detail.replace(",", " "), right, total, money, GameState.money,
+	])

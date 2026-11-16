@@ -12,7 +12,7 @@ signal card_hovered(card: MapCard, on: bool)
 		title = v
 		_apply()
 ## ฉากปลายทาง (ตรงกับ SceneRouter.LocationID)
-@export_enum("บ้าน:0", "ร้านช่างขม:1", "Workshop:2", "Workbench:3", "ตลาด:4", "หน้าบ้าน:5") var location := 0
+@export_enum("บ้าน:0", "ร้านช่างขม:1", "Workshop:2", "Workbench:3", "ตลาด:4", "หน้าบ้าน:5", "เมือง:6") var location := 0
 ## รูปสถานที่
 @export var thumbnail: Texture2D:
 	set(v):

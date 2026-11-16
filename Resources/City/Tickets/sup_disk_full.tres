@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_disk_full"
+category = 1
+title = "เซฟไฟล์ไม่ได้"
+from = "ฝ่ายประชาสัมพันธ์"
+ask = "กดเซฟงานแล้วขึ้นว่าพื้นที่ไม่พอ ทั้งที่ไฟล์ก็ไม่ได้ใหญ่"
+actions = PackedStringArray("ดูพื้นที่ดิสก์", "ดูโฟลเดอร์ Downloads", "ดูถังขยะ")
+results = PackedStringArray("> This PC
+C: เหลือ 0.4 GB จาก 237 GB", "> Downloads
+วิดีโอประชุมเก่า 38 ไฟล์ รวม 96 GB", "> Recycle Bin
+ว่างเปล่า")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ย้ายวิดีโอเก่าไปไดรฟ์กลางของบริษัท แล้วล้างไฟล์ชั่วคราวด้วย Disk Cleanup", "ซื้อเครื่องใหม่", "ลบโฟลเดอร์ Windows", "เซฟซ้ำจนกว่าจะได้")
+explain = "ดิสก์เต็มเพราะไฟล์ใหญ่ที่ไม่ได้ใช้ ย้ายไปเก็บที่อื่นแทนการลบทิ้ง เพราะอาจยังต้องใช้ ห้ามลบไฟล์ระบบเด็ดขาด"
+skill = "จัดการพื้นที่ดิสก์"

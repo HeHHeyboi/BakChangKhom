@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_ram_full"
+category = 1
+title = "เครื่องช้ามากตอนบ่าย"
+from = "ฝ่ายการตลาด"
+ask = "เช้า ๆ ปกติดี พอบ่ายเครื่องหน่วงจนพิมพ์งานไม่ทัน"
+actions = PackedStringArray("เปิด Task Manager", "ดูพื้นที่ดิสก์", "ดูอุณหภูมิเครื่อง")
+results = PackedStringArray("> Task Manager
+เบราว์เซอร์ (41 แท็บ)  5,900 MB
+Memory : 95% ใช้อยู่", "> This PC
+C: เหลือ 120 GB จาก 237 GB", "> โปรแกรมวัดอุณหภูมิ
+CPU 55°C ปกติ")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ปิดแท็บที่ไม่ใช้และสอนผู้ใช้ ถ้าเป็นประจำค่อยเสนอเพิ่มแรม", "เปลี่ยนซีพียูทันที", "ฟอร์แมตเครื่อง", "ลบโปรแกรมแชต")
+explain = "ดูข้อมูลก่อนเดา ดิสก์กับความร้อนปกติ แต่แรมใช้ 95% เพราะแท็บเบราว์เซอร์ แก้ที่ต้นเหตุและอธิบายให้ผู้ใช้เข้าใจ จะได้ไม่เกิดซ้ำ"
+skill = "Task Manager"

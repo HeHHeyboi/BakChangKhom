@@ -15,7 +15,7 @@
 ผลลัพธ์
   participants.csv   1 แถวต่อผู้ทดสอบ: คะแนนก่อน/หลัง · เพิ่มขึ้น · เวลาเล่น (ชม.) · เดือนที่เล่นถึง · ยศ · ฉากจบ · ผลสอบเลื่อนยศ · วินิจฉัยถูกครั้งแรก
   prepost_stats.txt  n · ค่าเฉลี่ย · SD · paired t-test (t · df · p สองทาง) · Cohen's d (dz)
-  all_<ไฟล์>.csv      รวม CSV ชนิดเดียวกันของทุกคน (events · achievements · ending · learn_log · scenario_log · session)
+  all_<ไฟล์>.csv      รวม CSV ชนิดเดียวกันของทุกคน (events · achievements · ending · learn_log · scenario_log · session · city)
 """
 import argparse
 import csv
@@ -216,6 +216,13 @@ def summarize(tid, files, info):
     end = files.get("ending.csv", [])
     s["ending"] = end[-1].get("ending", "") if end else ""
     s["months_hit"] = end[-1].get("months_hit", "") if end else ""
+    # [0.9.5] เมือง: ไปกี่ครั้ง · ทางที่เอนตอนไปครั้งแรก → ฉากจบ (การเห็นเมืองเปลี่ยนการตัดสินใจไหม) · ตั๋วออฟฟิศที่ปิดได้
+    city = files.get("city.csv", [])
+    goes = [r for r in city if r.get("event") == "go"]
+    s["city_visits"] = len(goes)
+    s["city_lean_first"] = goes[0].get("lean", "") if goes else ""
+    tickets = [r for r in city if r.get("event") == "ticket"]
+    s["city_ticket_rate"] = round(sum(num(r.get("right")) for r in tickets) / len(tickets), 3) if tickets else ""
     return s
 
 
@@ -264,7 +271,7 @@ def main(argv=None):
         p["post_score"] = post.get(tid, "")
         p["gain"] = (post[tid] - pre[tid]) if tid in pre and tid in post else ""
     cols = ["tester_id", "pre_score", "post_score", "gain", "playtime_h", "sessions", "chapter_reached", "rank", "money",
-            "exam_answers", "exam_correct_rate", "scenarios", "diag_first_try_rate", "achievements", "months_hit", "ending", "game_version"]
+            "exam_answers", "exam_correct_rate", "scenarios", "diag_first_try_rate", "achievements", "months_hit", "ending", "city_visits", "city_lean_first", "city_ticket_rate", "game_version"]
     rows = [people[k] for k in sorted(people)]
     write_csv(os.path.join(a.out, "participants.csv"), rows, cols)
 

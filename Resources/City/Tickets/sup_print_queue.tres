@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_print_queue"
+category = 1
+title = "เครื่องพิมพ์ค้าง"
+from = "ฝ่ายบุคคล"
+ask = "กดพิมพ์ไปสิบกว่าแผ่นแล้วไม่ออกสักแผ่น ต้องส่งเอกสารเงินเดือนบ่ายนี้"
+actions = PackedStringArray("เปิดคิวเครื่องพิมพ์", "ดูกระดาษในถาด", "ดู Print Spooler")
+results = PackedStringArray("> คิว HR-Laser01
+1 payroll.pdf   Error
+2 leave.docx    Waiting
+... อีก 10 งานรอ", "> เปิดถาดกระดาษ
+กระดาษเต็มถาด ไม่มีติด", "> services.msc
+Print Spooler : Running")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ยกเลิกงานที่ error ตัวแรก ถ้ายังค้างค่อยรีสตาร์ต Print Spooler", "ซื้อเครื่องพิมพ์ใหม่", "กดพิมพ์ซ้ำอีกสิบรอบ", "ถอดหมึกมาเขย่า")
+explain = "งานแรกที่ error ทำให้งานหลังจากนั้นรอทั้งหมด เคลียร์ตัวที่ค้างก่อน ถ้าคิวยังไม่ขยับค่อยรีสตาร์ต Print Spooler เร็วกว่ารีสตาร์ตทั้งเครื่อง"
+skill = "เคลียร์คิวพิมพ์"

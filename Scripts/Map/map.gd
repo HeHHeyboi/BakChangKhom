@@ -44,9 +44,21 @@ func _refresh() -> void:
 	for c in _cards():
 		c.is_here = c.location == cur
 		c.scale = Vector2.ONE
+	_refresh_city()
+	_show_confirm(false)
 	var here := card_for(cur)
 	here_label.text = "ตอนนี้อยู่: %s" % (here.title if here else "-")
 	speech.text = default_hint
+
+
+## [0.9.5] การ์ดเมือง: ปลดหลังบท 11 · ล็อกพร้อมเหตุผลเมื่อวันนี้ไปไม่ได้ (DayLoop.city_state)
+func _refresh_city() -> void:
+	var city := card_for(SceneRouter.CITY)
+	if city == null:
+		return
+	var st: StringName = DayLoop.city_state()
+	city.locked = not (st == &"ok" or st == &"here")
+	city.locked_text = DayLoop.city_state_text(st) if city.locked else "เร็ว ๆ นี้"
 
 
 func _on_card_hovered(card: MapCard, on: bool) -> void:
@@ -70,7 +82,84 @@ func _on_card_pressed(card: MapCard) -> void:
 		return
 	if Global.isDialogShown() or Global.isInMinigame():
 		return
+	if card.location == SceneRouter.CITY: # [0.9.5] ไปเมือง = ใช้ทั้งวัน → ถามก่อน
+		speech.text = "ไปเมืองแล้วร้านปิดทั้งวันนะ แน่ใจไหม?"
+		_show_confirm(true)
+		return
 	showmap(card.location)
+
+
+# ---------------------------------------------------------------- [0.9.5] ยืนยันไปเมือง (สร้างจากโค้ด)
+var _confirm: PanelContainer
+var _confirm_text: Label
+
+
+func _show_confirm(on: bool) -> void:
+	if not on:
+		if _confirm:
+			_confirm.hide()
+		return
+	if _confirm == null:
+		_build_confirm()
+	_confirm_text.text = DayLoop.city_confirm_text()
+	_confirm.show()
+
+
+func _build_confirm() -> void:
+	_confirm = PanelContainer.new()
+	_confirm.name = "CityConfirm"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 0.98, 0.92, 0.98)
+	sb.set_corner_radius_all(14)
+	sb.set_content_margin_all(16)
+	sb.border_color = Color(0.23, 0.16, 0.11)
+	sb.set_border_width_all(4)
+	_confirm.add_theme_stylebox_override("panel", sb)
+	_confirm.custom_minimum_size = Vector2(520, 0)
+	_confirm.position = Vector2(316, 200)
+	$Root.add_child(_confirm)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	_confirm.add_child(box)
+	var head := Label.new()
+	head.text = "เข้าเมืองวันนี้?"
+	head.add_theme_font_size_override("font_size", 26)
+	head.add_theme_color_override("font_color", Color(0.45, 0.22, 0.05))
+	box.add_child(head)
+	_confirm_text = Label.new()
+	_confirm_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_confirm_text.add_theme_font_size_override("font_size", 18)
+	_confirm_text.add_theme_color_override("font_color", Color(0.23, 0.16, 0.11))
+	box.add_child(_confirm_text)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 16)
+	box.add_child(row)
+	var go := Button.new()
+	go.name = "Go"
+	go.text = "ไปเมือง"
+	go.custom_minimum_size = Vector2(180, 44)
+	go.add_theme_font_size_override("font_size", 20)
+	go.pressed.connect(_on_city_confirmed)
+	row.add_child(go)
+	var no := Button.new()
+	no.name = "No"
+	no.text = "ไม่ไปดีกว่า"
+	no.custom_minimum_size = Vector2(180, 44)
+	no.add_theme_font_size_override("font_size", 20)
+	no.pressed.connect(func() -> void:
+		_show_confirm(false)
+		speech.text = default_hint)
+	row.add_child(no)
+
+
+func _on_city_confirmed() -> void:
+	_show_confirm(false)
+	if not DayLoop.city_trip():
+		_refresh_city()
+		speech.text = "วันนี้ไปเมืองไม่ได้แล้ว (%s)" % DayLoop.city_state_text(DayLoop.city_state())
+		return
+	showmap(SceneRouter.CITY)
 
 
 ## ปิดแผนที่แล้วไปฉาก id (SceneRouter.LocationID)

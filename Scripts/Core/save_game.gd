@@ -15,7 +15,8 @@ const PATH := "user://save.json"
 ## [0.7.0] VERSION 8 = seed รายวัน (run_seed) · ความจำกันซ้ำ · อีเวนต์ (event_state · event_log · อีเวนต์วันนี้/การ์ด/ไฟดับ) · ร้านลดราคา + บัญชีดำ · ใบประกาศ (achievements · ach_stats)
 ## [0.8.0] VERSION 9 = ของขวัญสิ้นปี (gifts_received) · ตัวเลือกบทต้นเดือน/ทางแยกอยู่ใน story_flags (มีแล้ว)
 ## [0.9.0] VERSION 10 = เวลาเล่นสะสม (playtime_sec)
-const VERSION := 10
+## [0.9.5] VERSION 11 = เมือง (game.city · GameState.CITY_DEFAULT)
+const VERSION := 11
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -106,6 +107,7 @@ static func save() -> bool:
 			"event_state": GameState.event_state, "event_log": GameState.event_log, "seller_blacklist": GameState.seller_blacklist,
 			"achievements": GameState.achievements, "ach_stats": GameState.ach_stats, "ach_pinned": GameState.ach_pinned, "gifts_received": GameState.gifts_received,
 			"playtime_sec": roundi(GameState.playtime_sec), # [0.9.0]
+			"city": GameState.city.duplicate(true), # [0.9.5]
 			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
 			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
@@ -194,6 +196,15 @@ static func load_into() -> int:
 	GameState.ach_pinned = g.get("ach_pinned", [])
 	GameState.gifts_received = g.get("gifts_received", { })
 	GameState.playtime_sec = float(g.get("playtime_sec", 0)) # [0.9.0] เซฟ v3–v9 ไม่มี = 0
+	# [0.9.5] เมือง · เซฟ v3–v10 ไม่มี = ยังไม่เคยไป (ค่าที่ไม่มีในเซฟใช้ค่าเริ่ม)
+	GameState.city = GameState.CITY_DEFAULT.duplicate(true)
+	var cty: Dictionary = g.get("city", { })
+	for k in cty:
+		GameState.city[String(k)] = cty[k]
+	for k in ["visits", "last_shift", "arrive_shift", "office_shift", "cafe_shift", "office_right", "office_total", "ledger_from"]:
+		GameState.city[k] = int(GameState.city[k])
+	GameState.city["months"] = (GameState.city.months as Array).map(func(x) -> int: return int(x))
+	GameState.city["seen_tickets"] = (GameState.city.seen_tickets as Array).map(func(x) -> String: return String(x))
 	DayLoop.reseed_day()
 	GameState.request_log.clear()
 	for r in g.get("request_log", []):

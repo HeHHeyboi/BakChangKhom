@@ -81,17 +81,18 @@ func _ready() -> void:
 	SaveGame.allow_in_tests = true
 	gs.reset()
 	gs.playtime_sec = 777.0
-	_check(SaveGame.VERSION == 10 and SaveGame.save(), "บันทึกเป็น VERSION 10")
+	_check(SaveGame.VERSION >= 10 and SaveGame.save(), "บันทึกเป็น VERSION %d (≥ 10 มี playtime)" % SaveGame.VERSION)
 	gs.playtime_sec = 0.0
 	SaveGame.load_into()
 	_check(int(gs.playtime_sec) == 777, "โหลด v10 ได้เวลาเล่น")
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH))
 	d["version"] = 9
 	(d.game as Dictionary).erase("playtime_sec")
+	(d.game as Dictionary).erase("city") # [0.9.5] v11
 	var f := FileAccess.open(SaveGame.PATH, FileAccess.WRITE)
 	f.store_string(JSON.stringify(d))
 	f.close()
-	_check(not SaveGame.is_old_version() and SaveGame.load_into() >= 0 and gs.playtime_sec == 0.0, "เซฟ v9 ยังโหลดได้")
+	_check(not SaveGame.is_old_version() and SaveGame.load_into() >= 0 and gs.playtime_sec == 0.0 and int(gs.city.visits) == 0, "เซฟ v9 ยังโหลดได้ (เมือง = ยังไม่เคยไป)")
 	SaveGame.clear()
 	SaveGame.allow_in_tests = false
 

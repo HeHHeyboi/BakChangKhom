@@ -460,3 +460,19 @@ func affinity_mult(tier: int) -> float:
 @export var deal_fake_share := 0.6
 ## ร้านปลอมตั้งราคาไม่เกินนี้ (เงินที่เสียต่อครั้ง)
 @export var fake_deal_max := 600
+
+@export_group("เมือง 0.9.5")
+## [0.9.5] ค่ารถไป–กลับเมือง (บาท · หักตอนออกเดินทาง)
+@export var city_fare := 200
+## ต้องออกจากร้านก่อนกี่โมง (รถเข้าเมืองเที่ยวสุดท้าย)
+@export var city_leave_by := 12 * 60
+## ถึงเมืองกี่โมง (นาฬิกาเดินไปถึงเวลานี้ตอนออกเดินทาง)
+@export var city_arrive_minute := 10 * 60 + 30
+## ลองงานออฟฟิศ: ค่าแรงต่อตั๋วที่ปิดได้ · โบนัสเมื่อปิดได้ทุกใบ · ใช้กี่เทิร์น
+## (บอทปกติ 6 seed: เข้าเมืองเดือนละครั้ง กำไรเดือนนั้นลด ~600–900 · ตั๋วละ 150 → ถึงเป้า พ.ย.–ธ.ค. 8/12 เทียบไม่ไป 11/12 → ขึ้นเป็น 200 · 16 พ.ย. ค่ำ: ตั๋วเหลือ 3 ใบ → 250)
+@export var city_ticket_pay := 250
+@export var city_full_bonus := 100
+@export var city_office_slots := 6
+## ร้านกาแฟ: ค่ากาแฟ · ใช้กี่เทิร์น
+@export var city_coffee := 45
+@export var city_cafe_slots := 2

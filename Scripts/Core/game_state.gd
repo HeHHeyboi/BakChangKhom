@@ -209,6 +209,14 @@ var ach_pinned: Array = []
 var gifts_received: Dictionary = { }
 ## [0.9.0] เวลาเล่นสะสม (วินาที · Playlog นับ) — เซฟ v10
 var playtime_sec := 0.0
+## [0.9.5] เมือง (DayLoop "[0.9.5] เมือง" · CityBook) — เซฟ v11
+## visits = ไปกี่ครั้ง · months = เดือนที่ไปแล้ว (เดือนละครั้ง) · last_shift = วันเปิดร้านที่ไปล่าสุด · office_shift/cafe_shift = วันที่ทำไปแล้ว (ทำได้วันละครั้ง)
+## tried_office · office_right/office_total (ตั๋วที่ปิดได้/ทั้งหมด สะสม) · seen_tickets · met_cowork · ledger_from = ตำแหน่ง ledger ตอนออกเดินทาง (นับเงินซื้อของในเมือง)
+const CITY_DEFAULT := {
+	"visits": 0, "months": [], "last_shift": -1, "arrive_shift": -1, "office_shift": -1, "cafe_shift": -1,
+	"tried_office": false, "office_right": 0, "office_total": 0, "seen_tickets": [], "met_cowork": false, "ledger_from": 0,
+}
+var city: Dictionary = CITY_DEFAULT.duplicate(true)
 
 
 func reset() -> void:
@@ -221,6 +229,7 @@ func reset() -> void:
 	ach_pinned = []
 	gifts_received = { }
 	playtime_sec = 0.0
+	city = CITY_DEFAULT.duplicate(true)
 	money = economy.start_money
 	hold_next_payment = false
 	satisfaction_history.clear()
@@ -301,6 +310,7 @@ const MONEY_KINDS := {
 	&"buy": "ซื้ออะไหล่/ของ",
 	&"invest": "ลงทุน",
 	&"scam": "โดนโกง", # [0.7.0] มิจฉาชีพ · ร้านออนไลน์ปลอม
+	&"city": "เข้าเมือง", # [0.9.5] ค่ารถ · กาแฟ · ค่าแรงลองงานออฟฟิศ
 	&"other": "อื่น ๆ",
 }
 
@@ -1475,11 +1485,15 @@ func chapter_story(n: int) -> Dictionary:
 	var ch: Dictionary = (CHAPTERS[clampi(n, 1, CHAPTERS.size()) - 1] as Dictionary).duplicate()
 	if ch.has("low_file") and rank() < int(ch.get("min_rank", 0)):
 		ch["file"] = ch["low_file"]
+	if n == 12: # [0.9.5] เคยไปเมือง → บท 12 อ้างถึงสิ่งที่เห็น (CityBook.chapter12_file)
+		ch["file"] = CityBook.chapter12_file()
 	return ch
 
 
 ## [0.8.0] จบบทต้นเดือน → จำตัวเลือก (ch<n>_pick) · ทางแยก · ความสนิท
 func _on_chapter_done(n: int) -> void:
+	if n >= 11: # [0.9.5] หัวหน้าชวนไปดูออฟฟิศ → การ์ดเมืองในแผนที่ปลด
+		story_flags["city_open"] = true
 	chapter_choice(n, DialogScene.last_choice)
 
 

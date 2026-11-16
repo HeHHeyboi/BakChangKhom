@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_no_signal"
+category = 1
+title = "จอขึ้น No Signal"
+from = "ฝ่ายออกแบบ"
+ask = "แม่บ้านย้ายโต๊ะให้เมื่อเช้า เปิดเครื่องแล้วจอขึ้นว่า No Signal"
+actions = PackedStringArray("ฟังเสียงเครื่อง", "ดูสายจอหลังเครื่อง", "กดปุ่ม Source ที่จอ")
+results = PackedStringArray("> ฟังที่เคส
+พัดลมหมุน ไฟเครื่องติด เครื่องทำงานปกติ", "> ส่องหลังเคส
+สาย HDMI เสียบช่องบนเมนบอร์ด
+แต่เครื่องนี้มีการ์ดจอแยก", "> เมนูจอ
+Input : HDMI (ถูกแล้ว)")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ย้ายสายจอไปเสียบช่องของการ์ดจอ", "เปลี่ยนจอใหม่", "เปลี่ยนแรม", "ลงไดรเวอร์ใหม่ทั้งหมด")
+explain = "เครื่องที่มีการ์ดจอแยก ภาพจะออกจากช่องของการ์ดจอ ไม่ใช่ช่องบนเมนบอร์ด ตอนย้ายโต๊ะสายมักถูกเสียบผิดช่อง ดูของง่าย ๆ ก่อนเปลี่ยนอุปกรณ์"
+skill = "เช็กสายก่อนเปลี่ยนของ"

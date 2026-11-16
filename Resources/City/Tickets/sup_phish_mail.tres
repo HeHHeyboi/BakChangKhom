@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_phish_mail"
+category = 2
+title = "อีเมลให้ยืนยันบัญชีด่วน"
+from = "ฝ่ายบัญชี"
+ask = "มีอีเมลจากไอทีบอกว่าบัญชีจะถูกปิดถ้าไม่กดลิงก์ยืนยันภายในวันนี้ กดเลยดีไหม"
+actions = PackedStringArray("ดูชื่อผู้ส่ง", "ชี้ลิงก์ดู (ไม่กด)")
+results = PackedStringArray("> ผู้ส่ง
+it-support@cornpany-mail.com
+(ใช้ rn แทน m)", "> ลิงก์จริง
+http://verify-account-login.xyz")
+question = "จะบอกผู้ใช้ว่ายังไง"
+choices = PackedStringArray("อย่ากด แจ้งไอทีและลบทิ้ง แล้วเตือนทีมว่ามีอีเมลแบบนี้", "กดลิงก์แล้วใส่รหัสให้เสร็จ ๆ", "ส่งต่อให้ทุกคนในบริษัทกด", "ตอบกลับไปถามว่าจริงไหม")
+explain = "ชื่อโดเมนที่สะกดเลียนแบบและลิงก์ที่ไม่ใช่เว็บบริษัทคือสัญญาณฟิชชิง ไอทีตัวจริงไม่ขอรหัสผ่านทางลิงก์ในอีเมล"
+skill = "ดูสัญญาณฟิชชิง"

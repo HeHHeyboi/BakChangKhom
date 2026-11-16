@@ -1,0 +1,435 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Location/city.gd" id="1_xtt0p"]
+[ext_resource type="Texture2D" path="res://Assets/Background/bg_city_day.jpg" id="2_bg"]
+[ext_resource type="Script" uid="uid://f601kgx8e3pv" path="res://Scripts/Home/map_place_holder.gd" id="3_map"]
+[ext_resource type="Script" path="res://Scripts/Market/market_stall.gd" id="4_stall"]
+[ext_resource type="Script" path="res://Scripts/Market/shop_panel.gd" id="5_shop"]
+[ext_resource type="Script" path="res://Scripts/Location/scene_hotspot.gd" id="11_hot"]
+[ext_resource type="Resource" path="res://Resources/Shop/gpu_used.tres" id="it_gpu_used"]
+[ext_resource type="Resource" path="res://Resources/Shop/mb_used.tres" id="it_mb_used"]
+[ext_resource type="Theme" path="res://Assets/UI/menu_theme.tres" id="6_theme"]
+[ext_resource type="Texture2D" path="res://Assets/UI/ui_icon_storage.png" id="7_box"]
+[ext_resource type="Script" path="res://Scripts/Resources/shop_item.gd" id="10_si"]
+[ext_resource type="Resource" path="res://Resources/Shop/ram_ddr4_8gb_used.tres" id="it_ram_ddr4_8gb_used"]
+[ext_resource type="Resource" path="res://Resources/Shop/ram_ddr4_8gb_new.tres" id="it_ram_ddr4_8gb_new"]
+[ext_resource type="Resource" path="res://Resources/Shop/ram_ddr3_4gb_used.tres" id="it_ram_ddr3_4gb_used"]
+[ext_resource type="Resource" path="res://Resources/Shop/cable_sata.tres" id="it_cable_sata"]
+[ext_resource type="Resource" path="res://Resources/Shop/cable_hdmi.tres" id="it_cable_hdmi"]
+[ext_resource type="Resource" path="res://Resources/Shop/ipa90.tres" id="it_ipa90"]
+[ext_resource type="Resource" path="res://Resources/Shop/paste_grey.tres" id="it_paste_grey"]
+[ext_resource type="Resource" path="res://Resources/Shop/air_can.tres" id="it_air_can"]
+[ext_resource type="Resource" path="res://Resources/Shop/cmos_cr2032.tres" id="it_cmos_cr2032"]
+[ext_resource type="Resource" path="res://Resources/Shop/fp_switch.tres" id="it_fp_switch"]
+[ext_resource type="Resource" path="res://Resources/Shop/fan_cpu.tres" id="it_fan_cpu"]
+[ext_resource type="Resource" path="res://Resources/Shop/fan_gpu.tres" id="it_fan_gpu"]
+[ext_resource type="Resource" path="res://Resources/Shop/psu_450w.tres" id="it_psu_450w"]
+
+[sub_resource type="StyleBoxFlat" id="SB_map"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.77, 0.56, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_map_hover"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.89, 0.68, 0.43, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.86, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_say"]
+content_margin_left = 20.0
+content_margin_right = 20.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 0.98, 0.92, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.23, 0.16, 0.11, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="SB_tab"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.98, 0.93, 0.82, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.38, 0.22, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_hover"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 0.88, 0.66, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.45, 0.15, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_on"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.85, 0.5, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.25, 0.08, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="City" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xtt0p")
+say_seconds = 4.5
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="Office" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 70.0
+offset_right = 360.0
+offset_bottom = 505.0
+ignore_texture_size = true
+script = ExtResource("11_hot")
+label_text = "ออฟฟิศเก่า (ลองงานกับทีม)"
+
+[node name="StallParts" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 430.0
+offset_top = 230.0
+offset_right = 740.0
+offset_bottom = 505.0
+ignore_texture_size = true
+script = ExtResource("4_stall")
+message = "ร้านอะไหล่ใหญ่ในเมือง ของครบกว่าตลาด ซื้อแล้วได้เลยไม่ต้องรอส่ง แต่มาได้แค่วันนี้นะ"
+items = Array[ExtResource("10_si")]([ExtResource("it_gpu_used"), ExtResource("it_mb_used"), ExtResource("it_psu_450w"), ExtResource("it_fan_cpu"), ExtResource("it_fan_gpu"), ExtResource("it_ram_ddr4_8gb_new"), ExtResource("it_ram_ddr4_8gb_used"), ExtResource("it_ram_ddr3_4gb_used"), ExtResource("it_cmos_cr2032"), ExtResource("it_fp_switch"), ExtResource("it_cable_sata"), ExtResource("it_cable_hdmi"), ExtResource("it_paste_grey"), ExtResource("it_air_can"), ExtResource("it_ipa90")])
+label_text = "ร้านอะไหล่คอมในเมือง"
+
+[node name="Cafe" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 250.0
+offset_right = 1120.0
+offset_bottom = 505.0
+ignore_texture_size = true
+script = ExtResource("11_hot")
+label_text = "ร้านกาแฟ (คนทำงานออนไลน์)"
+
+[node name="Van" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 470.0
+offset_top = 545.0
+offset_right = 690.0
+offset_bottom = 640.0
+ignore_texture_size = true
+script = ExtResource("11_hot")
+label_text = "รถตู้กลับบ้าน"
+label_below = false
+
+[node name="MapPlaceHolder" type="Button" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 582.0
+offset_right = 158.0
+offset_bottom = 632.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_hover_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_colors/font_pressed_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("SB_map")
+theme_override_styles/hover = SubResource("SB_map_hover")
+theme_override_styles/pressed = SubResource("SB_map_hover")
+theme_override_styles/disabled = SubResource("SB_map")
+text = "แผนที่"
+script = ExtResource("3_map")
+
+[node name="Say" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 236.0
+offset_top = 560.0
+offset_right = 916.0
+offset_bottom = 630.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_say")
+
+[node name="Text" type="Label" parent="Say"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+offset_left = 146.0
+offset_top = 40.0
+offset_right = 1006.0
+offset_bottom = 608.0
+theme = ExtResource("6_theme")
+theme_override_styles/panel = SubResource("SB_say")
+script = ExtResource("5_shop")
+
+[node name="Box" type="VBoxContainer" parent="ShopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="ShopPanel/Box"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="ShopPanel/Box/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.45, 0.22, 0.05, 1)
+theme_override_font_sizes/font_size = 28
+text = "ร้านค้า"
+
+[node name="Money" type="Label" parent="ShopPanel/Box/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.45, 0.15, 1)
+theme_override_font_sizes/font_size = 24
+text = "฿0"
+
+[node name="Note" type="Label" parent="ShopPanel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 0.8)
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="TabRow" type="HBoxContainer" parent="ShopPanel/Box"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TabAll" type="Button" parent="ShopPanel/Box/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_hover_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SB_tab")
+theme_override_styles/hover = SubResource("SB_tab_hover")
+theme_override_styles/pressed = SubResource("SB_tab_on")
+theme_override_styles/hover_pressed = SubResource("SB_tab_on")
+theme_override_styles/focus = SubResource("SB_tab")
+toggle_mode = true
+text = "ทั้งหมด"
+
+[node name="TabParts" type="Button" parent="ShopPanel/Box/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_hover_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SB_tab")
+theme_override_styles/hover = SubResource("SB_tab_hover")
+theme_override_styles/pressed = SubResource("SB_tab_on")
+theme_override_styles/hover_pressed = SubResource("SB_tab_on")
+theme_override_styles/focus = SubResource("SB_tab")
+toggle_mode = true
+text = "อะไหล่"
+
+[node name="TabSupplies" type="Button" parent="ShopPanel/Box/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_hover_color = Color(0.35, 0.22, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SB_tab")
+theme_override_styles/hover = SubResource("SB_tab_hover")
+theme_override_styles/pressed = SubResource("SB_tab_on")
+theme_override_styles/hover_pressed = SubResource("SB_tab_on")
+theme_override_styles/focus = SubResource("SB_tab")
+toggle_mode = true
+text = "ของสิ้นเปลือง"
+
+[node name="StorageInfo" type="Label" parent="ShopPanel/Box/TabRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.3, 0.2, 1)
+theme_override_font_sizes/font_size = 17
+text = "คลัง 0/8 ช่อง"
+horizontal_alignment = 2
+
+[node name="StorageButton" type="Button" parent="ShopPanel/Box/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 38)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 17
+text = "ดูคลัง"
+icon = ExtResource("7_box")
+theme_override_constants/icon_max_width = 28
+
+[node name="Scroll" type="ScrollContainer" parent="ShopPanel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="ShopPanel/Box/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 12
+columns = 6
+
+[node name="Empty" type="Label" parent="ShopPanel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.4, 0.3, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = "ยังไม่มีของขาย"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Line" type="HSeparator" parent="ShopPanel/Box"]
+layout_mode = 2
+
+[node name="DetailName" type="Label" parent="ShopPanel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.22, 0.05, 1)
+theme_override_font_sizes/font_size = 20
+text = "เลือกของที่อยากซื้อ"
+
+[node name="DetailText" type="Label" parent="ShopPanel/Box"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 16
+text = "กดที่การ์ดเพื่อดูรายละเอียด"
+autowrap_mode = 3
+
+[node name="BuyRow" type="HBoxContainer" parent="ShopPanel/Box"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="QtyMinus" type="Button" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "−"
+
+[node name="Qty" type="Label" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 22
+text = "1"
+horizontal_alignment = 1
+
+[node name="QtyPlus" type="Button" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "+"
+
+[node name="Total" type="Label" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.23, 0.16, 0.11, 1)
+theme_override_font_sizes/font_size = 20
+text = "รวม ฿0"
+
+[node name="BuyButton" type="Button" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "ซื้อ"
+
+[node name="Close" type="Button" parent="ShopPanel/Box/BuyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "ออกจากร้าน"
+
+[connection signal="pressed" from="MapPlaceHolder" to="MapPlaceHolder" method="_on_map_button_pressed"]

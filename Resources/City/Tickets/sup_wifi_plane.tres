@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OfficeTicket" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/office_ticket.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sup_wifi_plane"
+category = 0
+title = "โน้ตบุ๊กต่อ Wi-Fi ไม่ได้"
+from = "ฝ่ายการตลาด"
+ask = "เมื่อวานพาโน้ตบุ๊กไปขึ้นเครื่องบิน วันนี้หาไวไฟออฟฟิศไม่เจอเลย"
+actions = PackedStringArray("ดูไอคอนมุมจอ", "netsh wlan show interfaces", "ถามเครื่องอื่น")
+results = PackedStringArray("> ดูแถบมุมขวาล่าง
+เป็นรูปเครื่องบิน ไม่มีรายชื่อ Wi-Fi", "C:\\> netsh wlan show interfaces
+State : disconnected
+Radio status : Software Off", "> ถามโต๊ะข้าง ๆ
+Wi-Fi ใช้ได้ปกติทุกเครื่อง")
+question = "จะแก้ยังไง"
+choices = PackedStringArray("ปิดโหมดเครื่องบิน แล้วเลือก Wi-Fi ออฟฟิศ", "รีเซ็ตเราเตอร์ทั้งตึก", "ซื้อการ์ด Wi-Fi ใหม่", "ลบโปรแกรมทั้งหมด")
+explain = "เครื่องอื่นใช้ได้ แปลว่าปัญหาอยู่ที่เครื่องนี้เครื่องเดียว Radio Software Off คือโหมดเครื่องบินยังเปิดอยู่ แก้ที่เครื่องเดียวพอ ไม่ต้องไปยุ่งกับเราเตอร์"
+skill = "แยกปัญหาเครื่องเดียว/ทั้งตึก"

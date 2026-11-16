@@ -14,7 +14,7 @@ const TITLES := {
 const BGS := {
 	&"stay": "res://Assets/Background/bg_year_after.jpg",
 	&"coworking": "res://Assets/Background/bg_shop_busy.jpg",
-	&"city": "res://Assets/Background/bg_path_sunset.jpg",
+	&"city": "res://Assets/Background/bg_city_day.jpg", ## [0.9.5] ภาพเมืองจริง (เดิม bg_path_sunset)
 	&"failure": "res://Assets/Background/bg_shop_empty.jpg",
 }
 ## Part ที่มิ้นเรียนจากขม (ชื่อไทย) · ครั้งที่ขมซ่อมผ่าน ≥ TAUGHT_AT = มิ้นทำเองได้ · 1+ = ยังต้องเปิดคู่มือ
@@ -59,6 +59,7 @@ static func lines_for(e: StringName) -> PackedStringArray:
 		out.append("ปิ๊บ,%s" % _clean(failure_reason()))
 		_file(out, DIR + "failure_close.txt")
 		return out
+	out.append_array(CityBook.ending_lines(e)) # [0.9.5] อ้างถึงการไปเมือง
 	out.append_array(recap_lines())
 	for id in top_npcs():
 		var p := DIR + "thanks_%s.txt" % id
@@ -190,10 +191,11 @@ static func log_ending() -> void:
 		return
 	var gs := GameState
 	var hit := gs.month_results.filter(func(r: Dictionary) -> bool: return bool(r.get("reached", false))).size()
-	Playlog.append("ending.csv", ["ending", "ch11_pick", "ch12_pick", "months_hit", "rank", "achievements", "gifts", "repairs", "min_tier", "playtime_sec"], [
+	Playlog.append("ending.csv", ["ending", "ch11_pick", "ch12_pick", "months_hit", "rank", "achievements", "gifts", "repairs", "min_tier", "playtime_sec", "city_visits", "city_office", "city_cafe"], [
 		String(gs.ending), String(gs.story_flags.get("ch11_pick", "")), String(gs.story_flags.get("ch12_pick", "")), hit, gs.rank(),
 		gs.achievements.size(), gs.gifts_received.size(), gs.satisfaction_history.size(), String(min_report().tier), roundi(gs.playtime_sec),
-	]) # [0.9.0]
+		int(gs.city.get("visits", 0)), "%d/%d" % [int(gs.city.get("office_right", 0)), int(gs.city.get("office_total", 0))], bool(gs.city.get("met_cowork", false)),
+	]) # [0.9.0] · [0.9.5] เมือง
 
 
 static func _file(out: PackedStringArray, path: String) -> void:
