@@ -283,17 +283,7 @@ func profile_count() -> int:
 
 
 func _append_csv(a: Achievement, when: Vector2i) -> void:
-	DirAccess.make_dir_recursive_absolute("user://playlog")
-	var path := "user://playlog/achievements.csv"
-	var fresh := not FileAccess.file_exists(path)
-	var f := FileAccess.open(path, FileAccess.READ_WRITE if not fresh else FileAccess.WRITE)
-	if f == null:
-		return
-	f.seek_end()
-	if fresh:
-		f.store_line("time,chapter,day,id,title")
-	f.store_line("%s,%d,%d,%s,%s" % [Time.get_datetime_string_from_system(), when.x, when.y, String(a.id), a.title.replace(",", " ")])
-	f.close()
+	Playlog.append("achievements.csv", ["chapter", "day", "id", "title"], [when.x, when.y, String(a.id), a.title]) # [0.9.0]
 
 
 # ---------------------------------------------------------------- ป๊อปอัปมุมขวาบน
@@ -353,7 +343,7 @@ func _tick_popup(delta: float) -> void:
 	if _queue.is_empty() or Global.in_minigame or (has_node(^"/root/DialogScene") and DialogScene.visible):
 		return
 	var a: Achievement = _queue.pop_front()
-	_popup_title.text = a.title + ((" · " + a.reward_text) if a.reward_text != "" else "")
+	_popup_title.text = a.title
 	_popup_time = POPUP_SECONDS
 	_popup.show()
 	var au := get_node_or_null(^"/root/Audio")

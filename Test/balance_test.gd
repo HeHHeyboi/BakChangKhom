@@ -16,6 +16,10 @@ extends Node
 ##   ไม่มีสถานการณ์ (BAL_NOSCEN=1) ได้มัธยฐาน ~9.5 → ตรวจก่อนรู้อะไหล่ทำให้เครื่องรอบนชั้นนานขึ้น + อะไหล่ใช้บ่อยขึ้น (เงินหมุนข้ามเดือน) ~1 เดือน/ปี · สวิตช์ทดลอง BAL_REQ · BAL_NOWIN · BAL_NOSCEN · BAL_STUFEE · BAL_NOTRAIT · BAL_PARTW · BAL_SEEDS
 ##   สั่งเมื่อมีงาน กำไรเฉลี่ย ฿24,197 · ตุนของ ฿21,107 (เงินจม + เดินไปตลาดบ่อย) · เก่ง ฿31,391
 ## ผล 16 พ.ย. 0.7.0 (seed รายวัน · อีเวนต์ 12 เดือน + สุ่ม · ร้านปลอม · ใบประกาศ · เป้าใหม่ 250/200/550/650/800/1100/1250/1750/1800/1500/2000/2000): ดูผลรันล่าสุดใน PLAN_0_7_0 ข้อ 6 · สวิตช์ BAL_NOEVENT=1 ปิดอีเวนต์
+## [0.9.0 ขั้น D] บอทหาช่องโหว่ (exploit · BAL_LVS=good,exploit): เล่นแบบเก่ง + รายงานดีลก่อนซื้อ · ซื้อออนไลน์ของที่ถูกกว่าราคาขายคืนมาวนขาย · ล่วงเวลาทุกครั้งที่ได้
+##   ก่อนอุด: fp_switch ออนไลน์ ฿45 ขายคืน ฿48 (วนขายกำไร +฿321/ปี) · รายงานร้านจริงแล้วยังซื้อได้ (ใช้รายงานเช็กฟรี 1–3 ครั้ง/ปี) · ดีลร้านจริงขายคืนได้มากกว่าทุน
+##   อุดแล้ว: ขายคืนคิดจากราคาที่จ่ายจริงถ้าถูกกว่าราคาตลาด (GameState.sell_price) · รายงานร้านจริง = ดีลนั้นปิด (report_wrong)
+##   ผล 16 พ.ย.: exploit ฿25,933 < เก่ง ฿27,689 (3 seed) · ล่วงเวลาทุกครั้งไม่คุ้ม (7–13 วัน/ปี) · ปกติ 30 seed: ≥ 9/12 = 19/30 · มัธยฐาน 9 · ไม่มีร้านปิด
 ## เปิด Test/balance_test.tscn → F6 → Output มีตารางรายเดือน + "T DONE fails=0" (ใช้เวลา ~1 นาที)
 
 const SEEDS := [11, 22, 33, 44, 55]
@@ -36,18 +40,19 @@ func _ready() -> void:
 	DayLoop.demo_shifts = 0 # เล่นครบปี ไม่จบเดโม
 	var res := { }
 	# BAL_LVS=normal,good → เล่นเฉพาะระดับที่ระบุ (แบ่งรันได้ · ไม่ตรวจเกณฑ์ข้ามระดับ)
-	var lvs: Array = [&"good", &"normal", &"normal_stock", &"idle"]
+	var lvs: Array = [&"good", &"normal", &"normal_stock", &"idle", &"exploit"]
 	if OS.has_environment("BAL_LVS"):
 		lvs = Array(OS.get_environment("BAL_LVS").split(",")).map(func(x: String) -> StringName: return StringName(x))
 	_apply_env_overrides()
 	for lv in lvs:
 		res[lv] = []
-		var seeds: Array = NORMAL_SEEDS if lv in [&"normal", &"normal_stock"] else (SEEDS if lv == &"good" else [SEEDS[0]])
+		var seeds: Array = NORMAL_SEEDS if lv in [&"normal", &"normal_stock"] else (SEEDS if _g(lv) else [SEEDS[0]])
 		if OS.has_environment("BAL_SEEDS"): # [0.6.0] BAL_SEEDS=11,22 → รันเฉพาะ seed ที่ระบุ
 			seeds = Array(OS.get_environment("BAL_SEEDS").split(",")).map(func(x: String) -> int: return int(x))
 		for s in seeds:
 			res[lv].append(await play_year(lv, s))
 	_report(res)
+	_exploit_checks(res)
 	if OS.has_environment("BAL_LVS"):
 		DayLoop.demo_shifts = demo
 		DayLoop._reset_run()
@@ -114,7 +119,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	# [0.7.0] อีเวนต์: BAL_NOEVENT=1 ปิด · บอทตอบการ์ดเอง (ปกติตอบดี 85% · บูธ 50/50 · งานเหมา/แข่ง/ศาลา ไป)
 	EventDirector.disabled = OS.has_environment("BAL_NOEVENT")
 	DayLoop.bot_event_pick = func(ev: ShopEvent, choices: Array, step: int) -> String:
-		var p_good := 1.0 if lv == &"good" else 0.85
+		var p_good := 1.0 if _g(lv) else 0.85
 		if step > 0:
 			return String(choices[0]) if rng.randf() < p_good else String(choices[-1])
 		if ev.good_count > 0:
@@ -123,6 +128,8 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 			return ev.choices[0] if rng.randf() < 0.5 else ev.choices[1]
 		return ev.choices[0]
 	rank_months = { }
+	ex_stats = { "flip_buy": 0, "flip_sell": 0, "flip_cost": 0, "deal_buy": 0, "deal_sell": 0, "deal_cost": 0, "reports": 0, "report_peek": 0, "ot_days": 0 }
+	_flip_wait.clear()
 	helper_runs = 0
 	helper_money = 0
 	requests_done = 0
@@ -172,7 +179,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	var returned := 0
 	for o: RepairShelf.Order in DayLoop.shelf.history:
 		returned += 1 if o.state == RepairShelf.State.RETURNED else 0
-	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)), "gifts": GameState.gifts_received.size(), "club": [&"phum", &"fern", &"oat", &"namwan"].map(func(id: StringName) -> int: return GameState.affinity(id)).max(), "min_tier": String(EndingBook.min_report().tier), "rank_end": GameState.rank() }
+	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)), "gifts": GameState.gifts_received.size(), "club": [&"phum", &"fern", &"oat", &"namwan"].map(func(id: StringName) -> int: return GameState.affinity(id)).max(), "min_tier": String(EndingBook.min_report().tier), "rank_end": GameState.rank(), "ex": ex_stats.duplicate() }
 
 
 ## 1 วันเปิดร้าน · คืนจำนวนงานที่ซ่อม
@@ -181,6 +188,9 @@ func _play_day(lv: StringName) -> int:
 	_buy_upgrades(lv)
 	if lv == &"normal_stock":
 		_stock_up()
+	if lv == &"exploit":
+		_mark_arrived()
+		_exploit_day()
 	if lv == &"idle":
 		DayLoop.forced_case = null
 		return 0
@@ -193,7 +203,7 @@ func _play_day(lv: StringName) -> int:
 		_handle_door(lv)
 		_rush_parts()
 		var o := _next_shelf_job(lv)
-		if o and not (lv != &"good" and rng.randf() < 0.15):
+		if o and not (not _g(lv) and rng.randf() < 0.15):
 			if DayLoop.job_fit(o.case) == &"ot":
 				_set_ot()
 			if _inspect_stops(o, lv): # [0.6.0] ครึ่งตรวจ: ของไม่มี → รอของ
@@ -302,10 +312,10 @@ func _handle_door(lv: StringName) -> void:
 			continue
 		# [0.6.0 ขั้น G] คำขอ: บอทเก่งรับเสมอถ้ามีโควตา · ปกติรับ 70% · ตอบถูกตามระดับ
 		if c.is_request():
-			var take := DayLoop.door_accept_state(-1) == &"ok" and (lv == &"good" or rng.randf() < 0.7)
+			var take := DayLoop.door_accept_state(-1) == &"ok" and (_g(lv) or rng.randf() < 0.7)
 			if take and DayLoop.door_accept(-1):
 				var req := c.request()
-				var acc := 0.95 if lv == &"good" else 0.75
+				var acc := 0.95 if _g(lv) else 0.75
 				for step in req.steps():
 					var src := req.choices if step == 0 else req.choices2
 					var ok := rng.randf() < acc
@@ -323,16 +333,16 @@ func _handle_door(lv: StringName) -> void:
 		if c.takes_machine():
 			var promise := 1
 			var has_part := c.part_ids().is_empty() or c.part_ids().any(func(id: StringName) -> bool: return GameState.free_count(id) > 0)
-			if lv == &"good" and has_part and DayLoop.job_fit(c) == &"ok" and _today_load() + DayLoop.job_slots(c) * TimeSystem.SLOT_MIN <= ts.remaining_work_minutes():
+			if _g(lv) and has_part and DayLoop.job_fit(c) == &"ok" and _today_load() + DayLoop.job_slots(c) * TimeSystem.SLOT_MIN <= ts.remaining_work_minutes():
 				promise = 0
 			if DayLoop.door_accept_state(promise) == &"ok" and DayLoop.door_accept(promise):
 				continue
 		else:
 			var st := DayLoop.door_accept_state(-1)
-			if st == &"ok" or (st == &"ot" and lv == &"good"):
+			if st == &"ok" or (st == &"ot" and _g(lv)):
 				_desktop_now(j, st, lv)
 				continue
-		if DayLoop.door_can_appoint() and not (lv != &"good" and rng.randf() < 0.3):
+		if DayLoop.door_can_appoint() and not (not _g(lv) and rng.randf() < 0.3):
 			DayLoop.door_appoint()
 		else:
 			DayLoop.door_reject()
@@ -358,7 +368,7 @@ func _next_shelf_job(lv: StringName) -> RepairShelf.Order:
 		if not DayLoop.order_has_parts(o):
 			continue
 		var fit := DayLoop.job_fit(o.case)
-		if fit == &"ok" or (fit == &"ot" and lv == &"good" and o.due <= ts.shift):
+		if fit == &"ok" or (fit == &"ot" and _g(lv) and (o.due <= ts.shift or lv == &"exploit")):
 			return o
 	return null
 
@@ -376,8 +386,8 @@ func _repair(c: CustomerCase, o: RepairShelf.Order, lv: StringName) -> void:
 	DayLoop.current_job = { "case": c, "order": o } if o else { "case": c }
 	DayLoop.today_case = c
 	GameState.hold_next_payment = o != null
-	var score := rng.randi_range(88, 100) if lv == &"good" else rng.randi_range(65, 95)
-	var damaged := lv != &"good" and rng.randf() < (float(OS.get_environment("BAL_DMG")) if OS.has_environment("BAL_DMG") else 0.03)
+	var score := rng.randi_range(88, 100) if _g(lv) else rng.randi_range(65, 95)
+	var damaged := not _g(lv) and rng.randf() < (float(OS.get_environment("BAL_DMG")) if OS.has_environment("BAL_DMG") else 0.03)
 	GameState.record_repair(c.part(), score, damaged, c.fee, c.level)
 	DayLoop._result_pending = false
 	_bot_story(lv)
@@ -391,7 +401,7 @@ func _inspect_stops(o: RepairShelf.Order, lv: StringName) -> bool:
 		return false
 	DayLoop.current_job = { "case": o.case, "order": o }
 	DayLoop.today_case = o.case
-	o.case.set_meta("inspection", { "mistakes": { "diagnosis": 0 if lv == &"good" else 10 }, "wrong": 0, "skipped": [], "did_optional": [], "cause": o.case.scenario().cause })
+	o.case.set_meta("inspection", { "mistakes": { "diagnosis": 0 if _g(lv) else 10 }, "wrong": 0, "skipped": [], "did_optional": [], "cause": o.case.scenario().cause })
 	DayLoop._after_inspection()
 	inspections += 1
 	return true
@@ -422,7 +432,7 @@ var helper_money := 0
 func _bot_exam(lv: StringName) -> void:
 	if lv == &"idle" or not GameState.rank_ready():
 		return
-	var p_right := 0.9 if lv == &"good" else 0.7
+	var p_right := 0.9 if _g(lv) else 0.7
 	for q: ExamQuestion in DayLoop.exam_begin():
 		DayLoop.exam_answer(q.correct_text() if rng.randf() < p_right else "ผิด")
 	if DayLoop.exam_finish():
@@ -438,11 +448,13 @@ func _bot_story(lv: StringName) -> void:
 		return
 	var st: NpcStory = DayLoop.pending_story["story"]
 	DayLoop.story_today = true
-	var good := rng.randf() < (0.9 if lv == &"good" else 0.6)
+	var good := rng.randf() < (0.9 if _g(lv) else 0.6)
 	DayLoop.story_finish(st.good_choice if (good or st.good_choice == "") else "ตอบห้วน")
 
 
 func _set_ot() -> void:
+	if not DayLoop._ot_this_shift:
+		ex_stats["ot_days"] = int(ex_stats.get("ot_days", 0)) + 1
 	ts.overtime = true
 	if not DayLoop._ot_this_shift:
 		DayLoop._ot_this_shift = true
@@ -454,10 +466,10 @@ func _buy_upgrades(lv: StringName) -> void:
 	var r6: ItemDef = load("res://Resources/Shop/shelf_rack_6.tres")
 	# [0.4.0] คลังเต็มเร็วขึ้น (ของสิ้นเปลือง 4 ชนิด + อะไหล่) → ซื้อชั้นเก็บอะไหล่ 14 ช่องหลังชั้นวางเครื่อง
 	var st: ItemDef = load("res://Resources/Shop/storage_shelf.tres")
-	if GameState.shelf_slots >= 4 and GameState.money > (2500 if lv == &"good" else 3500):
+	if GameState.shelf_slots >= 4 and GameState.money > (2500 if _g(lv) else 3500):
 		GameState.buy(st)
 	match lv:
-		&"good":
+		&"good", &"exploit":
 			if GameState.money > 2500:
 				GameState.buy(r4)
 			if GameState.money > 5000:
@@ -465,6 +477,115 @@ func _buy_upgrades(lv: StringName) -> void:
 		&"normal", &"normal_stock":
 			if GameState.money > 3000:
 				GameState.buy(r4)
+
+
+## บอทเก่ง + บอทหาช่องโหว่ เล่นแบบเก่งเหมือนกัน
+func _g(lv: StringName) -> bool:
+	return lv == &"good" or lv == &"exploit"
+
+
+# ---------------------------------------------------------------- [0.9.0 ขั้น D] บอทหาช่องโหว่
+## เล่นแบบเก่ง + ทุกวัน: รายงานดีลทุกดีลก่อนซื้อ (ใช้รายงานเช็กว่าร้านจริงไหม) แล้วซื้อดีลที่ยังซื้อได้ → ขายคืนตอนของมา
+## ซื้อของออนไลน์ที่ถูกกว่าราคาขายคืนมาวนขาย (fp_switch ฯลฯ) · ล่วงเวลาทุกครั้งที่ทำได้ (ตามเพดาน ot_max_per_week) · รับคำขอทุกครั้ง · ให้มิ้นทำทุกวัน
+## เกณฑ์ (_exploit_checks): ซื้อ–ขายคืนวนไม่มีกำไร · รายงานไม่ได้ใช้เช็กฟรี · กำไรทั้งปีไม่เกินบอทเก่ง 10%
+var ex_stats := { }
+
+
+func _exploit_day() -> void:
+	# ของที่สั่งมาวนขายแล้วถึง → ขายคืนทั้งหมด (ไม่แตะของที่จองให้เครื่อง)
+	var i := GameState.inventory.size() - 1
+	while i >= 0:
+		var e: Dictionary = GameState.inventory[i]
+		if bool(e.get("flip", false)) and String(e.reserved_for) == "":
+			var kind := String(e.get("flip_kind", "flip"))
+			var cost := int(e.get("cost", 0))
+			var got := GameState.sell_back(i)
+			if got >= 0:
+				ex_stats[kind + "_sell"] = int(ex_stats.get(kind + "_sell", 0)) + got
+				ex_stats[kind + "_cost"] = int(ex_stats.get(kind + "_cost", 0)) + cost
+		i -= 1
+	# ดีลวันนี้: รายงานก่อน (ถ้ารายงานแล้วบอกว่าร้านจริง = ใช้เช็กฟรี) แล้วลองซื้อ
+	for k in DayLoop.deals_today.size():
+		var d: Dictionary = DayLoop.deals_today[k]
+		if String(d.done) != "":
+			continue
+		var rr := DayLoop.deal_report(k)
+		ex_stats["reports"] = int(ex_stats.reports) + 1
+		if bool(rr.get("fake", true)):
+			continue
+		var m0 := GameState.money
+		var rb := DayLoop.deal_buy(k)
+		if bool(rb.get("ok", false)) and not bool(rb.get("fake", false)):
+			ex_stats["report_peek"] = int(ex_stats.report_peek) + 1
+			ex_stats["deal_buy"] = int(ex_stats.deal_buy) + (m0 - GameState.money)
+			_tag_pending(&"deal")
+	# สั่งออนไลน์ของที่ถูกกว่าราคาขายคืน (วนกินส่วนต่าง)
+	var lines := []
+	for it: ItemDef in DayLoop.online_catalog():
+		# ของที่ราคาออนไลน์ต่ำกว่าราคาขายคืนตามราคาตลาด (80%) = ช่องให้วนขาย (เดิม fp_switch ออนไลน์ ฿45 ขายคืน ฿48)
+		if it.kind != ItemDef.Kind.PART or GameState.rank() < it.unlock_rank or it.online_cost() >= roundi(it.price * 0.8):
+			continue
+		for n in 3:
+			lines.append([it, 1])
+	while not lines.is_empty() and GameState.order_block_reason(lines) != "":
+		lines.pop_back()
+	if not lines.is_empty() and GameState.money > 1500:
+		var m1 := GameState.money
+		if GameState.order_online(lines) == "":
+			ex_stats["flip_buy"] = int(ex_stats.flip_buy) + (m1 - GameState.money)
+			for n in lines.size():
+				_tag_pending(&"flip", lines.size() - n)
+
+
+## ติดป้ายพัสดุล่าสุด (n รายการท้ายคิว) ว่าเป็นของวนขาย → ตอนของถึง GameState ใส่ลงคลัง (บอทหาเองจาก cost + id)
+func _tag_pending(kind: StringName, back := 1) -> void:
+	var po: Array = GameState.pending_orders
+	if po.size() >= back:
+		po[po.size() - back]["flip_kind"] = String(kind)
+		_flip_wait.append({ "id": po[po.size() - back].id, "kind": String(kind), "cost": int(po[po.size() - back].cost) })
+
+
+var _flip_wait: Array = []
+
+
+## ของที่รอวนขายถึงคลังแล้ว → ติดป้าย flip ในช่องคลัง (จับจาก id + ราคาทุน · ยังไม่จอง)
+func _mark_arrived() -> void:
+	var left: Array = []
+	for w in _flip_wait:
+		var found := false
+		for e: Dictionary in GameState.inventory:
+			if not bool(e.get("flip", false)) and e.id == w.id and int(e.get("cost", 0)) == int(w.cost) and String(e.reserved_for) == "":
+				e["flip"] = true
+				e["flip_kind"] = w.kind
+				found = true
+				break
+		if not found:
+			left.append(w)
+	_flip_wait = left
+
+
+func _exploit_checks(res: Dictionary) -> void:
+	if not res.has(&"exploit"):
+		return
+	var flip_net := 0
+	var deal_net := 0
+	var peeks := 0
+	var ot := 0
+	for r: Dictionary in res[&"exploit"]:
+		var ex: Dictionary = r.ex
+		flip_net += int(ex.get("flip_sell", 0)) - int(ex.get("flip_cost", 0))
+		deal_net += int(ex.get("deal_sell", 0)) - int(ex.get("deal_cost", 0))
+		peeks += int(ex.report_peek)
+		ot += int(ex.ot_days)
+		print("BAL %-14s ช่องโหว่: วนขาย ทุน ฿%d ขายคืน ฿%d · ดีลลดราคา ทุน ฿%d ขายคืน ฿%d · รายงาน %d (เช็กแล้วซื้อ %d) · ล่วงเวลา %d วัน · กำไรปี ฿%d" % [
+			"exploit#%d" % r.seed, int(ex.get("flip_cost", 0)), int(ex.get("flip_sell", 0)), int(ex.get("deal_cost", 0)), int(ex.get("deal_sell", 0)), int(ex.reports), int(ex.report_peek), int(ex.ot_days), int(r.profit)])
+	_check(flip_net <= 0, "[0.9.0] ซื้อออนไลน์แล้วขายคืนวนไม่มีกำไร (สุทธิ ฿%d)" % flip_net)
+	_check(deal_net <= 0, "[0.9.0] ซื้อดีลลดราคาแล้วขายคืนไม่มีกำไร (สุทธิ ฿%d)" % deal_net)
+	_check(peeks == 0, "[0.9.0] รายงานร้านใช้เช็กฟรีก่อนซื้อไม่ได้ (ซื้อหลังรายงาน %d ครั้ง)" % peeks)
+	if res.has(&"good"):
+		var gp := _avg(res[&"good"], &"profit")
+		var ep := _avg(res[&"exploit"], &"profit")
+		_check(ep <= gp * 1.10, "[0.9.0] บอทหาช่องโหว่กำไรไม่เกินบอทเก่ง 10%% (฿%d vs ฿%d)" % [ep, gp])
 
 
 func _avg(rs: Array, key: StringName) -> int:

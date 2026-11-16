@@ -57,6 +57,9 @@ func _ready() -> void:
 		# [0.2.0] เดโมจบที่บท 1 → ปิดเดโมก่อนถึงจะไปสิ้นเดือน/สิ้นเกมได้
 		{ "label": "ทดสอบเดือน: ปิดเดโม → ไปปิดร้านวันสุดท้ายของ ม.ค. (หน้าสรุปเดือน)", "call": func() -> void: _goto_no_demo(TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH) },
 		{ "label": "ทดสอบจบเกม: ปิดเดโม → ไปปิดร้านวันสุดท้ายของเกม", "call": func() -> void: _goto_no_demo(TimeSystem.TOTAL_SHIFTS) },
+		# [0.9.0 ขั้น B] ทดสอบป๊อปอัปหลังเล่น (รันด้วย -- --tester)
+		{ "label": "ผู้ทดสอบ: ไปปิดร้านวันสุดท้ายของ มี.ค. (ครบ 3 เดือน → ป๊อปอัปหลังเล่น)", "call": func() -> void: _goto_no_demo(TimeSystem.SHIFTS_PER_WEEK * TimeSystem.WEEKS_PER_MONTH * 3) },
+		{ "label": "ผู้ทดสอบ: เปิดป๊อปอัปหลังเล่นตอนนี้", "call": func() -> void: Playlog.show_post_form() },
 		{ "label": "ระดับ: ปลด Lv3–Lv5 (ให้ ★★ ครบ)", "call": _unlock_levels },
 	]
 	_build_ui()
@@ -188,6 +191,8 @@ func _on_jump_point_pressed(point: Dictionary) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if OS.has_feature("tester"): # [0.9.0] บิลด์ผู้ทดสอบ (export) ปิดเมนูทีม · รัน -- --tester ในเครื่องทีมยังใช้ F1 ได้
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == TOGGLE_KEY:
 		visible = !visible
 		get_viewport().set_input_as_handled()

@@ -188,23 +188,12 @@ static func log_ending() -> void:
 	var dl: Node = tree.root.get_node_or_null(^"/root/DayLoop") if tree else null
 	if dl and bool(dl.get("quiet")):
 		return
-	DirAccess.make_dir_recursive_absolute("user://playlog")
-	var path := "user://playlog/ending.csv"
-	var fresh := not FileAccess.file_exists(path)
-	var f := FileAccess.open(path, FileAccess.READ_WRITE if not fresh else FileAccess.WRITE)
-	if f == null:
-		return
-	f.seek_end()
-	if fresh:
-		f.store_line("time,ending,ch11_pick,ch12_pick,months_hit,rank,achievements,gifts,repairs,min_tier")
 	var gs := GameState
 	var hit := gs.month_results.filter(func(r: Dictionary) -> bool: return bool(r.get("reached", false))).size()
-	f.store_line("%s,%s,%s,%s,%d,%d,%d,%d,%d,%s" % [
-		Time.get_datetime_string_from_system(), gs.ending, String(gs.story_flags.get("ch11_pick", "")).replace(",", " "),
-		String(gs.story_flags.get("ch12_pick", "")).replace(",", " "), hit, gs.rank(), gs.achievements.size(),
-		gs.gifts_received.size(), gs.satisfaction_history.size(), String(min_report().tier),
-	])
-	f.close()
+	Playlog.append("ending.csv", ["ending", "ch11_pick", "ch12_pick", "months_hit", "rank", "achievements", "gifts", "repairs", "min_tier", "playtime_sec"], [
+		String(gs.ending), String(gs.story_flags.get("ch11_pick", "")), String(gs.story_flags.get("ch12_pick", "")), hit, gs.rank(),
+		gs.achievements.size(), gs.gifts_received.size(), gs.satisfaction_history.size(), String(min_report().tier), roundi(gs.playtime_sec),
+	]) # [0.9.0]
 
 
 static func _file(out: PackedStringArray, path: String) -> void:

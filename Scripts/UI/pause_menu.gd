@@ -1,15 +1,22 @@
 extends CanvasLayer
-## เมนูพัก (autoload PauseMenu) — กด Esc ระหว่างเล่น: เล่นต่อ · ตั้งค่า · กลับเมนูหลัก · ออกจากเกม
+## เมนูพัก (autoload PauseMenu) — กด Esc ระหว่างเล่น: เล่นต่อ · บันทึก · ความสำเร็จ · ตั้งค่า · ส่งออกข้อมูลการเล่น · กลับเมนูหลัก · ออกจากเกม
+## [0.9.0 ขั้น 0] หน้า "ความสำเร็จ" (ใบประกาศ + ของขวัญส่งท้ายปี) อยู่ที่นี่ที่เดียว · ปุ่ม "ความสำเร็จ"/"ส่งออก" สร้างในโค้ด (_add_buttons)
 ## ไม่เปิดตอนอยู่เมนูหลัก และตอนอยู่ในมินิเกม (มินิเกมใช้ Esc = ย้อนกลับมุมมอง)
 ## โหลด + ใช้ค่าตั้งค่าของผู้เล่นตอนเปิดเกม (GameSettings) · [Claude 10 ต.ค. 2569]
 
 const START_SCENE := "res://Scene/Start_Scene.tscn"
+const ACH_SCENE := preload("res://Scene/UI/achievement_app.tscn")
+const BUTTON_H := 56.0
 
 @onready var panel: Control = %Panel
 @onready var settings: SettingsPanel = %Settings
 @onready var menu_button: Button = %MenuButton
 
 var _confirm_menu := false
+var ach_button: Button
+var export_button: Button
+var post_button: Button
+var ach_page: PanelContainer
 
 
 func _ready() -> void:
@@ -25,6 +32,92 @@ func _ready() -> void:
 	settings.closed.connect(func():
 		panel.show()
 		%ResumeButton.grab_focus())
+	_add_buttons()
+
+
+## [0.9.0] ปุ่มเพิ่ม 2 ปุ่ม + ย่อความสูงปุ่มให้ 7 ปุ่มพอดีจอ
+func _add_buttons() -> void:
+	var vb := %ResumeButton.get_parent() as VBoxContainer
+	ach_button = Button.new()
+	ach_button.name = "AchButton"
+	ach_button.text = "ความสำเร็จ"
+	ach_button.pressed.connect(open_achievements)
+	vb.add_child(ach_button)
+	vb.move_child(ach_button, %SettingsButton.get_index())
+	export_button = Button.new()
+	export_button.name = "ExportButton"
+	export_button.text = "ส่งออกข้อมูลการเล่น"
+	export_button.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร เพื่อส่งให้ทีม"
+	export_button.pressed.connect(_on_export_pressed)
+	vb.add_child(export_button)
+	vb.move_child(export_button, menu_button.get_index())
+	post_button = Button.new() # [0.9.0 ขั้น B] บิลด์ผู้ทดสอบ · ครบเดือนแล้ว = เปิดป๊อปอัปหลังเล่นซ้ำได้
+	post_button.name = "PostTestButton"
+	post_button.text = "แบบทดสอบหลังเล่น"
+	post_button.pressed.connect(func() -> void:
+		resume()
+		Playlog.show_post_form())
+	vb.add_child(post_button)
+	vb.move_child(post_button, export_button.get_index())
+	vb.add_theme_constant_override(&"separation", 10)
+	for b in vb.get_children():
+		if b is Button:
+			b.custom_minimum_size = Vector2(340, BUTTON_H)
+			b.add_theme_font_size_override(&"font_size", 24)
+	post_button.visible = false
+	panel.offset_top = -310.0
+	panel.offset_bottom = 310.0
+
+
+func _on_export_pressed() -> void:
+	var msg := Playlog.export_and_show()
+	export_button.text = "ส่งออกแล้ว ✓"
+	export_button.tooltip_text = msg
+
+
+## หน้าความสำเร็จ (ใบประกาศทั้งหมด + ของขวัญส่งท้ายปี) · Esc/ปุ่มปิด = กลับเมนูพัก
+func open_achievements() -> void:
+	if ach_page == null:
+		ach_page = PanelContainer.new()
+		ach_page.name = "AchievementPage"
+		ach_page.set_anchors_preset(Control.PRESET_CENTER)
+		ach_page.offset_left = -330.0
+		ach_page.offset_right = 330.0
+		ach_page.offset_top = -300.0
+		ach_page.offset_bottom = 300.0
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(1, 0.97, 0.9)
+		sb.border_color = Color(0.6, 0.42, 0.2)
+		sb.set_border_width_all(3)
+		sb.set_corner_radius_all(12)
+		sb.set_content_margin_all(16)
+		ach_page.add_theme_stylebox_override(&"panel", sb)
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override(&"separation", 8)
+		ach_page.add_child(box)
+		var app := ACH_SCENE.instantiate() as Control
+		app.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		box.add_child(app)
+		var close := Button.new()
+		close.name = "Close"
+		close.text = "กลับ"
+		close.custom_minimum_size = Vector2(0, 48)
+		close.pressed.connect(close_achievements)
+		box.add_child(close)
+		panel.get_parent().add_child(ach_page)
+	var app_node := ach_page.get_child(0).get_child(0)
+	if app_node.has_method(&"refresh"):
+		app_node.refresh(true)
+	panel.hide()
+	ach_page.show()
+	(ach_page.find_child("Close", true, false) as Button).grab_focus.call_deferred()
+
+
+func close_achievements() -> void:
+	if ach_page:
+		ach_page.hide()
+	panel.show()
+	ach_button.grab_focus.call_deferred()
 
 
 ## เปิดเมนูพักได้ไหมตอนนี้
@@ -48,6 +141,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		if settings.visible:
 			settings.close()
+		elif ach_page and ach_page.visible:
+			close_achievements()
 		else:
 			resume()
 	elif can_pause():
@@ -60,6 +155,12 @@ func open() -> void:
 	menu_button.text = "กลับเมนูหลัก"
 	%SaveButton.text = "บันทึกเกม"
 	settings.hide()
+	if ach_page:
+		ach_page.hide()
+	if export_button:
+		export_button.text = "ส่งออกข้อมูลการเล่น"
+	if post_button:
+		post_button.visible = Playlog.tester_build() and GameState.month_results.size() >= Playlog.config.post_after_months
 	panel.show()
 	show()
 	get_tree().paused = true

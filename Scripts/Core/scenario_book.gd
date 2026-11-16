@@ -94,18 +94,8 @@ static func roll(part: StringName, rng: RandomNumberGenerator, recent: Array = [
 	}
 
 
-## เขียนผลลง user://scenario_log.csv (ข้อมูลการวินิจฉัยระหว่างเล่น ประกอบเล่มรายงาน)
+## เขียนผลลง user://playlog/scenario_log.csv (ข้อมูลการวินิจฉัยระหว่างเล่น ประกอบเล่มรายงาน) · [0.9.0] ย้ายเข้า playlog + รหัสผู้ทดสอบ
 static func append_csv(row: Dictionary) -> void:
-	var path := "user://scenario_log.csv"
-	var fresh := not FileAccess.file_exists(path)
-	var f := FileAccess.open(path, FileAccess.READ_WRITE if not fresh else FileAccess.WRITE)
-	if f == null:
-		return
-	f.seek_end()
-	if fresh:
-		f.store_line("time,chapter,day,scenario,part,first_try,wrong,skipped,did_optional,score,gave_up")
-	f.store_line("%s,%d,%d,%s,%s,%d,%d,%d,%d,%d,%d" % [
-		Time.get_datetime_string_from_system(), int(row.ch), int(row.day), String(row.id), String(row.part),
-		1 if row.first_try else 0, int(row.wrong), int(row.skipped), int(row.did_optional), int(row.score), 1 if row.gave_up else 0,
+	Playlog.append("scenario_log.csv", ["chapter", "day", "scenario", "part", "first_try", "wrong", "skipped", "did_optional", "score", "gave_up"], [
+		int(row.ch), int(row.day), String(row.id), String(row.part), bool(row.first_try), int(row.wrong), int(row.skipped), int(row.did_optional), int(row.score), bool(row.gave_up),
 	])
-	f.close()

@@ -212,7 +212,7 @@ func _deal_row(i: int, d: Dictionary) -> PanelContainer:
 	var bx := VBoxContainer.new()
 	hb.add_child(bx)
 	var done := String(d.done)
-	var buy := _button("ซื้อ ฿%d" % int(d.price) if done == "" else {"bought": "สั่งแล้ว", "scammed": "โดนโกง", "reported": "รายงานแล้ว"}.get(done, "-"), not bool(d.can_buy), true)
+	var buy := _button("ซื้อ ฿%d" % int(d.price) if done == "" else {"bought": "สั่งแล้ว", "scammed": "โดนโกง", "reported": "รายงานแล้ว", "report_wrong": "ไม่ขายให้"}.get(done, "-"), not bool(d.can_buy), true)
 	buy.name = "Buy"
 	buy.custom_minimum_size = Vector2(96, 28)
 	buy.pressed.connect(_on_deal.bind(i, true))

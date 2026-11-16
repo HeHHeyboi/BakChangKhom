@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="BakChangKhom"
-config/version="0.8.0-test1"
+config/version="0.9.0-test1"
 run/main_scene="uid://d2rbfnaviwwmi"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://Assets/Logo/logo_emblem_512.png"
@@ -35,6 +35,7 @@ PauseMenu="*res://Scene/UI/pause_menu.tscn"
 Audio="*res://Scripts/Core/audio_manager.gd"
 Storage="*res://Scene/UI/storage_panel.tscn"
 Achievements="*res://Scripts/Core/achievements.gd"
+Playlog="*res://Scripts/Core/playlog.gd"
 
 [display]
 

@@ -40,6 +40,7 @@ func _ready() -> void:
 		al.add_theme_constant_override(&"outline_size", 4)
 		al.position = Vector2(16, 612)
 		add_child(al)
+	_add_export_button() # [0.9.0 ขั้น A]
 	for b in $Menu.get_children():
 		if b is Button:
 			_hover_bounce(b)
@@ -83,8 +84,17 @@ func _on_start_button_pressed() -> void:
 		$Menu/Start_Button.text = "เริ่มใหม่? กดอีกครั้ง"
 		$Menu/Start_Button.tooltip_text = "เซฟเดิมจะถูกแทนที่ด้วยเกมใหม่"
 		return
+	if Playlog.tester_build(): # [0.9.0 ขั้น A] บิลด์ผู้ทดสอบ: ถามรหัสก่อนเริ่ม
+		showTutorial = true
+		Playlog.ask_tester_id(func() -> void: Playlog.show_pre_form(_begin_new_game)) # [0.9.0 ขั้น B] แล้วหน้าแบบทดสอบก่อนเล่น
+		return
+	_begin_new_game()
+
+
+func _begin_new_game(pre_opened := false) -> void:
 	SaveGame.clear() # เริ่มใหม่ = ลบเซฟเดิม → เซฟใหม่สร้างเองตอนเข้าฉากแรก
 	DayLoop._reset_run()
+	GameState.form_pre_opened = pre_opened # [0.9.0] reset() ล้างแล้ว → ใส่หลังรีเซ็ต
 	EventManager.jump_event(EventManager.EventID.MAIN, 0) # เควสต์กลับขั้นแรก (กรณีกลับเมนูมาเริ่มใหม่)
 	EventManager.hideUI()
 	showTutorial = true
@@ -129,9 +139,45 @@ func _on_continue_button_pressed() -> void:
 		showTutorial = false
 		$Menu/Continue_Button.hide()
 		return
+	if Playlog.tester_build() and GameState.tester_id == "": # [0.9.0] เซฟเก่ายังไม่มีรหัส
+		Playlog.ask_tester_id(_enter_loaded.bind(loc))
+		return
+	_enter_loaded(loc)
+
+
+func _enter_loaded(loc: int) -> void:
 	EventManager.on_tutorial_finish.disconnect(tutorial_end)
 	EventManager.on_dialog_end.disconnect(dialog_end)
 	Global.on_start = false
 	EventManager.showUI()
 	hide()
 	SceneRouter.go(loc)
+
+
+## [0.9.0 ขั้น A] ปุ่ม "ส่งออกข้อมูลการเล่น" มุมขวาล่าง (มีข้อมูลแล้ว หรือบิลด์ผู้ทดสอบ) + รหัสผู้ทดสอบ
+func _add_export_button() -> void:
+	if not (Playlog.has_data() or Playlog.tester_build()):
+		return
+	var b := Button.new()
+	b.name = "ExportButton"
+	b.text = "ส่งออกข้อมูลการเล่น"
+	b.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร เพื่อส่งให้ทีม"
+	b.add_theme_font_size_override(&"font_size", 18)
+	b.custom_minimum_size = Vector2(250, 44)
+	b.position = Vector2(1152 - 250 - 16, 648 - 44 - 40)
+	b.pressed.connect(func() -> void:
+		var msg := Playlog.export_and_show()
+		b.text = "ส่งออกแล้ว ✓"
+		b.tooltip_text = msg)
+	add_child(b)
+	var tid := SaveGame.saved_tester_id()
+	if tid != "" or Playlog.tester_build():
+		var l := Label.new()
+		l.name = "TesterTag"
+		l.text = "ผู้ทดสอบ %s" % (tid if tid != "" else "—")
+		l.add_theme_font_size_override(&"font_size", 14)
+		l.add_theme_color_override(&"font_color", Color(1, 0.93, 0.75))
+		l.add_theme_color_override(&"font_outline_color", Color(0.2, 0.12, 0.05))
+		l.add_theme_constant_override(&"outline_size", 4)
+		l.position = Vector2(1152 - 250 - 16, 648 - 36)
+		add_child(l)

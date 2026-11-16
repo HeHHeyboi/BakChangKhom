@@ -98,14 +98,4 @@ static func mark(state: Dictionary, e: ShopEvent, shift: int) -> void:
 
 ## user://playlog/events.csv (เวลา · บท · วัน · อีเวนต์ · ตัวเลือก) ประกอบเล่มรายงาน
 static func append_csv(row: Dictionary) -> void:
-	DirAccess.make_dir_recursive_absolute("user://playlog")
-	var path := "user://playlog/events.csv"
-	var fresh := not FileAccess.file_exists(path)
-	var f := FileAccess.open(path, FileAccess.READ_WRITE if not fresh else FileAccess.WRITE)
-	if f == null:
-		return
-	f.seek_end()
-	if fresh:
-		f.store_line("time,chapter,day,event,choice")
-	f.store_line("%s,%d,%d,%s,%s" % [Time.get_datetime_string_from_system(), int(row.ch), int(row.day), String(row.id), String(row.choice).replace(",", " ")])
-	f.close()
+	Playlog.append("events.csv", ["chapter", "day", "event", "choice"], [int(row.ch), int(row.day), String(row.id), String(row.choice)]) # [0.9.0]

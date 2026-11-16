@@ -74,8 +74,7 @@ static func ending_summary() -> String:
 	var hit := gs.month_results.filter(func(r: Dictionary) -> bool: return bool(r.get("reached", false))).size()
 	var lines: PackedStringArray = []
 	lines.append("ถึงเป้า %d/%d เดือน · ซ่อม %d งาน · เงิน ฿%d · ชื่อเสียง %d" % [hit, gs.month_results.size(), gs.satisfaction_history.size(), gs.money, gs.reputation])
-	var title := DecorBook.title_text()
-	lines.append("ยศ %s%s · ใบประกาศ %d ใบ · ของในร้าน %d ชิ้น" % [gs.rank_name(), (" (" + title + ")") if title != "" else "", gs.achievements.size(), DecorBook.owned().size()])
+	lines.append("ยศ %s · ใบประกาศ %d ใบ · ของขวัญ %d ชิ้น" % [gs.rank_name(), gs.achievements.size(), gs.gifts_received.size()])
 	var top := EndingBook.top_npcs()
 	if not top.is_empty():
 		lines.append("คนที่สนิทที่สุด: " + " · ".join(top.map(func(id: StringName) -> String:
@@ -1852,8 +1851,9 @@ func deal_report(i: int) -> Dictionary:
 	var s := seller_by_id(StringName(d.seller))
 	if s == null:
 		return { "ok": false, "msg": "" }
-	if not s.fake:
-		return { "ok": true, "fake": false, "msg": "ปิ๊บ: ร้านนี้ดูน่าเชื่อถือนะ (%s) · ลดราคาไม่ได้แปลว่าปลอมเสมอไป ดูหลาย ๆ อย่างประกอบกัน" % ", ".join(s.signs.slice(0, 2)) }
+	if not s.fake: # [0.9.0 ขั้น D] รายงานผิด = ดีลนี้ปิด (ไม่ให้รายงานไว้เช็กฟรีก่อนซื้อ)
+		d["done"] = "report_wrong"
+		return { "ok": true, "fake": false, "msg": "ปิ๊บ: ร้านนี้ดูน่าเชื่อถือนะ (%s) · ร้านเห็นว่าโดนรายงานเลยไม่ขายให้วันนี้ · ลดราคาไม่ได้แปลว่าปลอมเสมอไป ดูหลาย ๆ อย่างประกอบกัน" % ", ".join(s.signs.slice(0, 2)) }
 	d["done"] = "reported"
 	GameState.seller_blacklist[String(s.id)] = { "why": "reported", "lost": 0 }
 	var st: Dictionary = GameState.event_state

@@ -13,4 +13,6 @@ func _ready() -> void:
 static func version_text() -> String:
 	var v := str(ProjectSettings.get_setting("application/config/version", "dev"))
 	var tag := "Web" if OS.has_feature("web") else OS.get_name()
+	if OS.has_feature("tester"): # [0.9.0] บิลด์ผู้ทดสอบ
+		tag += " · ผู้ทดสอบ"
 	return "v%s · %s" % [v, tag]

@@ -1,6 +1,8 @@
 class_name AchievementApp extends VBoxContainer
-## [Claude 16 พ.ย. 2569 · 0.7.0 ขั้น J] แอป "ใบประกาศ" ในคอมของขม (ShopPC ใส่ผ่าน DesktopMinigameV2.add_custom_app)
+## [Claude 16 พ.ย. 2569 · 0.7.0 ขั้น J] หน้า "ความสำเร็จ" (ใบประกาศ)
+## [0.9.0 ขั้น 0] ย้ายจากแอปในคอมขมมาอยู่ในเมนูพัก (PauseMenu → ความสำเร็จ) ที่เดียว · ไม่มีติดผนัง/รางวัลของตกแต่งแล้ว
 ## แสดงผลอย่างเดียว ← Achievements.view() · แยกหมวด · ได้แล้ว = วันที่ได้ · ยังไม่ได้ = ความคืบหน้า · ใบลับ = ???
+## ท้ายหน้า = ของขวัญส่งท้ายปีที่ได้รับ (GameState.gifts_received)
 
 @export var row_style: StyleBox
 @export var font := Color(0.35, 0.2, 0.08)
@@ -27,7 +29,7 @@ func refresh(force := false) -> void:
 	if a == null:
 		return
 	var v: Dictionary = a.view()
-	var h := (str(v) + str(GameState.ach_pinned)).hash()
+	var h := (str(v) + str(GameState.gifts_received)).hash()
 	if h == _last_hash and not force:
 		return
 	_last_hash = h
@@ -45,6 +47,7 @@ func refresh(force := false) -> void:
 			hd.add_theme_color_override(&"font_color", font)
 			%List.add_child(hd)
 		%List.add_child(_row(r))
+	_add_gifts()
 
 
 func _row(r: Dictionary) -> Control:
@@ -78,35 +81,33 @@ func _row(r: Dictionary) -> Control:
 	box.add_child(t)
 	var d := Label.new()
 	var sub := String(r.desc)
-	if bool(r.got):
+	if bool(r.got) and String(r.when) != "":
 		sub += " · " + String(r.when)
 	elif int(r.target) > 1 and not (bool(r.hidden)):
 		sub += " · %d/%d" % [int(r.cur), int(r.target)]
-	if String(r.reward) != "" and (bool(r.got) or not bool(r.hidden)):
-		sub += " · รางวัล: " + String(r.reward)
 	d.text = sub
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.add_theme_font_size_override(&"font_size", 12)
 	d.add_theme_color_override(&"font_color", font if bool(r.got) else dim)
 	box.add_child(d)
-	if bool(r.got): # ติดผนังร้านได้ 3 ใบ
-		var pinned := GameState.ach_pinned.has(String(r.id))
-		var b := Button.new()
-		b.name = "Pin"
-		b.text = "เอาลง" if pinned else "ติดผนัง"
-		b.focus_mode = Control.FOCUS_NONE
-		b.disabled = not pinned and GameState.ach_pinned.size() >= 3
-		b.tooltip_text = "ติดผนังร้านได้ 3 ใบ"
-		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		b.add_theme_font_size_override(&"font_size", 13)
-		b.pressed.connect(_toggle_pin.bind(String(r.id)))
-		hb.add_child(b)
 	return p
 
 
-func _toggle_pin(id: String) -> void:
-	if GameState.ach_pinned.has(id):
-		GameState.ach_pinned.erase(id)
-	elif GameState.ach_pinned.size() < 3:
-		GameState.ach_pinned.append(id)
-	refresh(true)
+## ของขวัญส่งท้ายปี (ได้วันเปิดร้านวันสุดท้าย) · ยังไม่ได้ = ไม่ขึ้นหัวข้อ
+func _add_gifts() -> void:
+	if GameState.gifts_received.is_empty():
+		return
+	var hd := Label.new()
+	hd.name = "GiftHead"
+	hd.text = "%s (%d ชิ้น)" % [DecorBook.GIFT_TITLE, GameState.gifts_received.size()]
+	hd.add_theme_font_size_override(&"font_size", 15)
+	hd.add_theme_color_override(&"font_color", font)
+	%List.add_child(hd)
+	for npc_id in GameState.gifts_received:
+		var d := DecorBook.by_id(StringName(GameState.gifts_received[npc_id]))
+		var n := NpcBook.by_id(StringName(npc_id))
+		var who := n.display_name if n else String(npc_id)
+		%List.add_child(_row({
+			"id": "gift_" + String(npc_id), "title": d.title if d else String(GameState.gifts_received[npc_id]),
+			"desc": "จาก" + who, "got": true, "when": "", "hidden": false, "cur": 0, "target": 1,
+		}))

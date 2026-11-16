@@ -51,7 +51,9 @@ func _ready() -> void:
 	var rr := DayLoop.deal_report(0)
 	_check(bool(rr.fake) and GameState.seller_blacklist.has(String(other.id)) and int(GameState.event_state.get("fake_reported", 0)) == 1, "รายงานร้านปลอม = บัญชีดำ + นับดูออก")
 	var rr2 := DayLoop.deal_report(1)
-	_check(not bool(rr2.fake) and not GameState.seller_blacklist.has(String(reals[0].id)) and String(DayLoop.deals_today[1].done) == "", "รายงานร้านจริง = ปิ๊บบอกว่าน่าเชื่อถือ (ยังซื้อได้)")
+	_check(not bool(rr2.fake) and not GameState.seller_blacklist.has(String(reals[0].id)) and String(DayLoop.deals_today[1].done) == "report_wrong", "รายงานร้านจริง = ไม่ขึ้นบัญชีดำ · ดีลนี้ปิด")
+	_check(not bool(DayLoop.deal_buy(1).ok), "[0.9.0] รายงานผิดแล้วซื้อดีลนั้นไม่ได้ (ไม่ใช้รายงานเช็กฟรี)")
+	DayLoop.deals_today[1].done = ""
 	m0 = GameState.money
 	var rb := DayLoop.deal_buy(1)
 	_check(bool(rb.ok) and not bool(rb.fake) and GameState.money == m0 - 300 and GameState.pending_orders.back().cost == 300, "ซื้อร้านจริง: ของมาวันถัดไปราคาลด")

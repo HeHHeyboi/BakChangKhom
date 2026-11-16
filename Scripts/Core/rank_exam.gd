@@ -80,18 +80,8 @@ static func shuffled(q: ExamQuestion, rng: RandomNumberGenerator) -> Array[int]:
 	return idx
 
 
-## เขียนผลลง user://learn_log.csv (ใช้ประกอบผลการเรียนรู้ในเล่มรายงาน)
+## เขียนผลลง user://playlog/learn_log.csv (ใช้ประกอบผลการเรียนรู้ในเล่มรายงาน) · [0.9.0] ย้ายเข้า playlog + รหัสผู้ทดสอบ
 static func append_csv(row: Dictionary) -> void:
-	var path := "user://learn_log.csv"
-	var fresh := not FileAccess.file_exists(path)
-	var f := FileAccess.open(path, FileAccess.READ_WRITE if not fresh else FileAccess.WRITE)
-	if f == null:
-		return
-	f.seek_end()
-	if fresh:
-		f.store_line("time,chapter,day,target_rank,attempt,question,part,chosen,correct")
-	f.store_line("%s,%d,%d,%d,%d,%s,%s,%s,%d" % [
-		Time.get_datetime_string_from_system(), int(row.ch), int(row.day), int(row.target), int(row.attempt),
-		String(row.qid), String(row.part), String(row.chosen).replace(",", " "), 1 if row.correct else 0,
+	Playlog.append("learn_log.csv", ["chapter", "day", "target_rank", "attempt", "question", "part", "chosen", "correct"], [
+		int(row.ch), int(row.day), int(row.target), int(row.attempt), String(row.qid), String(row.part), String(row.chosen), bool(row.correct),
 	])
-	f.close()

@@ -82,8 +82,7 @@ func _process(_delta: float) -> void:
 func update_rank() -> void:
 	if rank_box == null:
 		return
-	var t := DecorBook.title_text() # [0.8.0] ฉายาจากใบประกาศ
-	(rank_box.get_node(^"Rank") as Label).text = GameState.rank_name() + ((" · " + t) if t != "" else "")
+	(rank_box.get_node(^"Rank") as Label).text = GameState.rank_name()
 	(rank_box.get_node(^"Bar") as ProgressBar).value = GameState.rank_progress()
 	var nxt := GameState.xp_next()
 	(rank_box.get_node(^"Xp") as Label).text = (
