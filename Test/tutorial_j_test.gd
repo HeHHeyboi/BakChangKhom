@@ -38,7 +38,7 @@ func _ready() -> void:
 	await _end_dialog()
 	# ลูกค้ามารับ → บทมารับเครื่อง
 	DayLoop.door_queue.clear()
-	DayLoop.door_queue.append({ "case": ram, "kind": &"pickup", "order": o })
+	DayLoop.door_queue.append(DayLoop.pickup_entry({ "order": o, "late": 0, "mult": 1.0, "sat_delta": 0, "on_time": true })) # [0.7.0] ใช้รูปแบบจริง (เดิมไม่มีคีย์ pickup → SCRIPT ERROR ใน _part_tutorials)
 	_check(DayLoop._maybe_tutorial(DayLoop.Card.DOOR) and GameState.story_flags.get("tut_pickup", false), "ลูกค้ามารับเครื่องครั้งแรก → บทสอนมารับ")
 	await _end_dialog()
 	_check(not DayLoop._maybe_tutorial(DayLoop.Card.DOOR) and not DayLoop._maybe_tutorial(DayLoop.Card.NONE), "ครบ 3 บทแล้ว ไม่ขึ้นอีก")
