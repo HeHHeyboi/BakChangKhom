@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cwpxqyxdgbtjd" path="res://Scripts/Room/door.gd" id="8_ubegv"]
 [ext_resource type="Script" uid="uid://dn5iw3elrf84n" path="res://Scripts/Room/shop_pc.gd" id="9_pc"]
 [ext_resource type="Script" path="res://Scripts/Room/wall_certificates.gd" id="10_wall"]
+[ext_resource type="Script" path="res://Scripts/Room/decor_shelf.gd" id="11_decor"]
 
 [node name="Room" type="Control" unique_id=346166324]
 layout_mode = 3
@@ -55,6 +56,30 @@ offset_top = 200.0
 offset_right = 914.0
 offset_bottom = 340.0
 script = ExtResource("10_wall")
+
+[node name="DecorShelf" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 236.0
+offset_right = 340.0
+offset_bottom = 272.0
+tooltip_text = "ของตกแต่งในร้าน (รางวัลใบประกาศ · ของขวัญ)"
+script = ExtResource("11_decor")
+spots = Array[int]([0, 1])
+max_items = 5
+item_size = Vector2(34, 34)
+
+[node name="DecorCeiling" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 560.0
+offset_top = 6.0
+offset_right = 800.0
+offset_bottom = 42.0
+alignment = 1
+script = ExtResource("11_decor")
+spots = Array[int]([2])
+max_items = 2
+item_size = Vector2(34, 34)
 
 [node name="Event" parent="." unique_id=22790592 instance=ExtResource("3_uj64w")]
 layout_mode = 0

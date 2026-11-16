@@ -5,16 +5,16 @@
 [resource]
 script = ExtResource("1_case")
 id = &"w10_headman_vr_gpu"
-customer = "ผู้ใหญ่บ้าน"
-reason = "บูธ VR ของร้านในงานหมู่บ้าน"
-device = "คอมพิวเตอร์ที่ต่อแว่น VR ในบูธร้าน"
-symptom = "เด็ก ๆ ลองแว่น VR ได้สักพักภาพกระตุก แล้วจอดับ เครื่องร้อนจี๋"
+customer = "ภูมิ"
+reason = "เครื่องของชมรมคอมที่จะใช้ซ้อมก่อนแข่ง"
+device = "คอมพิวเตอร์ของชมรมคอม"
+symptom = "เปิดโปรแกรมหนัก ๆ ได้สักพักภาพกระตุก แล้วจอดับ เครื่องร้อนจี๋"
 level = 3
 est_slots = 5
 months = PackedInt32Array()
 part_id = "part_gpu"
 job_title = "ล้างการ์ดจอ + จัดสายไฟ"
 arrive_dialog = "res://Assets/Dialog/Customer/w10_headman_vr_gpu.txt"
-thanks_text = "บูธร้านคนต่อคิวยาวที่สุดในงานเลย!"
-complain_text = "ยังดับอยู่ เด็ก ๆ เลยต้องวาดรูปรอไปก่อน"
+thanks_text = "ชมรมได้ซ้อมทุกวันเลยครับ ขอบคุณครับพี่ขม!"
+complain_text = "ยังดับอยู่เลยครับ ชมรมต้องผลัดกันใช้เครื่องครูไปก่อน"
 forced = true

@@ -59,12 +59,16 @@ const CHAPTERS := [
 	{
 		"title": "สอนคอมพิวเตอร์พื้นฐาน",
 		"file": "res://Assets/Dialog/Chapter7Teaching.txt",
+		"min_rank": 2, ## [0.8.0] ยศต่ำกว่านี้ = ผู้ใหญ่บ้านยังไม่ชวนสอนศาลา (ตรง act_sala.min_rank)
+		"low_file": "res://Assets/Dialog/Chapter7Teaching_low.txt",
 		"bg": "res://Assets/Background/bg_shop_open.jpg",
 	},
 	{ "title": "ไฟดับ", "file": "res://Assets/Dialog/Chapter8Problem.txt", "bg": "res://Assets/Background/HomeBG.jpg" },
 	{
 		"title": "สอนที่โรงเรียน",
 		"file": "res://Assets/Dialog/Chapter9School.txt",
+		"min_rank": 2, ## [0.8.0] ยศต่ำกว่านี้ = โรงเรียนจ้างร้านอื่น (ตรง cal_school.min_rank)
+		"low_file": "res://Assets/Dialog/Chapter9School_low.txt",
 		"bg": "res://Assets/Background/bg_school_room.jpg",
 	},
 	{
@@ -201,6 +205,8 @@ var achievements: Dictionary = { }
 var ach_stats: Dictionary = { }
 ## ใบประกาศที่เลือกติดผนังร้าน (สูงสุด 3) — เซฟ
 var ach_pinned: Array = []
+## [0.8.0 ขั้น G] ของขวัญสิ้นปีที่ได้รับ { npc_id (String): decor_id (String) } (DecorBook)
+var gifts_received: Dictionary = { }
 
 
 func reset() -> void:
@@ -211,6 +217,7 @@ func reset() -> void:
 	achievements = { }
 	ach_stats = { }
 	ach_pinned = []
+	gifts_received = { }
 	money = economy.start_money
 	hold_next_payment = false
 	satisfaction_history.clear()
@@ -1420,30 +1427,85 @@ func has_cleared(part_id: StringName) -> bool:
 # ---------------------------------------------------------------- ลูปรอบ / ฉากจบ
 
 
+## [0.8.0] ทางแยกบท 11 (ตอบอีกครั้งได้ในบท 12) → story_flags["ch11_choice"] · เปิดให้ทุกคน ไม่ผูกยศ
+const PATH_CHOICES := {
+	"อยู่ที่หมู่บ้านต่อ": "stay",
+	"ทำงานกับบริษัทแบบออนไลน์จากร้าน": "coworking",
+	"กลับไปทำงานในเมือง": "city",
+}
+## [0.8.0] ตัวเลือกในบทต้นเดือน → ความสนิทเล็กน้อย (ไม่มีคำตอบผิด)
+const CHAPTER_CHOICE_AFFINITY := {
+	"ชวนลูกหลานพาพ่อแม่มาเรียนใช้เครื่อง": { &"amnuay": 2 },
+	"ตั้งป้ายรับซ่อมช่วงสงกรานต์": { &"min": 2 },
+	"ทำโฆษณาบนเพจชุมชน": { &"min": 2 },
+	"ถามผู้ใหญ่บ้านเรื่องงานบุญเพิ่ม": { &"headman": 2 },
+	"เริ่มจากเรื่องที่ผู้สูงอายุอยากทำ": { &"headman": 2 },
+	"เริ่มจากพื้นฐานทีละขั้น": { &"headman": 2 },
+	"เขียนหนังสือถึง อบต. เรื่องไฟดับบ่อย": { &"min": 2 },
+	"ชวนเด็ก ๆ มาทำการบ้านที่ศาลาตอนกลางวัน": { &"bew": 2, &"fai": 2 },
+	"ชวนชมรมมาดูตอนซ่อมที่ร้าน": { &"phum": 3, &"oat": 3 },
+	"ให้ชมรมลองวางแผนสเปกตามงบก่อน": { &"fern": 3, &"namwan": 3 },
+	"ซ้อมให้ถูกขั้นตอนก่อนค่อยเร็ว": { &"fern": 2, &"namwan": 2 },
+	"ซ้อมจับเวลาให้ชินกับความกดดัน": { &"oat": 2, &"phum": 2 },
+}
+
+
 ## ครบรอบ week → เปิดบทของรอบถัดไป · DayLoop เรียกหลังการ์ดสรุปรอบ
 func play_week_chapter(week: int) -> bool:
 	if week < 1 or week >= CHAPTERS.size():
 		return false
-	return _play_story(CHAPTERS[week])
+	var ch := chapter_story(week + 1)
+	if not _play_story(ch):
+		return false
+	if not DialogScene.on_dialog_finish.is_connected(_on_chapter_done):
+		DialogScene.on_dialog_finish.connect(_on_chapter_done.bind(week + 1), CONNECT_ONE_SHOT)
+	return true
 
 
-## ครบ 12 รอบ → ตัดสินฉากจบ + Epilogue · DayLoop เรียกหลังการ์ดสรุปรอบ 12
+## [0.8.0] บทต้นเดือนของบท n (1–12) · บทที่ขึ้นกับยศใช้ low_file เมื่อยศยังไม่ถึง
+func chapter_story(n: int) -> Dictionary:
+	var ch: Dictionary = (CHAPTERS[clampi(n, 1, CHAPTERS.size()) - 1] as Dictionary).duplicate()
+	if ch.has("low_file") and rank() < int(ch.get("min_rank", 0)):
+		ch["file"] = ch["low_file"]
+	return ch
+
+
+## [0.8.0] จบบทต้นเดือน → จำตัวเลือก (ch<n>_pick) · ทางแยก · ความสนิท
+func _on_chapter_done(n: int) -> void:
+	chapter_choice(n, DialogScene.last_choice)
+
+
+func chapter_choice(n: int, choice: String) -> void:
+	if choice == "":
+		return
+	story_flags["ch%d_pick" % n] = choice
+	if PATH_CHOICES.has(choice):
+		story_flags["ch11_choice"] = PATH_CHOICES[choice]
+	var aff: Dictionary = CHAPTER_CHOICE_AFFINITY.get(choice, { })
+	for id in aff:
+		if has_affinity(id):
+			add_affinity(id, int(aff[id]), &"chapter")
+
+
+## ครบ 12 รอบ → ตัดสินฉากจบ → บทฉากจบที่ประกอบจากการเล่นจริง (EndingBook) · DayLoop เรียกหลังการ์ดสรุปรอบ 12
 func finish_game() -> void:
 	ending = decide_ending()
-	_play_story(EPILOGUE)
+	EndingBook.log_ending()
+	var path := EndingBook.build(ending)
+	_play_story({ "title": EndingBook.title(ending), "file": path, "bg": EndingBook.bg(ending) })
 	game_finished.emit(ending)
 
 
-## ฉากจบตาม GAME_LOOP §6 · ยศช่างยังไม่มี จึงใช้ XP แทนชั่วคราว
+## [0.8.0] ร้านปิด (พลาดเป้า 3 เดือนติด / ค้างบิล 2 เดือนติด) = failure · ที่เหลือตามที่ผู้เล่นเลือกในบท 11–12 (ไม่เลือก = อยู่ต่อ)
 func decide_ending() -> StringName:
-	if shop_closed or average_satisfaction() < 40.0 or money < 0 or debt > 0:
+	if shop_closed:
 		return &"failure"
-	match story_flags.get(&"ch11_choice", &"stay"):
-		&"city":
+	match String(story_flags.get("ch11_choice", "stay")):
+		"city":
 			return &"city"
-		&"coworking":
+		"coworking":
 			return &"coworking"
-	return &"stay" if average_satisfaction() >= 70.0 else &"failure"
+	return &"stay"
 
 
 func _play_story(ch: Dictionary) -> bool:
@@ -1454,7 +1516,8 @@ func _play_story(ch: Dictionary) -> bool:
 		return false
 	if bg != "" and not ResourceLoader.exists(bg):
 		bg = ""
-	return EventManager.play_story_dialog(ch.get("title", ""), file, bg, DialogUtil.speakers_in(file))
+	# [0.8.0] ขึ้นรูปไว้ก่อนแค่ 2 คนแรก (บทยาวมีคนพูด 5–8 คน เดิมขึ้นซ้อนกัน 4 รูป) · คนที่เหลือขึ้นตอนพูด (DialogScene._show_speaker)
+	return EventManager.play_story_dialog(ch.get("title", ""), file, bg, DialogUtil.speakers_in(file).slice(0, 2))
 
 
 ## (เก่า) ใช้ DialogUtil.speakers_in แทน — เก็บไว้ให้โค้ดเดิมเรียกได้

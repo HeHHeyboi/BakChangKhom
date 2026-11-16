@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ach_kids_drawing"
+title = "ภาพวาดของน้อง ๆ"
+desc = "ภาพวาดร้านบักช่างขมฝีมือแก๊งสามเกลอ"
+from_achievement = &"R04"
+from_npc = &""
+gift_line = ""
+spot = 1
+icon = &"clipboard"
+tint = Color(0.6, 0.95, 0.6, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gift_min"
+title = "รูปคู่หน้าร้าน"
+desc = "มิ้นใส่กรอบรูปวันเปิดร้านไว้ให้"
+from_achievement = &""
+from_npc = &"min"
+gift_line = "มิ้นเอารูปวันทำบุญร้านใส่กรอบมาให้ค่ะ ปีหน้าถ่ายรูปใหม่ด้วยกันอีกนะ"
+spot = 1
+icon = &"book"
+tint = Color(1.0, 0.75, 0.85, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

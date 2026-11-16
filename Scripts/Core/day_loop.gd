@@ -36,7 +36,7 @@ extends CanvasLayer
 
 @export_group("เดโม")
 ## [Claude 10 ต.ค. 2569] เดโม: ครบกี่กะแล้วจบการเล่น (0 = เล่นเต็ม 60 กะ) → การ์ดสรุป → กลับบ้าน + ป้าย "กำลังพัฒนาให้ครบลูป"
-@export var demo_shifts := 8 ## [0.2.5] 8 = จบบทที่ 2 (ครบ ม.ค.–ก.พ. = เห็นสรุปเดือน 2 ครั้ง) · 4 = จบบทที่ 1
+@export var demo_shifts := 0 ## [0.8.0] 0 = เล่นครบปี (48 วัน → ฉากจบ) · [0.2.5] 8 = จบบทที่ 2 (เดโม ม.ค.–ก.พ.) · 4 = จบบทที่ 1
 ## ว่าง = "จบบทที่ n" ตามบทของ demo_shifts
 @export var demo_banner_title := ""
 ## {n} = บทที่จบ · {next} = บทถัดไป
@@ -63,9 +63,29 @@ const ENDING_TEXT := {
 	&"stay": "ฉากจบ: อยู่หมู่บ้าน ขยายร้าน\nร้านบักช่างขมกลายเป็นที่พึ่งของทั้งหมู่บ้าน",
 	&"city": "ฉากจบ: กลับเมือง\nมิ้นดูแลร้านแทน ส่วนขมกลับไปทำงานบริษัท",
 	&"coworking": "ฉากจบ: ปรับร้านเป็น Coworking\nร้านกลายเป็นที่เรียนรู้ของเด็ก ๆ ในหมู่บ้าน",
-	&"failure": "ฉากจบ: ร้านปิด\nลูกค้าไม่พอใจจนร้านไปต่อไม่ไหว…",
+	&"failure": "ฉากจบ: ร้านปิด\nเงินไม่พอจะเปิดร้านต่อ… ลองใหม่อีกครั้งนะ",
 }
 const GRADE_TEXT := ["ซ่อมถูกทุกอย่าง", "ผ่าน แต่มีจุดพลาด", "ซ่อมไม่ผ่าน"]
+
+
+## [0.8.0 ขั้น E] การ์ดจบเกม: สรุปทั้งปีจากข้อมูลจริง
+static func ending_summary() -> String:
+	var gs := GameState
+	var hit := gs.month_results.filter(func(r: Dictionary) -> bool: return bool(r.get("reached", false))).size()
+	var lines: PackedStringArray = []
+	lines.append("ถึงเป้า %d/%d เดือน · ซ่อม %d งาน · เงิน ฿%d · ชื่อเสียง %d" % [hit, gs.month_results.size(), gs.satisfaction_history.size(), gs.money, gs.reputation])
+	var title := DecorBook.title_text()
+	lines.append("ยศ %s%s · ใบประกาศ %d ใบ · ของในร้าน %d ชิ้น" % [gs.rank_name(), (" (" + title + ")") if title != "" else "", gs.achievements.size(), DecorBook.owned().size()])
+	var top := EndingBook.top_npcs()
+	if not top.is_empty():
+		lines.append("คนที่สนิทที่สุด: " + " · ".join(top.map(func(id: StringName) -> String:
+			var n := NpcBook.by_id(id)
+			return "%s ♥%d" % [n.display_name if n else String(id), gs.affinity(id)])))
+	if gs.ending == &"city":
+		var r := EndingBook.min_report()
+		lines.append("มิ้นดูแลร้าน: ทำเองได้ %d งาน · ยังต้องเปิดคู่มือ %d · ส่งต่อ %d · ลูกค้าที่ยังมา %d คน" % [
+			(r.taught as Array).size(), (r.learning as Array).size(), (r.untaught as Array).size(), (r.loyal as Array).size()])
+	return "\n".join(lines)
 
 enum Card {
 	NONE,
@@ -674,6 +694,7 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	_plan_events(ts) # [0.7.0] ก่อนรถขายของ/รอบลูกค้า
 	_plan_deals(ts) # [0.7.0 ขั้น I] ร้านออนไลน์ลดราคา/ร้านปลอม
 	_plan_vendor(ts)
+	_plan_gifts(ts) # [0.8.0 ขั้น G] วันเปิดร้านวันสุดท้ายของปี
 	_door_tick = ts.current_minute
 	_plan_visitors(ts)
 	if quiet: # [0.7.0] บอท: การ์ดตอนเปิดร้าน (บูธ · งานเหมา · แข่ง · ยายไม่สบาย) ตัดสินทันที
@@ -975,6 +996,15 @@ const GROUP_DEBATES := [
 	  "side_a": "ต้นกล้าพูดถูก เพิ่มแรมเลย", "side_b": "แพรวพูดถูก สแกนไวรัสพอ",
 	  "fair": "ยังไม่รู้ ต้องดูอาการในเครื่องก่อน เปิดดูการใช้แรมแล้วค่อยบอกว่าเพราะอะไร",
 	  "explain": "ก่อนตัดสินว่าใครถูก ช่างต้องดูหลักฐานก่อน ทุกคนเลยยอมรับผลได้" },
+	# [0.8.0 ขั้น H] ชมรมคอม ม.ปลาย
+	{ "a": &"oat", "a_say": "ซื้อการ์ดจอแรงสุดที่งบไหวเลยพี่ ที่เหลือค่อยว่ากัน", "b": &"fern", "b_say": "ไม่ได้ เงินชมรมต้องเหลือซื้อพาวเวอร์ซัพพลายดี ๆ ด้วย",
+	  "side_a": "โอ๊ตพูดถูก ทุ่มที่การ์ดจอ", "side_b": "เฟิร์นพูดถูก ซื้อของถูกไว้ก่อน",
+	  "fair": "แบ่งงบให้ทุกชิ้นพอดีกัน การ์ดจอแรงแต่ไฟไม่พอเครื่องก็ดับ เขียนตารางงบให้ทุกคนดูด้วยกัน",
+	  "explain": "เครื่องที่ดีคือทุกชิ้นสมดุลกัน พอเห็นตัวเลขชัด ทั้งคนอยากแรงและคนคุมเงินก็ยอมรับได้" },
+	{ "a": &"namwan", "a_say": "อ่านคู่มือให้ครบก่อนค่อยประกอบค่ะ", "b": &"phum", "b_say": "ลงมือเลยดีกว่า ทำไปเรียนไป",
+	  "side_a": "น้ำหวานพูดถูก อ่านให้ครบก่อน", "side_b": "ภูมิพูดถูก ลงมือเลย",
+	  "fair": "อ่านขั้นที่กำลังจะทำแล้วลงมือทีละขั้น ถอดปลั๊กก่อนเสมอ ติดตรงไหนเปิดคู่มือดูตรงนั้น",
+	  "explain": "อ่านกับลงมือไปด้วยกันได้ ทุกคนได้ทำ และไม่มีใครข้ามขั้นที่อันตราย" },
 ]
 
 ## เคสกลุ่มที่กำลังตัดสิน { case, debate, choices, done (Callable) }
@@ -1006,7 +1036,7 @@ func _add_group_second(c: CustomerCase, first: RepairShelf.Order, promise: int) 
 
 ## ความเห็นไม่ตรงกัน: เลือกคำตอบ → ความสนิทแต่ละคน · then = ทำต่อหลังตัดสิน (บทลูกค้า)
 func _start_debate(c: CustomerCase, then: Callable = Callable()) -> void:
-	var d: Dictionary = GROUP_DEBATES[rng(&"debate").randi_range(0, GROUP_DEBATES.size() - 1)]
+	var d: Dictionary = _debates_for(c)[rng(&"debate").randi_range(0, _debates_for(c).size() - 1)]
 	var opts := [["fair", d.fair], ["a", d.side_a], ["b", d.side_b]]
 	opts.shuffle()
 	debate_state = { "case": c, "debate": d, "choices": opts, "then": then, "answered": false }
@@ -1021,6 +1051,16 @@ func _start_debate(c: CustomerCase, then: Callable = Callable()) -> void:
 		_request_card.done.connect(_on_request_card_done)
 	_request_card.show()
 	_request_card.show_question(debate_view())
+
+
+## [0.8.0] ความเห็นไม่ตรงกันที่เป็นของสมาชิกกลุ่มนี้ (แก๊งสามเกลอ / ชมรมคอม) · ไม่มีเลย = ทั้งหมด
+func _debates_for(c: CustomerCase) -> Array:
+	var n := NpcBook.of_case(c)
+	if n == null:
+		return GROUP_DEBATES
+	var ids := n.member_ids()
+	var out := GROUP_DEBATES.filter(func(d: Dictionary) -> bool: return ids.has(d.a) and ids.has(d.b))
+	return out if not out.is_empty() else GROUP_DEBATES
 
 
 func debate_view() -> Dictionary:
@@ -2692,6 +2732,7 @@ func _continue_after_summary() -> void:
 
 ## เริ่มเกมใหม่หลังฉากจบ: เงิน/คะแนน/เวลา กลับค่าเริ่มต้น
 func _reset_run() -> void:
+	gift_pending = { }
 	exam = { }
 	pending_story = { }
 	story_today = false
@@ -2777,6 +2818,9 @@ func _process(delta: float) -> void:
 		return
 	# [0.3.0 ขั้น J] บทสอนสั้นครั้งแรก (หน้าประตู · ชั้นวาง · มารับเครื่อง)
 	if _maybe_tutorial(want):
+		return
+	# [0.8.0 ขั้น G] ของขวัญสิ้นปี (ตอนเปิดร้านวันสุดท้าย)
+	if _maybe_gifts(want):
 		return
 	# [0.5.0 ขั้น E] เรื่องส่วนตัวของลูกค้าประจำ (หลังส่งงาน/ส่งมอบเครื่อง)
 	if _maybe_story(want):
@@ -3040,12 +3084,7 @@ func _show_card(card: Card) -> void:
 				month_summary.show_report(_title.text, week_line, _last_month, _last_bill, _primary.text)
 		Card.ENDING:
 			_title.text = "จบเกม"
-			_body.text = "%s\n\nเงิน ฿%d · ความพอใจเฉลี่ย %d · ชื่อเสียง %d" % [
-				ENDING_TEXT.get(GameState.ending, ""),
-				GameState.money,
-				roundi(GameState.average_satisfaction()),
-				GameState.reputation,
-			]
+			_body.text = "%s\n\n%s" % [ENDING_TEXT.get(GameState.ending, ""), ending_summary()]
 			_primary.text = "กลับหน้าแรก"
 		Card.DEMO_END:
 			var nxt := GameState.xp_next()
@@ -4519,6 +4558,45 @@ func _queue_story(c: CustomerCase) -> void:
 		pending_story = { "id": id, "story": s }
 
 
+# ---------------------------------------------------------------- [0.8.0 ขั้น G] ของขวัญสิ้นปี (PLAN_0_8_0 ข้อ 2.4)
+
+## ของขวัญที่รอเล่นวันนี้ (DecorBook.year_gifts) · ว่าง = ไม่มี
+var gift_pending: Dictionary = { }
+
+
+func _plan_gifts(ts: TimeSystem) -> void:
+	gift_pending = { }
+	if ts.shift != TimeSystem.TOTAL_SHIFTS or bool(GameState.story_flags.get("gifts_done", false)):
+		return
+	var list := DecorBook.year_gifts()
+	if quiet:
+		DecorBook.grant(list)
+		return
+	gift_pending = list
+
+
+func _maybe_gifts(want: Card) -> bool:
+	if gift_pending.is_empty() or quiet or _working or _result_pending or not _in_shop() or Global.in_minigame or DialogScene.visible:
+		return false
+	if want not in [Card.DOOR, Card.NONE]:
+		return false
+	var list := gift_pending
+	gift_pending = { }
+	DecorBook.grant(list) # ให้ของก่อนเล่นบท (ปิดเกมกลางบทก็ไม่หาย)
+	var path := DecorBook.gift_dialog(list)
+	_working = true
+	_hide()
+	if path != "" and EventManager.play_story_dialog(DecorBook.GIFT_TITLE, path, "res://Assets/Background/bg_shop_open.jpg", DialogUtil.speakers_in(path).slice(0, 2)):
+		_wait_dialog(func() -> void:
+			_pending_cb = Callable()
+			_working = false
+			_board_dirty = true)
+	else:
+		_working = false
+	autosave.call_deferred()
+	return true
+
+
 func _maybe_story(want: Card) -> bool:
 	if pending_story.is_empty() or quiet or _working or _result_pending or not _in_shop() or Global.in_minigame or DialogScene.visible:
 		return false
@@ -4783,6 +4861,7 @@ func door_helper() -> Dictionary:
 	var id := npc_id(c)
 	var money := 0
 	var aff := 0
+	GameState.ach_stats["helper_runs"] = int(GameState.ach_stats.get("helper_runs", 0)) + 1 # [0.8.0] สอนมิ้น → ฉากจบกลับเมือง
 	if ok:
 		money = roundi(_fee(c) * e.helper_fee_share)
 		GameState.add_money(money, &"fee", "มิ้นทำ: %s" % c.job_title)

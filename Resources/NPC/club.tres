@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/NPC/phum.tres" id="m1"]
+[ext_resource type="Resource" path="res://Resources/NPC/fern.tres" id="m2"]
+[ext_resource type="Resource" path="res://Resources/NPC/oat.tres" id="m3"]
+[ext_resource type="Resource" path="res://Resources/NPC/namwan.tres" id="m4"]
+
+[resource]
+script = ExtResource("1")
+id = &"club"
+display_name = "ชมรมคอม ม.ปลาย"
+char_key = "ชมรมคอม"
+start_affinity = 0
+base_weight = 1.5
+has_affinity = false
+bio = "ภูมิ เฟิร์น โอ๊ต และน้ำหวาน ชมรมคอมของโรงเรียนประจำตำบล อยากประกอบเครื่องให้ชมรมเองและอยากไปแข่ง"
+kind = 1
+tags = PackedStringArray("group")
+members = Array[ExtResource("1")]([ExtResource("m1"), ExtResource("m2"), ExtResource("m3"), ExtResource("m4")])
+devices = PackedStringArray("คอมของชมรมคอมที่โรงเรียน", "เครื่องที่ชมรมประกอบเอง")
+school_hours = true
+fee_mult = 0.8
+unlock_chapter = 9
+# [Claude 16 พ.ย. 2569 · 0.8.0 ขั้น H] กลุ่ม ม.ปลาย 4 คน · ปลดบท 9 (ผอ.แนะนำในบทต้นเดือน) · ค่าแรง ×0.8 (งบชมรม)

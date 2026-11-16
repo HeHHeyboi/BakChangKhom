@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"oat"
+display_name = "โอ๊ต"
+char_key = "โอ๊ต"
+start_affinity = 15
+base_weight = 1.5
+has_affinity = true
+bio = "สมาชิกชมรมคอม ม.4 ชอบเล่นเกม มือไวแต่ใจร้อน กลัวทำซีพียูขางอที่สุด"
+kind = 0
+tags = PackedStringArray("student", "club")
+devices = PackedStringArray("คอมของชมรมคอมที่โรงเรียน", "โน้ตบุ๊กที่ใช้ทำงานส่งครู")
+school_hours = true
+fee_mult = 0.8
+affinity_mult = 1.5
+unlock_chapter = 9
+solo_min_affinity = 40
+
+# [Claude 16 พ.ย. 2569 · 0.8.0 ขั้น H] สมาชิกชมรมคอม ม.ปลาย · ปลดบท 9 · มาคนเดียวเมื่อสนิท 40 · รูปชั่วคราว (เงาสี รออาร์ต)

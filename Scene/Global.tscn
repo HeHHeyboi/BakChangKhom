@@ -24,6 +24,10 @@
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_grandma_worried.png" id="c20"]
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_min_serious.png" id="c21"]
 [ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_amnuay_smile.png" id="c22"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_phum.png" id="c23"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_fern.png" id="c24"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_oat.png" id="c25"]
+[ext_resource type="Texture2D" path="res://Assets/CharacterSprite/char_club_namwan.png" id="c26"]
 
 [node name="Global" type="Node2D" unique_id=280335373]
 scale = Vector2(0.998061, 0.994891)
@@ -56,5 +60,10 @@ _CharacterMap = {
 "เด็กหญิง": ExtResource("c16"),
 "ต้นกล้า": ExtResource("c15"),
 "แพรว": ExtResource("c16"),
-"แก๊งสามเกลอ": ExtResource("c15")
+"แก๊งสามเกลอ": ExtResource("c15"),
+"ภูมิ": ExtResource("c23"),
+"เฟิร์น": ExtResource("c24"),
+"โอ๊ต": ExtResource("c25"),
+"น้ำหวาน": ExtResource("c26"),
+"ชมรมคอม": ExtResource("c23")
 }

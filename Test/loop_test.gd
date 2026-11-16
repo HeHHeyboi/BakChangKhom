@@ -18,6 +18,7 @@ func _ready() -> void:
 	get_parent().remove_child(self)
 	root.add_child(self)
 	var ts: TimeSystem = EventManager.time_system
+	GameState.seed_override = 11 # [0.8.0] ผลคงที่ (seed สุ่มทำให้บางครั้งไม่มีคนมาตอน 13:30)
 	DayLoop.tutorials = false # [0.3.0 ขั้น J] บทสอนครั้งแรกทดสอบแยกใน tutorial_j_test
 	DayLoop.demo_shifts = 6 # [0.2.5] เกมจริงจบบทที่ 1 ที่วันที่ 4 (25 ม.ค.) — เทสต์นี้เลื่อนไป 6 เพื่อทดสอบสรุปเดือน + บทที่ 2 ด้วย
 	DayLoop.day_skip_seconds = 0.0 # [0.2.0] ปิดแอนิเมชันข้ามวันระหว่างเดินลูป (ทดสอบแยกในหัวข้อ A2)

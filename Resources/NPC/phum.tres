@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="2_story"]
+[ext_resource type="Resource" path="res://Resources/NPC/Stories/phum_40.tres" id="s1"]
+[ext_resource type="Resource" path="res://Resources/NPC/Stories/phum_60.tres" id="s2"]
+[ext_resource type="Resource" path="res://Resources/NPC/Stories/phum_80.tres" id="s3"]
+
+[resource]
+script = ExtResource("1")
+id = &"phum"
+display_name = "ภูมิ (ประธานชมรม)"
+char_key = "ภูมิ"
+start_affinity = 15
+base_weight = 1.5
+has_affinity = true
+bio = "ประธานชมรมคอม ม.5 จริงจัง ชอบจดทุกอย่าง กลัวชมรมถูกยุบเพราะสมาชิกน้อย"
+kind = 0
+tags = PackedStringArray("student", "club")
+devices = PackedStringArray("คอมของชมรมคอมที่โรงเรียน", "โน้ตบุ๊กที่ใช้ทำงานส่งครู")
+school_hours = true
+fee_mult = 0.8
+affinity_mult = 1.5
+unlock_chapter = 9
+solo_min_affinity = 40
+stories = Array[ExtResource("2_story")]([ExtResource("s1"), ExtResource("s2"), ExtResource("s3")])
+# [Claude 16 พ.ย. 2569 · 0.8.0 ขั้น H] สมาชิกชมรมคอม ม.ปลาย · ปลดบท 9 · มาคนเดียวเมื่อสนิท 40 · รูปชั่วคราว (เงาสี รออาร์ต)

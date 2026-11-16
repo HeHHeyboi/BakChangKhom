@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ach_group_photo"
+title = "รูปหมู่ลูกค้าประจำ"
+desc = "รูปหมู่กับลูกค้าที่สนิทกันห้าคน ติดไว้ข้างประตู"
+from_achievement = &"R02"
+from_npc = &""
+gift_line = ""
+spot = 1
+icon = &"book"
+tint = Color(0.7, 0.85, 1.0, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

@@ -68,11 +68,12 @@ func _ready() -> void:
 
 	# E · เซฟ/โหลด ไม่หาย · โปรไฟล์รวมข้ามเซฟ
 	var n_before: int = A.count()
+	var pc_before: int = A.profile_count() # [0.8.0] เทสต์ (quiet) ไม่เขียนโปรไฟล์ → เทียบก่อน/หลัง reset แทน (เครื่องใหม่ไม่มีโปรไฟล์)
 	SaveGame.allow_in_tests = true
 	_check(SaveGame.save(), "เซฟได้")
 	GameState.reset()
 	_check(A.count() == 0, "เกมใหม่ (reset) ใบในเซฟนี้ = 0")
-	_check(A.profile_count() >= n_before, "โปรไฟล์ยังจำ (%d)" % A.profile_count())
+	_check(A.profile_count() == pc_before, "โปรไฟล์ไม่ถูกล้างตอนเริ่มเกมใหม่ (%d)" % A.profile_count())
 	SaveGame.load_into()
 	_check(A.count() == n_before and A.has(&"R05"), "โหลดเซฟ ใบประกาศกลับมาครบ (%d)" % A.count())
 	got.clear()

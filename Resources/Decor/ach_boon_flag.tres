@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ach_boon_flag"
+title = "ธงงานบุญ"
+desc = "ธงที่ระลึกจากบูธตรวจเครื่องฟรีในงานบุญบั้งไฟ"
+from_achievement = &"D02"
+from_npc = &""
+gift_line = ""
+spot = 2
+icon = &"flag"
+tint = Color(0.95, 0.45, 0.3, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

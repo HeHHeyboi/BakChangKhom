@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 60
+title = "งบชมรมกับ ผอ."
+dialog = "res://Assets/Dialog/NPC/phum_60.txt"
+good_choice = "สอนภูมิทำแผนงบไปเสนอ ผอ. เอง"
+reward_item = &""
+flag = &"club_story_60"
+# [Claude 16 พ.ย. 2569 · 0.8.0 ขั้น H] เรื่องส่วนตัว ภูมิ (ประธานชมรมคอม) ♥60 (ร่าง · ทีมอ่านตรวจ)

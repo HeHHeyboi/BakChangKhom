@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ach_title_allround"
+title = "ฉายา ช่างครบเครื่อง"
+desc = "ซ่อมผ่านครบทุก Part แล้ว ชาวบ้านเรียกขมว่าช่างครบเครื่อง"
+from_achievement = &"A02"
+from_npc = &""
+gift_line = ""
+spot = 3
+icon = &"star"
+tint = Color(1, 1, 1, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

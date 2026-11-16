@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 40
+title = "ชมรมคอมจะถูกยุบ"
+dialog = "res://Assets/Dialog/NPC/phum_40.txt"
+good_choice = "ช่วยกันคิดกิจกรรมให้น้อง ม.ต้น อยากเข้าชมรม"
+reward_item = &""
+flag = &"club_story_40"
+# [Claude 16 พ.ย. 2569 · 0.8.0 ขั้น H] เรื่องส่วนตัว ภูมิ (ประธานชมรมคอม) ♥40 (ร่าง · ทีมอ่านตรวจ)

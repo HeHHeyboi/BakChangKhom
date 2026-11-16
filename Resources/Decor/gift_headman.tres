@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gift_headman"
+title = "ลำโพงเสียงตามสายจิ๋ว"
+desc = "ผู้ใหญ่บ้านให้ไว้ประกาศหน้าร้าน"
+from_achievement = &""
+from_npc = &"headman"
+gift_line = "ลำโพงตัวนี้ผมให้ไว้ประกาศหน้าร้าน ขมช่วยหมู่บ้านมาทั้งปี"
+spot = 0
+icon = &"speaker"
+tint = Color(0.8, 0.8, 0.85, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

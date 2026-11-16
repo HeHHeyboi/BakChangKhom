@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"R08"
+title = "ของขวัญเต็มร้าน"
+desc = "ได้ของขวัญส่งท้ายปีจากคนในหมู่บ้าน 3 ชิ้น"
+category = 3
+hidden = false
+check = &"gifts"
+target = 3
+arg = &""
+reward_text = ""
+# [Claude 16 พ.ย. 2569 · 0.8.0] ใบประกาศใหม่ (ร่าง · ทีมอ่านตรวจ)

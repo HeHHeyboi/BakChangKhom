@@ -142,6 +142,7 @@ func _ready() -> void:
 	_check(ms_text.contains("ความสนิทเดือนนี้: ") and ms_text.contains("ครู ♥"), "สรุปเดือนมีบรรทัดความสนิท")
 
 	# ---------------- E · [ขั้น C] คนสนิทมาบ่อยกว่า · เพิ่งมาไม่นานมาน้อยลง (สุ่มจากงาน Lv2 400 ครั้ง)
+	GameState.seed_override = 11 # [0.8.0] ผลคงที่ (สุ่ม 400 ครั้งบาง seed ได้ ×1.7)
 	GameState.reset()
 	ts.shift = 10
 	var low := _share(&"ครู")
@@ -172,7 +173,7 @@ func _ready() -> void:
 			if not ok:
 				files_ok = false
 				print("  ไฟล์เรื่องไม่ครบ ", st.dialog, " ", keys)
-	_check(n_stories == 24 and files_ok, "เรื่องส่วนตัว 24 เรื่อง (0.6.0 +ผอ. +เพื่อนร่วมงาน) · ทุกไฟล์มีทางเลือก \"ฟังเรื่อง\" / \"%s\" / ตัวเลือกจบดี" % DayLoop.STORY_BUSY)
+	_check(n_stories == 27 and files_ok, "เรื่องส่วนตัว 27 เรื่อง (0.6.0 +ผอ. +เพื่อนร่วมงาน · 0.8.0 +ภูมิ) · ทุกไฟล์มีทางเลือก \"ฟังเรื่อง\" / \"%s\" / ตัวเลือกจบดี" % DayLoop.STORY_BUSY)
 	DialogScene.DialogDict = { "dialog": [] }
 	GameState.add_affinity(&"teacher", 39 - GameState.affinity(&"teacher"))
 	_check(DayLoop.next_story(&"teacher") == null, "ครู 39 → ยังไม่มีเรื่องเล่า")

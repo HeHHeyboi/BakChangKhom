@@ -291,6 +291,10 @@ func dialog_end() -> void:
 	# ล้างสถานะก่อนแจ้งจบ — ผู้ฟังสัญญาณเปิดบทถัดไปต่อได้ทันที (เดิมล้างทีหลังเลยลบบทใหม่ทิ้ง)
 	Global.hideDialog()
 	self.visible = false
+	# [0.8.0] ปิดบทตอนตัวเลือกยังค้าง → ล้างปุ่ม (เดิมปุ่มค้างไปโผล่ในบทถัดไป)
+	ChoiceContainer.visible = false
+	for b in ChoiceContainer.get_children():
+		b.queue_free()
 	DialogDict.clear()
 	index_stack.clear()
 	dialog_stack.clear()

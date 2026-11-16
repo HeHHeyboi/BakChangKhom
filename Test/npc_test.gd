@@ -10,9 +10,9 @@ func _ready() -> void:
 	var e: EconomyConfig = gs.economy
 	gs.reset()
 
-	# A · ข้อมูล NPC 13 คน (0.6.0 +ต้นกล้า แพรว แก๊งสามเกลอ) · ชื่อตรง _CharacterMap
+	# A · ข้อมูล NPC 18 คน (0.6.0 +ต้นกล้า แพรว แก๊งสามเกลอ · 0.8.0 +ชมรมคอม 4 + กลุ่ม) · ชื่อตรง _CharacterMap
 	var all := NpcBook.all()
-	_check(all.size() == 13, "มีลูกค้าประจำ 13 คน (%d)" % all.size())
+	_check(all.size() == 18, "มีลูกค้าประจำ 18 คน (%d)" % all.size())
 	var chars: Array = Global._CharacterMap.keys()
 	var bad := PackedStringArray()
 	for n in all:

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gift_boss"
+title = "ปากกาที่หัวหน้าใช้เซ็นสัญญา"
+desc = "หัวหน้าเก่าส่งมาพร้อมการ์ดอวยพร"
+from_achievement = &""
+from_npc = &"boss"
+gift_line = "ปากกาด้ามนี้ผมใช้เซ็นงานใหญ่ทุกงาน ขอให้ร้านนายโตแบบนี้ต่อไป"
+spot = 0
+icon = &"star"
+tint = Color(0.3, 0.3, 0.4, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

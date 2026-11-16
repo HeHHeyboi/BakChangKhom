@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gift_amnuay"
+title = "พระเครื่องลุงอำนวย"
+desc = "ลุงอำนวยให้ไว้คุ้มครองร้าน"
+from_achievement = &""
+from_npc = &"amnuay"
+gift_line = "ลุงเอาพระองค์นี้มาให้ขม ตั้งไว้ในร้านนะ ให้คุ้มครองร้านกับคนในร้าน"
+spot = 0
+icon = &"star"
+tint = Color(0.85, 0.75, 0.5, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

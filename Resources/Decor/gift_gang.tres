@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopDecor" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_decor.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gift_gang"
+title = "ตุ๊กตาดินปั้นสามเกลอ"
+desc = "บิว ต้นกล้า แพรว ปั้นตัวเองให้"
+from_achievement = &""
+from_npc = &"bew"
+gift_line = "พวกผมปั้นตุ๊กตาตัวเองมาให้ครับ ตั้งไว้บนชั้นนะพี่"
+spot = 0
+icon = &"star"
+tint = Color(0.8, 0.6, 0.4, 1)
+# [Claude 16 พ.ย. 2569 · 0.8.0] ของตกแต่ง (ร่าง · รออาร์ต)

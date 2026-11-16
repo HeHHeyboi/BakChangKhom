@@ -196,6 +196,15 @@ func _value(a: Achievement) -> int:
 			if gs.month_results.size() < 12:
 				return 0
 			return 1 if gs.ledger.all(func(e: Dictionary) -> bool: return e.kind != &"ot_power") else 0
+		&"ending": # [0.8.0] ได้ฉากจบนี้ (arg = stay/coworking/city/failure)
+			return 1 if gs.ending == StringName(a.arg) else 0
+		&"gifts": # [0.8.0] ของขวัญสิ้นปี
+			return gs.gifts_received.size()
+		&"group_all": # [0.8.0] สมาชิกกลุ่ม (arg = id กลุ่ม) ที่สนิท ≥ 60
+			var g := NpcBook.by_id(StringName(a.arg))
+			if g == null:
+				return 0
+			return g.member_ids().filter(func(id: StringName) -> bool: return gs.affinity(id) >= 60).size()
 		&"no_miss_year":
 			if gs.month_results.size() < 12:
 				return 0

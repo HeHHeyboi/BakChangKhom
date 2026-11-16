@@ -13,7 +13,8 @@ const PATH := "user://save.json"
 ## [0.5.0] VERSION 6 = ลูกค้าประจำ: ความสนิท · ประวัติเครื่อง · มาร้านล่าสุด · เรื่องส่วนตัวที่ฟังแล้ว (game.npc)
 ## [0.6.0] VERSION 7 = งานกลางเก็บเป็น { path · npc · device } (door · appointments · shelf.orders[].case) · helper_used_today
 ## [0.7.0] VERSION 8 = seed รายวัน (run_seed) · ความจำกันซ้ำ · อีเวนต์ (event_state · event_log · อีเวนต์วันนี้/การ์ด/ไฟดับ) · ร้านลดราคา + บัญชีดำ · ใบประกาศ (achievements · ach_stats)
-const VERSION := 8
+## [0.8.0] VERSION 9 = ของขวัญสิ้นปี (gifts_received) · ตัวเลือกบทต้นเดือน/ทางแยกอยู่ใน story_flags (มีแล้ว)
+const VERSION := 9
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -101,7 +102,7 @@ static func save() -> bool:
 			"scenario_log": GameState.scenario_log, "request_log": GameState.request_log, "group_fair": GameState.group_fair_count, # [0.6.0]
 			"run_seed": GameState.run_seed, # [0.7.0]
 			"event_state": GameState.event_state, "event_log": GameState.event_log, "seller_blacklist": GameState.seller_blacklist,
-			"achievements": GameState.achievements, "ach_stats": GameState.ach_stats, "ach_pinned": GameState.ach_pinned,
+			"achievements": GameState.achievements, "ach_stats": GameState.ach_stats, "ach_pinned": GameState.ach_pinned, "gifts_received": GameState.gifts_received,
 			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
 			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
@@ -188,6 +189,7 @@ static func load_into() -> int:
 	GameState.achievements = g.get("achievements", { })
 	GameState.ach_stats = g.get("ach_stats", { })
 	GameState.ach_pinned = g.get("ach_pinned", [])
+	GameState.gifts_received = g.get("gifts_received", { })
 	DayLoop.reseed_day()
 	GameState.request_log.clear()
 	for r in g.get("request_log", []):

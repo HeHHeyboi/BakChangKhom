@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"E01"
+title = "ร้านของหมู่บ้าน"
+desc = "จบปีแรกโดยเลือกอยู่หมู่บ้านต่อ"
+category = 4
+hidden = false
+check = &"ending"
+target = 1
+arg = &"stay"
+reward_text = ""
+# [Claude 16 พ.ย. 2569 · 0.8.0] ใบประกาศใหม่ (ร่าง · ทีมอ่านตรวจ)

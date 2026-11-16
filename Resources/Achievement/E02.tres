@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"E02"
+title = "ทำงานโลกกว้างจากบ้านเกิด"
+desc = "จบปีแรกโดยทำงานกับบริษัทแบบออนไลน์จากร้าน"
+category = 4
+hidden = false
+check = &"ending"
+target = 1
+arg = &"coworking"
+reward_text = ""
+# [Claude 16 พ.ย. 2569 · 0.8.0] ใบประกาศใหม่ (ร่าง · ทีมอ่านตรวจ)

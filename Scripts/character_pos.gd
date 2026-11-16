@@ -7,6 +7,12 @@ var posSet = [0, 1, 2, 3]
 
 func addCharacterSprite(charSprite: CharacterSprite, pos: int = -1):
 	var mark: Marker2D
+	# [0.8.0] บทที่มีคนพูดเกินจำนวนจุดยืน (เช่น บท 10 มี 7 คน) — เดิม error index เกิน · คนที่เกินขึ้นตอนพูด (_show_speaker)
+	if pos < 0 and currentPos >= marks.size():
+		charSprite.queue_free()
+		return
+	if pos >= marks.size():
+		pos = marks.size() - 1
 	if pos < 0:
 		mark = marks.get(currentPos) as Marker2D
 		charSprite.position = mark.position

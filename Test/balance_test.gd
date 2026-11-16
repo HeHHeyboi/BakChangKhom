@@ -172,7 +172,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	var returned := 0
 	for o: RepairShelf.Order in DayLoop.shelf.history:
 		returned += 1 if o.state == RepairShelf.State.RETURNED else 0
-	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)) }
+	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee(), "ach": GameState.achievements.size(), "events": GameState.event_log.size(), "scam": int(GameState.event_state.get("scam_lost", 0)), "gifts": GameState.gifts_received.size(), "club": [&"phum", &"fern", &"oat", &"namwan"].map(func(id: StringName) -> int: return GameState.affinity(id)).max(), "min_tier": String(EndingBook.min_report().tier), "rank_end": GameState.rank() }
 
 
 ## 1 วันเปิดร้าน · คืนจำนวนงานที่ซ่อม
@@ -500,14 +500,14 @@ func _report(res: Dictionary) -> void:
 	for lv in res:
 		for r: Dictionary in res[lv]:
 			var rm: Dictionary = r.get("rank_m", { })
-			print("BAL %-14s ยศ %s · สอบ %d ครั้ง · สนิท %d · ขาประจำ %d · ฟังเรื่อง %d/24 · มิ้น %d งาน ฿%d" % [
+			print("BAL %-14s ยศ %s · สอบ %d ครั้ง · สนิท %d · ขาประจำ %d · ฟังเรื่อง %d/27 · มิ้น %d งาน ฿%d" % [
 				"%s#%d" % [lv, r.seed], "/".join([1, 2, 3, 4].map(func(k: int) -> String: return str(rm.get(k, "-")))),
 				int(r.get("exams", 0)), int(r.get("close", 0)), int(r.get("regular", 0)), int(r.get("heard", 0)), int(r.get("helper", 0)), int(r.get("helper_money", 0))])
 			print("BAL %-14s [0.6.0] คำขอ %d เรื่อง ฿%d · ครึ่งตรวจแล้วรอของ %d ครั้ง · ตัดสินกลุ่มแฟร์ %d · มาเอาคืน %d · งาน %d · ค่าแรงเฉลี่ย ฿%d" % ["%s#%d" % [lv, r.seed], int(r.get("requests", 0)), int(r.get("req_money", 0)), int(r.get("insp", 0)), int(r.get("fair", 0)), int(r.get("returned", 0)), int(r.get("jobs", 0)), int(r.get("avg_fee", 0))])
 	print("BAL ===== [0.7.0] อีเวนต์ · ใบประกาศ =====")
 	for lv in res:
 		for r: Dictionary in res[lv]:
-			print("BAL %-14s อีเวนต์ %d ครั้ง · หลงเชื่อมิจฉาชีพ %d · ใบประกาศ %d/%d" % ["%s#%d" % [lv, r.seed], int(r.get("events", 0)), int(r.get("scam", 0)), int(r.get("ach", 0)), Achievements.all().size()])
+			print("BAL %-14s อีเวนต์ %d ครั้ง · หลงเชื่อมิจฉาชีพ %d · ใบประกาศ %d/%d · [0.8.0] ของขวัญ %d · ชมรม♥สูงสุด %d · ยศสิ้นปี %d · ถ้ากลับเมือง มิ้น=%s" % ["%s#%d" % [lv, r.seed], int(r.get("events", 0)), int(r.get("scam", 0)), int(r.get("ach", 0)), Achievements.all().size(), int(r.get("gifts", 0)), int(r.get("club", 0)), int(r.get("rank_end", 0)), String(r.get("min_tier", ""))])
 	# มัธยฐานกำไรรายเดือนของบอทปกติ (ร้านปิดไปแล้ว = ไม่นับเดือนนั้น) + 70% ไว้ใช้ตั้งเป้า
 	var med := "BAL %-14s" % "มัธยฐานปกติ"
 	var sug := "BAL %-14s" % "70% (ปัด 50)"
