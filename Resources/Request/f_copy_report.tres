@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_copy_report"
+kind = 1
+npc_tags = PackedStringArray("student", "school")
+min_rank = 0
+title = "เพื่อนขอไฟล์รายงานไปลอก"
+ask = "เพื่อนขอไฟล์รายงานไปส่งครู จะให้ดีไหม"
+question = "ควรแนะนำว่ายังไง"
+choices = PackedStringArray("ไม่ให้ลอก แต่ช่วยอธิบายให้เพื่อนทำเองได้", "ให้ไปเลย เป็นเพื่อนกัน", "ให้ไปแล้วเปลี่ยนชื่อไฟล์")
+explain = "งานลอกกันมีความผิดทั้งคู่ ช่วยเพื่อนได้ด้วยการสอนให้เข้าใจแทน"
+fee = 0
+thanks = ""
+topic = "จริยธรรมการใช้คอม"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

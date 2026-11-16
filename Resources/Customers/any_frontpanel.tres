@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_frontpanel"
+customer = ""
+reason = "{name} เอา{device}มาให้ดู"
+device = "{device}"
+symptom = "กดปุ่มหน้าเครื่องแล้วไม่ติด แต่ไฟบนบอร์ดติด"
+level = 4
+est_slots = 5
+months = PackedInt32Array()
+part_id = "part_front_panel"
+job_title = "ต่อสายหน้าเคส"
+arrive_dialog = "res://Assets/Dialog/Customer/any_arrive.txt"
+thanks_text = "กดติดแล้ว เก่งแท้"
+complain_text = "กดยังไงก็ไม่ติด"
+npc_tags = PackedStringArray("any")
+use_scenario = true
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น A] งานกลาง — ใครที่ป้ายตรงก็เอามาได้ · อาการจริงมาจากตัวสุ่ม (ขั้น C)

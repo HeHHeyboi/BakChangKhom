@@ -74,12 +74,19 @@
 [ext_resource type="PackedScene" path="res://Scene/UI/work_order_card.tscn" id="ui_workorder"]
 [ext_resource type="PackedScene" path="res://Scene/UI/repair_shelf.tscn" id="ui_shelf"]
 [ext_resource type="PackedScene" path="res://Scene/UI/vendor_panel.tscn" id="ui_vendor"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_ram.tres" id="g_any_ram"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_mainboard.tres" id="g_any_mainboard"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_gpu.tres" id="g_any_gpu"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_frontpanel.tres" id="g_any_frontpanel"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_bios.tres" id="g_any_bios"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_group_pc.tres" id="g_any_group_pc"]
+[ext_resource type="Resource" path="res://Resources/Customers/any_group_two.tres" id="g_any_group_two"]
 
 [node name="DayLoop" type="CanvasLayer"]
 layer = 90
 script = ExtResource("1_loop")
 week_plans = Array[ExtResource("2_week")]([ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4"), ExtResource("w5"), ExtResource("w6"), ExtResource("w7"), ExtResource("w8"), ExtResource("w9"), ExtResource("w10"), ExtResource("w11"), ExtResource("w12")])
-random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5"), ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("b0"), ExtResource("b1"), ExtResource("b2"), ExtResource("n0"), ExtResource("n1"), ExtResource("n2"), ExtResource("n3"), ExtResource("n4"), ExtResource("n5"), ExtResource("n6"), ExtResource("n7"), ExtResource("n8"), ExtResource("n9"), ExtResource("n10"), ExtResource("n11"), ExtResource("n12"), ExtResource("n13"), ExtResource("n14"), ExtResource("n15"), ExtResource("n16"), ExtResource("n17"), ExtResource("n18"), ExtResource("n19"), ExtResource("n20"), ExtResource("n21")])
+random_pool = Array[ExtResource("3_case")]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("d0"), ExtResource("d1"), ExtResource("d3"), ExtResource("d4"), ExtResource("d5"), ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("b0"), ExtResource("b1"), ExtResource("b2"), ExtResource("n0"), ExtResource("n1"), ExtResource("n2"), ExtResource("n3"), ExtResource("n4"), ExtResource("n5"), ExtResource("n6"), ExtResource("n7"), ExtResource("n8"), ExtResource("n9"), ExtResource("n10"), ExtResource("n11"), ExtResource("n12"), ExtResource("n13"), ExtResource("n14"), ExtResource("n15"), ExtResource("n16"), ExtResource("n17"), ExtResource("n18"), ExtResource("n19"), ExtResource("n20"), ExtResource("n21"), ExtResource("g_any_ram"), ExtResource("g_any_mainboard"), ExtResource("g_any_gpu"), ExtResource("g_any_frontpanel"), ExtResource("g_any_bios"), ExtResource("g_any_group_pc"), ExtResource("g_any_group_two")])
 
 [node name="DaySkipLayer" type="CanvasLayer" parent="."]
 layer = 110

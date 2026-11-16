@@ -85,7 +85,7 @@ func _ready() -> void:
 	var bar: MonthGoalBar = DayLoop.goal_bar
 	_check(bar != null and bar.get_parent().name == "GoalLayer" and (bar.get_parent() as CanvasLayer).layer == 100, "แถบเป้าอยู่ใน day_loop.tscn → GoalLayer ชั้น 100")
 	_check(DayLoop._day_skip != null and DayLoop._day_skip.get_parent().name == "DaySkipLayer" and (DayLoop._day_skip.get_parent() as CanvasLayer).layer == 110, "ข้ามวันอยู่ใน day_loop.tscn → DaySkipLayer ชั้น 110")
-	_check(GameState.economy.target_for(1) == 250 and GameState.economy.target_for(12) == 2400 and GameState.economy.month_target.size() == 12, "[0.3.0 ปรับจากบอท] เป้า 12 เดือน: ม.ค. ฿250 · ธ.ค. ฿2,400")
+	_check(GameState.economy.target_for(1) == 250 and GameState.economy.target_for(12) == GameState.economy.month_target[11] and GameState.economy.month_target.size() == 12, "[ปรับจากบอท] เป้า 12 เดือน: ม.ค. ฿250 · ธ.ค. ฿%d" % GameState.economy.month_target[11])
 	GameState.reset()
 	ts.set_shift(2)
 	GameState.record_repair(&"part_ram", 100, false, -1, 1) # +80
@@ -103,7 +103,7 @@ func _ready() -> void:
 	_check(bar._value.text.begins_with("−฿270/") and is_zero_approx(bar._bar.value), "ขาดทุน → แสดง −฿270 แถบว่าง")
 	ts.set_shift(5)
 	bar.refresh()
-	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿450"), "ขึ้นบท 2 = ก.พ. → เป้า ฿450 เริ่มจาก 0")
+	_check(bar._title.text == "เป้า ก.พ." and bar._value.text.begins_with("฿0/฿%d" % GameState.economy.target_for(2)), "ขึ้นบท 2 = ก.พ. → เป้า ฿%d เริ่มจาก 0" % GameState.economy.target_for(2))
 
 	# ---- [0.2.0-E/F · 0.2.5] ปิดเดือน: เป้า · ค่าปรับ · พลาดเป้าติดกัน · ร้านปิด
 	GameState.reset()

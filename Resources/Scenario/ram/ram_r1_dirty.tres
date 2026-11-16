@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ram_r1_dirty"
+part = &"part_ram"
+title = "R-1 ขาทองหมอง"
+symptom = "เปิดเครื่องแล้วจอดำ มีเสียงปี๊บ ๆ ซ้ำ ๆ"
+job_title = "ทำความสะอาดแรม"
+cause = "ฝุ่นกับคราบออกไซด์บนขาทองแรมทำให้หน้าสัมผัสไม่ดี"
+diag_choices = PackedStringArray("แรมหน้าสัมผัสไม่ดี เพราะขาทองสกปรก", "จอเสีย", "พาวเวอร์ซัพพลายจ่ายไฟไม่พอ", "ติดไวรัส")
+diag_wrong = "ลองดูเบาะแสอีกที เสียงปี๊บกับขาทองที่หมองชี้ไปทางเดียวกัน"
+diag_correct = "ถูกต้อง เสียงปี๊บบอกว่าเมนบอร์ดอ่านแรมไม่ได้ และขาทองก็หมองจริง ๆ"
+decoy = "จอฟ้าทำให้ดูเหมือนวินโดวส์พัง แต่ต้นเหตุอยู่ที่แรม"
+teach = "เสียงปี๊บซ้ำตอนเปิดเครื่องมักเป็นปัญหาแรม ขาทองต้องสะอาด"
+flags = {"default": true}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

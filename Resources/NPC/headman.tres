@@ -16,3 +16,7 @@ base_weight = 1.0
 has_affinity = true
 bio = "ดูแลศาลาและเครื่องเสียงประจำหมู่บ้าน งานเอกสารของหมู่บ้านก็อยู่ในคอมเครื่องนี้"
 stories = Array[ExtResource("2_story")]([ExtResource("s40"), ExtResource("s60"), ExtResource("s80")])
+kind = 0
+tags = PackedStringArray("village", "office", "elder")
+windows = Array[Vector2i]([Vector2i(510, 930)])
+devices = PackedStringArray("คอมที่ทำการหมู่บ้าน", "โน้ตบุ๊กของผู้ใหญ่บ้าน")

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_update_popup"
+kind = 1
+npc_tags = PackedStringArray("elder", "village", "office")
+min_rank = 0
+title = "หน้าต่างเตือนเครื่องติดไวรัส"
+ask = "เปิดเว็บแล้วมีหน้าต่างขึ้นว่าเครื่องติดไวรัส ให้โทรเบอร์นี้ด่วน"
+question = "ควรแนะนำว่ายังไง"
+choices = PackedStringArray("อย่าโทร ปิดหน้าเว็บนั้นแล้วสแกนด้วยโปรแกรมจริงในเครื่อง", "รีบโทรตามเบอร์", "กดดาวน์โหลดโปรแกรมที่เว็บให้")
+explain = "หน้าเว็บที่บอกให้โทรด่วนคือกลหลอกให้ตกใจ โปรแกรมป้องกันจริงไม่ให้โทรหาเบอร์แปลก ๆ"
+fee = 0
+thanks = ""
+topic = "ความปลอดภัยไซเบอร์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

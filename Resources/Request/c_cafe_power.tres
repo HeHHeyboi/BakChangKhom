@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_cafe_power"
+kind = 0
+npc_tags = PackedStringArray("gamer", "office")
+min_rank = 1
+title = "ไฟตกบ่อย ควรซื้ออะไรกันเครื่อง"
+ask = "หมู่บ้านไฟตกบ่อย เครื่องดับกลางงานหลายรอบ ควรมีอะไรไว้"
+question = "อุปกรณ์อะไรช่วยให้เครื่องไม่ดับทันทีตอนไฟตก"
+choices = PackedStringArray("UPS เครื่องสำรองไฟ", "ปลั๊กพ่วงธรรมดา", "พัดลมเพิ่มอีกตัว")
+explain = "UPS จ่ายไฟต่อให้พอเซฟงานแล้วปิดเครื่องอย่างปลอดภัย ปลั๊กพ่วงธรรมดาช่วยไม่ได้"
+fee = 30
+thanks = ""
+topic = "ไฟฟ้ากับคอมพิวเตอร์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

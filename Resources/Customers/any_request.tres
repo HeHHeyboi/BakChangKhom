@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_request"
+customer = ""
+reason = "{name} มีเรื่องอยากให้ช่วย"
+device = ""
+symptom = "มีเรื่องอยากถาม"
+level = 1
+est_slots = 1
+months = PackedInt32Array()
+part_id = "part_ram"
+job_title = "คำขอ"
+thanks_text = "ขอบใจหลายเด้อ"
+complain_text = "อืม ไว้ค่อยว่ากัน"
+kind = 2
+npc_tags = PackedStringArray("any")
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น G] ต้นแบบของคำขอ (ขอคำปรึกษา/ขอให้ช่วย) — ไม่อยู่ใน random_pool · RequestBook.make_case ใส่เนื้อหาจาก Resources/Request/

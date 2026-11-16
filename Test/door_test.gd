@@ -9,6 +9,7 @@ var e: EconomyConfig
 
 
 func _ready() -> void:
+	GameState.economy.request_share = 0.0 # [0.6.0] เทสต์นับจำนวนลูกค้าเป๊ะ → ไม่มีคำขอ (คนที่มาเพิ่ม) · คำขออยู่ใน request_test
 	await get_tree().process_frame
 	ts = EventManager.time_system
 	e = GameState.economy

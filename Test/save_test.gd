@@ -144,7 +144,7 @@ func _ready() -> void:
 	DayLoop.assign_parts(false)
 	GameState.order_online([[load("res://Resources/Shop/fan_cpu.tres"), 1]])
 	var key_b := ob.key
-	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == 6, "บันทึกเป็น VERSION 6 (0.5.0)")
+	_check(SaveGame.save() and int(JSON.parse_string(FileAccess.get_file_as_string(SaveGame.PATH)).get("version", 0)) == SaveGame.VERSION, "บันทึกเป็น VERSION %d" % SaveGame.VERSION)
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	GameState.shelf_slots = 2
 	GameState.inventory.clear()

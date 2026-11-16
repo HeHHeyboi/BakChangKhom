@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_videocall"
+kind = 1
+npc_tags = PackedStringArray("elder", "family", "village")
+min_rank = 0
+title = "สอนวิดีโอคอลหาหลาน"
+ask = "อยากวิดีโอคอลหาหลานที่กรุงเทพ แต่กดไม่เป็น"
+question = "ขั้นแรกที่ควรสอนคืออะไร"
+choices = PackedStringArray("เปิดแอปแชต เลือกชื่อหลาน แล้วกดรูปกล้อง", "ลงวินโดวส์ใหม่ก่อน", "ซื้อกล้องราคาแพง")
+explain = "สอนทีละขั้นด้วยภาษาง่าย ๆ ให้ลองกดเองจะจำได้นานกว่าทำให้ดู"
+fee = 0
+thanks = "เห็นหน้าหลานแล้ว ดีใจหลาย"
+topic = "การใช้งานพื้นฐาน"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

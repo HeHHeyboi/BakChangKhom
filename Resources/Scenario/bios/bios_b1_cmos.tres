@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bios_b1_cmos"
+part = &"part_bios"
+title = "B-1 ถ่าน CMOS หมด"
+symptom = "เปิดเครื่องทีไรต้องกด F1 นาฬิกาย้อนไปปีเก่า เข้าเว็บไม่ได้"
+job_title = "เปลี่ยนถ่าน CMOS"
+cause = "ถ่าน CMOS หมด ค่า BIOS กับนาฬิกาหายทุกครั้งที่ถอดปลั๊ก"
+lines = Dictionary[String, String]({"INSPECT_BOOT": "วันที่ใน BIOS เป็นปีเก่ามาก ลำดับบูตก็กลับไปค่าเดิม|ค่าที่ตั้งไว้หายทุกครั้งที่ถอดปลั๊ก แปลว่าถ่านที่เลี้ยงค่าไว้หมดแล้ว"})
+diag_choices = PackedStringArray("ถ่าน CMOS หมด", "อินเทอร์เน็ตเสีย", "ติดไวรัส", "ฮาร์ดดิสก์เสีย")
+diag_wrong = "นาฬิกาย้อนทุกครั้งที่ถอดปลั๊ก ลองนึกถึงสิ่งที่เลี้ยงค่า BIOS ไว้"
+diag_correct = "ถูก เปลี่ยนถ่าน CR2032 แล้วตั้งวันเวลาใหม่ เว็บก็จะเข้าได้"
+optional_phases = PackedStringArray("OS_INSTALL")
+needs_part = &"cmos_cr2032"
+part_hint = "ถ่าน CMOS หมด ต้องใช้ถ่าน CR2032 ก้อนใหม่"
+decoy = "เวลาผิดแล้วเว็บ HTTPS เข้าไม่ได้ ดูเหมือนเน็ตเสีย"
+teach = "ถ่าน CMOS เลี้ยงค่า BIOS กับนาฬิกา เวลาผิดทำให้เว็บที่ปลอดภัยเข้าไม่ได้"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

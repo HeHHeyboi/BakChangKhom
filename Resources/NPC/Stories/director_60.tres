@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 60
+title = "ช่วยสอนเด็กเรื่องมิจฉาชีพออนไลน์"
+dialog = "res://Assets/Dialog/NPC/director_60.txt"
+good_choice = "เล่าเป็นเรื่องที่เด็กเจอจริง"
+reward_item = &""
+flag = &""
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น L] เรื่องส่วนตัว ผอ. ♥60 (ร่าง · ทีมอ่านตรวจ)

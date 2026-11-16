@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_kids_screen"
+kind = 0
+npc_tags = PackedStringArray("family", "school", "elder")
+min_rank = 1
+title = "ลูกเล่นคอมทั้งวันทำยังไงดี"
+ask = "ลูกเล่นคอมทั้งวันจนไม่ยอมนอน จะตั้งอะไรในเครื่องได้บ้าง"
+question = "วิธีที่เหมาะคืออะไร"
+choices = PackedStringArray("ตั้งเวลาใช้งานในบัญชีเด็กและคุยกติกากัน", "ถอดสายไฟซ่อน", "ลบเกมทุกเกม")
+explain = "ระบบมีบัญชีเด็กให้จำกัดเวลาได้ แต่ที่ได้ผลที่สุดคือคุยกติกาให้ลูกเข้าใจ"
+fee = 20
+thanks = ""
+topic = "ใช้คอมอย่างปลอดภัย"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

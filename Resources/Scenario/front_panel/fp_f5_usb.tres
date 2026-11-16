@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fp_f5_usb"
+part = &"part_front_panel"
+title = "F-5 USB หน้าเคสใช้ไม่ได้"
+symptom = "เสียบแฟลชไดรฟ์หน้าเครื่องไม่ขึ้น แต่ช่องหลังเครื่องใช้ได้"
+job_title = "ต่อสาย USB หน้าเคส"
+cause = "สาย USB header หน้าเคสหลุดจากบอร์ด ตอนมีคนถอดสายหน้าเคส"
+lines = Dictionary[String, String]({"INSPECT_RECENT": "โน้ตบอกว่ามีคนถอดสายหน้าเคสออกมาทำความสะอาด|ดูมุมบอร์ดสิ หัว USB เก้าพินหลุดห้อยอยู่ด้วย"})
+diag_choices = PackedStringArray("สาย USB หน้าเคสหลุดจากบอร์ด", "แฟลชไดรฟ์เสีย", "ติดไวรัส", "ไดรเวอร์หาย")
+diag_wrong = "ช่องหลังเครื่องใช้ได้ แปลว่าแฟลชไดรฟ์กับระบบปกติ ลองดูสายจากหน้าเคส"
+diag_correct = "ใช่ หัว USB มีขาตันหนึ่งขา ใส่ตามร่องจะไม่กลับด้าน"
+optional_phases = PackedStringArray("DUAL_CHANNEL")
+decoy = "ถ้าไปสแกนไวรัสหรือลงไดรเวอร์ อาการก็ไม่หาย"
+teach = "หัวต่อในคอมมีร่องกันเสียบผิด ห้ามฝืน"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

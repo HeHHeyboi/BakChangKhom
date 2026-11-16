@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fp_f2_switch"
+part = &"part_front_panel"
+title = "F-2 ปุ่มเปิดเครื่องค้าง"
+symptom = "กดเปิดเครื่องแล้วติดแป๊บเดียวก็ดับไปเอง"
+job_title = "เปลี่ยนสวิตช์หน้าเคส"
+cause = "สปริงปุ่มหน้าเคสเสีย ปุ่มค้าง เหมือนกดค้างสี่วินาทีจนเครื่องปิดเอง"
+lines = Dictionary[String, String]({"INSPECT_BUTTON": "กดปุ่มแล้วมันยุบค้างไม่เด้งกลับ|ถ้าปุ่มค้างเกินสี่วินาที เมนบอร์ดจะสั่งปิดเครื่องเอง"})
+diag_choices = PackedStringArray("สวิตช์หน้าเคสเสีย ปุ่มค้าง", "พาวเวอร์ซัพพลายจ่ายไฟไม่พอ", "ซีพียูร้อน", "ติดไวรัส")
+diag_wrong = "ติดแล้วดับเหมือนไฟตก แต่ลองกดปุ่มดูว่ามันเด้งกลับไหม"
+diag_correct = "ถูก ปุ่มค้างเท่ากับกดค้าง เครื่องเลยบังคับปิด ต้องเปลี่ยนสวิตช์"
+optional_phases = PackedStringArray("DUAL_CHANNEL")
+needs_part = &"fp_switch"
+part_hint = "สปริงปุ่มเสีย ต้องใช้สวิตช์หน้าเคสใหม่"
+decoy = "ดูเหมือนไฟตกหรือพาวเวอร์เสีย ถ้าเปลี่ยนพาวเวอร์ก็ไม่หาย"
+teach = "กดปุ่ม power ค้างสี่วินาทีคือบังคับปิด แยกปัญหาปุ่มกับปัญหาไฟให้ออก"
+flags = {"meter": "วัดขาสวิตช์หน้าเคสแล้ว ปล่อยมือขาก็ยังต่อกันอยู่ แปลว่าปุ่มค้าง"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

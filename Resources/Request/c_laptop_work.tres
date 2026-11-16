@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_laptop_work"
+kind = 0
+npc_tags = PackedStringArray("office", "friend")
+min_rank = 1
+title = "โน้ตบุ๊กทำงานควรเลือกแบบไหน"
+ask = "จะซื้อโน้ตบุ๊กไว้ทำงานเอกสารกับประชุมออนไลน์ เลือกยังไงดี"
+question = "สเปกแบบไหนเหมาะกับงานเอกสารและประชุม"
+choices = PackedStringArray("SSD แรม 16GB แบตอึด", "การ์ดจอแรงที่สุด", "จอ 4K เท่านั้น")
+explain = "งานเอกสารเน้น SSD แรมพอ แบตอึด การ์ดจอแรงไม่ได้ช่วยและทำให้แบตหมดไว"
+fee = 40
+thanks = ""
+topic = "เลือกสเปกตามงาน"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

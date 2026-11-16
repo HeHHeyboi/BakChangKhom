@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gpu_g2_power"
+part = &"part_gpu"
+title = "G-2 การ์ดจอไม่ได้ต่อไฟ"
+symptom = "ไฟติด พัดลมหมุน แต่จอไม่ขึ้นภาพ"
+job_title = "ต่อไฟการ์ดจอ"
+cause = "ลืมเสียบสายไฟแปดพินเข้าการ์ดจอ การ์ดเลยไม่ทำงาน"
+diag_choices = PackedStringArray("การ์ดจอไม่ได้ต่อสายไฟเลี้ยง", "การ์ดจอเสีย", "จอเสีย", "แรมเสีย")
+diag_wrong = "ไฟบนการ์ดไม่ติด กับหัวสายที่ห้อยอยู่ ชี้ไปทางเดียวกันนะ"
+diag_correct = "ถูก การ์ดไม่ได้รับไฟ ไม่ใช่การ์ดเสีย"
+decoy = "ฝุ่นเยอะก็จริง แต่ไม่ได้ทำให้จอไม่ขึ้นเลย"
+teach = "การ์ดจอแรง ๆ ต้องต่อไฟจากพาวเวอร์เพิ่ม ไฟบนการ์ดไม่ติดแปลว่าไม่มีไฟเข้า"
+flags = {"default": true}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

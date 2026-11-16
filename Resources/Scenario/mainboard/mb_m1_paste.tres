@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mb_m1_paste"
+part = &"part_mainboard"
+title = "M-1 ซิลิโคนแห้ง"
+symptom = "ใช้ไปสักพักเครื่องดับเอง พัดลมดังมาก"
+job_title = "เปลี่ยนซิลิโคน CPU"
+cause = "ซิลิโคนเก่าแห้งแตก ความร้อนจาก CPU ส่งไปฮีตซิงก์ไม่ได้"
+diag_choices = PackedStringArray("ซิลิโคนแห้ง ความร้อนระบายไม่ออก", "พาวเวอร์ซัพพลายเสีย", "ติดไวรัส", "แรมเสีย")
+diag_wrong = "ดับเองหลังใช้ไปสักพัก ลองนึกถึงความร้อนดู"
+diag_correct = "ใช่ ซิลิโคนแห้งเป็นขุยแบบนี้ ความร้อนออกไม่ได้ เครื่องเลยตัดตัวเอง"
+decoy = "ครีบฮีตซิงก์มีฝุ่นด้วย แต่ตัวการหลักคือซิลิโคนที่แห้ง"
+teach = "ซิลิโคนเป็นของสิ้นเปลือง ต้องเปลี่ยนตามอายุ เครื่องดับเองหลังใช้สักพักมักเป็นความร้อน"
+flags = {"default": true}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

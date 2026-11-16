@@ -94,6 +94,196 @@ const PART_BENCH = "part_bench"
 @export var forced := false
 
 
+@export_group("แยกคนกับงาน (0.6.0 · PLAN_0_6_0 ข้อ 2)")
+## ชนิดเรื่องที่ลูกค้าเอามา · REPAIR = งานซ่อม (เดิม) · CONSULT/FAVOR = คำขอ 1 เทิร์น (ขั้น G)
+@export_enum("REPAIR", "CONSULT", "FAVOR") var kind := 0
+## [0.6.0] งานกลาง: เว้น customer ว่าง แล้วใส่ป้ายว่าคนแบบไหนเอามาได้ (ตรงกับ CustomerNPC.tags) · "any" = ใครก็ได้
+## ตอนสุ่ม DayLoop เลือกคนก่อน แล้ว instance_for(npc) ใส่ชื่อ/เครื่องของคนนั้น ({npc} {device} ในข้อความ)
+@export var npc_tags: PackedStringArray = []
+## ความสนิทขั้นต่ำของคนที่จะเอางานนี้มา (เช่น เรื่องที่เล่าเฉพาะคนสนิท)
+@export_range(0, 100) var min_affinity := 0
+## กลุ่มนักเรียนเอามาได้ (ขั้น I)
+@export var group_ok := false
+## จำนวนเครื่อง (กลุ่ม 2 เครื่อง = มินิเกม 2 รอบ · ขั้น I)
+@export_range(1, 2) var device_count := 1
+## [0.6.0] ใช้ตัวสุ่มอาการของ Part นี้ (ขั้น C) · false = อาการตามเคสเดิม
+@export var use_scenario := false
+## ยศขั้นต่ำที่งานนี้จะมา (GameState.rank_level) · เช่น กลุ่ม 2 เครื่อง = ยศประจำหมู่บ้าน (2)
+@export_range(0, 4) var min_rank := 0
+
+const KIND_REPAIR := 0
+const KIND_CONSULT := 1
+const KIND_FAVOR := 2
+
+
+## [0.6.0] งานกลาง (ไม่ผูกคน) — รอใส่ชื่อตอนสุ่ม
+func is_generic() -> bool:
+	return customer.strip_edges() == ""
+
+
+## [0.6.0] เคสต้นแบบ (ไฟล์ใน Resources/Customers/) — เคสที่ใส่ชื่อแล้วจำต้นแบบไว้ใน meta "template"
+func template() -> CustomerCase:
+	if has_meta("template"):
+		var t = get_meta("template")
+		if t is CustomerCase:
+			return t
+	return self
+
+
+## [0.6.0] งานกลางที่ใส่ชื่อคนนี้แล้ว (สำเนา) · customer = char_key → NpcBook.of_case / npc_id / ประวัติเครื่อง ใช้ได้เหมือนเดิม
+## งานที่ผูกคนอยู่แล้ว → คืนตัวเดิม
+func instance_for(npc: CustomerNPC, device_text := "") -> CustomerCase:
+	if not is_generic() or npc == null:
+		return self
+	var c := duplicate() as CustomerCase
+	c.set_meta("template", self)
+	c.customer = npc.char_key
+	var dev := device_text if device_text != "" else (npc.devices[0] if not npc.devices.is_empty() else "")
+	if dev != "":
+		c.device = dev if c.device.strip_edges() == "" or c.device.contains("{device}") else c.device
+	if npc.is_group(): # [0.6.0 ขั้น I] กลุ่ม = คุยกันหลายคน +1 เทิร์น
+		c.est_slots = (est_slots if est_slots > 0 else [2, 3, 5, 7, 10][clampi(level, 1, 5) - 1]) + 1
+	var vars := { "npc": npc.display_name, "name": npc.display_name, "device": dev if dev != "" else c.device }
+	for f in ["reason", "symptom", "job_title", "thanks_text", "complain_text", "device", "part_hint"]:
+		c.set(f, fill_vars(String(c.get(f)), vars))
+	return c
+
+
+## [0.6.0 ขั้น C] ใส่สถานการณ์จากตัวสุ่ม (ScenarioBook.roll) ลงเคสที่เป็นสำเนา · roll = { scenario · trait · condition }
+## เปลี่ยนอาการ · ชื่องาน · อะไหล่ · เครื่อง (+สภาพ) · ลูกค้ารีบ = รอได้ 1 เทิร์น · งบน้อย = ค่าแรง × budget_fee_mult (0.9)
+func apply_scenario(roll: Dictionary, econ: EconomyConfig = null) -> void:
+	var sc: RepairScenario = roll.get("scenario")
+	if sc == null:
+		return
+	set_meta("scenario", sc)
+	if not has_meta("base_device"):
+		set_meta("base_device", device)
+	set_meta("trait", StringName(roll.get("trait", &"normal")))
+	set_meta("condition", StringName(roll.get("condition", &"old")))
+	symptom = sc.symptom
+	if sc.job_title != "":
+		job_title = sc.job_title
+	needs_part = sc.needs_part
+	part_alternatives = sc.part_alternatives.duplicate()
+	part_hint = sc.part_hint
+	var cond := String(ScenarioBook.CONDITION_NAMES.get(get_meta("condition"), ""))
+	if cond != "" and not device.contains(cond):
+		device = "%s (%s)" % [device, cond]
+	match get_meta("trait"):
+		&"rushed":
+			patience = 1
+		&"budget":
+			var base: int = fee if fee >= 0 else (econ.fee_for_level(level) if econ else [60, 150, 300, 420, 750][clampi(level, 1, 5) - 1])
+			fee = int(round(base * (econ.budget_fee_mult if econ else 0.9)))
+
+
+## [0.6.0 ขั้น G] ใส่คำขอ (ขอคำปรึกษา/ขอให้ช่วย) ลงสำเนา any_request · 1 เทิร์น · ไม่มีมินิเกม
+func apply_request(r: RequestTask) -> void:
+	if r == null:
+		return
+	set_meta("request", r)
+	kind = KIND_CONSULT if r.is_consult() else KIND_FAVOR
+	job_title = "%s · %s" % [r.kind_name(), r.title]
+	symptom = r.ask
+	fee = r.fee
+	est_slots = 1
+	if r.thanks != "":
+		thanks_text = r.thanks
+
+
+func request() -> RequestTask:
+	return get_meta("request") if has_meta("request") else null
+
+
+func is_request() -> bool:
+	return kind != KIND_REPAIR
+
+
+func scenario() -> RepairScenario:
+	return get_meta("scenario") if has_meta("scenario") else null
+
+
+func scenario_roll() -> Dictionary:
+	if not has_meta("scenario"):
+		return { }
+	return { "scenario": get_meta("scenario"), "trait": get_meta("trait", &"normal"), "condition": get_meta("condition", &"old") }
+
+
+## [0.6.0 ขั้น H] ค่าแรงตามคน (นักเรียน ×0.6) · เคสผูกคนทำสำเนาก่อน (ต้นแบบไม่เปลี่ยน) · คืนเคสที่ใช้ต่อ
+func with_fee_mult(npc: CustomerNPC, econ: EconomyConfig = null) -> CustomerCase:
+	if npc == null or is_equal_approx(npc.fee_mult, 1.0) or kind != KIND_REPAIR or has_meta("fee_mult"):
+		return self
+	var c := self
+	if template() == self:
+		c = duplicate() as CustomerCase
+		c.set_meta("template", self)
+	var base: int = fee if fee >= 0 else (econ.fee_for_level(level) if econ else [60, 150, 300, 420, 750][clampi(level, 1, 5) - 1])
+	c.fee = maxi(1, roundi(base * npc.fee_mult))
+	c.set_meta("fee_mult", npc.fee_mult)
+	return c
+
+
+## แทน {key} ในข้อความ
+static func fill_vars(text: String, vars: Dictionary) -> String:
+	if not text.contains("{"):
+		return text
+	var out := text
+	for k in vars:
+		out = out.replace("{%s}" % k, String(vars[k]))
+	return out
+
+
+## [0.6.0] เก็บลงเซฟ: ไฟล์ต้นแบบ + ชื่อคน (งานกลาง) · เคสผูกคน = path อย่างเดียวเหมือนเซฟเก่า
+static func to_ref(c: CustomerCase) -> Variant:
+	if c == null:
+		return ""
+	var t := c.template()
+	if t == c:
+		return c.resource_path
+	var n := NpcBook.of_case(c)
+	var d := { "path": t.resource_path, "npc": String(n.id) if n else "", "device": c.device, "fee": c.fee }
+	if c.request():
+		d["request"] = String(c.request().id)
+	if c.scenario():
+		d["scenario"] = String(c.scenario().id)
+		d["trait"] = String(c.get_meta("trait", &"normal"))
+		d["condition"] = String(c.get_meta("condition", &"old"))
+		d["device"] = String(c.get_meta("base_device", c.device))
+	return d
+
+
+## อ่านจากเซฟ (String = เซฟเก่า/เคสผูกคน · Dictionary = งานกลาง) · null = ไฟล์หาย
+static func from_ref(v: Variant) -> CustomerCase:
+	var path := ""
+	var d := { }
+	if v is Dictionary:
+		d = v
+		path = String(d.get("path", ""))
+	else:
+		path = String(v)
+	if path == "" or not ResourceLoader.exists(path):
+		return null
+	var t := load(path) as CustomerCase
+	if t == null or d.is_empty():
+		return t
+	if not t.is_generic(): # [0.6.0] เคสผูกคนที่ปรับค่าแรงตามคน (นักเรียน)
+		return t.with_fee_mult(NpcBook.by_id(StringName(d.get("npc", ""))), GameState.economy)
+	var n := NpcBook.by_id(StringName(d.get("npc", "")))
+	if n == null:
+		return null
+	var c := t.instance_for(n, String(d.get("device", ""))).with_fee_mult(n, GameState.economy)
+	var rq := RequestBook.by_id(StringName(d.get("request", "")))
+	if rq:
+		c.apply_request(rq)
+	var sc := ScenarioBook.by_id(StringName(d.get("scenario", "")))
+	if sc:
+		c.set_meta("base_device", c.device)
+		c.apply_scenario({ "scenario": sc, "trait": StringName(d.get("trait", "normal")), "condition": StringName(d.get("condition", "old")) }, GameState.economy if Engine.get_main_loop() else null)
+	if d.has("fee"): # ค่าแรงตอนรับเครื่อง (งบน้อย · นักเรียน · กลุ่ม 2 เครื่อง) — ใส่ท้ายสุด ไม่คูณซ้ำ
+		c.fee = int(d.fee)
+	return c
+
+
 ## [0.2.5] มาได้ในเดือนนี้ไหม
 func in_month(m: int) -> bool:
 	return months.is_empty() or months.has(m)
@@ -109,7 +299,7 @@ func part() -> StringName:
 
 ## [0.3.0] งานนี้ต้องรับเครื่องไว้ (ฮาร์ดแวร์ → ใบรับเครื่อง + ชั้นวาง) · งานขมOS ทำต่อหน้าลูกค้าจบในวันเดียว
 func takes_machine() -> bool:
-	return part_id != PART_DESKTOP
+	return part_id != PART_DESKTOP and kind == KIND_REPAIR # [0.6.0] คำขอไม่รับเครื่อง
 
 
 ## [0.3.0] รอหน้าประตูได้กี่เทิร์น
@@ -141,7 +331,12 @@ func problems() -> PackedStringArray:
 	if id == &"":
 		out.append("ไม่มี id")
 	if customer.strip_edges() == "":
-		out.append("ไม่มีชื่อลูกค้า (customer)")
+		if npc_tags.is_empty():
+			out.append("ไม่มีชื่อลูกค้า (customer) — งานกลางต้องใส่ npc_tags")
+		if forced:
+			out.append("งานบังคับต้องมีชื่อลูกค้า")
+	elif use_scenario:
+		out.append("use_scenario ใช้ได้เฉพาะงานกลาง (customer ว่าง)")
 	elif not Engine.is_editor_hint():
 		var g := (Engine.get_main_loop() as SceneTree).root.get_node_or_null(^"Global") if Engine.get_main_loop() is SceneTree else null
 		if g and g.has_method("hasCharacter") and not g.hasCharacter(customer):

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ram_r3_bad"
+part = &"part_ram"
+title = "R-3 แรมเสียจริง"
+symptom = "จอฟ้าเด้งบ่อย ขึ้นว่า MEMORY MANAGEMENT ถอดแรมไปเช็ดเองแล้วก็ไม่หาย"
+job_title = "เปลี่ยนแรม"
+cause = "ชิปบนแรมเสีย ทำความสะอาดแล้วก็ไม่หาย ต้องเปลี่ยนแท่งใหม่"
+lines = Dictionary[String, String]({"DIAGNOSIS_CLUE_DUST": "ขาทองค่อนข้างสะอาดแล้ว ลูกค้าเช็ดมาเอง|แต่ชิปตัวที่สองบนแรมมีรอยไหม้จาง ๆ อยู่"})
+diag_choices = PackedStringArray("แรมเสีย ต้องเปลี่ยนแท่งใหม่", "ขาทองแรมสกปรก", "วินโดวส์ติดไวรัส", "จอเสีย")
+diag_wrong = "ลูกค้าเช็ดขาทองมาแล้วยังเป็นอยู่ ลองดูชิปบนแรมดี ๆ"
+diag_correct = "ถูก เช็ดแล้วไม่หายแถมชิปมีรอยไหม้ แรมแท่งนี้เสียจริง ต้องเปลี่ยน"
+optional_phases = PackedStringArray("CLEAN")
+needs_part = &"ram_ddr4_8gb_used"
+part_alternatives = Array[StringName]([&"ram_ddr4_8gb_new"])
+part_hint = "แรมแท่งเดิมเสียจริง ต้องใช้แรม DDR4 แท่งใหม่"
+decoy = "ทำความสะอาดแล้วเปิดติดครั้งแรก แต่ใช้ไปสักพักจอฟ้าจะกลับมา"
+teach = "แยกแรมสกปรกกับแรมเสียด้วยการทดสอบ ถ้าทำความสะอาดแล้วยังเป็นให้เปลี่ยน"
+flags = {"post": "การ์ด POST ขึ้นรหัสค้างที่ขั้นตรวจแรมทุกครั้ง"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

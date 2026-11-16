@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bios_b5_upgrade"
+part = &"part_bios"
+title = "B-5 อัปเกรดตามงบ"
+symptom = "เครื่องเปิดช้าเกือบสามนาที อยากให้เร็วขึ้นแต่งบไม่เยอะ"
+job_title = "อัปเกรดเครื่องตามงบ"
+cause = "เครื่องยังใช้ฮาร์ดดิสก์จานหมุน คอขวดอยู่ที่ดิสก์"
+lines = Dictionary[String, String]({"INSPECT_STORAGE": "ดิสก์หลักเป็นฮาร์ดดิสก์จานหมุนรุ่นเก่า|นี่แหละตัวที่ทำให้เปิดเครื่องช้า ซื้อการ์ดจอก็ไม่ช่วย"})
+diag_choices = PackedStringArray("คอขวดอยู่ที่ฮาร์ดดิสก์ ควรเปลี่ยนเป็น SSD", "การ์ดจอแรงไม่พอ", "ติดไวรัส", "ซีพียูเก่าต้องเปลี่ยนก่อน")
+diag_wrong = "เปิดเครื่องช้าไม่เกี่ยวกับการ์ดจอ ลองดูแถบ Storage อีกที"
+diag_correct = "ถูก ดิสก์คือแท่งที่เตี้ยสุดในกราฟ เปลี่ยนเป็น SSD คุ้มที่สุดในงบนี้"
+optional_phases = PackedStringArray("XMP")
+decoy = "การ์ดจอใหม่ดูน่าซื้อ แต่ไม่ได้ช่วยให้เปิดเครื่องเร็วขึ้น"
+teach = "หาคอขวดก่อนอัปเกรด SSD ช่วยเรื่องเปิดเครื่องช้ามากที่สุด และต้องสำรองข้อมูลก่อนย้าย"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

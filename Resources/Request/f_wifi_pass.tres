@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_wifi_pass"
+kind = 1
+npc_tags = PackedStringArray("any")
+min_rank = 0
+title = "ช่วยเปลี่ยนรหัสไวไฟ"
+ask = "เพื่อนบ้านแอบใช้ไวไฟจนเน็ตช้า ช่วยเปลี่ยนรหัสให้หน่อย"
+question = "รหัสไวไฟใหม่แบบไหนดี"
+choices = PackedStringArray("ยาวและผสมตัวอักษรตัวเลข เดายาก", "เบอร์โทรเจ้าของบ้าน", "12345678")
+explain = "รหัสที่เดาง่ายอย่างเบอร์โทรหรือเลขเรียง คนอื่นลองเดาได้เร็วมาก"
+fee = 0
+thanks = "เน็ตกลับมาเร็วแล้ว"
+topic = "ความปลอดภัยไซเบอร์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

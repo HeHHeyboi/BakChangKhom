@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_photo_privacy"
+kind = 1
+npc_tags = PackedStringArray("student", "family", "school")
+min_rank = 0
+title = "จะโพสต์รูปเพื่อนลงเน็ตดีไหม"
+ask = "ถ่ายรูปเพื่อนตอนหลับในห้องเรียนมา ตลกดี จะโพสต์ลงเน็ต"
+question = "ควรแนะนำว่ายังไง"
+choices = PackedStringArray("ถามเพื่อนก่อน ถ้าเขาไม่โอเคก็ไม่โพสต์", "โพสต์ได้เลยเพราะตลก", "โพสต์แล้วค่อยลบถ้าเพื่อนว่า")
+explain = "รูปที่โพสต์ไปแล้วถูกบันทึกต่อได้ ลบทีหลังไม่หายจริง ต้องขออนุญาตก่อนเสมอ"
+fee = 0
+thanks = ""
+topic = "ความเป็นส่วนตัว"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

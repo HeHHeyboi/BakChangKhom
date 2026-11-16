@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gpu_g4_psu"
+part = &"part_gpu"
+title = "G-4 พาวเวอร์ไม่พอ"
+symptom = "อัปการ์ดจอใหม่เอง เล่นเกมหนัก ๆ แล้วเครื่องรีสตาร์ตเอง"
+job_title = "เปลี่ยนพาวเวอร์ซัพพลาย"
+cause = "พาวเวอร์ซัพพลาย 350W จ่ายไฟไม่พอการ์ดใหม่ตอนโหลดหนัก"
+lines = Dictionary[String, String]({"INSPECT_CABLE": "หัวแปดพินห้อยอยู่ก็จริง|แต่ดูป้ายพาวเวอร์สิ เขียนแค่ 350W ต่อให้เสียบไฟครบก็ไม่พอการ์ดรุ่นนี้"})
+diag_choices = PackedStringArray("พาวเวอร์ซัพพลายกำลังไม่พอ ต้องเปลี่ยน", "การ์ดจอเสีย", "ซิลิโคนแห้ง", "ติดไวรัส")
+diag_wrong = "รีสตาร์ตตอนโหลดหนักแต่เปิดเว็บปกติ ลองอ่านป้ายพาวเวอร์ดู"
+diag_correct = "ใช่ รวมวัตต์ซีพียูกับการ์ดแล้วเผื่ออีกหน่อย 350W ไม่พอ ต้องใช้ตัวที่ใหญ่กว่า"
+optional_phases = PackedStringArray("CLEAN")
+needs_part = &"psu_450w"
+part_hint = "ต้องเปลี่ยนเป็นพาวเวอร์ซัพพลาย 450W"
+decoy = "การ์ดใหม่สะอาดดูดีทุกอย่าง ถ้าไม่อ่านป้ายพาวเวอร์จะหาสาเหตุไม่เจอ"
+teach = "คำนวณกำลังไฟก่อนอัปการ์ด และเลือกพาวเวอร์ที่มีมาตรฐาน"
+flags = {"meter": "วัดราง 12 โวลต์ตอนเปิดเกม ไฟตกลงเยอะเลย พาวเวอร์จ่ายไม่ไหว"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

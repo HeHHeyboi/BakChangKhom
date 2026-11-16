@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ram_r5_missing"
+part = &"part_ram"
+title = "R-5 แรมหายไปหนึ่งแถว"
+symptom = "เครื่องอืดมาก เปิดโปรแกรมหลายตัวไม่ได้ บางทีจอดำมีเสียงปี๊บ"
+job_title = "เพิ่มแรม"
+cause = "หลานถอดแรมไปหนึ่งแถวไปใส่เครื่องตัวเอง แถวที่เหลือก็หลวม"
+lines = Dictionary[String, String]({"DIAGNOSIS_CLUE_DUST": "สล็อตข้าง ๆ ว่างอยู่หนึ่งช่อง รอยฝุ่นเป็นกรอบสี่เหลี่ยม|แปลว่าเคยมีแรมเสียบอยู่ตรงนี้ แล้วมีคนถอดออกไป"})
+diag_choices = PackedStringArray("แรมหายไปหนึ่งแถว ต้องใส่เพิ่ม", "ติดไวรัส ต้องสแกน", "ซีพียูร้อนเกิน", "ฮาร์ดดิสก์ใกล้เสีย")
+diag_wrong = "เครื่องอืดไม่ได้แปลว่าไวรัสเสมอไป ลองดูรอยฝุ่นในเคสอีกที"
+diag_correct = "ใช่ รอยฝุ่นบอกว่าเคยมีแรมอยู่ ลองถามลูกค้าดี ๆ ว่ามีใครมายุ่งกับเครื่องไหม"
+needs_part = &"ram_ddr4_8gb_used"
+part_alternatives = Array[StringName]([&"ram_ddr4_8gb_new"])
+part_hint = "แรมหายไปแถวหนึ่ง ต้องใส่แรม DDR4 เพิ่ม"
+decoy = "อาการอืดดูเหมือนไวรัส ถ้าไปสแกนไวรัสก็เสียเวลาไม่เจออะไร"
+teach = "ดูขนาดแรมในระบบ และถามลูกค้าแบบชวนเล่าว่ามีใครเปิดเครื่องไหม"
+secret = "จริง ๆ หลานมาขอแรมไปแถวหนึ่ง บอกว่าเครื่องหลานไม่พอ"
+flags = {"post": "การ์ด POST ผ่านขั้นแรมแต่เห็นแรมแค่แถวเดียว"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mb_m5_standoff"
+part = &"part_mainboard"
+title = "M-5 บอร์ดช็อตกับเคส"
+symptom = "เพิ่งย้ายเครื่องใส่เคสใหม่ เปิดแป๊บเดียวแล้วดับ"
+job_title = "แก้บอร์ดช็อตเคส"
+cause = "ใส่ standoff เกินมาหนึ่งตัว ใต้บอร์ดแตะกับเคสจนไฟช็อต"
+lines = Dictionary[String, String]({"INSPECT_STANDOFF": "ใต้เมนบอร์ดมีรอยขูดตรงที่แตะเคส|นับดูแล้ว standoff เกินมาหนึ่งตัว อยู่ตรงที่บอร์ดไม่มีรู แบบนี้ช็อต", "INSPECT_FINS": "ฮีตซิงก์ยังเย็นอยู่เลย เครื่องดับก่อนจะร้อนด้วยซ้ำ"})
+diag_choices = PackedStringArray("บอร์ดช็อตกับเคส เพราะ standoff เกิน", "ซิลิโคนแห้ง", "แรมเสีย", "การ์ดจอเสีย")
+diag_wrong = "เครื่องดับก่อนจะทันร้อน แปลว่าไม่ใช่เรื่องความร้อน ลองดูใต้บอร์ด"
+diag_correct = "ใช่ standoff ตัวที่เกินแตะลายวงจรใต้บอร์ด เปิดเครื่องแล้วไฟเลยช็อต"
+decoy = "ซิลิโคนก็เก่าแล้ว แต่ไม่ใช่สาเหตุที่ดับทันที"
+teach = "ประกอบเคสใหม่ต้องใส่ standoff เฉพาะตรงที่บอร์ดมีรู ดับทันทีหลังเปิดมักเป็นไฟช็อต"
+flags = {"meter": "วัดระหว่างใต้บอร์ดกับเคสแล้วไฟถึงกัน แปลว่าช็อตกับเคส"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

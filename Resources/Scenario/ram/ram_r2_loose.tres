@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ram_r2_loose"
+part = &"part_ram"
+title = "R-2 แรมใส่ไม่สุด"
+symptom = "ย้ายโต๊ะคอมแล้วเปิดติดบ้างไม่ติดบ้าง วันนี้ไม่ขึ้นเลย"
+job_title = "ใส่แรมให้แน่น"
+cause = "ย้ายเครื่องแล้วแรมกระเด้งหลุดจากสล็อตครึ่งหนึ่ง สลักข้างหนึ่งไม่ล็อก"
+lines = Dictionary[String, String]({"DIAGNOSIS_CLUE_DUST": "ดูแรมแถวนี้สิ เอียงอยู่ สลักข้างขวาไม่ได้ล็อก|แต่ขาทองยังเงาดีอยู่นะ ไม่ได้สกปรกอะไร"})
+diag_choices = PackedStringArray("แรมเสียบไม่สุด หลุดจากสล็อต", "ขาทองแรมสกปรก", "แรมเสีย ต้องเปลี่ยนใหม่", "ฮาร์ดดิสก์เสีย")
+diag_wrong = "ขาทองยังเงาอยู่นะ ลองนึกถึงตอนที่ลูกค้าย้ายโต๊ะดู"
+diag_correct = "ใช่ ย้ายเครื่องแล้วกระแทก แรมเลยหลุดจากสล็อต ไม่ต้องทำความสะอาดก็ได้"
+optional_phases = PackedStringArray("CLEAN")
+decoy = "ถ้ารีบถูขาทองทั้งที่สะอาดอยู่แล้ว ก็เสียเวลาเปล่า"
+teach = "ดูก่อนลงมือ ไม่ใช่ทุกเคสต้องทำความสะอาด สังเกตสลักว่าล็อกครบไหม"
+flags = {"ram_clean": true}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

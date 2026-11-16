@@ -366,13 +366,14 @@ func _cases_of_level(lv: int, exclude_board := true) -> Array[CustomerCase]:
 	for c in random_pool:
 		if c == null or c.forced or c.level != lv or not c.in_month(m): # [0.2.5] งานตามฤดู
 			continue
-		if exclude_board and (is_case_busy(c) or c == today_case):
+		if exclude_board and (is_case_busy(c) or (today_case and c == today_case.template())):
 			continue
 		out.append(c)
 	return out
 
 
 ## [0.2.5] เลือกงานจากคลังให้หลากหลาย: ไม่เอาคนที่ยืนรอ/นัดไว้/มีเครื่องบนชั้นอยู่แล้ว · ไม่เอางานที่เพิ่งมาไม่นาน (_recent) · ไม่มีให้เลือกค่อยยอมซ้ำ
+## [0.6.0] pool = เคสต้นแบบ (มีงานกลางที่ไม่ผูกคน) · คืนเคสที่ใส่ชื่อคนแล้ว (instance_for) · null = ไม่มีใครมาได้
 func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 	var waiting := { }
 	for c in busy_cases():
@@ -382,8 +383,12 @@ func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 		best = pool.filter(func(c: CustomerCase) -> bool: return not _recent.has(c))
 	if best.is_empty():
 		best = pool
-	var c := _pick_by_npc(best)
-	_recent.append(c)
+	var c := _pick_by_npc(best, waiting)
+	if c == null and best != pool:
+		c = _pick_by_npc(pool, waiting)
+	if c == null:
+		return null
+	_recent.append(c.template())
 	while _recent.size() > RECENT_MEMORY:
 		_recent.pop_front()
 	return c
@@ -391,41 +396,120 @@ func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 
 ## [0.5.0 ขั้น C] เลือกคนก่อน (น้ำหนักตามความสนิท · เพิ่งมาไม่นานลดลง) แล้วสุ่มเคสของคนนั้น — คนที่มีเคสเยอะไม่ได้มาบ่อยกว่าคนอื่น
 ## ไม่เปลี่ยนสัดส่วนระดับงาน (เลือกระดับมาก่อนแล้ว) → ไม่กระทบรายได้
-func _pick_by_npc(cases: Array[CustomerCase]) -> CustomerCase:
-	var groups := { }
-	for c in cases:
-		if not groups.has(c.customer):
-			groups[c.customer] = []
-		(groups[c.customer] as Array).append(c)
+## [0.6.0 ขั้น A–B] งานกลาง (customer ว่าง) เข้ากลุ่มของทุกคนที่ป้ายตรง · ทุกคนต้องเปิดแล้ว (unlock_chapter) และอยู่ในช่วงเวลาของตัวเอง
+func _pick_by_npc(cases: Array[CustomerCase], waiting := { }) -> CustomerCase:
+	var groups := candidates_by_person(cases, waiting)
+	if groups.is_empty():
+		return null
 	var keys := groups.keys()
 	var weights: Array[float] = []
 	var total := 0.0
 	for k in keys:
-		var w := npc_weight(groups[k][0])
+		var w := npc_weight_of(k)
 		weights.append(w)
 		total += w
 	var pick: Array = groups[keys[0]]
+	var who: String = keys[0]
 	var r := _rng.randf() * total
 	for i in keys.size():
 		r -= weights[i]
 		if r <= 0.0:
 			pick = groups[keys[i]]
+			who = keys[i]
 			break
-	return pick[_rng.randi_range(0, pick.size() - 1)]
+	var c: CustomerCase = pick[_rng.randi_range(0, pick.size() - 1)]
+	if c.is_generic():
+		var n := NpcBook.of_name(who)
+		var dev := ""
+		if n and not n.devices.is_empty():
+			dev = n.devices[_rng.randi_range(0, n.devices.size() - 1)]
+		c = c.instance_for(n, dev)
+		if c.use_scenario:
+			roll_scenario(c)
+	return c.with_fee_mult(NpcBook.of_name(who), _econ())
+
+
+## [0.6.0 ขั้น C] สถานการณ์ที่เพิ่งเจอต่อ Part (ไม่ให้ซ้ำ 2 ครั้งล่าสุด) { part: [id…] }
+var scenario_recent: Dictionary = { }
+
+
+## สุ่มสถานการณ์ใส่เคส (สำเนาของงานกลาง) · คืน roll ({} = Part นี้ไม่มีสถานการณ์)
+func roll_scenario(c: CustomerCase) -> Dictionary:
+	var ts := _ts()
+	var part := c.part()
+	var recent: Array = scenario_recent.get(part, [])
+	var r := ScenarioBook.roll(part, _rng, recent, GameState.rank(), ts.month() if ts else 1)
+	if r.is_empty():
+		return r
+	c.apply_scenario(r, _econ())
+	recent.append((r.scenario as RepairScenario).id)
+	while recent.size() > 4:
+		recent.pop_front()
+	scenario_recent[part] = recent
+	return r
+
+
+## [0.6.0] { char_key: [เคสต้นแบบ…] } คนที่มาร้านได้ตอนนี้ + เคสที่คนนั้นเอามาได้
+func candidates_by_person(cases: Array[CustomerCase], waiting := { }) -> Dictionary:
+	var groups := { }
+	var rank := GameState.rank()
+	for c in cases:
+		if c == null or c.min_rank > rank:
+			continue
+		if not c.is_generic():
+			if person_available(c.customer):
+				if not groups.has(c.customer):
+					groups[c.customer] = []
+				(groups[c.customer] as Array).append(c)
+			continue
+		for n: CustomerNPC in NpcBook.all():
+			if waiting.has(n.char_key) or not person_available(n.char_key):
+				continue
+			if not n.matches(c, GameState.affinity(n.id)):
+				continue
+			if not groups.has(n.char_key):
+				groups[n.char_key] = []
+			(groups[n.char_key] as Array).append(c)
+	return groups
+
+
+## [0.6.0 ขั้น B] คนนี้เดินมาร้านได้ตอนนี้ไหม (เปิดในบทนี้ · ช่วงเวลา · นักเรียนช่วงเปิดเทอม) · ขาจร = ได้เสมอ
+func person_available(char_key: String) -> bool:
+	var n := NpcBook.of_name(char_key)
+	if n == null:
+		return true
+	var ts := _ts()
+	if ts == null:
+		return true
+	if not n.unlocked_in(ts.chapter()) and not (n.unlock_by and n.unlock_by_affinity > 0 and GameState.affinity(n.unlock_by.id) >= n.unlock_by_affinity):
+		return false
+	if n.solo_min_affinity > 0 and GameState.affinity(n.id) < n.solo_min_affinity:
+		return false
+	if _visit_minute == -2:
+		return true
+	var e := _econ()
+	var minute := _visit_minute if _visit_minute >= 0 else ts.current_minute
+	return n.available_at(minute, ts.month(), e.school_break_months, e.school_after_minute)
 
 
 ## น้ำหนักที่คนเจ้าของเคสจะเดินมาร้าน (ลูกค้าขาจร = 1)
 func npc_weight(c: CustomerCase) -> float:
-	var n := NpcBook.of_case(c)
+	return npc_weight_of(c.customer if c else "")
+
+
+func npc_weight_of(char_key: String) -> float:
+	var n := NpcBook.of_name(char_key)
 	if n == null:
 		return 1.0
 	var e := _econ()
 	var w := n.base_weight
-	if n.has_affinity:
+	if GameState.has_affinity(n.id):
 		w *= e.affinity_mult(GameState.affinity_tier(n.id))
 	var ts := _ts()
 	if ts and GameState.visited_recently(n.id, ts.shift):
 		w *= e.affinity_recent_mult
+	if n.is_student() and ts and e.school_break_months.has(ts.month()):
+		w *= e.school_break_weight
 	return maxf(w, 0.001)
 
 
@@ -443,7 +527,13 @@ func busy_cases() -> Array[CustomerCase]:
 
 
 func is_case_busy(c: CustomerCase) -> bool:
-	return busy_cases().has(c)
+	if c == null:
+		return false
+	var t := c.template()
+	for b in busy_cases():
+		if b and b.template() == t:
+			return true
+	return false
 
 
 ## [0.3.0] ลูกค้า 1 คนหน้าประตู
@@ -455,12 +545,15 @@ func door_entry(c: CustomerCase, phone := false, appointed := false, free := fal
 
 ## [0.3.0] สุ่มลูกค้าใหม่ n คนมายืนต่อคิวหน้าประตู (ไม่ซ้ำคนที่อยู่ในร้าน · คิวยาวสุด board_max) · คืนจำนวนที่มาได้จริง
 ## waited = มาถึงก่อนตอนนี้กี่นาทีงาน (รอบที่มาระหว่างผู้เล่นทำงานอยู่) · ทุกคนได้ยืนให้เห็นอย่างน้อย 1 เทิร์น
-func add_visitors(n: int, phone := false, waited := 0) -> int:
+## [0.6.0 ขั้น B] at_minute = เวลาที่รอบนี้มาถึง (ใช้เช็กช่วงเวลาของคน) · -1 = ตอนนี้ · โทรเข้า = ไม่เช็กช่วงเวลา
+## ระดับที่สุ่มได้แต่ไม่มีใครมาได้ตอนนั้น → ตัดระดับนั้นแล้วสุ่มใหม่ (ไม่ทำให้คนหาย)
+func add_visitors(n: int, phone := false, waited := 0, at_minute := -1) -> int:
 	var ts := _ts()
 	if ts == null:
 		return 0
 	var e := _econ()
 	var added := 0
+	_visit_minute = -2 if phone else (at_minute if at_minute >= 0 else ts.current_minute)
 	for k in n:
 		if door_queue.size() >= e.board_max:
 			break
@@ -469,27 +562,44 @@ func add_visitors(n: int, phone := false, waited := 0) -> int:
 		for i in 5:
 			if _cases_of_level(i + 1).is_empty():
 				w[i] = 0.0
-		var total := 0.0
-		for x in w:
-			total += x
-		if total <= 0.0:
-			break
-		var r := _rng.randf() * total
-		var lv := 1
-		for i in 5:
-			r -= w[i]
-			if r <= 0.0:
-				lv = i + 1
+		var c: CustomerCase = null
+		for attempt in 5:
+			var total := 0.0
+			for x in w:
+				total += x
+			if total <= 0.0:
 				break
-		var pool := _cases_of_level(lv)
-		if pool.is_empty():
-			continue
-		var c := _pick_case(pool)
+			var r := _rng.randf() * total
+			var lv := 1
+			for i in 5:
+				r -= w[i]
+				if r <= 0.0:
+					lv = i + 1
+					break
+			var pool := _cases_of_level(lv)
+			c = _pick_case(pool) if not pool.is_empty() else null
+			if c:
+				break
+			w[lv - 1] = 0.0
+		if c == null:
+			break
 		var cap_wait := maxi(door_patience_slots(c) - 1, 0) * TimeSystem.SLOT_MIN
 		door_queue.append(door_entry(c, phone, false, false, clampi(waited, 0, cap_wait)))
 		added += 1
+	# [0.6.0 ขั้น G] คำขอ (ปรึกษา/ช่วย) = คนที่เดินมาเพิ่ม ไม่แทนลูกค้างานซ่อม · วันละไม่เกิน request_daily_max · โทรเข้าไม่มีคำขอ
+	if not phone and added > 0 and requests_spawned_today < e.request_daily_max and door_queue.size() < e.board_max and _rng.randf() < e.request_share:
+		var rc := _pick_request()
+		if rc:
+			requests_spawned_today += 1
+			door_queue.append(door_entry(rc, false, false, false, clampi(waited, 0, maxi(door_patience_slots(rc) - 1, 0) * TimeSystem.SLOT_MIN)))
+			added += 1
+	_visit_minute = -1
 	_board_dirty = true
 	return added
+
+
+## [0.6.0] นาทีที่ใช้เช็กช่วงเวลาของคนตอนสุ่ม · -1 = นาฬิกาตอนนี้ · -2 = ไม่เช็ก (โทรเข้า)
+var _visit_minute := -1
 
 # ---------------------------------------------------------------- สัญญาณเวลา
 
@@ -510,6 +620,8 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	pending_story = { }
 	story_today = false
 	helper_used_today = 0
+	requests_today = 0
+	requests_spawned_today = 0
 	_auto_handover()
 	for j in door_queue:
 		left_home.append((j["case"] as CustomerCase).customer)
@@ -582,7 +694,7 @@ func _check_waves(ts: TimeSystem, notify := true) -> void:
 	while not visitor_waves.is_empty() and int(visitor_waves[0]["minute"]) <= ts.current_minute:
 		var w: Dictionary = visitor_waves.pop_front()
 		var late := TimeSystem.work_minutes_between(int(w["minute"]), ts.current_minute) if int(w["minute"]) > TimeSystem.OPEN else 0
-		came += add_visitors(int(w["count"]), false, late)
+		came += add_visitors(int(w["count"]), false, late, int(w["minute"]))
 	if came <= 0:
 		return
 	visitors_arrived += came
@@ -696,7 +808,7 @@ func _on_repair_recorded(result: Dictionary) -> void:
 	if c:
 		var ts := _ts()
 		if ts:
-			ts.advance_minutes(job_slots(c) * TimeSystem.SLOT_MIN)
+			ts.advance_minutes(_repair_slots(c, order) * TimeSystem.SLOT_MIN)
 			ts.snap_to_slot()
 		_parts_seen[c.part_id] = true
 		if c == forced_case:
@@ -734,6 +846,7 @@ func _on_repair_recorded(result: Dictionary) -> void:
 		result["npc_name"] = aff["name"]
 		if int(aff["tip"]) > 0:
 			result["money"] = int(result.get("money", 0)) + int(aff["tip"])
+	_log_scenario(c, result)
 	current_job = { }
 	last_result = result
 	_result_pending = true
@@ -741,6 +854,395 @@ func _on_repair_recorded(result: Dictionary) -> void:
 	shift_results.append(result)
 	week_results.append(result)
 	_working = false
+
+## [0.6.0 ขั้น E] เวลาของงานบนชั้น: ตรวจไว้แล้ว (เล่นครึ่งซ่อม) = 60% · ครึ่งตรวจ = 40%
+const SPLIT_REPAIR_SHARE := 0.6
+
+
+func _repair_slots(c: CustomerCase, o: RepairShelf.Order) -> int:
+	var n := job_slots(c)
+	if o and not o.partial.is_empty():
+		return maxi(1, ceili(n * SPLIT_REPAIR_SHARE))
+	return n
+
+
+func _case_inspected(c: CustomerCase) -> bool:
+	if shelf:
+		for o: RepairShelf.Order in shelf.orders:
+			if o.case == c:
+				return o.inspected
+	return false
+
+
+## สถานะการตรวจบนชั้นวาง: "ตรวจแล้ว: <สาเหตุ>" · "ยังไม่ได้ตรวจ" · "" (งานไม่มีสถานการณ์)
+func order_inspect_note(o: RepairShelf.Order) -> String:
+	if o == null or o.case == null:
+		return ""
+	if not o.partial.is_empty():
+		return "ตรวจแล้ว: %s" % String(o.partial.get("cause", ""))
+	if o.case.scenario() != null and not o.inspected:
+		return "ยังไม่ได้ตรวจ"
+	return ""
+
+
+## มินิเกมถึงจุดแบ่ง: รู้แล้วว่าต้องใช้อะไหล่อะไร → จองเลย · คืน true = ของไม่มี หยุดไว้ที่ครึ่งตรวจ
+func _minigame_checkpoint(o: RepairShelf.Order) -> bool:
+	if o == null:
+		return false
+	o.inspected = true
+	var ids := o.part_ids()
+	if ids.is_empty():
+		return false
+	if GameState.reserved_index(o.key) < 0:
+		GameState.reserve(ids, o.key)
+	return GameState.reserved_index(o.key) < 0
+
+
+## มินิเกมปิดหลังครึ่งตรวจ (meta "inspection") → เก็บผลไว้ในใบรับเครื่อง · เวลาเดิน 40% · บอกว่ารอของอะไร
+func _after_inspection() -> void:
+	var c := today_case
+	if c == null or not c.has_meta("inspection"):
+		return
+	var o: RepairShelf.Order = current_job.get("order") as RepairShelf.Order
+	var d: Dictionary = c.get_meta("inspection")
+	c.remove_meta("inspection")
+	GameState.hold_next_payment = false
+	current_job = { }
+	if o == null:
+		return
+	o.inspected = true
+	o.partial = d
+	var ts := _ts()
+	if ts:
+		ts.advance_minutes(maxi(1, job_slots(c) - ceili(job_slots(c) * SPLIT_REPAIR_SHARE)) * TimeSystem.SLOT_MIN)
+		ts.snap_to_slot()
+	_parts_seen[c.part_id] = true
+	assign_parts(false)
+	last_inspection = { "order": o, "cause": String(d.get("cause", "")), "missing": missing_note(o) }
+	_board_dirty = true
+	if visitor_toast and not quiet:
+		visitor_toast.show_message("ตรวจเครื่อง%sแล้ว · รออะไหล่" % o.case.customer, "สาเหตุ: %s · ต้องใช้ %s" % [last_inspection.cause, last_inspection.missing])
+
+
+## ผลครึ่งตรวจล่าสุด (เทสต์/ป้าย) { order, cause, missing }
+var last_inspection: Dictionary = { }
+
+
+# ---------------------------------------------------------------- [0.6.0 ขั้น I] นักเรียนกลุ่ม (PLAN_0_6_0 ข้อ 6 · V2_0_0_PLAN ข้อ 4.2)
+
+## ความเห็นไม่ตรงกันของกลุ่ม · a/b = id สมาชิก · fair = ตอบที่อธิบายให้ทุกคนเข้าใจ
+const GROUP_DEBATES := [
+	{ "a": &"bew", "a_say": "ซื้อการ์ดจอใหม่เลยพี่ ตัวนี้เก่าแล้ว", "b": &"tonkla", "b_say": "ทำความสะอาดก่อนสิ ประหยัดกว่าเยอะ",
+	  "side_a": "บิวพูดถูก ซื้อใหม่เลย", "side_b": "ต้นกล้าพูดถูก ทำความสะอาดพอ",
+	  "fair": "ตรวจก่อนว่าเสียจริงไหม ถ้าแค่สกปรกก็ล้าง ถ้าเสียค่อยซื้อ แล้วอธิบายให้ทุกคนฟัง",
+	  "explain": "ตอบแบบมีเหตุผลให้ทุกคนเห็นภาพเดียวกัน ทุกคนรับได้ ไม่มีใครรู้สึกว่าแพ้" },
+	{ "a": &"praew", "a_say": "ลงโปรแกรมฟรีจากเว็บที่เพื่อนส่งมาเลยค่ะ", "b": &"bew", "b_say": "ไม่เอา เดี๋ยวติดไวรัส",
+	  "side_a": "แพรวพูดถูก ลงเลย", "side_b": "บิวพูดถูก ห้ามลงอะไรเลย",
+	  "fair": "ลงได้ถ้ามาจากเว็บผู้ผลิตจริง ดูชื่อเว็บก่อน แล้วสแกนไฟล์ก่อนเปิด",
+	  "explain": "ไม่ต้องห้ามทุกอย่างและไม่ลงทุกอย่าง สอนวิธีดูว่าแหล่งไหนปลอดภัย" },
+	{ "a": &"tonkla", "a_say": "เครื่องอืดเพราะแรมน้อย ต้องเพิ่มแรม", "b": &"praew", "b_say": "อืดเพราะติดไวรัสแน่ ๆ เลย",
+	  "side_a": "ต้นกล้าพูดถูก เพิ่มแรมเลย", "side_b": "แพรวพูดถูก สแกนไวรัสพอ",
+	  "fair": "ยังไม่รู้ ต้องดูอาการในเครื่องก่อน เปิดดูการใช้แรมแล้วค่อยบอกว่าเพราะอะไร",
+	  "explain": "ก่อนตัดสินว่าใครถูก ช่างต้องดูหลักฐานก่อน ทุกคนเลยยอมรับผลได้" },
+]
+
+## เคสกลุ่มที่กำลังตัดสิน { case, debate, choices, done (Callable) }
+var debate_state: Dictionary = { }
+
+
+func _is_group(c: CustomerCase) -> bool:
+	var n := NpcBook.of_case(c)
+	return n != null and n.is_group()
+
+
+func _add_group_second(c: CustomerCase, first: RepairShelf.Order, promise: int) -> RepairShelf.Order:
+	var e := _econ()
+	var each := maxi(1, roundi(e.fee_for_level(c.level) * e.group_fee_mult / 2.0))
+	first.case.fee = each
+	var c2 := c.duplicate() as CustomerCase
+	c2.set_meta("template", c.template())
+	for k in ["base_device", "fee_mult"]:
+		if c.has_meta(k):
+			c2.set_meta(k, c.get_meta(k))
+	c2.device = "%s (เครื่องที่ 2)" % String(c.get_meta("base_device", c.device))
+	c2.set_meta("base_device", c2.device)
+	if c2.use_scenario:
+		roll_scenario(c2)
+	c2.fee = each
+	var ts := _ts()
+	return shelf.add(c2, ts.shift if ts else 1, promise)
+
+
+## ความเห็นไม่ตรงกัน: เลือกคำตอบ → ความสนิทแต่ละคน · then = ทำต่อหลังตัดสิน (บทลูกค้า)
+func _start_debate(c: CustomerCase, then: Callable = Callable()) -> void:
+	var d: Dictionary = GROUP_DEBATES[_rng.randi_range(0, GROUP_DEBATES.size() - 1)]
+	var opts := [["fair", d.fair], ["a", d.side_a], ["b", d.side_b]]
+	opts.shuffle()
+	debate_state = { "case": c, "debate": d, "choices": opts, "then": then, "answered": false }
+	if quiet:
+		return
+	_working = true
+	_hide()
+	if not is_instance_valid(_request_card):
+		_request_card = RequestCard.new()
+		add_child(_request_card)
+		_request_card.picked.connect(_on_card_picked)
+		_request_card.done.connect(_on_request_card_done)
+	_request_card.show()
+	_request_card.show_question(debate_view())
+
+
+func debate_view() -> Dictionary:
+	if debate_state.is_empty():
+		return { }
+	var d: Dictionary = debate_state.debate
+	var na := NpcBook.by_id(d.a)
+	var nb := NpcBook.by_id(d.b)
+	var c: CustomerCase = debate_state.case
+	return {
+		"kind": "ความเห็นไม่ตรงกัน", "title": "จะตอบยังไงให้ทุกคนเข้าใจ", "who": npc_name(c),
+		"ask": "%s: %s\n%s: %s" % [na.display_name if na else "", d.a_say, nb.display_name if nb else "", d.b_say],
+		"portrait": Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null,
+		"question": "ขมจะพูดว่าอะไร", "choices": (debate_state.choices as Array).map(func(o: Array) -> String: return o[1]), "step": 1, "steps": 1,
+	}
+
+
+## เลือกคำตอบ (ข้อความ) → { correct (= ตอบให้ทุกคนเข้าใจ), answer, explain, more, deltas { id: n } }
+func debate_answer(text: String) -> Dictionary:
+	if debate_state.is_empty() or bool(debate_state.answered):
+		return { }
+	debate_state["answered"] = true
+	var d: Dictionary = debate_state.debate
+	var key := "fair"
+	for o in debate_state.choices:
+		if o[1] == text:
+			key = o[0]
+	var deltas := { }
+	var n := NpcBook.of_case(debate_state.case)
+	if key == "fair":
+		for m in n.member_ids():
+			deltas[m] = GameState.affinity_event(m, &"group_fair")
+		GameState.group_fair_count += 1
+	else:
+		var win: StringName = d.a if key == "a" else d.b
+		var lose: StringName = d.b if key == "a" else d.a
+		deltas[win] = GameState.affinity_event(win, &"group_side")
+		deltas[lose] = GameState.affinity_event(lose, &"group_other")
+	return { "correct": key == "fair", "answer": d.fair, "explain": d.explain, "more": false, "deltas": deltas }
+
+
+func debate_finish() -> void:
+	var then: Callable = debate_state.get("then", Callable())
+	debate_state = { }
+	if is_instance_valid(_request_card):
+		_request_card.hide()
+	_working = false
+	_board_dirty = true
+	if then.is_valid():
+		then.call()
+
+
+func _on_card_picked(t: String) -> void:
+	if not debate_state.is_empty():
+		_request_card.show_answer(debate_answer(t))
+	else:
+		_request_card.show_answer(request_answer(t))
+
+
+# ---------------------------------------------------------------- [0.6.0 ขั้น G] ขอคำปรึกษา / ขอให้ช่วย (PLAN_0_6_0 ข้อ 5)
+
+## คำขอที่รับวันนี้ / ที่เดินมาวันนี้ (ล้างตอนเปิดร้าน)
+var requests_today := 0
+var requests_spawned_today := 0
+## คำขอที่เพิ่งมา (ไม่ซ้ำ 6 เรื่องล่าสุด)
+var _recent_requests: Array[StringName] = []
+## คำขอที่กำลังคุย { case, req, step, right, card }
+var request_state: Dictionary = { }
+var _request_card: RequestCard
+
+
+## สุ่มคำขอ: เลือกคนที่มาได้ตอนนี้ (น้ำหนักความสนิท) แล้วเลือกเรื่องที่เข้ากับคนนั้น · null = ไม่มี
+func _pick_request() -> CustomerCase:
+	var rank := GameState.rank()
+	var waiting := { }
+	for b in busy_cases():
+		waiting[b.customer] = true
+	var groups := { }
+	for r in RequestBook.all():
+		if _recent_requests.has(r.id):
+			continue
+		for n: CustomerNPC in NpcBook.all():
+			if waiting.has(n.char_key) or not person_available(n.char_key):
+				continue
+			if RequestBook.fits(r, n, rank):
+				if not groups.has(n.char_key):
+					groups[n.char_key] = []
+				(groups[n.char_key] as Array).append(r)
+	if groups.is_empty():
+		return null
+	var keys := groups.keys()
+	var total := 0.0
+	var ws: Array[float] = []
+	for k in keys:
+		ws.append(npc_weight_of(k))
+		total += ws.back()
+	var who: String = keys[0]
+	var x := _rng.randf() * total
+	for i in keys.size():
+		x -= ws[i]
+		if x <= 0.0:
+			who = keys[i]
+			break
+	var list: Array = groups[who]
+	var req: RequestTask = list[_rng.randi_range(0, list.size() - 1)]
+	_recent_requests.append(req.id)
+	while _recent_requests.size() > 6:
+		_recent_requests.pop_front()
+	return RequestBook.make_case(req, NpcBook.of_name(who))
+
+
+func _start_request(c: CustomerCase) -> void:
+	var req := c.request()
+	if req == null:
+		return
+	_working = true
+	_hide()
+	request_state = { "case": c, "req": req, "step": 1, "right": 0, "answered": false }
+	if quiet:
+		return
+	if not is_instance_valid(_request_card):
+		_request_card = RequestCard.new()
+		add_child(_request_card)
+		_request_card.picked.connect(_on_card_picked)
+		_request_card.done.connect(_on_request_card_done)
+	_request_card.show()
+	_request_card.show_question(request_view())
+
+
+## ข้อปัจจุบัน { kind, title, ask, who, portrait, question, choices (สลับแล้ว), step, steps }
+func request_view() -> Dictionary:
+	if request_state.is_empty():
+		return { }
+	var req: RequestTask = request_state.req
+	var c: CustomerCase = request_state.case
+	var step := int(request_state.step)
+	var src := req.choices if step == 1 else req.choices2
+	var opts := Array(src)
+	var r := RandomNumberGenerator.new()
+	r.seed = hash(String(req.id)) + step
+	for i in range(opts.size() - 1, 0, -1):
+		var j := r.randi_range(0, i)
+		var t = opts[i]
+		opts[i] = opts[j]
+		opts[j] = t
+	return {
+		"kind": req.kind_name(), "title": req.title, "ask": req.ask, "who": npc_name(c),
+		"portrait": Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null,
+		"question": req.question if step == 1 else req.question2, "choices": opts, "step": step, "steps": req.steps(),
+	}
+
+
+## ตอบข้อปัจจุบัน → { correct, answer, explain, more }
+func request_answer(text: String) -> Dictionary:
+	if request_state.is_empty() or bool(request_state.answered):
+		return { }
+	var req: RequestTask = request_state.req
+	var step := int(request_state.step)
+	var src := req.choices if step == 1 else req.choices2
+	var ok := text == src[0]
+	request_state["answered"] = true
+	if ok:
+		request_state["right"] = int(request_state.right) + 1
+	request_state["last_ok"] = ok
+	var more := ok and step == 1 and req.steps() > 1
+	return { "correct": ok, "answer": src[0], "explain": req.explain if step == 1 else req.explain2, "more": more }
+
+
+func _on_request_card_done() -> void:
+	if not debate_state.is_empty():
+		debate_finish()
+		return
+	if request_state.is_empty():
+		return
+	var req: RequestTask = request_state.req
+	if bool(request_state.get("last_ok", false)) and int(request_state.step) == 1 and req.steps() > 1:
+		request_state["step"] = 2
+		request_state["answered"] = false
+		if is_instance_valid(_request_card):
+			_request_card.show_question(request_view())
+		return
+	request_finish()
+
+
+## จบคำขอ: เวลา 1 เทิร์น · ตอบถูกทุกข้อ = ความสนิทเต็ม + ค่าปรึกษา · ถูกบางข้อ = ความสนิทน้อย · ผิด = ไม่ได้อะไร (ลูกค้าไม่โกรธ)
+## คืน { money, affinity, grade (&"good" · &"ok" · &"miss") }
+func request_finish() -> Dictionary:
+	if request_state.is_empty():
+		return { }
+	var c: CustomerCase = request_state.case
+	var req: RequestTask = request_state.req
+	var right := int(request_state.right)
+	var grade := &"good" if right >= req.steps() else (&"ok" if right > 0 else &"miss")
+	var ts := _ts()
+	if ts:
+		ts.advance_minutes(maxi(c.est_slots, 1) * TimeSystem.SLOT_MIN)
+		ts.snap_to_slot()
+	var money := 0
+	if grade != &"miss" and req.fee > 0:
+		money = req.fee if grade == &"good" else req.fee / 2
+		GameState.add_money(money, &"fee", "%s · %s" % [req.kind_name(), npc_name(c)])
+	var aff := 0
+	if grade != &"miss":
+		aff = affinity_for(c, &"request_good" if grade == &"good" else &"request_ok")
+	var when := GameState._ledger_when()
+	GameState.request_log.append({ "ch": when.x, "day": when.y, "id": String(req.id), "kind": req.kind_name(), "topic": req.topic, "right": right, "steps": req.steps(), "npc": String(npc_id(c)) })
+	GameState.note_visit(npc_id(c), ts.shift if ts else 0)
+	var out := { "money": money, "affinity": aff, "grade": grade }
+	request_state = { }
+	if is_instance_valid(_request_card):
+		_request_card.hide()
+	if reward_popup and not quiet and (money != 0 or aff != 0):
+		reward_popup.pop_result({ "money": money, "reputation": 0, "affinity": aff, "npc_name": npc_name(c) })
+	if visitor_toast and not quiet:
+		var line := c.thanks_text if grade != &"miss" else c.complain_text
+		visitor_toast.show_message("%s: \"%s\"" % [npc_name(c), line], "%s · ♥ %+d%s" % [req.title, aff, (" · +฿%d" % money) if money > 0 else ""])
+	today_case = null
+	_working = false
+	_board_dirty = true
+	return out
+
+
+## [0.6.0 ขั้น C] จดผลสถานการณ์ซ่อม (วินิจฉัยถูกครั้งแรกไหม · ข้ามขั้นที่ไม่จำเป็นไหม) ลง GameState.scenario_log + user://scenario_log.csv
+func _log_scenario(c: CustomerCase, result: Dictionary) -> void:
+	if c == null or not c.has_meta("scenario_report"):
+		return
+	var r: Dictionary = c.get_meta("scenario_report")
+	var when := GameState._ledger_when()
+	var row := {
+		"ch": when.x, "day": when.y, "id": r.get("id", ""), "part": r.get("part", ""),
+		"first_try": bool(r.get("first_try", false)), "wrong": int(r.get("wrong", 0)),
+		"skipped": (r.get("skipped", []) as Array).size(), "did_optional": (r.get("did_optional", []) as Array).size(),
+		"score": int(result.get("score", 0)), "gave_up": bool(result.get("gave_up", false)),
+	}
+	GameState.scenario_log.append(row)
+	if not quiet:
+		ScenarioBook.append_csv(row)
+
+
+## บรรทัดสรุปสาเหตุบนการ์ดผลงาน · ว่าง = งานนี้ไม่มีสถานการณ์
+static func scenario_line(c: CustomerCase) -> String:
+	if c == null or not c.has_meta("scenario_report"):
+		return ""
+	var r: Dictionary = c.get_meta("scenario_report")
+	var out := "สาเหตุ: %s\nสังเกตได้จาก: %s" % [r.get("cause", ""), r.get("teach", "")]
+	if bool(r.get("first_try", false)):
+		out += "\n🔎 วินิจฉัยถูกตั้งแต่ครั้งแรก"
+	elif int(r.get("wrong", 0)) > 0:
+		out += "\nวินิจฉัยผิด %d ครั้ง" % int(r.get("wrong", 0))
+	if not (r.get("did_optional", []) as Array).is_empty():
+		out += "\nขั้นที่ทำไปแต่เคสนี้ไม่จำเป็น: %d ขั้น (ครั้งหน้าข้ามได้)" % (r.get("did_optional", []) as Array).size()
+	return out
+
 
 # ---------------------------------------------------------------- งาน
 
@@ -791,11 +1293,15 @@ func door_accept_state(promise := -1) -> StringName:
 		return &"pickup"
 	if bool(j.get("phone", false)):
 		return &"phone"
+	var c: CustomerCase = j["case"]
+	if c.is_request() and not _econ().request_counts_quota: # [0.6.0] คำขอไม่กินโควตา แต่วันละไม่เกิน request_daily_max
+		if requests_today >= _econ().request_daily_max:
+			return &"full"
+		return job_fit(c)
 	if not bool(j.get("free", false)) and quota_left() <= 0:
 		return &"full"
-	var c: CustomerCase = j["case"]
 	if promise >= 0 and c.takes_machine():
-		return &"shelf_full" if shelf == null or shelf.is_full() else &"ok"
+		return &"shelf_full" if shelf == null or shelf.slots - shelf.used() < c.device_count else &"ok" # [0.6.0] กลุ่ม 2 เครื่อง = 2 ช่อง
 	return job_fit(c)
 
 
@@ -807,19 +1313,30 @@ func door_accept(promise := -1) -> bool:
 		return false
 	var j: Dictionary = door_queue.pop_front()
 	var c: CustomerCase = j["case"]
-	if not bool(j.get("free", false)):
+	if c.is_request() and not _econ().request_counts_quota:
+		requests_today += 1
+	elif not bool(j.get("free", false)):
 		accepted_today += 1
 	if bool(j.get("appointed", false)):
 		affinity_for(c, &"kept_appointment") # [0.5.0] นัดแล้วรับจริง
 	_board_dirty = true
+	if c.is_request(): # [0.6.0 ขั้น G] คำขอ: การ์ดตอบคำถาม 1 เทิร์น ไม่มีมินิเกม
+		today_case = c
+		_start_request(c)
+		return true
 	if promise >= 0 and c.takes_machine():
 		var ts := _ts()
 		var o := shelf.add(c, ts.shift if ts else 1, promise)
 		if o == null:
 			return false
+		if c.device_count > 1: # [0.6.0 ขั้น I] กลุ่ม 2 เครื่อง → ใบรับเครื่อง 2 ใบ (สุ่มอาการคนละแบบ) · ค่าแรงรวม ×group_fee_mult
+			_add_group_second(c, o, promise)
 		assign_parts(false)
 		today_case = c
-		play_arrival(false)
+		if _is_group(c) and not quiet:
+			_start_debate(c, func() -> void: play_arrival(false))
+		else:
+			play_arrival(false)
 		return true
 	if st == &"ot":
 		var ts := _ts()
@@ -881,7 +1398,7 @@ func play_arrival(then_repair: bool) -> void:
 	_working = true
 	_hide()
 	arrived_today = true
-	var path := today_case.arrive_dialog
+	var path := arrival_dialog_path(today_case)
 	var done := func() -> void:
 		_pending_cb = Callable()
 		_working = false
@@ -895,6 +1412,16 @@ func play_arrival(then_repair: bool) -> void:
 		_wait_dialog(done)
 	else:
 		done.call() # ไม่มีบท/เปิดบทไม่ได้ → ข้ามไปขั้นต่อไปเลย ไม่ให้ค้าง
+
+
+## [0.6.0] บทลูกค้ามาถึง · งานกลางแทน {npc} = ชื่อคนพูด (char_key) · {name} = ชื่อบนการ์ด · {device}
+static func arrival_dialog_path(c: CustomerCase) -> String:
+	if c == null or c.arrive_dialog == "":
+		return ""
+	if c.template() == c:
+		return c.arrive_dialog
+	var n := NpcBook.of_case(c)
+	return DialogUtil.filled_copy(c.arrive_dialog, { "npc": c.customer, "name": n.display_name if n else c.customer, "device": c.device, "symptom": c.symptom.replace(",", " ").replace(":", " ") })
 
 
 ## เปิดมินิเกมของงานนี้ · meta "work_order" = งานลูกค้า (PartMinigame ส่งคะแนนเข้า GameState เฉพาะงานที่มี meta นี้)
@@ -916,6 +1443,13 @@ func start_repair() -> void:
 	_working = true
 	_hide()
 	m.set_meta("work_order", today_case)
+	# [0.6.0 ขั้น E] งานบนชั้นที่มีสถานการณ์: ถึงจุดแบ่งแล้วถามว่ามีของไหม · ตรวจไว้แล้ว = เล่นต่อจากจุดแบ่ง
+	var o: RepairShelf.Order = current_job.get("order") as RepairShelf.Order
+	if o and today_case.scenario() != null:
+		m.set_meta("checkpoint", _minigame_checkpoint.bind(o))
+		if o.inspected and not o.partial.is_empty():
+			m.set_meta("resume", o.partial)
+	today_case.remove_meta("inspection")
 	m.tree_exited.connect(_on_minigame_closed)
 	_minigame = m
 	SceneRouter.push_node(m)
@@ -924,6 +1458,7 @@ func start_repair() -> void:
 
 func _on_minigame_closed() -> void:
 	_minigame = null
+	_after_inspection()
 	_working = false
 	GameState.hold_next_payment = false # ปิดมินิเกมโดยไม่มีผล → อย่าให้ค้างไปงานถัดไป
 	Global.in_minigame = false # กันมินิเกมปิดแบบผิดปกติแล้วค่านี้ค้าง true (การ์ดจะไม่ขึ้นอีกเลย)
@@ -965,6 +1500,10 @@ const TUTORIALS := {
 	"tut_story": "res://Assets/Dialog/Tutorial/story_first.txt",
 	"tut_exam": "res://Assets/Dialog/Tutorial/exam_first.txt",
 	"tut_helper": "res://Assets/Dialog/Tutorial/helper_first.txt",
+	"tut_inspect": "res://Assets/Dialog/Tutorial/inspect_first.txt", # [0.6.0]
+	"tut_request": "res://Assets/Dialog/Tutorial/request_first.txt",
+	"tut_group": "res://Assets/Dialog/Tutorial/group_first.txt",
+	"tut_tool": "res://Assets/Dialog/Tutorial/tool_first.txt",
 }
 
 
@@ -1397,6 +1936,10 @@ func _reset_run() -> void:
 	walkouts.clear()
 	left_home.clear()
 	_recent.clear()
+	scenario_recent.clear()
+	_recent_requests.clear()
+	request_state = { }
+	debate_state = { }
 	visitor_waves.clear()
 	visitors_today = 0
 	visitors_arrived = 0
@@ -1645,6 +2188,9 @@ func _show_card(card: Card) -> void:
 				else:
 					_title.text = "%s มารับเครื่อง · %s" % [o.case.customer, "ทันนัด" if p["on_time"] else "ช้า %d วัน" % int(p["late"])]
 					_body.text += "\n%s" % ("ทันนัด ความพอใจ +%d" % int(p["sat_delta"]) if p["on_time"] else "ช้ากว่านัด ค่าแรง ×%.2f · ความพอใจ %d" % [float(p["mult"]), int(p["sat_delta"])])
+			var sr := scenario_line(c)
+			if sr != "":
+				_body.text += "\n\n" + sr
 			_primary.text = "กลับหน้าร้าน"
 		Card.SHIFT_END:
 			var earned := GameState.money - shift_start_money
@@ -1793,6 +2339,9 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 	var pl := part_line(c)
 	if pl != "":
 		f["detail"] += "\n" + pl
+	var tr := String(ScenarioBook.TRAIT_NAMES.get(c.get_meta("trait", &"normal"), "")) # [0.6.0] นิสัยลูกค้าจากตัวสุ่ม
+	if tr != "":
+		f["detail"] += "\n(%s)" % tr
 	f["portrait"] = Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null
 	f["patience_left"] = door_patience_left(j)
 	f["patience_max"] = door_patience_slots(c)
@@ -1801,14 +2350,14 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 	var st := door_accept_state(1 if c.takes_machine() else -1)
 	match st:
 		&"ok":
-			acc["text"] = "รับเครื่อง" if c.takes_machine() else "รับงาน\n(ทำเลย)"
+			acc["text"] = "รับเครื่อง" if c.takes_machine() else ("ช่วยเลย\n(1 เทิร์น)" if c.is_request() else "รับงาน\n(ทำเลย)")
 			acc["tooltip"] = "ออกใบรับเครื่อง เลือกวันนัด แล้ววางเครื่องบนชั้น" if c.takes_machine() else "นั่งทำงานขมOS ต่อหน้าลูกค้าเลย"
 		&"ot":
 			acc["text"] = "รับงาน\n(ล่วงเวลา)"
 		&"full":
-			acc["text"] = "วันนี้คิวเต็ม"
+			acc["text"] = "วันนี้คิวเต็ม" if not c.is_request() else "วันนี้ช่วย\nครบแล้ว"
 			acc["disabled"] = true
-			acc["tooltip"] = "รับลูกค้าใหม่ได้วันละ %d คน" % _econ().daily_cap
+			acc["tooltip"] = ("รับลูกค้าใหม่ได้วันละ %d คน" % _econ().daily_cap) if not c.is_request() else ("ช่วยเรื่องที่ไม่ใช่งานซ่อมได้วันละ %d เรื่อง" % _econ().request_daily_max)
 		&"shelf_full":
 			acc["text"] = "ชั้นเต็ม"
 			acc["disabled"] = true
@@ -2317,6 +2866,8 @@ func _deliver_parcels(ts: TimeSystem) -> void:
 
 ## บรรทัดอะไหล่บนการ์ด: "ต้องใช้: ถ่าน CMOS · ในคลังมี ✓" / "✗ ยังไม่มี — ตลาด ฿30 (เหลือ 2) · ออนไลน์ ฿25"
 func part_line(c: CustomerCase) -> String:
+	if c and c.scenario() != null and not _case_inspected(c): # [0.6.0 ขั้น E] รู้อะไหล่หลังตรวจเครื่อง
+		return "อะไหล่: ยังไม่รู้ — ต้องรับเครื่องมาตรวจก่อน"
 	var ids := c.part_ids() if c else ([] as Array[StringName])
 	if ids.is_empty():
 		return ""
@@ -2440,7 +2991,13 @@ func shelf_view() -> Dictionary:
 				r["warn"] = true
 			elif not o.part_ids().is_empty():
 				r["status"] += " · อะไหล่พร้อม ✓"
-			var rp := { "text": "ซ่อม (%s)" % _cost_text(job_slots(c)), "disabled": false, "tooltip": "" }
+			# [0.6.0 ขั้น E] ตรวจแล้ว → บอกสาเหตุ · ยังไม่ตรวจ (มีสถานการณ์) → ซ่อม = เริ่มตรวจ
+			var ins := order_inspect_note(o)
+			if ins.begins_with("ตรวจแล้ว"):
+				r["status"] = "%s · %s" % [ins, r["status"]]
+			elif ins != "":
+				r["status"] += " · " + ins
+			var rp := { "text": "ซ่อม (%s)" % _cost_text(_repair_slots(c, o)), "disabled": false, "tooltip": "" }
 			match shelf_repair_state(o):
 				&"no_part":
 					rp["text"] = "รอของ"
@@ -2689,7 +3246,7 @@ func work_order_view() -> Dictionary:
 	var e := _econ()
 	var opts: Array[Dictionary] = []
 	var sel := -1
-	var have_part := c.part_ids().is_empty()
+	var have_part := c.part_ids().is_empty() or c.scenario() != null # [0.6.0] งานมีสถานการณ์ รู้อะไหล่หลังตรวจ
 	for id in c.part_ids():
 		have_part = have_part or GameState.free_count(id) > 0
 	for o in promise_options_for(c):
@@ -3499,4 +4056,13 @@ func _npc_tutorials() -> Array[String]:
 	var j := door_front()
 	if not j.is_empty() and helper_button(j).get("visible", false):
 		out.append("tut_helper")
+	# [0.6.0 ขั้น O] ตรวจแล้วรอของ · คำขอ · กลุ่ม · เครื่องมือ
+	if shelf and shelf.orders.any(func(o: RepairShelf.Order) -> bool: return not o.partial.is_empty() and not order_has_parts(o)):
+		out.append("tut_inspect")
+	if not j.is_empty() and not is_pickup(j) and (j["case"] as CustomerCase).is_request():
+		out.append("tut_request")
+	if not j.is_empty() and not is_pickup(j) and _is_group(j["case"]):
+		out.append("tut_group")
+	if GameState.has_tool(&"multimeter"):
+		out.append("tut_tool")
 	return out

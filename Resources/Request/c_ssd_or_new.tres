@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_ssd_or_new"
+kind = 0
+npc_tags = PackedStringArray("office", "elder", "village", "oldpc")
+min_rank = 1
+title = "เครื่องช้า ซื้อใหม่หรืออัปเกรดดี"
+ask = "คอมเครื่องเก่าเปิดช้ามาก จะซื้อใหม่ทั้งเครื่องดีไหม"
+question = "ถ้าเครื่องยังใช้ฮาร์ดดิสก์จานหมุน วิธีที่คุ้มที่สุดคืออะไร"
+choices = PackedStringArray("เปลี่ยนเป็น SSD", "ซื้อเครื่องใหม่ทันที", "เปลี่ยนเมาส์ใหม่")
+explain = "SSD ทำให้เครื่องเก่าเปิดเร็วขึ้นมากในราคาไม่แพง ลองก่อนค่อยคิดซื้อใหม่"
+fee = 30
+thanks = "ประหยัดไปหลายพันเลย"
+topic = "อัปเกรดคุ้มค่า"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_used_gpu"
+kind = 0
+npc_tags = PackedStringArray("gamer", "student")
+min_rank = 1
+title = "ซื้อการ์ดจอมือสองดีไหม"
+ask = "เห็นการ์ดจอมือสองราคาถูกมาก ซื้อดีไหม"
+question = "ซื้อการ์ดจอมือสองควรเช็กอะไรก่อน"
+choices = PackedStringArray("ทดสอบเล่นจริงดูความร้อนและประกันที่เหลือ", "ดูแค่ว่ากล่องสวยไหม", "เชื่อผู้ขายได้เลยไม่ต้องดู")
+explain = "ของมือสองต้องเห็นมันทำงานจริง ดูอุณหภูมิ ดูประกัน ถ้าถูกผิดปกติให้ระวังของขุดหรือของเสีย"
+fee = 30
+thanks = ""
+topic = "ซื้อของมือสอง"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

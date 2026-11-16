@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_group_two"
+customer = ""
+reason = "{name} ยกคอมมาสองเครื่อง อาการคล้ายกัน"
+device = "{device}"
+symptom = "เปิดเครื่องแล้วจอดำ มีเสียงปี๊บ ทั้งสองเครื่อง"
+level = 2
+est_slots = 3
+months = PackedInt32Array()
+part_id = "part_ram"
+job_title = "คอมสองเครื่องของแก๊ง"
+arrive_dialog = "res://Assets/Dialog/Customer/any_group_arrive.txt"
+thanks_text = "ใช้ได้ทั้งสองเครื่องเลย สุดยอด"
+complain_text = "ยังเปิดไม่ขึ้นอยู่เครื่องหนึ่ง"
+npc_tags = PackedStringArray("group")
+group_ok = true
+device_count = 2
+use_scenario = true
+min_rank = 2
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น I] งานกลุ่ม 2 เครื่อง (ยศประจำหมู่บ้าน) · ใบรับเครื่อง 2 ใบ สุ่มอาการคนละแบบ · ค่าแรงรวม ×1.6

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bios_b2_boot"
+part = &"part_bios"
+title = "B-2 ลำดับบูตผิด"
+symptom = "เปิดทีไรเข้าหน้าจอฟ้า ๆ ไม่เข้าวินโดวส์"
+job_title = "ตั้งค่า BIOS"
+cause = "ลำดับบูตเอา USB ขึ้นก่อน และมีแฟลชไดรฟ์เปล่าเสียบค้าง"
+diag_choices = PackedStringArray("ลำดับบูตเอา USB ขึ้นก่อน", "ฮาร์ดดิสก์เสีย", "แรมเสีย", "วินโดวส์พัง ต้องลงใหม่")
+diag_wrong = "ดิสก์ยังเห็นอยู่ใน BIOS นะ ลองดูแถบ Boot Priority อีกที"
+diag_correct = "ถูก เครื่องหา USB ก่อนแล้วไม่เจอระบบ เลยวนกลับมาที่ BIOS"
+decoy = "ถ้ารีบลงวินโดวส์ใหม่ ข้อมูลลูกค้าอาจหาย"
+teach = "Boot Order บอกว่าเครื่องหาระบบจากไหนก่อน อย่ารีบลงระบบใหม่"
+flags = {"default": true}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

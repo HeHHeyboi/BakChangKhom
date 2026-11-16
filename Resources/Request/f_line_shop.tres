@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_line_shop"
+kind = 1
+npc_tags = PackedStringArray("village", "office", "family")
+min_rank = 0
+title = "ช่วยตั้งไลน์ร้านค้าให้หน่อย"
+ask = "อยากให้ลูกค้าสั่งข้าวแกงผ่านไลน์ได้ ช่วยตั้งให้หน่อย"
+question = "ข้อมูลไหนไม่ควรใส่ในหน้าร้านที่ทุกคนเห็น"
+choices = PackedStringArray("เลขบัตรประชาชนกับรหัสผ่าน", "ชื่อร้านกับเวลาเปิดปิด", "เมนูกับราคา")
+explain = "ข้อมูลส่วนตัวอย่างเลขบัตรกับรหัสผ่านไม่ควรเปิดเผย หน้าร้านใส่แค่ข้อมูลที่ลูกค้าต้องรู้"
+fee = 0
+thanks = ""
+topic = "การใช้งานพื้นฐาน"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

@@ -10,9 +10,9 @@ func _ready() -> void:
 	var e: EconomyConfig = gs.economy
 	gs.reset()
 
-	# A · ข้อมูล NPC 10 คน · ชื่อตรง _CharacterMap
+	# A · ข้อมูล NPC 13 คน (0.6.0 +ต้นกล้า แพรว แก๊งสามเกลอ) · ชื่อตรง _CharacterMap
 	var all := NpcBook.all()
-	_check(all.size() == 10, "มีลูกค้าประจำ 10 คน (%d)" % all.size())
+	_check(all.size() == 13, "มีลูกค้าประจำ 13 คน (%d)" % all.size())
 	var chars: Array = Global._CharacterMap.keys()
 	var bad := PackedStringArray()
 	for n in all:
@@ -31,6 +31,8 @@ func _ready() -> void:
 			continue
 		var c := load(path) as CustomerCase
 		if c == null:
+			continue
+		if c.is_generic(): # [0.6.0] งานกลาง — ใส่ชื่อตอนสุ่ม (match_test)
 			continue
 		count += 1
 		if NpcBook.of_case(c) == null:
@@ -81,7 +83,7 @@ func _ready() -> void:
 
 	# F · เซฟ v6 → โหลดกลับครบ
 	SaveGame.allow_in_tests = true
-	_check(SaveGame.VERSION == 6 and SaveGame.save(), "บันทึกเซฟ v6")
+	_check(SaveGame.VERSION >= 6 and SaveGame.save(), "บันทึกเซฟ v%d" % SaveGame.VERSION)
 	gs.reset()
 	_check(gs.affinity(&"amnuay") == 20 and not gs.met(&"teacher"), "reset → ค่าเริ่ม")
 	SaveGame.load_into()

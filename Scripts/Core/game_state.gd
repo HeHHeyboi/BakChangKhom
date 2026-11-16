@@ -198,6 +198,9 @@ func reset() -> void:
 	perks.clear()
 	level_three_stars.clear()
 	learn_log.clear()
+	scenario_log.clear()
+	request_log.clear()
+	group_fair_count = 0
 	exam_attempts.clear()
 	part_clears.clear()
 	story_flags.clear()
@@ -498,6 +501,13 @@ func _econ() -> EconomyConfig:
 
 ## ค่าความสนิท 0–100 (ลูกค้าขาจร/ไม่มีค่าความสนิท = 0)
 func affinity(id: StringName) -> int:
+	var g := NpcBook.by_id(id)
+	if g and g.is_group(): # [0.6.0 ขั้น I] ความสนิทกลุ่ม = เฉลี่ยสมาชิก
+		var ids := g.member_ids()
+		var sum := 0
+		for m in ids:
+			sum += affinity(m)
+		return roundi(float(sum) / maxi(ids.size(), 1))
 	if npc_affinity.has(id):
 		return npc_affinity[id]
 	var n := NpcBook.by_id(id)
@@ -520,15 +530,24 @@ func affinity_hearts(id: StringName) -> float:
 
 func has_affinity(id: StringName) -> bool:
 	var n := NpcBook.by_id(id)
-	return n != null and n.has_affinity
+	return n != null and (n.has_affinity or n.is_group()) # [0.6.0] กลุ่ม = ค่าเฉลี่ยของสมาชิก
 
 
 ## เปลี่ยนความสนิท · คืนส่วนต่างที่เปลี่ยนจริง (ชนเพดาน/ไม่มีค่าความสนิท = 0)
 func add_affinity(id: StringName, delta: int, reason: StringName = &"") -> int:
+	var grp := NpcBook.by_id(id)
+	if grp and grp.is_group() and delta != 0: # [0.6.0 ขั้น I] ผลงานของกลุ่มเข้าทุกคนที่มา · คืนค่าเฉลี่ย
+		var total := 0
+		for m in grp.member_ids():
+			total += add_affinity(m, delta, reason)
+		return roundi(float(total) / maxi(grp.member_ids().size(), 1))
 	if delta == 0 or not has_affinity(id):
 		return 0
 	if delta > 0 and has_perk(&"sweet_talk"): # [ขั้น I] ปากหวาน
 		delta = ceili(delta * _econ().perk_affinity_mult)
+	var npc := NpcBook.by_id(id) # [0.6.0 ขั้น H] นักเรียนจำคนใจดีได้ ×1.5
+	if delta > 0 and npc and npc.affinity_mult != 1.0:
+		delta = ceili(delta * npc.affinity_mult)
 	var before := affinity(id)
 	var after := clampi(before + delta, 0, 100)
 	if after == before:
@@ -632,6 +651,12 @@ var rank_level := 0
 signal rank_exam_ready(target: int)
 ## [ขั้น G] ผลสอบรายข้อ { ch, day, target, attempt, qid, part, chosen, correct } — เซฟ + user://learn_log.csv
 var learn_log: Array[Dictionary] = []
+## [0.6.0 ขั้น C] ผลสถานการณ์ซ่อม { ch, day, id, part, first_try, wrong, skipped, did_optional, score, gave_up } — เซฟ + user://scenario_log.csv
+var scenario_log: Array[Dictionary] = []
+## [0.6.0 ขั้น G] ผลคำขอ { ch, day, id, kind, topic, right, steps, npc } — เซฟ
+var request_log: Array[Dictionary] = []
+## [0.6.0 ขั้น I] ตัดสินความเห็นไม่ตรงกันของกลุ่มแบบทุกคนพอใจ (Achievement R05 ใน 0.7.0) — เซฟ
+var group_fair_count := 0
 ## ยศเป้าหมาย → สอบมาแล้วกี่ครั้ง
 var exam_attempts: Dictionary = { }
 ## วันเปิดร้าน (shift) ที่สอบล่าสุด — สอบได้วันละครั้ง
@@ -763,9 +788,22 @@ func level_lock_reason(level: int) -> String:
 
 
 ## [0.5.0 ขั้น H] สิ่งที่ยศนี้ปลด (การ์ดหลังสอบผ่าน)
+## [0.6.0 ขั้น J] มีเครื่องมือนี้แล้ว (ได้ตอนเลื่อนยศ)
+func has_tool(id: StringName) -> bool:
+	var e := _econ()
+	for r in e.rank_tools:
+		if int(r) <= rank_level and (e.rank_tools[r] as Array).has(id):
+			return true
+	return false
+
+
 func rank_unlock_lines(r: int) -> PackedStringArray:
 	var e := _econ()
 	var out := PackedStringArray()
+	for t in e.rank_tools.get(r, []): # [0.6.0 ขั้น J]
+		out.append("เครื่องมือ: %s — %s" % [EconomyConfig.TOOL_NAMES.get(t, String(t)), EconomyConfig.TOOL_NOTES.get(t, "")])
+	if r == e.guide_hint_rank:
+		out.append("ไกด์ขึ้นเมื่อขอคำใบ้เท่านั้น · ทำเองไม่ขอคำใบ้ คะแนน +%d" % e.self_bonus)
 	for lv in range(1, 6):
 		if _rank_for_level(lv) == r and r > 0:
 			out.append("งาน Lv%d %s" % [lv, CustomerCase.LEVEL_NAMES[lv - 1]])

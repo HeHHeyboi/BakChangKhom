@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fp_f1_swap"
+part = &"part_front_panel"
+title = "F-1 สายหน้าเคสสลับคู่"
+symptom = "ให้ร้านอื่นเปลี่ยนเคสมา กดปุ่มเปิดเครื่องแล้วไม่ติด"
+job_title = "ต่อสายหน้าเคส"
+cause = "สาย POWER SW เสียบอยู่ที่คู่พิน RESET"
+diag_choices = PackedStringArray("สายปุ่มหน้าเคสเสียบผิดคู่", "พาวเวอร์ซัพพลายเสีย", "เมนบอร์ดเสีย", "แรมหลวม")
+diag_wrong = "ไฟบนเมนบอร์ดยังติดนะ แปลว่าไฟเข้า ลองนึกถึงสายปุ่มดู"
+diag_correct = "ใช่ ไฟเข้าบอร์ดแต่สัญญาณจากปุ่มไปไม่ถึง ต้องอ่านผังพินแล้วเสียบใหม่"
+decoy = "ถ้าเปลี่ยนพาวเวอร์ทั้งที่ไฟเข้าบอร์ดปกติ ก็เสียเงินเปล่า"
+teach = "อ่านผังพิน Front Panel ก่อนเสียบ หัวสายหน้าตาเหมือนกันแต่ชื่อต่างกัน"
+flags = {"default": true, "meter": "วัดคู่พิน PWR SW แล้วไม่มีสายต่ออยู่เลย สายไปเสียบที่คู่ RESET"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

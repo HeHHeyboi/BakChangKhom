@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_printer_ink"
+kind = 0
+npc_tags = PackedStringArray("office", "school", "village")
+min_rank = 1
+title = "ปริ้นเตอร์แบบไหนคุ้ม"
+ask = "ต้องปริ้นเอกสารเยอะทุกเดือน หมึกแพงมาก ควรเปลี่ยนเป็นแบบไหน"
+question = "ถ้าปริ้นเยอะ ควรดูอะไรนอกจากราคาเครื่อง"
+choices = PackedStringArray("ค่าหมึกต่อแผ่น เช่นแบบแท็งก์", "สีของตัวเครื่อง", "ขนาดเครื่องเล็กที่สุด")
+explain = "ปริ้นเยอะต้องดูค่าหมึกต่อแผ่น เครื่องถูกแต่หมึกแพงสุดท้ายจ่ายมากกว่า"
+fee = 20
+thanks = ""
+topic = "ต้นทุนการใช้งาน"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

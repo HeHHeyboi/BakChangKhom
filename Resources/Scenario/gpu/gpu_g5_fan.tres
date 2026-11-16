@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gpu_g5_fan"
+part = &"part_gpu"
+title = "G-5 พัดลมการ์ดจอเสีย"
+symptom = "การ์ดจอมีเสียงดังแกรก ๆ แล้วร้อนจนจอดับ"
+job_title = "เปลี่ยนพัดลมการ์ดจอ"
+cause = "ใบพัดการ์ดจอหัก ลูกปืนแห้ง พัดลมหมุนไม่ไหว"
+lines = Dictionary[String, String]({"INSPECT_LED": "ใบพัดการ์ดหักไปแฉกหนึ่ง หมุนแล้วสั่นเสียงดังแกรก|ล้างฝุ่นอย่างเดียวไม่หาย ต้องเปลี่ยนพัดลม"})
+diag_choices = PackedStringArray("พัดลมการ์ดจอเสีย ต้องเปลี่ยน", "การ์ดจอไม่ได้ต่อไฟ", "สายจอหลวม", "แรมเสีย")
+diag_wrong = "เสียงแกรก ๆ มาจากชิ้นที่หมุนได้ ลองดูใบพัดอีกที"
+diag_correct = "ถูก ใบพัดหักแบบนี้ต้องเปลี่ยนพัดลมการ์ด"
+needs_part = &"fan_gpu"
+part_hint = "ใบพัดการ์ดหัก ต้องใช้พัดลมการ์ดจอใหม่"
+decoy = "ฝุ่นก็มี แต่เป่าแล้วเสียงยังดังเหมือนเดิม"
+teach = "ฟังเสียงชิ้นส่วนที่หมุน เสียงแกรกคือลูกปืนหรือใบพัดเสีย"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

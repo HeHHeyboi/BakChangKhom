@@ -51,6 +51,14 @@ func _ready() -> void:
 ## แรมสกปรกตั้งแต่เริ่ม: ฝุ่นบน PCB · ขาทองหมอง · ฝุ่นในสล็อต
 func _setup_dirt() -> void:
 	var ram: Item2D = %RamA2
+	if bool(scenario_flag("ram_clean")): # [0.6.0] สถานการณ์ R-2: แรมสะอาดอยู่แล้ว (แค่หลุดจากสล็อต)
+		set_gold(1.0)
+		ram.set_state("clean")
+		(%SlotBodyA2 as Item2D).set_state("clean")
+		(%BeepFx as Item2D).texture = TEX_BEEP
+		(%Monitor as Item2D).set_state("glitch")
+		set_led(true)
+		return
 	ram.add_overlay("Dust", TEX_DUST, Color(1, 1, 1, 1), PcPart.Face.SIDE_X, 0.9, 0.015) # ใช้ตอนยังไม่มีรูปสถานะ
 	set_gold(0.0)
 	ram.set_state("dirty")
@@ -141,7 +149,7 @@ func _debug_prepare(phase: int) -> void:
 	var slot := %SlotA2 as Socket2D
 	var glass := %GlassPanel as Item2D
 	var unplugged := phase > PhaseState.POWER_OFF and phase < PhaseState.SUMMARY # ตัดไฟแล้วจน VERIFY เสียบคืน
-	var cleaned := phase > PhaseState.CLEAN
+	var cleaned: bool = phase > PhaseState.CLEAN or bool(scenario_flag("ram_clean")) # [0.6.0] R-2 แรมสะอาดอยู่แล้ว
 	var on_mat := phase == PhaseState.CLEAN or phase == PhaseState.INSTALL # แรมวางบนแผ่น ESD
 	panel_open = phase > PhaseState.REMOVE
 	plugged = not unplugged
@@ -164,6 +172,11 @@ func _debug_prepare(phase: int) -> void:
 	ram.set_state("clean" if cleaned else "dirty")
 	(%SlotBodyA2 as Item2D).set_state("clean" if cleaned else "dirty")
 	ram.mode = Item2D.Mode.DRAGGABLE
+
+
+## [0.6.0] แรมมีขั้นวินิจฉัย (เลือกสาเหตุ) ของตัวเองใน PhaseDiagnosis
+func _scenario_uses_panel() -> bool:
+	return false
 
 
 ## ของเสียระหว่างซ่อม → GameState หักเงิน

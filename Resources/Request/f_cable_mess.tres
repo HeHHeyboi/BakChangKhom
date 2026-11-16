@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_cable_mess"
+kind = 1
+npc_tags = PackedStringArray("elder", "village", "family")
+min_rank = 0
+title = "ปลั๊กพ่วงต่อกันหลายทอด"
+ask = "ปลั๊กไม่พอ เลยเอาปลั๊กพ่วงมาต่อกันสามอัน ร้อนนิดหน่อย ไม่เป็นไรใช่ไหม"
+question = "ควรแนะนำว่ายังไง"
+choices = PackedStringArray("อย่าต่อพ่วงหลายทอด ใช้ปลั๊กที่รับไฟพอและมีมาตรฐาน", "ร้อนนิดหน่อยไม่เป็นไร", "เอาเทปพันให้แน่นก็พอ")
+explain = "ปลั๊กร้อนคือเตือนว่ารับไฟเกิน ต่อหลายทอดเสี่ยงไฟไหม้ ใช้ปลั๊กมีมาตรฐานและไม่เสียบเกินกำลัง"
+fee = 0
+thanks = "จะไปซื้อปลั๊กใหม่ดี ๆ เลย"
+topic = "ความปลอดภัยไฟฟ้า"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

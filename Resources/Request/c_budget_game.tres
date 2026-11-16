@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_budget_game"
+kind = 0
+npc_tags = PackedStringArray("gamer", "student", "friend")
+min_rank = 1
+title = "งบหมื่นห้าซื้อคอมเล่นเกมอะไรดี"
+ask = "มีงบหมื่นห้า อยากได้คอมเล่นเกม ควรทุ่มเงินไปที่อะไรก่อน"
+question = "ถ้าเน้นเล่นเกม ควรแบ่งงบให้ชิ้นไหนมากที่สุด"
+choices = PackedStringArray("การ์ดจอ", "เคสสวย ๆ มีไฟ", "แรมเยอะ ๆ 64GB")
+explain = "เกมส่วนใหญ่หนักที่การ์ดจอ แบ่งงบให้การ์ดจอมากสุด แล้วจัดซีพียูให้พอดีกันจะได้ไม่เกิดคอขวด"
+question2 = "แล้วพาวเวอร์ซัพพลายควรเลือกยังไง"
+choices2 = PackedStringArray("มียี่ห้อ มีมาตรฐาน วัตต์เผื่อไว้", "ถูกที่สุดที่หาได้", "วัตต์สูงที่สุดในร้าน")
+explain2 = "พาวเวอร์ที่ไม่มีมาตรฐานพังแล้วพาชิ้นอื่นพังด้วย เลือกวัตต์พอดีเผื่อสักหน่อยก็พอ"
+fee = 40
+thanks = "เข้าใจแล้ว ไม่ซื้อเคสไฟวิบวับก่อนละ"
+topic = "เลือกสเปกตามงบ"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fp_f3_led"
+part = &"part_front_panel"
+title = "F-3 ไฟหน้าเคสกลับขั้ว"
+symptom = "ไฟหน้าเคสไม่ติด กลัวว่าคอมจะเสีย แต่ก็ยังใช้งานได้อยู่"
+job_title = "แก้ไฟหน้าเคส"
+cause = "สาย Power LED เสียบกลับขั้วบวกลบ"
+lines = Dictionary[String, String]({"INSPECT_BUTTON": "กดแล้วเครื่องติดนะ พัดลมหมุน แต่ไฟหน้าเคสไม่สว่างเลย", "INSPECT_RECENT": "โน้ตบอกว่าเพิ่งถอดสายหน้าเคสออกมาทำความสะอาด แล้วเสียบกลับเอง"})
+diag_choices = PackedStringArray("สายไฟ LED เสียบกลับขั้ว", "เมนบอร์ดเสีย", "พาวเวอร์ซัพพลายเสีย", "หลอดไฟหน้าเคสขาด")
+diag_wrong = "เครื่องติดปกตินะ ปัญหาอยู่ที่ไฟดวงเดียว ลองนึกถึงขั้วของ LED"
+diag_correct = "ใช่ LED มีขั้ว เสียบกลับด้านก็ไม่ติด แค่กลับหัวก็หาย ต้องบอกลูกค้าตามจริงว่าไม่ได้เสียหนัก"
+optional_phases = PackedStringArray("DUAL_CHANNEL")
+decoy = "ถ้าบอกลูกค้าว่าเสียหนักเพื่อคิดเงินเยอะ คือโกหก"
+teach = "LED มีขั้วบวกลบ ไม่ใช่ทุกอาการคือของเสีย และต้องบอกลูกค้าตามจริง"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

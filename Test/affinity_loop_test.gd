@@ -132,11 +132,11 @@ func _ready() -> void:
 	DayLoop.door_queue.clear()
 	var book := DayLoop.customer_book_view()
 	var rows: Array = book["rows"]
-	_check(rows.size() == 9 and bool(rows[0].met) and rows.any(func(r: Dictionary) -> bool: return not r.met and r.name == "???"), "สมุดลูกค้า 9 คน · คนที่เจอแล้วขึ้นก่อน · ยังไม่เจอ = ???")
+	_check(rows.size() == NpcBook.with_affinity().size() and bool(rows[0].met) and rows.any(func(r: Dictionary) -> bool: return not r.met and r.name == "???"), "สมุดลูกค้าครบทุกคนที่มีความสนิท · คนที่เจอแล้วขึ้นก่อน · ยังไม่เจอ = ???")
 	var app = load("res://Scene/UI/customer_book_app.tscn").instantiate()
 	add_child(app)
 	await _frames(1)
-	_check(app.get_node("%List").get_child_count() == 9 and String(app.get_node("%Head").text).contains("รู้จักแล้ว"), "แอปสมุดลูกค้าวาดได้ 9 แถว")
+	_check(app.get_node("%List").get_child_count() == NpcBook.with_affinity().size() and String(app.get_node("%Head").text).contains("รู้จักแล้ว"), "แอปสมุดลูกค้าวาดได้ครบทุกแถว")
 	app.queue_free()
 	var ms_text := DayLoop.month_summary_text(GameState.month_report(ts.month()))
 	_check(ms_text.contains("ความสนิทเดือนนี้: ") and ms_text.contains("ครู ♥"), "สรุปเดือนมีบรรทัดความสนิท")
@@ -172,7 +172,7 @@ func _ready() -> void:
 			if not ok:
 				files_ok = false
 				print("  ไฟล์เรื่องไม่ครบ ", st.dialog, " ", keys)
-	_check(n_stories == 18 and files_ok, "เรื่องส่วนตัว 18 เรื่อง · ทุกไฟล์มีทางเลือก \"ฟังเรื่อง\" / \"%s\" / ตัวเลือกจบดี" % DayLoop.STORY_BUSY)
+	_check(n_stories == 24 and files_ok, "เรื่องส่วนตัว 24 เรื่อง (0.6.0 +ผอ. +เพื่อนร่วมงาน) · ทุกไฟล์มีทางเลือก \"ฟังเรื่อง\" / \"%s\" / ตัวเลือกจบดี" % DayLoop.STORY_BUSY)
 	DialogScene.DialogDict = { "dialog": [] }
 	GameState.add_affinity(&"teacher", 39 - GameState.affinity(&"teacher"))
 	_check(DayLoop.next_story(&"teacher") == null, "ครู 39 → ยังไม่มีเรื่องเล่า")

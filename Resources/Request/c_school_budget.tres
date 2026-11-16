@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_school_budget"
+kind = 0
+npc_tags = PackedStringArray("school")
+min_rank = 1
+title = "งบห้องคอมโรงเรียนมีจำกัด"
+ask = "โรงเรียนได้งบมาก้อนเดียว จะซ่อมเครื่องเก่าหรือซื้อใหม่ไม่กี่เครื่องดี"
+question = "ควรตัดสินใจจากอะไรเป็นหลัก"
+choices = PackedStringArray("เทียบค่าซ่อมกับราคาเครื่องใหม่และงานที่เด็กต้องใช้", "ซื้อใหม่ทั้งหมดเพราะใหม่ดีกว่าเสมอ", "ซ่อมทุกเครื่องเพราะถูกกว่าเสมอ")
+explain = "ดูว่าเครื่องเก่าซ่อมแล้วคุ้มไหมเทียบกับเครื่องใหม่ และเด็กต้องใช้ทำอะไร ไม่มีคำตอบเดียวทุกกรณี"
+fee = 40
+thanks = ""
+topic = "วางแผนงบ"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

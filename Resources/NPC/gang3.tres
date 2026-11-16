@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/NPC/bew.tres" id="m1"]
+[ext_resource type="Resource" path="res://Resources/NPC/tonkla.tres" id="m2"]
+[ext_resource type="Resource" path="res://Resources/NPC/praew.tres" id="m3"]
+
+[resource]
+script = ExtResource("1")
+id = &"gang3"
+display_name = "แก๊งสามเกลอ ม.2"
+char_key = "แก๊งสามเกลอ"
+start_affinity = 0
+base_weight = 1.0
+has_affinity = false
+bio = "น้องบิว น้องต้นกล้า และน้องแพรว เพื่อนสามคนที่ชอบมาด้วยกัน ความเห็นไม่ค่อยตรงกันแต่รักกันมาก"
+kind = 1
+tags = PackedStringArray("group")
+members = Array[ExtResource("1")]([ExtResource("m1"), ExtResource("m2"), ExtResource("m3")])
+devices = PackedStringArray("คอมที่บ้านน้องบิวที่ใช้เล่นด้วยกัน", "คอมของชมรมที่โรงเรียน")
+school_hours = true
+fee_mult = 0.6
+unlock_chapter = 5
+unlock_by = ExtResource("m1")
+unlock_by_affinity = 60
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น I] กลุ่มนักเรียน · 1 คนในโควตา +1 เทิร์น · ความสนิท · เฉลี่ยสมาชิก · ปลดบท 5 หรือน้องบิวสนิท 60

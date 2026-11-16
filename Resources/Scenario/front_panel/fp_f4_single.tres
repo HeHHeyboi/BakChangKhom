@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fp_f4_single"
+part = &"part_front_panel"
+title = "F-4 แรมทำงานช่องเดียว"
+symptom = "ซื้อแรมเพิ่มมาใส่เองแล้ว แต่เกมไม่ลื่นขึ้นเท่าที่คิด"
+job_title = "จัดแรม Dual Channel"
+cause = "ใส่แรมสองแถวในสล็อตติดกัน เลยทำงานแบบ Single Channel"
+lines = Dictionary[String, String]({"INSPECT_RECENT": "โน้ตบอกว่าลูกค้าเพิ่งใส่แรมแถวที่สองเอง และถอดสายหน้าเคสออกตอนใส่"})
+diag_choices = PackedStringArray("แรมสองแถวเสียบติดกัน ได้แค่ Single Channel", "แรมใหม่เสีย", "การ์ดจอเสีย", "ติดไวรัส")
+diag_wrong = "เครื่องไม่มี error อะไรเลย แค่ไม่เร็วขึ้น ลองดูว่าแรมเสียบช่องไหน"
+diag_correct = "ถูก ต่อสายปุ่มให้เรียบร้อยแล้วย้ายแรมไปช่องสีเดียวกัน จะได้วิ่งคู่กัน"
+decoy = "ไม่มี error ให้เห็น ถ้าไม่เช็กใน BIOS ก็ไม่รู้ว่าแรมวิ่งช่องเดียว"
+teach = "Dual Channel ต้องใส่แรมเว้นช่องตามสีที่คู่มือบอก"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

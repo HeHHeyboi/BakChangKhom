@@ -11,7 +11,8 @@ const PATH := "user://save.json"
 ## [0.3.0] VERSION 4 = หน้าประตู (door · appointments · accepted_today) · ชั้นวาง (shelf · shelf_slots) · ลูกค้ามารับ (door[].pickup)
 ## [0.4.0] VERSION 5 = อะไหล่ผูกกับงาน: ราคาทุนในคลัง (items[].cost) · พัสดุออนไลน์ (inventory.pending) · ใบรับเครื่องมีรหัส/ของชดใช้ (shelf.orders[].key · replace_part) · สต็อกตลาดรอบ 2 สัปดาห์ (inventory.week = รอบ)
 ## [0.5.0] VERSION 6 = ลูกค้าประจำ: ความสนิท · ประวัติเครื่อง · มาร้านล่าสุด · เรื่องส่วนตัวที่ฟังแล้ว (game.npc)
-const VERSION := 6
+## [0.6.0] VERSION 7 = งานกลางเก็บเป็น { path · npc · device } (door · appointments · shelf.orders[].case) · helper_used_today
+const VERSION := 7
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -65,8 +66,9 @@ static func save() -> bool:
 	var door := []
 	for j in DayLoop.door_queue:
 		var c: CustomerCase = j.get("case")
-		if c and c.resource_path != "":
-			var d := { "case": c.resource_path, "phone": bool(j.get("phone", false)), "appointed": bool(j.get("appointed", false)), "free": bool(j.get("free", false)), "waited": int(j.get("waited", 0)) }
+		var ref: Variant = CustomerCase.to_ref(c) # [0.6.0] งานกลาง = { path · npc · device }
+		if ref is Dictionary or String(ref) != "":
+			var d := { "case": ref, "phone": bool(j.get("phone", false)), "appointed": bool(j.get("appointed", false)), "free": bool(j.get("free", false)), "waited": int(j.get("waited", 0)) }
 			if DayLoop.is_pickup(j): # [0.3.0 ขั้น E] ลูกค้ามารับเครื่อง (ใบรับเครื่องที่ปิดแล้ว + ค่าที่คิดไว้ตอนมาถึง)
 				var p: Dictionary = j["pickup"]
 				d["pickup"] = { "order": (p["order"] as RepairShelf.Order).to_dict(), "late": p["late"], "mult": p["mult"], "sat_delta": p["sat_delta"], "on_time": p["on_time"] }
@@ -74,8 +76,9 @@ static func save() -> bool:
 	var appts := []
 	for a in DayLoop.appointments:
 		var c: CustomerCase = a.get("case")
-		if c and c.resource_path != "":
-			appts.append({ "case": c.resource_path, "free": bool(a.get("free", false)) })
+		var aref: Variant = CustomerCase.to_ref(c)
+		if aref is Dictionary or String(aref) != "":
+			appts.append({ "case": aref, "free": bool(a.get("free", false)) })
 	var stars := { }
 	for k in GameState.level_stars:
 		stars[str(k)] = GameState.level_stars[k]
@@ -94,12 +97,13 @@ static func save() -> bool:
 			"ledger": GameState.ledger.map(func(e: Dictionary) -> Dictionary: return { "ch": e.ch, "day": e.day, "kind": String(e.kind), "amount": e.amount, "note": e.note }), # [0.2.0-C]
 			"npc": _npc_save(), # [0.5.0]
 			"rank_level": GameState.rank_level, "learn_log": GameState.learn_log, # [0.5.0 ขั้น F–G]
+			"scenario_log": GameState.scenario_log, "request_log": GameState.request_log, "group_fair": GameState.group_fair_count, # [0.6.0]
 			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
 			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
-			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today,
+			"door": door, "appointments": appts, "accepted_today": DayLoop.accepted_today, "helper_used": DayLoop.helper_used_today, # [0.6.0]
 			"shelf": DayLoop.shelf.to_save() if DayLoop.shelf else { }, "vendor": DayLoop.vendor, "ot_this_week": DayLoop.ot_this_week, "parts_seen": DayLoop._parts_seen.keys().map(func(k): return String(k)),
 			"break_done": DayLoop._break_done, "demo_over": DayLoop.demo_over, "demo_ack": DayLoop._demo_ack,
 			"week_start_money": DayLoop.week_start_money, "force_active": DayLoop.force_active,
@@ -162,6 +166,15 @@ static func load_into() -> int:
 	_npc_load(g.get("npc", { })) # [0.5.0] เซฟ v3–v5 ไม่มี = ค่าเริ่มของแต่ละคน
 	# [0.5.0 ขั้น F] เซฟเก่าไม่มียศที่สอบ → ใช้ยศตาม XP (ไม่ต้องสอบย้อนหลัง)
 	GameState.rank_level = int(g.get("rank_level", GameState.xp_rank()))
+	GameState.group_fair_count = int(g.get("group_fair", 0))
+	GameState.request_log.clear()
+	for r in g.get("request_log", []):
+		if r is Dictionary:
+			GameState.request_log.append(r)
+	GameState.scenario_log.clear()
+	for r in g.get("scenario_log", []):
+		if r is Dictionary:
+			GameState.scenario_log.append(r)
 	for r in g.get("learn_log", []):
 		if r is Dictionary:
 			GameState.learn_log.append(r)
@@ -211,20 +224,23 @@ static func load_into() -> int:
 	var l: Dictionary = d.get("loop", { })
 	DayLoop.door_queue.clear()
 	for j in l.get("door", l.get("board", [])): # เซฟก่อน 0.3.0 มี "board" (กระดานงาน) → ยืนหน้าประตูแทน
-		if not ResourceLoader.exists(String(j.case)):
-			continue
 		if j.has("pickup"):
 			var pd: Dictionary = j["pickup"]
 			var o := RepairShelf.Order.from_dict(pd.get("order", { }))
 			if o:
 				DayLoop.door_queue.append(DayLoop.pickup_entry({ "order": o, "late": int(pd.get("late", 0)), "mult": float(pd.get("mult", 1.0)), "sat_delta": int(pd.get("sat_delta", 0)), "on_time": bool(pd.get("on_time", true)) }))
 			continue
-		DayLoop.door_queue.append(DayLoop.door_entry(load(String(j.case)), bool(j.get("phone", false)), bool(j.get("appointed", false)), bool(j.get("free", false)), int(j.get("waited", 0))))
+		var jc := CustomerCase.from_ref(j.get("case", ""))
+		if jc == null:
+			continue
+		DayLoop.door_queue.append(DayLoop.door_entry(jc, bool(j.get("phone", false)), bool(j.get("appointed", false)), bool(j.get("free", false)), int(j.get("waited", 0))))
 	DayLoop.appointments.clear()
 	for a in l.get("appointments", []):
-		if ResourceLoader.exists(String(a.case)):
-			DayLoop.appointments.append({ "case": load(String(a.case)), "free": bool(a.get("free", false)) })
+		var ac := CustomerCase.from_ref(a.get("case", ""))
+		if ac:
+			DayLoop.appointments.append({ "case": ac, "free": bool(a.get("free", false)) })
 	DayLoop.accepted_today = int(l.get("accepted_today", 0))
+	DayLoop.helper_used_today = int(l.get("helper_used", 0)) # [0.6.0] เซฟ v6 ไม่มี = 0
 	# [0.3.0 ขั้น D] ชั้นวางเครื่อง (ใบรับเครื่องที่ยังไม่ปิด) · เซฟ v3 ไม่มี = ชั้นว่าง
 	DayLoop.shelf = RepairShelf.new(GameState.economy)
 	DayLoop.shelf.load_save(l.get("shelf", { }))

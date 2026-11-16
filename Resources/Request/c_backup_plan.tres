@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_backup_plan"
+kind = 0
+npc_tags = PackedStringArray("office", "village", "school")
+min_rank = 1
+title = "จะเก็บไฟล์สำคัญยังไงไม่ให้หาย"
+ask = "ไฟล์งานทั้งหมดอยู่ในเครื่องเดียว กลัวเครื่องพังแล้วหาย ทำยังไงดี"
+question = "วิธีสำรองข้อมูลที่ดีคืออะไร"
+choices = PackedStringArray("เก็บไว้สองที่ขึ้นไป เช่นฮาร์ดดิสก์นอกกับคลาวด์", "เก็บไว้ในเครื่องเดียวแต่ตั้งชื่อไฟล์ดี ๆ", "ปริ้นออกมาทุกไฟล์")
+explain = "ข้อมูลสำคัญควรมีสำเนาอย่างน้อยสองที่ ถ้าที่หนึ่งพังยังมีอีกที่"
+fee = 20
+thanks = "วันนี้กลับไปสำรองเลย"
+topic = "สำรองข้อมูล"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

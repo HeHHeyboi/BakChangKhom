@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mb_m2_clip"
+part = &"part_mainboard"
+title = "M-2 ขาล็อกฮีตซิงก์หลุด"
+symptom = "เครื่องช้ามาก พัดลมดังตลอดเวลา"
+job_title = "ยึดฮีตซิงก์ใหม่"
+cause = "ขาล็อกฮีตซิงก์หลุดหนึ่งมุม CPU ร้อนจนลดความเร็วตัวเอง"
+lines = Dictionary[String, String]({"INSPECT_FINS": "มุมหนึ่งของฮีตซิงก์ลอยขึ้นมา ขาล็อกหลุดไปข้างหนึ่ง|ฮีตซิงก์ไม่แนบกับ CPU ความร้อนเลยออกไม่หมด", "INSPECT_PASTE": "ซิลิโคนยังพอใช้ได้อยู่ แต่เกลี่ยไม่เต็มเพราะฮีตซิงก์เอียง"})
+diag_choices = PackedStringArray("ฮีตซิงก์ยึดไม่แน่น CPU ร้อนจนลดความเร็ว", "ติดไวรัส เครื่องเลยช้า", "แรมไม่พอ", "ฮาร์ดดิสก์เสีย")
+diag_wrong = "เครื่องช้ากับพัดลมดังพร้อมกัน ลองดูฮีตซิงก์อีกที"
+diag_correct = "ถูก ฮีตซิงก์ลอยมุมหนึ่ง CPU ร้อนเลยลดความเร็วตัวเอง ที่เรียกว่า throttling"
+decoy = "อาการช้าดูเหมือนไวรัส แต่จริง ๆ มาจากความร้อน"
+teach = "อาการช้าอาจมาจากความร้อน ฮีตซิงก์ต้องยึดครบทุกมุม"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

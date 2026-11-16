@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_fake_shop"
+kind = 1
+npc_tags = PackedStringArray("any")
+min_rank = 0
+title = "ร้านออนไลน์นี้น่าเชื่อไหม"
+ask = "เจอร้านขายมือถือถูกกว่าที่อื่นครึ่งราคา ให้โอนก่อน น่าเชื่อไหม"
+question = "จุดไหนน่าสงสัยที่สุด"
+choices = PackedStringArray("ถูกผิดปกติและให้โอนเงินก่อนเท่านั้น", "มีรูปสินค้าหลายรูป", "ร้านมีชื่อภาษาอังกฤษ")
+explain = "ราคาถูกผิดปกติบวกกับบังคับโอนก่อนคือสัญญาณร้านปลอม ซื้อผ่านแพลตฟอร์มที่มีระบบคุ้มครองดีกว่า"
+fee = 0
+thanks = ""
+topic = "ซื้อของออนไลน์อย่างปลอดภัย"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

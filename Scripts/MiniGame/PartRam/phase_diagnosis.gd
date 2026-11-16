@@ -46,8 +46,15 @@ func _build() -> void:
 	_choice_box = VBoxContainer.new()
 	rail.add_child(_choice_box)
 	PhaseUI.label(_choice_box, "สาเหตุน่าจะเป็น…", 18, PhaseUI.COL_OK)
-	for c in CHOICES:
-		PhaseUI.rail_button(_choice_box, c[0], _on_choice.bind(c[1]))
+	# [0.6.0 ขั้น C] มีสถานการณ์ → ตัวเลือกของสถานการณ์ (สลับลำดับ) แทนชุดเดิม
+	if owner.scenario:
+		var btns := []
+		for c in owner.scenario_choices():
+			btns.append(PhaseUI.rail_button(_choice_box, c[0], _on_choice.bind("correct" if c[1] else "wrong")))
+		owner.add_tool_buttons(_choice_box, btns, owner.scenario.diag_choices[0]) # [0.6.0 ขั้น J] มัลติมิเตอร์ · การ์ด POST
+	else:
+		for c in CHOICES:
+			PhaseUI.rail_button(_choice_box, c[0], _on_choice.bind(c[1]))
 
 
 func _on_clicked(p: Item2D) -> void:
@@ -106,7 +113,15 @@ func _on_choice(data: String) -> void:
 			b.disabled = true
 	if data == "correct":
 		is_correct = true
+		if owner.scenario:
+			owner.scenario_answer(true)
 		say(MinigameHeader.DIAGNOSIS_CORRECT, PibHint.Mood.HAPPY)
+		return
+	if data == "wrong": # [0.6.0] สถานการณ์: หักคะแนน + ปิ๊บใบ้ใน scenario_answer
+		owner.scenario_answer(false)
+		_wrong_count += 1
+		if _wrong_count == 3:
+			say(MinigameHeader.DIAGNOSIS_HINT)
 		return
 	mistake.emit(&"diagnosis", 10)
 	_wrong_count += 1

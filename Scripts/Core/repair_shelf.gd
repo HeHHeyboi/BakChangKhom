@@ -36,28 +36,36 @@ class Order extends RefCounted:
 	func late_days(day: int) -> int:
 		return maxi(day - due, 0)
 
-	## [0.4.0] อะไหล่ที่งานนี้ต้องใช้ (ตามเคส) — จองด้วย key
+	## [0.6.0 ขั้น E] ตรวจแล้ว (ครึ่งแรกของมินิเกม) — งานที่มีสถานการณ์ซ่อมรู้อะไหล่หลังตรวจเท่านั้น
+	var inspected := false
+	## ผลครึ่งตรวจที่เก็บไว้เล่นต่อ { mistakes, wrong, skipped, did_optional } · ว่าง = ยังไม่ได้แบ่ง
+	var partial: Dictionary = { }
+
+	## [0.4.0] อะไหล่ที่งานนี้ต้องใช้ (ตามเคส) — จองด้วย key · [0.6.0] งานมีสถานการณ์ = ว่างจนกว่าจะตรวจ
 	func part_ids() -> Array[StringName]:
-		return case.part_ids() if case else ([] as Array[StringName])
+		if case == null or (case.scenario() != null and not inspected):
+			return [] as Array[StringName]
+		return case.part_ids()
 
 	func replace_key() -> String:
 		return key + "!r"
 
 	func to_dict() -> Dictionary:
 		return {
-			"case": case.resource_path if case else "",
+			"case": CustomerCase.to_ref(case), # [0.6.0] งานกลาง = { path · npc · device }
 			"accepted": accepted, "due": due, "promise": promise,
 			"state": state, "result": result, "closed_on": closed_on,
 			"postponed": postponed, "sat_adjust": sat_adjust,
 			"key": key, "replace_part": String(replace_part),
+			"inspected": inspected, "partial": partial,
 		}
 
 	static func from_dict(d: Dictionary) -> Order:
-		var path: String = d.get("case", "")
-		if path == "" or not ResourceLoader.exists(path):
+		var c := CustomerCase.from_ref(d.get("case", ""))
+		if c == null:
 			return null
 		var o := Order.new()
-		o.case = load(path) as CustomerCase
+		o.case = c
 		o.accepted = int(d.get("accepted", 0))
 		o.due = int(d.get("due", 0))
 		o.promise = int(d.get("promise", 1))
@@ -68,6 +76,8 @@ class Order extends RefCounted:
 		o.sat_adjust = int(d.get("sat_adjust", 0))
 		o.key = String(d.get("key", ""))
 		o.replace_part = StringName(d.get("replace_part", ""))
+		o.inspected = bool(d.get("inspected", false))
+		o.partial = d.get("partial", { }) if d.get("partial") is Dictionary else { }
 		return o
 
 

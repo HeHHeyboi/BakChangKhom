@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CustomerNPC" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/customer_npc.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"praew"
+display_name = "น้องแพรว"
+char_key = "แพรว"
+start_affinity = 0
+base_weight = 0.8
+has_affinity = true
+bio = "สมาชิกแก๊งสามเกลอ ช่างสังเกต ชอบถามเรื่องความปลอดภัยในโลกออนไลน์"
+kind = 0
+tags = PackedStringArray("student", "school")
+devices = PackedStringArray("โน้ตบุ๊กของน้องแพรว")
+school_hours = true
+fee_mult = 0.6
+affinity_mult = 1.5
+solo_min_affinity = 40
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น I] สมาชิกแก๊งสามเกลอ · มาคนเดียวเมื่อสนิทถึง 40 · รูปชั่วคราว · char_girl (รออาร์ต)

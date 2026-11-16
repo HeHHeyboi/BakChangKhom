@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_sms_scam"
+kind = 1
+npc_tags = PackedStringArray("any")
+min_rank = 0
+title = "ช่วยดูว่า SMS นี้หลอกไหม"
+ask = "ได้ข้อความว่าพัสดุตกค้าง ให้กดลิงก์จ่ายค่าส่งยี่สิบบาท จริงไหม"
+question = "ควรแนะนำว่ายังไง"
+choices = PackedStringArray("อย่ากดลิงก์ ตรวจสอบกับขนส่งทางช่องทางที่เป็นทางการ", "กดลิงก์จ่ายไปเลยแค่ยี่สิบบาท", "ส่งต่อให้เพื่อนช่วยกดดู")
+explain = "ลิงก์แบบนี้มักพาไปหน้าปลอมเพื่อขโมยข้อมูลบัตร ตรวจสอบกับขนส่งเองทางแอปหรือเบอร์จริง"
+question2 = "ถ้ากดไปแล้วและกรอกบัตรไปแล้วต้องทำยังไง"
+choices2 = PackedStringArray("รีบโทรธนาคารอายัดบัตร", "รอดูก่อนว่ามีเงินหายไหม", "ลบข้อความทิ้งก็พอ")
+explain2 = "รีบอายัดบัตรทันที ยิ่งช้ายิ่งเสียหายมาก"
+fee = 0
+thanks = "โชคดีที่ยังไม่กด"
+topic = "ความปลอดภัยไซเบอร์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

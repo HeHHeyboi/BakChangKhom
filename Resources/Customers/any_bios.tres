@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_bios"
+customer = ""
+reason = "{name} เอา{device}มาให้ดู"
+device = "{device}"
+symptom = "เปิดเครื่องแล้วขึ้นข้อความแปลก ๆ บูตไม่เข้าวินโดวส์"
+level = 5
+est_slots = 8
+months = PackedInt32Array()
+part_id = "part_bios"
+job_title = "ตั้งค่า BIOS"
+arrive_dialog = "res://Assets/Dialog/Customer/any_arrive.txt"
+thanks_text = "เข้าวินโดวส์ได้แล้ว ขอบคุณมาก"
+complain_text = "ยังบูตไม่เข้าเลย"
+npc_tags = PackedStringArray("office", "school", "gamer", "friend")
+use_scenario = true
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น A] งานกลาง — ใครที่ป้ายตรงก็เอามาได้ · อาการจริงมาจากตัวสุ่ม (ขั้น C)

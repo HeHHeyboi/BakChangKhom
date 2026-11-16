@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 80
+title = "ชวนไปช่วยห้องคอมโรงเรียน"
+dialog = "res://Assets/Dialog/NPC/director_80.txt"
+good_choice = ""
+reward_item = &""
+flag = &"npc_regular_director"
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น L] เรื่องส่วนตัว ผอ. ♥80 (ร่าง · ทีมอ่านตรวจ)

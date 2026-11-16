@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"c_online_class"
+kind = 0
+npc_tags = PackedStringArray("school", "family", "elder")
+min_rank = 1
+title = "ลูกจะเรียนออนไลน์ต้องใช้อะไรบ้าง"
+ask = "ลูกต้องเรียนออนไลน์ ต้องซื้ออะไรเพิ่มบ้าง ไม่อยากเสียเงินเกินจำเป็น"
+question = "ของที่จำเป็นที่สุดสำหรับเรียนออนไลน์คืออะไร"
+choices = PackedStringArray("เน็ตที่เสถียรกับกล้องและไมค์", "การ์ดจอแรง ๆ", "จอใหญ่สามจอ")
+explain = "เรียนออนไลน์ใช้เน็ตกับกล้องไมค์เป็นหลัก เครื่องธรรมดาก็พอ ไม่ต้องลงทุนการ์ดจอ"
+fee = 20
+thanks = "ดีแล้วที่มาถามก่อน เกือบไปซื้อการ์ดจอให้ลูกแล้ว"
+topic = "อุปกรณ์เรียนออนไลน์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

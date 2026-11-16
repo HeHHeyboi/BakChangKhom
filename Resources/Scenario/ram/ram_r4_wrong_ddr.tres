@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ram_r4_wrong_ddr"
+part = &"part_ram"
+title = "R-4 ซื้อแรมผิดรุ่น"
+symptom = "ซื้อแรมมาใส่เองแต่ใส่ไม่ลง เลยใส่แท่งเก่ากลับ ตอนนี้เปิดไม่ติดเลย"
+job_title = "ใส่แรมให้ถูกรุ่น"
+cause = "แรมที่ลูกค้าซื้อเป็น DDR3 แต่บอร์ดรองรับ DDR4 ส่วนแท่งเก่าก็ใส่กลับไม่สุด"
+lines = Dictionary[String, String]({"DIAGNOSIS_CLUE_DUST": "แท่งที่ลูกค้าซื้อมาวางอยู่ข้างเครื่อง ป้ายเขียนว่า DDR3|ร่องบากอยู่คนละที่กับสล็อต DDR4 บนบอร์ดนี้ ใส่ยังไงก็ไม่ลง"})
+diag_choices = PackedStringArray("แรมผิดรุ่น บอร์ดนี้ต้องใช้ DDR4", "สล็อตแรมเสีย", "แรมใหม่เสีย", "พาวเวอร์ซัพพลายเสีย")
+diag_wrong = "ลองอ่านป้ายบนแรมที่ลูกค้าซื้อมา แล้วเทียบกับสล็อตดู"
+diag_correct = "ใช่ DDR3 กับ DDR4 ร่องบากอยู่คนละที่ ใส่แทนกันไม่ได้ ต้องหาแรมรุ่นที่ถูกมาใส่"
+needs_part = &"ram_ddr4_8gb_new"
+part_alternatives = Array[StringName]([&"ram_ddr4_8gb_used"])
+part_hint = "ต้องใช้แรม DDR4 แทนแท่ง DDR3 ที่ลูกค้าซื้อผิด"
+decoy = "ถ้าฝืนกดแรมผิดรุ่นลงไป สล็อตจะร้าว"
+teach = "แรมแต่ละรุ่นใส่แทนกันไม่ได้ ดูร่องบากและป้ายก่อนซื้อ"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

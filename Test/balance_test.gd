@@ -12,6 +12,8 @@ extends Node
 ##   กับ "ตุนของ" (normal_stock · ซื้ออะไหล่ถูก ๆ เก็บไว้ล่วงหน้าที่ตลาด) — รายงานเทียบกันในตาราง
 ## ผล 15 พ.ย. 0.4.0 (เป้าเดิม · ค่าชดใช้ใหม่ · บอทซื้อชั้นเก็บอะไหล่ 14 ช่อง): ปกติ 10/10 seed ≥ 9/12 · มัธยฐาน 10 · ไม่มีร้านปิด
 ## ผล 16 พ.ย. 0.5.0 (สอบเลื่อนยศ · ยศล็อกระดับงาน · XP 1000/3000/6500/11000 · ความสนิท · มิ้นลูกมือ): ปกติ 9/10 seed ≥ 9/12 · มัธยฐาน 10 · ไม่มีร้านปิด · ยศ 2/3/4/5 ราว ก.พ./เม.ย./มิ.ย.–ก.ค./ก.ย. · สนิท 1–5 คน ขาประจำ 1–3 คน · มิ้นได้ ≤ ฿546/ปี · เก่ง ฿29,594 > ปกติ ฿24,676 · แบ่งรันได้ด้วย BAL_LVS
+## ผล 16 พ.ย. 0.6.0 (สถานการณ์ซ่อม + ตรวจก่อนรู้อะไหล่ · คำขอนอกโควตาวันละ 1 · นักเรียน ×0.6 · กลุ่ม · รอบ 16:00 · เป้าใหม่ 250/200/650/750/900/1250/1450/1800/2100/1900/1900/2250): ปกติ 8/10 seed ≥ 9/12 · มัธยฐาน 9 · ไม่มีร้านปิด · เก่ง 11–12/12 ~฿25,200 > ปกติ ~฿20,300 > ตุนของ ~฿18,600 · ไม่ทำงานปิดเดือน 3 · ยศ 2/4–5/6–7/9–10 · สนิท 3–5 · คำขอ 7–24 เรื่อง/ปี · ครึ่งตรวจแล้วรอของ 7–15 ครั้ง
+##   ไม่มีสถานการณ์ (BAL_NOSCEN=1) ได้มัธยฐาน ~9.5 → ตรวจก่อนรู้อะไหล่ทำให้เครื่องรอบนชั้นนานขึ้น + อะไหล่ใช้บ่อยขึ้น (เงินหมุนข้ามเดือน) ~1 เดือน/ปี · สวิตช์ทดลอง BAL_REQ · BAL_NOWIN · BAL_NOSCEN · BAL_STUFEE · BAL_NOTRAIT · BAL_PARTW · BAL_SEEDS
 ##   สั่งเมื่อมีงาน กำไรเฉลี่ย ฿24,197 · ตุนของ ฿21,107 (เงินจม + เดินไปตลาดบ่อย) · เก่ง ฿31,391
 ## เปิด Test/balance_test.tscn → F6 → Output มีตารางรายเดือน + "T DONE fails=0" (ใช้เวลา ~1 นาที)
 
@@ -35,9 +37,13 @@ func _ready() -> void:
 	var lvs: Array = [&"good", &"normal", &"normal_stock", &"idle"]
 	if OS.has_environment("BAL_LVS"):
 		lvs = Array(OS.get_environment("BAL_LVS").split(",")).map(func(x: String) -> StringName: return StringName(x))
+	_apply_env_overrides()
 	for lv in lvs:
 		res[lv] = []
-		for s in (NORMAL_SEEDS if lv in [&"normal", &"normal_stock"] else (SEEDS if lv == &"good" else [SEEDS[0]])):
+		var seeds: Array = NORMAL_SEEDS if lv in [&"normal", &"normal_stock"] else (SEEDS if lv == &"good" else [SEEDS[0]])
+		if OS.has_environment("BAL_SEEDS"): # [0.6.0] BAL_SEEDS=11,22 → รันเฉพาะ seed ที่ระบุ
+			seeds = Array(OS.get_environment("BAL_SEEDS").split(",")).map(func(x: String) -> int: return int(x))
+		for s in seeds:
 			res[lv].append(await play_year(lv, s))
 	_report(res)
 	if OS.has_environment("BAL_LVS"):
@@ -55,7 +61,8 @@ func _ready() -> void:
 	sorted_hits.sort()
 	# ไม่มีของเสีย (BAL_DMG=0) บอทปกติได้ 11–12/12 ทุก seed — ที่พลาดมาจากค่าชดใช้ของเสียเป็นหลัก
 	_check(ok_seeds * 10 >= normal_hits.size() * 7, "บอทปกติถึงเป้า ≥ 9/12 อย่างน้อย 70%% ของ seed (%d/%d · %s)" % [ok_seeds, normal_hits.size(), normal_hits])
-	_check(int(sorted_hits[sorted_hits.size() / 2]) >= 10, "บอทปกติถึงเป้าค่ามัธยฐาน ≥ 10/12 (%d)" % int(sorted_hits[sorted_hits.size() / 2]))
+	# [0.6.0] มัธยฐาน 10 → 9: ตรวจเครื่องก่อนรู้อะไหล่ (ตั้งใจให้ยากขึ้น) · ดูหมายเหตุผลบอทหัวไฟล์
+	_check(int(sorted_hits[sorted_hits.size() / 2]) >= 9, "บอทปกติถึงเป้าค่ามัธยฐาน ≥ 9/12 (%d)" % int(sorted_hits[sorted_hits.size() / 2]))
 	var closed: int = res[&"normal"].filter(func(r: Dictionary) -> bool: return r.closed).size()
 	_check(closed * 10 <= normal_hits.size(), "บอทปกติร้านปิดไม่เกิน 10%% ของ seed (%d/%d — จากของเสียติดกัน)" % [closed, normal_hits.size()])
 	_check(res[&"idle"][0].closed, "บอทไม่ทำงาน → ร้านปิด (เดือน %d)" % res[&"idle"][0].months)
@@ -72,6 +79,27 @@ func _ready() -> void:
 	get_tree().quit()
 
 
+## [0.6.0] สวิตช์ทดลองหาสาเหตุสมดุล: BAL_REQ=0 (ไม่มีคำขอ) · BAL_NOWIN=1 (ไม่มีช่วงเวลา/นักเรียนมาได้ทั้งวัน) · BAL_NOSCEN=1 (งานกลางไม่สุ่มอาการ) · BAL_STUFEE=1 (นักเรียนค่าแรงเต็ม)
+func _apply_env_overrides() -> void:
+	var e: EconomyConfig = GameState.economy
+	if OS.has_environment("BAL_REQ"):
+		e.request_share = float(OS.get_environment("BAL_REQ"))
+	if OS.has_environment("BAL_NOWIN"):
+		for n in NpcBook.all():
+			n.windows = [] as Array[Vector2i]
+			n.school_hours = false
+	if OS.has_environment("BAL_NOSCEN"):
+		for f in ["any_ram", "any_mainboard", "any_gpu", "any_frontpanel", "any_bios", "any_group_pc", "any_group_two"]:
+			(load("res://Resources/Customers/%s.tres" % f) as CustomerCase).use_scenario = false
+	if OS.has_environment("BAL_NOTRAIT"):
+		ScenarioBook.traits_enabled = false
+	if OS.has_environment("BAL_PARTW"):
+		ScenarioBook.part_weight_mult = float(OS.get_environment("BAL_PARTW"))
+	if OS.has_environment("BAL_STUFEE"):
+		for n in NpcBook.all():
+			n.fee_mult = 1.0
+
+
 ## เล่น 1 ปี (48 วัน) · คืน { level, seed, months, hits, closed, profit, rows: [{m, profit, target, reached, money, jobs, walk}] }
 func play_year(lv: StringName, s: int) -> Dictionary:
 	DayLoop._rng.seed = s # ก่อน _reset_run — ลูกค้ารอบแรกของวันที่ 1 สุ่มตอนรีเซ็ต
@@ -83,6 +111,9 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	rank_months = { }
 	helper_runs = 0
 	helper_money = 0
+	requests_done = 0
+	request_money = 0
+	inspections = 0
 	GameState.story_flags.clear()
 	GameState.ensure_starter_kit() # [0.4.0] ของติดตัวหลังบทสอน (ผู้เล่นจริงได้ก่อนเปิดร้าน)
 	var jobs := 0
@@ -127,7 +158,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	var returned := 0
 	for o: RepairShelf.Order in DayLoop.shelf.history:
 		returned += 1 if o.state == RepairShelf.State.RETURNED else 0
-	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money }
+	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money, "requests": requests_done, "req_money": request_money, "insp": inspections, "fair": GameState.group_fair_count, "avg_fee": _avg_fee() }
 
 
 ## 1 วันเปิดร้าน · คืนจำนวนงานที่ซ่อม
@@ -151,6 +182,8 @@ func _play_day(lv: StringName) -> int:
 		if o and not (lv != &"good" and rng.randf() < 0.15):
 			if DayLoop.job_fit(o.case) == &"ot":
 				_set_ot()
+			if _inspect_stops(o, lv): # [0.6.0] ครึ่งตรวจ: ของไม่มี → รอของ
+				continue
 			_repair(o.case, o, lv)
 			done += 1
 			continue
@@ -253,6 +286,26 @@ func _handle_door(lv: StringName) -> void:
 			if not (DayLoop.door_can_appoint() and DayLoop.door_appoint()):
 				DayLoop.door_reject()
 			continue
+		# [0.6.0 ขั้น G] คำขอ: บอทเก่งรับเสมอถ้ามีโควตา · ปกติรับ 70% · ตอบถูกตามระดับ
+		if c.is_request():
+			var take := DayLoop.door_accept_state(-1) == &"ok" and (lv == &"good" or rng.randf() < 0.7)
+			if take and DayLoop.door_accept(-1):
+				var req := c.request()
+				var acc := 0.95 if lv == &"good" else 0.75
+				for step in req.steps():
+					var src := req.choices if step == 0 else req.choices2
+					var ok := rng.randf() < acc
+					DayLoop.request_answer(src[0] if ok else src[1])
+					if not ok:
+						break
+					if step == 0 and req.steps() > 1:
+						DayLoop._on_request_card_done()
+				var rr := DayLoop.request_finish()
+				requests_done += 1
+				request_money += int(rr.get("money", 0))
+				continue
+			DayLoop.door_reject()
+			continue
 		if c.takes_machine():
 			var promise := 1
 			var has_part := c.part_ids().is_empty() or c.part_ids().any(func(id: StringName) -> bool: return GameState.free_count(id) > 0)
@@ -283,6 +336,10 @@ func _desktop_now(j: Dictionary, st: StringName, lv: StringName) -> void:
 
 ## งานบนชั้นที่จะซ่อมต่อ: นัดใกล้สุดก่อน · ปกติไม่ล่วงเวลา · เก่งล่วงเวลาเมื่อถึง/เลยนัด
 func _next_shelf_job(lv: StringName) -> RepairShelf.Order:
+	# [0.6.0] เครื่องที่ยังไม่ตรวจ (มีสถานการณ์) ตรวจก่อน — รู้เร็วว่าต้องสั่งอะไหล่อะไร
+	for o: RepairShelf.Order in DayLoop.shelf.waiting():
+		if o.case.scenario() != null and not o.inspected and DayLoop.job_fit(o.case) == &"ok":
+			return o
 	for o: RepairShelf.Order in DayLoop.shelf.waiting():
 		if not DayLoop.order_has_parts(o):
 			continue
@@ -310,6 +367,35 @@ func _repair(c: CustomerCase, o: RepairShelf.Order, lv: StringName) -> void:
 	GameState.record_repair(c.part(), score, damaged, c.fee, c.level)
 	DayLoop._result_pending = false
 	_bot_story(lv)
+
+
+## [0.6.0 ขั้น E] งานที่มีสถานการณ์และยังไม่ตรวจ: ถึงจุดแบ่งแล้วไม่มีของ → เก็บผลครึ่งตรวจ (เวลา 40%) แล้วรอของ · คืน true = หยุดรอ
+func _inspect_stops(o: RepairShelf.Order, lv: StringName) -> bool:
+	if o.case.scenario() == null or o.inspected:
+		return false
+	if not DayLoop._minigame_checkpoint(o):
+		return false
+	DayLoop.current_job = { "case": o.case, "order": o }
+	DayLoop.today_case = o.case
+	o.case.set_meta("inspection", { "mistakes": { "diagnosis": 0 if lv == &"good" else 10 }, "wrong": 0, "skipped": [], "did_optional": [], "cause": o.case.scenario().cause })
+	DayLoop._after_inspection()
+	inspections += 1
+	return true
+
+
+func _avg_fee() -> int:
+	var t := 0
+	var n := 0
+	for e in GameState.ledger:
+		if e.kind == &"fee" and int(e.amount) > 0:
+			t += int(e.amount)
+			n += 1
+	return t / maxi(n, 1)
+
+
+var requests_done := 0
+var request_money := 0
+var inspections := 0
 
 
 ## [0.5.0 ขั้น K] เดือนที่บอทถึงยศ r · มิ้นทำงานกี่งาน/ได้เงินเท่าไร (ต่อ seed)
@@ -400,9 +486,10 @@ func _report(res: Dictionary) -> void:
 	for lv in res:
 		for r: Dictionary in res[lv]:
 			var rm: Dictionary = r.get("rank_m", { })
-			print("BAL %-14s ยศ %s · สอบ %d ครั้ง · สนิท %d · ขาประจำ %d · ฟังเรื่อง %d/18 · มิ้น %d งาน ฿%d" % [
+			print("BAL %-14s ยศ %s · สอบ %d ครั้ง · สนิท %d · ขาประจำ %d · ฟังเรื่อง %d/24 · มิ้น %d งาน ฿%d" % [
 				"%s#%d" % [lv, r.seed], "/".join([1, 2, 3, 4].map(func(k: int) -> String: return str(rm.get(k, "-")))),
 				int(r.get("exams", 0)), int(r.get("close", 0)), int(r.get("regular", 0)), int(r.get("heard", 0)), int(r.get("helper", 0)), int(r.get("helper_money", 0))])
+			print("BAL %-14s [0.6.0] คำขอ %d เรื่อง ฿%d · ครึ่งตรวจแล้วรอของ %d ครั้ง · ตัดสินกลุ่มแฟร์ %d · มาเอาคืน %d · งาน %d · ค่าแรงเฉลี่ย ฿%d" % ["%s#%d" % [lv, r.seed], int(r.get("requests", 0)), int(r.get("req_money", 0)), int(r.get("insp", 0)), int(r.get("fair", 0)), int(r.get("returned", 0)), int(r.get("jobs", 0)), int(r.get("avg_fee", 0))])
 	# มัธยฐานกำไรรายเดือนของบอทปกติ (ร้านปิดไปแล้ว = ไม่นับเดือนนั้น) + 70% ไว้ใช้ตั้งเป้า
 	var med := "BAL %-14s" % "มัธยฐานปกติ"
 	var sug := "BAL %-14s" % "70% (ปัด 50)"

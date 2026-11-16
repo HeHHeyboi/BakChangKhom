@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_homework_file"
+kind = 1
+npc_tags = PackedStringArray("student", "school")
+min_rank = 0
+title = "ส่งการบ้านไม่ได้ ไฟล์ใหญ่เกิน"
+ask = "ครูให้ส่งรายงานทางระบบแต่ไฟล์ใหญ่เกิน ส่งไม่ขึ้น"
+question = "ควรแก้ยังไง"
+choices = PackedStringArray("ย่อขนาดรูปในรายงานหรือบันทึกเป็น PDF", "เปลี่ยนชื่อไฟล์ให้สั้นลง", "ส่งซ้ำหลาย ๆ รอบ")
+explain = "ไฟล์ใหญ่ส่วนมากมาจากรูป ย่อรูปหรือบันทึกเป็น PDF จะเล็กลงมาก"
+fee = 0
+thanks = "ทันส่งครูพอดี"
+topic = "การจัดการไฟล์"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ

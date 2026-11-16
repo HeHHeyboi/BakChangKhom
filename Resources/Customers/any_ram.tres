@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_ram"
+customer = ""
+reason = "{name} เอา{device}มาให้ดู"
+device = "{device}"
+symptom = "เปิดเครื่องแล้วจอดำ มีเสียงปี๊บ"
+level = 2
+est_slots = 3
+months = PackedInt32Array()
+part_id = "part_ram"
+job_title = "ทำความสะอาด/ตรวจแรม"
+arrive_dialog = "res://Assets/Dialog/Customer/any_arrive.txt"
+thanks_text = "ใช้ได้แล้ว ขอบใจหลายเด้อ"
+complain_text = "ยังเปิดไม่ขึ้นอยู่เลย"
+npc_tags = PackedStringArray("any")
+use_scenario = true
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น A] งานกลาง — ใครที่ป้ายตรงก็เอามาได้ · อาการจริงมาจากตัวสุ่ม (ขั้น C)

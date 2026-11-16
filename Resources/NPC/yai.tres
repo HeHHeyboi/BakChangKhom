@@ -11,3 +11,6 @@ start_affinity = 0
 base_weight = 1.0
 has_affinity = false
 bio = "ยายของขม เจ้าของบ้านที่แบ่งหน้าบ้านให้เปิดร้าน ใครในหมู่บ้านคอมเสียก็มักได้ยินเรื่องร้านจากยาย"
+kind = 2
+tags = PackedStringArray("family", "elder")
+devices = PackedStringArray("คอมเครื่องเดียวในบ้าน")

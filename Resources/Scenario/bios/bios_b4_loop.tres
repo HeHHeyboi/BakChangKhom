@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bios_b4_loop"
+part = &"part_bios"
+title = "B-4 บูตวนหลังปรับเอง"
+symptom = "ลองปรับ BIOS ตามคลิป แล้วเปิดเครื่องวนรีสตาร์ตไม่หยุด"
+job_title = "เคลียร์ค่า BIOS"
+cause = "ตั้งค่าแรมสูงเกินที่แรมรับได้ บูตไม่ผ่านจนต้องล้างค่า"
+lines = Dictionary[String, String]({"INSPECT_MEMORY": "แถบ Memory มีค่าที่ถูกปรับมือไว้ สูงกว่าที่แรมรับได้|แบบนี้ต้องล้างค่า BIOS ก่อน แล้วค่อยตั้งใหม่แบบปลอดภัย"})
+diag_choices = PackedStringArray("ตั้งค่าแรมสูงเกิน ต้องล้างค่า BIOS", "แรมเสีย", "การ์ดจอเสีย", "พาวเวอร์ซัพพลายเสีย")
+diag_wrong = "ฮาร์ดแวร์ยังเห็นครบนะ ลองถามลูกค้าว่าไปปรับอะไรมา"
+diag_correct = "ใช่ โหลดค่าเริ่มต้นหรือเคลียร์ CMOS ก่อน แล้วค่อยเปิด XMP แบบปลอดภัย"
+optional_phases = PackedStringArray("OS_INSTALL", "UPGRADE")
+decoy = "ดูเหมือนแรมหรือการ์ดจอเสีย ถ้าถอดทดสอบทีละชิ้นก็เสียเวลา"
+teach = "ปรับ BIOS เกินสเปกเสี่ยงบูตไม่ผ่าน รู้วิธีเคลียร์ CMOS กับโหลดค่าเริ่มต้น"
+secret = "จริง ๆ ไปปรับความเร็วแรมเองตามคลิป"
+flags = {"post": "การ์ด POST ค้างที่ขั้นตั้งค่าแรมทุกครั้งที่เปิด"}
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

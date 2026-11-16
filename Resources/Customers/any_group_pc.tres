@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CustomerCase" format=3]
+
+[ext_resource type="Script" uid="uid://den0jlvsn5ak2" path="res://Scripts/Resources/customer_case.gd" id="1_case"]
+
+[resource]
+script = ExtResource("1_case")
+id = &"any_group_pc"
+customer = ""
+reason = "{name} เอา{device}มาให้ช่วยดู รวมเงินกันมาสามคน"
+device = "{device}"
+symptom = "เล่นเกมด้วยกันแล้วจอดับ"
+level = 3
+est_slots = 5
+months = PackedInt32Array()
+part_id = "part_gpu"
+job_title = "เครื่องของแก๊ง"
+arrive_dialog = "res://Assets/Dialog/Customer/any_group_arrive.txt"
+thanks_text = "เย้ เล่นได้แล้ว ขอบคุณครับพี่ขม"
+complain_text = "ยังดับอยู่เลยพี่"
+npc_tags = PackedStringArray("group")
+group_ok = true
+use_scenario = true
+# [Claude 16 พ.ย. 2569 · 0.6.0 ขั้น I] งานกลุ่ม: เครื่องเดียวของกลุ่ม

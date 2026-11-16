@@ -72,9 +72,9 @@ class_name EconomyConfig extends Resource
 
 @export_group("ลูกค้าทยอยมา + ชื่อเสียง (0.2.5 · PLAN_0_2_5 ข้อ 3)")
 ## [0.2.5] เวลาที่ลูกค้าเดินเข้าร้าน (นาทีของวัน) · ช่อง 0 = ตอนเปิดร้าน 08:30 · 11:00 · 14:00 (งานโทรเข้า 15:30 แยกที่ board_phone_jobs)
-@export var visitor_waves: PackedInt32Array = [510, 660, 840]
+@export var visitor_waves: PackedInt32Array = [510, 660, 840, 960] # [0.6.0] + 16:00 หลังเลิกเรียน (นักเรียน · ครู · เพื่อนร่วมงาน)
 ## สัดส่วนลูกค้าต่อรอบ (ช่องตรงกับ visitor_waves · รวมกันควรได้ 1)
-@export var visitor_wave_share: PackedFloat32Array = [0.5, 0.3, 0.2]
+@export var visitor_wave_share: PackedFloat32Array = [0.5, 0.25, 0.1, 0.15]
 ## ชื่อเสียงขั้นต่ำของขั้นที่ 1 · 2 · 3 (ต่ำกว่าช่อง 0 = ขั้น 0)
 @export var rep_visitor_steps: PackedInt32Array = [20, 40, 70]
 ## ลูกค้าเพิ่ม/ลดต่อวันตามขั้นชื่อเสียง 0–3
@@ -193,7 +193,8 @@ class_name EconomyConfig extends Resource
 ## [0.3.0 ขั้น I · 15 พ.ย.] ปรับจากบอทเล่นครบปี (Test/balance_test): ≈ 70% ของกำไรมัธยฐานของบอทปกติ (หน้าประตู · โควตา 3 · ชั้นวาง)
 ##   ของเดิม [200, 300, 500, 800, 850, 900, 1300, 1300, 1550, 1600, 2000, 2000] บอทปกติได้ 2–3 เท่าตั้งแต่ พ.ค.
 ##   มัธยฐานบอทปกติ 10 seed: [434, 792, 982, 1072, 1616, 1772, 2862, 3482, 3242, 3782, 2502, 3440] → ~65–70% ปรับให้ขึ้นทีละขั้น
-@export var month_target: PackedInt32Array = [250, 450, 650, 750, 1150, 1250, 1800, 2100, 2200, 2300, 2000, 2400]
+## [0.6.0 ขั้น N] ปรับตามบอท ≈ 70% มัธยฐาน (ตรวจเครื่องก่อนรู้อะไหล่ = เครื่องรอบนชั้นนานขึ้น · อะไหล่ใช้บ่อยขึ้น เงินหมุนข้ามเดือน) · เดิม 250/450/650/750/1150/1250/1800/2100/2200/2300/2000/2400
+@export var month_target: PackedInt32Array = [250, 200, 650, 750, 900, 1250, 1450, 1800, 2100, 1900, 1900, 2250]
 
 @export_group("ผลสิ้นเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.3 · 8.1 E–F)")
 ## ค่าปรับยอดค้างชำระ (สัดส่วนของยอดค้าง) บวกในบิลเดือนถัดไป · โหมดช่วยไม่มีค่าปรับ
@@ -227,7 +228,7 @@ class_name EconomyConfig extends Resource
 @export var affinity_recent_mult := 0.3
 ## ได้/เสียความสนิทตามเหตุการณ์ (ข้อ 2.4)
 @export var affinity_gain: Dictionary[StringName, int] = {
-	&"pass": 2, &"three_star": 1, &"on_time": 1, &"kept_appointment": 1, &"call_early": 1, &"story_good": 4, &"story_plain": 1,
+	&"pass": 2, &"three_star": 1, &"on_time": 1, &"kept_appointment": 1, &"call_early": 1, &"story_good": 4, &"story_plain": 1, &"request_good": 3, &"request_ok": 1, &"group_fair": 2, &"group_side": 2, &"group_other": -1,
 	&"fail": -3, &"damage": -6, &"late_day": -2, &"reject": -2, &"walk_out": -3, &"reclaimed": -8,
 }
 ## ระดับที่ลูกค้ารอหน้าประตูได้ +1 เทิร์น (คุ้นเคย)
@@ -255,13 +256,46 @@ class_name EconomyConfig extends Resource
 @export var helper_fee_share := 0.7
 @export var helper_per_day := 1
 
+@export_group("นักเรียน + ช่วงเวลา (0.6.0 · PLAN_0_6_0 ข้อ 6)")
+## เดือนปิดเทอม (นักเรียนมาได้ทั้งวัน น้ำหนัก × school_break_weight) · มี.ค.–เม.ย. · ต.ค.
+@export var school_break_months: PackedInt32Array = [3, 4, 10]
+## ช่วงเปิดเทอม นักเรียนมาได้ตั้งแต่นาทีนี้ (16:00)
+@export var school_after_minute := 960
+@export var school_break_weight := 1.5
+
+@export_group("เครื่องมือ + ไกด์ตามยศ (0.6.0 · PLAN_0_6_0 ข้อ 7)")
+## เครื่องมือที่ได้ตอนเลื่อนยศ (ไม่ต้องซื้อ · ไม่กินช่องคลัง) { ยศ: [id…] }
+@export var rank_tools: Dictionary = { 1: [&"magnet_driver"], 2: [&"multimeter"], 3: [&"post_card"] }
+const TOOL_NAMES := { &"magnet_driver": "ไขควงแม่เหล็ก", &"multimeter": "มัลติมิเตอร์", &"post_card": "การ์ดอ่านโค้ด POST" }
+const TOOL_NOTES := {
+	&"magnet_driver": "น็อตไม่หล่น ขันง่ายขึ้น (โซน QTE กว้างขึ้นเล็กน้อย)",
+	&"multimeter": "วัดไฟ/สวิตช์ตอนวินิจฉัย ตัดตัวเลือกผิดได้ 1 ข้อ",
+	&"post_card": "อ่านรหัสตอนเปิดเครื่องว่าค้างที่ไหน ตัดตัวเลือกผิดได้ 1 ข้อ",
+}
+## ไขควงแม่เหล็ก: โซน QTE ×
+@export var magnet_qte_mult := 1.05
+## ยศนี้ขึ้นไป: ไกด์ (วงกลมชี้) ขึ้นเมื่อกด "ขอคำใบ้" เท่านั้น · ทำเองไม่ขอคำใบ้ได้คะแนน +self_bonus
+@export var guide_hint_rank := 3
+@export var self_bonus := 5
+
+@export_group("คำขอ (0.6.0 · PLAN_0_6_0 ข้อ 5)")
+## โอกาสที่คนที่เดินมาเป็นคำขอ (ปรึกษา/ช่วย) แทนงานซ่อม
+@export_range(0.0, 1.0, 0.01) var request_share := 0.2
+## [16 พ.ย. ผลบอท] คำขอนับในโควตา 3 คน/วันไหม · false = ไม่นับ แต่วันละไม่เกิน request_daily_max เรื่อง (นับแล้วบอทปกติร้านปิด 5/10 seed)
+@export var request_counts_quota := false
+@export var request_daily_max := 1
+## ลูกค้างบน้อย: ค่าแรง ×
+@export var budget_fee_mult := 0.9
+## กลุ่ม 2 เครื่อง: ค่าแรงรวม (เทียบค่าแรงระดับงาน 1 เครื่อง)
+@export var group_fee_mult := 1.6
+
 @export_group("ความสามารถช่าง (0.5.0 · PLAN_0_5_0 ข้อ 7)")
-## ยศ 1–4 → [ทาง A, ทาง B] { id, name, desc }
+## ยศ 1–4 → [ทาง A, ทาง B, ทาง C] { id, name, desc } · [0.6.0 ขั้น K] ทาง C = ความสามารถที่แก้มินิเกม (ตาไว · มือนิ่ง · นักสืบ)
 @export var perk_options: Dictionary = {
-	1: [{ "id": "sweet_talk", "name": "ปากหวาน", "desc": "ความสนิทที่ได้ +25%" }, { "id": "patient", "name": "ใจเย็น", "desc": "ลูกค้าหน้าร้านรอได้ +1 เทิร์น" }],
-	2: [{ "id": "punctual", "name": "นัดแม่น", "desc": "ผ่อนผันเลยนัดได้ 3 วัน · ความพอใจที่เสียจากเลยนัดลดครึ่ง" }, { "id": "connected", "name": "มีเส้นสาย", "desc": "รถขายของมาบ่อยขึ้น (40%) · ของ 4 ชิ้น" }],
+	1: [{ "id": "sweet_talk", "name": "ปากหวาน", "desc": "ความสนิทที่ได้ +25%" }, { "id": "patient", "name": "ใจเย็น", "desc": "ลูกค้าหน้าร้านรอได้ +1 เทิร์น" }, { "id": "sharp_eye", "name": "ตาไว", "desc": "เริ่มขั้นตรวจ จุดที่ต้องดูกะพริบให้เห็น" }],
+	2: [{ "id": "punctual", "name": "นัดแม่น", "desc": "ผ่อนผันเลยนัดได้ 3 วัน · ความพอใจที่เสียจากเลยนัดลดครึ่ง" }, { "id": "connected", "name": "มีเส้นสาย", "desc": "รถขายของมาบ่อยขึ้น (40%) · ของ 4 ชิ้น" }, { "id": "steady_hand", "name": "มือนิ่ง", "desc": "โซน QTE กว้างขึ้น 10%" }],
 	3: [{ "id": "power_saver", "name": "ประหยัดไฟ", "desc": "ค่าไฟ −15%" }, { "id": "careful", "name": "ตาถึง", "desc": "ทำของเสีย: ชื่อเสียงและความสนิทที่เสียลดครึ่ง" }],
-	4: [{ "id": "mentor", "name": "ครูช่าง", "desc": "มิ้นรับงานขมOS Lv2 ได้ · โอกาสผ่าน +10%" }, { "id": "beloved", "name": "ขวัญใจหมู่บ้าน", "desc": "คนที่สนิทขึ้นไปทิปเพิ่ม ฿20 · ฟังเรื่องส่วนตัวจบดีได้ของฝาก" }],
+	4: [{ "id": "mentor", "name": "ครูช่าง", "desc": "มิ้นรับงานขมOS Lv2 ได้ · โอกาสผ่าน +10%" }, { "id": "beloved", "name": "ขวัญใจหมู่บ้าน", "desc": "คนที่สนิทขึ้นไปทิปเพิ่ม ฿20 · ฟังเรื่องส่วนตัวจบดีได้ของฝาก" }, { "id": "detective", "name": "นักสืบ", "desc": "ปิ๊บเตือนจุดหลอกของเคส · ลูกค้าที่มีเรื่องไม่ได้เล่าจะเล่าเอง" }],
 }
 @export var perk_affinity_mult := 1.25
 @export var perk_late_grace_bonus := 1
@@ -269,6 +303,8 @@ class_name EconomyConfig extends Resource
 @export var perk_vendor_items := 4
 @export var perk_power_mult := 0.85
 @export var perk_helper_bonus := 0.1
+## [0.6.0 ขั้น K] มือนิ่ง: โซน QTE ×
+@export var perk_steady_mult := 1.1
 
 
 func fee_for_level(level: int) -> int:

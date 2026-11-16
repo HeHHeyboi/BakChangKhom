@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RepairScenario" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/repair_scenario.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bios_b3_xmp"
+part = &"part_bios"
+title = "B-3 ยังไม่เปิด XMP"
+symptom = "ซื้อแรม 3200 มาใส่ แต่ในเครื่องขึ้นแค่ 2133"
+job_title = "เปิดความเร็วแรม"
+cause = "ยังไม่ได้เปิดโปรไฟล์ XMP แรมเลยวิ่งความเร็วมาตรฐาน"
+lines = Dictionary[String, String]({"INSPECT_BOOT": "ลำดับบูตก็ยังเป็น USB อยู่ เดี๋ยวแก้ให้ด้วย", "INSPECT_MEMORY": "แถบ Memory ขึ้น 2133 ทั้งที่กล่องแรมเขียน 3200|แรมไม่ได้เสีย แค่ยังไม่ได้เปิดโปรไฟล์ความเร็ว"})
+diag_choices = PackedStringArray("ยังไม่ได้เปิด XMP", "แรมปลอม ต้องเปลี่ยน", "เมนบอร์ดเสีย", "แรมใส่ผิดช่อง")
+diag_wrong = "แรมไม่ได้เสีย ค่ามาตรฐานตั้งไว้ต่ำเพื่อให้บูตติดแน่ ลองนึกถึงโปรไฟล์แรม"
+diag_correct = "ใช่ เปิด XMP แล้วต้องทดสอบว่าบูตผ่าน"
+optional_phases = PackedStringArray("OS_INSTALL", "UPGRADE")
+decoy = "บางคนรีบเปลี่ยนแรมใหม่ ทั้งที่แค่ตั้งค่า"
+teach = "XMP คือโปรไฟล์ความเร็วของแรม เปิดแล้วต้องทดสอบความเสถียร"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — สร้างจาก gen/scen.py · รอทีมตรวจความถูกต้อง

@@ -53,5 +53,8 @@ _CharacterMap = {
 "เด็ก": ExtResource("c15"),
 "เด็กคนหนึ่ง": ExtResource("c15"),
 "เด็กๆ": ExtResource("c15"),
-"เด็กหญิง": ExtResource("c16")
+"เด็กหญิง": ExtResource("c16"),
+"ต้นกล้า": ExtResource("c15"),
+"แพรว": ExtResource("c16"),
+"แก๊งสามเกลอ": ExtResource("c15")
 }

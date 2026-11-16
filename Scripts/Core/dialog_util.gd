@@ -61,3 +61,21 @@ static func colon_lines(path: String) -> PackedInt32Array:
 		if line != "" and not line.begins_with("#") and line.find(":") > -1 and not line.begins_with("Choice:"):
 			out.append(n)
 	return out
+
+
+## [0.6.0] บทของงานกลาง: แทน {npc} (ชื่อคนพูด = char_key) {name} {device} แล้วเขียนเป็นไฟล์ชั่วคราวใน user:// · ไม่มี "{" = คืน path เดิม
+static func filled_copy(path: String, vars: Dictionary) -> String:
+	if path == "" or not FileAccess.file_exists(path):
+		return path
+	var text := FileAccess.get_file_as_string(path)
+	if not text.contains("{"):
+		return path
+	for k in vars:
+		text = text.replace("{%s}" % k, String(vars[k]))
+	var out := "user://dialog_tmp_%s" % path.get_file()
+	var f := FileAccess.open(out, FileAccess.WRITE)
+	if f == null:
+		return path
+	f.store_string(text)
+	f.close()
+	return out

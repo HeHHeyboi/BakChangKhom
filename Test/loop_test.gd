@@ -12,6 +12,7 @@ var _rem_checked := false
 
 
 func _ready() -> void:
+	GameState.economy.request_share = 0.0 # [0.6.0] เทสต์นับจำนวนลูกค้าเป๊ะ → ไม่มีคำขอ (คนที่มาเพิ่ม) · คำขออยู่ใน request_test
 	await get_tree().process_frame
 	var root := get_tree().root
 	get_parent().remove_child(self)
@@ -105,7 +106,7 @@ func _ready() -> void:
 	for i in ids:
 		uniq[i] = true
 	# [0.2.5] ลูกค้า 5 คน (ชื่อเสียง 20 = ปกติ) ทยอยมา 3 รอบ: เปิดร้าน 3 · 11:00 1 · 14:00 1
-	_check(DayLoop.visitors_today == 5 and GameState.economy.split_waves(5) == PackedInt32Array([3, 1, 1]) and DayLoop.visitor_waves.size() == 2, "ลูกค้าวันนี้ 5 คน แบ่ง 3 · 1 · 1 (%s)" % [DayLoop.visitor_waves])
+	_check(DayLoop.visitors_today == 5 and GameState.economy.split_waves(5) == PackedInt32Array([3, 1, 0, 1]) and DayLoop.visitor_waves.size() == 2, "ลูกค้าวันนี้ 5 คน แบ่ง 3 · 1 · 0 · 1 (%s)" % [DayLoop.visitor_waves])
 	_check(DayLoop.door_queue.size() == 3 and uniq.size() == 3 and DayLoop.door_queue.all(func(j: Dictionary) -> bool: return j["case"].level <= 2 and not j.phone and not j.appointed),
 		"[0.3.0] กะ 1 เปิดร้านมีลูกค้า Lv1–2 ยืนหน้าประตู %d คน (ไม่ซ้ำ) %s" % [DayLoop.door_queue.size(), ids])
 	var e := GameState.economy
@@ -277,8 +278,8 @@ func _ready() -> void:
 	toast.clear()
 	ts.set_clock(11 * 60)
 	_check(DayLoop.visitors_arrived == 4 and DayLoop.door_queue.size() == 4 and toast._queue.size() == 1 and toast._queue[0][0] == "มีลูกค้ามารอหน้าร้าน 1 คน", "11:00 ลูกค้ารอบ 2 มารอหน้าร้าน + ป้ายแจ้ง (ลุงอำนวยยังไม่มา ความอดทนไม่เดิน)")
-	ts.set_clock(14 * 60 + 30)
-	_check(DayLoop.visitors_arrived == 5 and DayLoop.visitor_waves.is_empty(), "14:00 ครบ 5 คน")
+	ts.set_clock(16 * 60 + 30)
+	_check(DayLoop.visitors_arrived == 5 and DayLoop.visitor_waves.is_empty(), "[0.6.0] 16:00 ครบ 5 คน (รอบ 14:00 ว่าง)")
 	var rep_close := GameState.reputation
 	var n_left := DayLoop.door_queue.size()
 	ts.end_shift()
@@ -286,7 +287,7 @@ func _ready() -> void:
 	_check(DayLoop.left_home.size() == n_left and GameState.reputation == rep_close + n_left * GameState.economy.rep_left_unserved and DayLoop.walkouts.is_empty(), "ปิดร้าน → ลูกค้า %d คนกลับบ้าน ชื่อเสียง −1/คน (%d → %d)" % [n_left, rep_close, GameState.reputation])
 	DayLoop._reset_run()
 	ts.set_clock(TimeSystem.CLOSE)
-	_check(DayLoop.visitors_arrived == 3 and DayLoop.visitor_waves.is_empty(), "ข้ามไปปิดร้านเลย → รอบ 11:00/14:00 ไม่มา (ไม่หักชื่อเสียง)")
+	_check(DayLoop.visitors_arrived == 3 and DayLoop.visitor_waves.is_empty(), "ข้ามไปปิดร้านเลย → รอบ 11:00/16:00 ไม่มา (ไม่หักชื่อเสียง)")
 	DayLoop._reset_run()
 
 	# [0.2.5] เนื้อหา: บท 2–12 มีงานเนื้อเรื่อง · งานในคลังกรอกครบ · ทุกเดือนมีงานแต่ละระดับให้เลือกพอ

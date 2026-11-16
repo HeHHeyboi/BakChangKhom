@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RequestTask" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/request_task.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f_backup_photos"
+kind = 1
+npc_tags = PackedStringArray("elder", "family", "village")
+min_rank = 0
+title = "ช่วยย้ายรูปในมือถือลงแฟลชไดรฟ์"
+ask = "มือถือเต็มแล้ว อยากเก็บรูปหลานไว้ไม่ให้หาย"
+question = "ก่อนลบรูปออกจากมือถือต้องทำอะไร"
+choices = PackedStringArray("เช็กว่ารูปคัดลอกครบและเปิดดูได้ก่อน", "ลบเลยไม่ต้องเช็ก", "ฟอร์แมตแฟลชไดรฟ์ทิ้ง")
+explain = "คัดลอกแล้วเปิดดูให้ชัวร์ว่าไฟล์ครบก่อนลบต้นฉบับเสมอ"
+fee = 0
+thanks = ""
+topic = "สำรองข้อมูล"
+# [Claude 16 พ.ย. 2569 · 0.6.0] ร่าง — gen/req.py · รอทีมตรวจ
