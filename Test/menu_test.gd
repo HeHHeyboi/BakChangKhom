@@ -18,12 +18,21 @@ func _ready() -> void:
 	await _frames(3)
 	var btns: Array = start.get_node("Menu").get_children().filter(func(b): return b.name != "Continue_Button").map(func(b): return b.text)
 	_check(btns == ["เริ่มเกม", "ตั้งค่า", "ออกจากเกม"], "เมนูหลัก: ปุ่ม เริ่มเกม · ตั้งค่า · ออกจากเกม (%s)" % [btns])
-	# [0.3.0] ข้ามบทนำ = ตัวเลือกต้นบทนำ (ไม่ใช่ปุ่มที่เมนู) · ทางเลือกทั้งสองมีบท
+	# [0.9.0] ดู/ข้ามบทนำ = หน้าเลือกการ์ด 2 ใบ (ไม่ใช่ตัวเลือกในบท) · ทั้งสองทางมีบท
 	DialogScene.read_file(Constant.PROLOUGE_TEXT)
-	var first_choice = DialogScene.DialogDict["dialog"].filter(func(t): return t is ChoiceToken)
-	_check(first_choice.size() == 1 and first_choice[0].choices.has(start.SKIP_INTRO_CHOICE) and first_choice[0].choices.has("ดูบทนำ"), "บทนำมีตัวเลือก ดูบทนำ / %s" % start.SKIP_INTRO_CHOICE)
-	_check(DialogScene.DialogDict.get("ดูบทนำ", []).size() >= 16 and DialogScene.DialogDict.get(start.SKIP_INTRO_CHOICE, []).size() >= 1, "ทางเลือกดูบทนำมีบทเต็ม (%d บรรทัด) · ทางเลือกข้ามมีบท" % DialogScene.DialogDict.get("ดูบทนำ", []).size())
+	var lines: Array = DialogScene.DialogDict["dialog"]
+	_check(lines.size() >= 16 and not lines.any(func(t): return t is ChoiceToken), "บทนำเล่นตรง ๆ ไม่มีตัวเลือกในบท (%d บรรทัด)" % lines.size())
+	DialogScene.read_file(start.PROLOGUE_SKIP_TEXT)
+	_check((DialogScene.DialogDict["dialog"] as Array).size() >= 1, "บทข้ามบทนำมีบท")
 	DialogScene.DialogDict = { "dialog": [] }
+	start._show_intro_choice()
+	await _frames(2)
+	var watch: Button = start.intro_layer.find_child("WatchCard", true, false)
+	var skipc: Button = start.intro_layer.find_child("SkipCard", true, false)
+	_check(watch != null and skipc != null and watch.has_focus() and (watch.find_child("Head", true, false) as Label).text == "ดูเรื่องราวตั้งแต่ต้น", "หน้าเลือกบทนำ: การ์ดดูเรื่องราว (โฟกัสก่อน) + การ์ดข้าม")
+	await _shot("intro_choice")
+	start.intro_layer.queue_free()
+	start.intro_layer = null
 	_check(start.get_node("Menu/Continue_Button").visible == SaveGame.exists(), "ปุ่มเล่นต่อขึ้นเมื่อมีเซฟเท่านั้น")
 	_check(start.is_in_group("main_menu") and start.get_node("Khom") is TextureRect and start.get_node("Title").text == "บักช่างขม", "เมนูหลักมีชื่อเกม + ตัวละคร (โหนด)")
 	await _shot("main_menu")

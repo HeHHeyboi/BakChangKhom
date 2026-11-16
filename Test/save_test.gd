@@ -78,6 +78,7 @@ func _ready() -> void:
 		DialogScene.dialog_end()
 	EventManager.tutorial.hide()
 	start.tutorial_end()
+	start._choose_intro(false) # [0.9.0] หน้าเลือกการ์ด → ดูเรื่องราว
 	DialogScene.dialog_end()
 	await get_tree().create_timer(1.6).timeout
 	_check(SaveGame.exists() and SaveGame.info() == { "shift": 1, "money": GameState.economy.start_money }, "เข้าบ้านครั้งแรก → สร้างเซฟใหม่ (%s)" % SaveGame.info())

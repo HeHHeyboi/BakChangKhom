@@ -15,7 +15,6 @@ const BUTTON_H := 56.0
 var _confirm_menu := false
 var ach_button: Button
 var export_button: Button
-var post_button: Button
 var ach_page: PanelContainer
 
 
@@ -47,26 +46,17 @@ func _add_buttons() -> void:
 	export_button = Button.new()
 	export_button.name = "ExportButton"
 	export_button.text = "ส่งออกข้อมูลการเล่น"
-	export_button.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร เพื่อส่งให้ทีม"
+	export_button.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร"
 	export_button.pressed.connect(_on_export_pressed)
 	vb.add_child(export_button)
 	vb.move_child(export_button, menu_button.get_index())
-	post_button = Button.new() # [0.9.0 ขั้น B] บิลด์ผู้ทดสอบ · ครบเดือนแล้ว = เปิดป๊อปอัปหลังเล่นซ้ำได้
-	post_button.name = "PostTestButton"
-	post_button.text = "แบบทดสอบหลังเล่น"
-	post_button.pressed.connect(func() -> void:
-		resume()
-		Playlog.show_post_form())
-	vb.add_child(post_button)
-	vb.move_child(post_button, export_button.get_index())
 	vb.add_theme_constant_override(&"separation", 10)
 	for b in vb.get_children():
 		if b is Button:
 			b.custom_minimum_size = Vector2(340, BUTTON_H)
 			b.add_theme_font_size_override(&"font_size", 24)
-	post_button.visible = false
-	panel.offset_top = -310.0
-	panel.offset_bottom = 310.0
+	panel.offset_top = -300.0
+	panel.offset_bottom = 300.0
 
 
 func _on_export_pressed() -> void:
@@ -159,8 +149,6 @@ func open() -> void:
 		ach_page.hide()
 	if export_button:
 		export_button.text = "ส่งออกข้อมูลการเล่น"
-	if post_button:
-		post_button.visible = Playlog.tester_build() and GameState.month_results.size() >= Playlog.config.post_after_months
 	panel.show()
 	show()
 	get_tree().paused = true

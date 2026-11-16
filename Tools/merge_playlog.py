@@ -4,7 +4,9 @@
 วิธีใช้
   python Tools/merge_playlog.py <โฟลเดอร์ zip> [--pre pre.csv] [--post post.csv] [--out ผลรวม]
 
-  <โฟลเดอร์ zip>  ไฟล์ BakChangKhom_<รหัส>_<เวลา>.zip ที่ผู้ทดสอบส่งมา (คนเดียวส่งหลายไฟล์ได้ ใช้ไฟล์ล่าสุด)
+  <โฟลเดอร์ zip>  ไฟล์ zip ที่ผู้ทดสอบส่งมา (ปุ่ม "ส่งออกข้อมูลการเล่น" ในเกม → BakChangKhom_playlog_<เวลา>.zip)
+                  ในเกมไม่มีรหัสผู้ทดสอบ → ทีมเปลี่ยนชื่อไฟล์ให้มีรหัส เช่น T01.zip หรือ T01_BakChangKhom_playlog_….zip
+                  (หาคำแรกแบบ ตัวอักษร 1–3 + เลข 1–3 ในชื่อไฟล์ · ไม่เจอ = ใช้ชื่อไฟล์) · คนเดียวหลายไฟล์ = ใช้ไฟล์ที่ส่งออกล่าสุด
   --pre / --post  CSV ที่ดาวน์โหลดจาก Google Form (ชีตคำตอบ → ไฟล์ → ดาวน์โหลด → CSV)
                   หาคอลัมน์รหัสเอง (หัวคอลัมน์มีคำว่า รหัส / tester / id) และคอลัมน์คะแนน (Score / คะแนน · แบบ "7 / 10" ก็ได้)
                   กำหนดเองได้ด้วย --id-col "ชื่อคอลัมน์" --score-col "ชื่อคอลัมน์"
@@ -26,7 +28,7 @@ import sys
 import zipfile
 
 ID_RE = re.compile(r"^[A-Z]{1,3}[0-9]{1,3}$")
-ZIP_RE = re.compile(r"BakChangKhom_([A-Za-z0-9]+)_(\d{8}_\d{6})\.zip$")
+NAME_ID_RE = re.compile(r"(?<![A-Za-z0-9])([A-Za-z]{1,3}[0-9]{1,3})(?![A-Za-z0-9])")
 
 
 # ---------------------------------------------------------------- สถิติ (ไม่ใช้ scipy)
@@ -95,16 +97,33 @@ def read_csv_text(text):
     return list(csv.DictReader(io.StringIO(text)))
 
 
+def zip_id(name):
+    stem = os.path.splitext(name)[0]
+    m = NAME_ID_RE.search(stem)
+    return norm_id(m.group(1)) if m else stem
+
+
+def exported_at(path):
+    try:
+        with zipfile.ZipFile(path) as z:
+            for line in z.read("info.txt").decode("utf-8", "replace").splitlines():
+                if line.startswith("exported="):
+                    return line.split("=", 1)[1].strip()
+    except (KeyError, zipfile.BadZipFile):
+        pass
+    return ""
+
+
 def latest_zips(folder):
-    """{ รหัส: path ของ zip ล่าสุด }"""
+    """{ รหัส: path ของ zip ที่ส่งออกล่าสุด }"""
     best = {}
     for name in sorted(os.listdir(folder)):
-        m = ZIP_RE.search(name)
-        if not m:
+        if not name.lower().endswith(".zip"):
             continue
-        tid = norm_id(m.group(1)) or m.group(1)
-        if tid not in best or m.group(2) > best[tid][0]:
-            best[tid] = (m.group(2), os.path.join(folder, name))
+        path = os.path.join(folder, name)
+        tid, when = zip_id(name), exported_at(path)
+        if tid not in best or when > best[tid][0]:
+            best[tid] = (when, path)
     return {k: v[1] for k, v in best.items()}
 
 

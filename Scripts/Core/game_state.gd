@@ -207,11 +207,8 @@ var ach_stats: Dictionary = { }
 var ach_pinned: Array = []
 ## [0.8.0 ขั้น G] ของขวัญสิ้นปีที่ได้รับ { npc_id (String): decor_id (String) } (DecorBook)
 var gifts_received: Dictionary = { }
-## [0.9.0 ขั้น A] รหัสผู้ทดสอบ (ไม่ล้างตอนเริ่มเกมใหม่ · ถามใหม่ในบิลด์ผู้ทดสอบ) · เวลาเล่นสะสม (วินาที · Playlog นับ) · เปิดฟอร์มก่อน/หลังเล่นแล้ว — เซฟ v10
-var tester_id := ""
+## [0.9.0] เวลาเล่นสะสม (วินาที · Playlog นับ) — เซฟ v10
 var playtime_sec := 0.0
-var form_pre_opened := false
-var form_post_opened := false
 
 
 func reset() -> void:
@@ -224,8 +221,6 @@ func reset() -> void:
 	ach_pinned = []
 	gifts_received = { }
 	playtime_sec = 0.0
-	form_pre_opened = false
-	form_post_opened = false
 	money = economy.start_money
 	hold_next_payment = false
 	satisfaction_history.clear()

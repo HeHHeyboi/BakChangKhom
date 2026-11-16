@@ -6,8 +6,10 @@ extends Control
 @export var tutorial: TextureRect
 var showTutorial = false
 var _confirm_new := false
-## ข้อความตัวเลือกใน Prolouge.txt ที่แปลว่า "ข้ามบทนำ" (ต้องตรงกับในไฟล์บททุกตัวอักษร)
-const SKIP_INTRO_CHOICE := "ข้ามบทนำ ไปเปิดร้านเลย"
+## [0.9.0] ดู/ข้ามบทนำ = หน้าเลือกการ์ดใหญ่ 2 ใบหลังสไลด์วิธีเล่น (_show_intro_choice) · เดิมเป็นตัวเลือกในบท Prolouge.txt
+const PROLOGUE_SKIP_TEXT := "res://Assets/Dialog/PrologueSkip.txt"
+var _skip_chosen := false
+var intro_layer: CanvasLayer
 
 
 func _ready() -> void:
@@ -51,7 +53,7 @@ func _ready() -> void:
 
 func dialog_end():
 	EventManager.on_dialog_end.disconnect(dialog_end)
-	if DialogScene.last_choice == SKIP_INTRO_CHOICE:
+	if _skip_chosen:
 		_skip_intro()
 	else:
 		SceneRouter.go(SceneRouter.HOME)
@@ -59,12 +61,143 @@ func dialog_end():
 
 
 func tutorial_end():
-	EventManager.show_dialog("ออฟฟิศ", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
+	EventManager.on_tutorial_finish.disconnect(tutorial_end)
+	_show_intro_choice()
+
+
+## [0.9.0] หน้าเลือก "ดูเรื่องราวตั้งแต่ต้น" / "ข้ามไปเปิดร้านเลย" — การ์ดใหญ่ อ่านง่าย มีคำอธิบายว่าแต่ละทางได้อะไร
+func _show_intro_choice() -> void:
+	intro_layer = CanvasLayer.new()
+	intro_layer.name = "IntroChoice"
+	intro_layer.layer = 50
+	add_child(intro_layer)
+	var dim := ColorRect.new()
+	dim.color = Color(0.06, 0.04, 0.02, 0.88)
+	for n in ["Menu", "Title", "Subtitle", "Logo", "Version", "ExportButton", "AchievementCount"]: # เหลือแค่ภาพพื้นหลัง + ตัวละคร
+		var c := get_node_or_null(NodePath(n)) as CanvasItem
+		if c:
+			c.hide()
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	intro_layer.add_child(dim)
+	var root := VBoxContainer.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.alignment = BoxContainer.ALIGNMENT_CENTER
+	root.add_theme_constant_override(&"separation", 22)
+	intro_layer.add_child(root)
+	var title := Label.new()
+	title.name = "Title"
+	title.text = "จะเริ่มเรื่องแบบไหนดี?"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override(&"font_size", 40)
+	title.add_theme_color_override(&"font_color", Color(1, 0.95, 0.82))
+	title.add_theme_color_override(&"font_outline_color", Color(0.25, 0.14, 0.05))
+	title.add_theme_constant_override(&"outline_size", 6)
+	root.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override(&"separation", 28)
+	root.add_child(row)
+	var watch := _intro_card("WatchCard", "ดูเรื่องราวตั้งแต่ต้น", "แนะนำ · เล่นครั้งแรก",
+		"รู้จักขม ยาย และปิ๊บ แล้วฝึกประกอบคอมทีละขั้นก่อนเปิดร้านจริง", "มีบทฝึกประกอบคอมกับปิ๊บ", true)
+	var skip := _intro_card("SkipCard", "ข้ามไปเปิดร้านเลย", "เคยเล่นแล้ว",
+		"เริ่มที่หน้าร้าน ได้ของติดตัวครบ รับลูกค้าคนแรกได้ทันที", "ดูวิธีเล่นได้จากสมุดคู่มือระหว่างซ่อม", false)
+	row.add_child(watch)
+	row.add_child(skip)
+	watch.pressed.connect(_choose_intro.bind(false))
+	skip.pressed.connect(_choose_intro.bind(true))
+	var hint := Label.new()
+	hint.text = "เลือกด้วยเมาส์ หรือปุ่มลูกศร + Enter"
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.add_theme_font_size_override(&"font_size", 16)
+	hint.add_theme_color_override(&"font_color", Color(1, 0.93, 0.8, 0.75))
+	root.add_child(hint)
+	watch.focus_neighbor_right = watch.get_path_to(skip)
+	skip.focus_neighbor_left = skip.get_path_to(watch)
+	watch.grab_focus.call_deferred()
+
+
+## การ์ดเลือก 1 ใบ = ปุ่มใหญ่ (ทั้งการ์ดกดได้) · หัวเรื่อง · ป้าย · คำอธิบาย · หมายเหตุ
+func _intro_card(card_name: String, head: String, tag: String, body: String, foot: String, primary: bool) -> Button:
+	var b := Button.new()
+	b.name = card_name
+	b.custom_minimum_size = Vector2(420, 250)
+	var base := Color(1, 0.96, 0.86) if primary else Color(0.96, 0.93, 0.87)
+	var edge := Color(0.85, 0.55, 0.15) if primary else Color(0.55, 0.45, 0.35)
+	for st in [&"normal", &"hover", &"pressed", &"focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = base if st == &"normal" else base.lightened(0.35)
+		sb.border_color = edge if st == &"normal" else Color(1, 0.75, 0.25)
+		sb.set_border_width_all(4 if st == &"normal" else 7)
+		sb.set_corner_radius_all(18)
+		sb.shadow_color = Color(0, 0, 0, 0.35)
+		sb.shadow_size = 10
+		if st == &"focus":
+			sb.draw_center = false
+		b.add_theme_stylebox_override(st, sb)
+	var m := MarginContainer.new()
+	m.set_anchors_preset(Control.PRESET_FULL_RECT)
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in [&"margin_left", &"margin_right", &"margin_top", &"margin_bottom"]:
+		m.add_theme_constant_override(side, 22)
+	b.add_child(m)
+	var v := VBoxContainer.new()
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_theme_constant_override(&"separation", 10)
+	m.add_child(v)
+	var pill := Label.new()
+	pill.name = "Tag"
+	pill.text = "  " + tag + "  "
+	pill.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	pill.add_theme_font_size_override(&"font_size", 16)
+	pill.add_theme_color_override(&"font_color", Color.WHITE)
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = Color(0.82, 0.45, 0.1) if primary else Color(0.5, 0.42, 0.35)
+	ps.set_corner_radius_all(10)
+	ps.set_content_margin_all(3)
+	pill.add_theme_stylebox_override(&"normal", ps)
+	v.add_child(pill)
+	var t := Label.new()
+	t.name = "Head"
+	t.text = head
+	t.add_theme_font_size_override(&"font_size", 32)
+	t.add_theme_color_override(&"font_color", Color(0.3, 0.16, 0.05))
+	v.add_child(t)
+	var d := Label.new()
+	d.name = "Body"
+	d.text = body
+	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.custom_minimum_size = Vector2(370, 0)
+	d.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	d.add_theme_font_size_override(&"font_size", 21)
+	d.add_theme_color_override(&"font_color", Color(0.25, 0.18, 0.12))
+	v.add_child(d)
+	var f := Label.new()
+	f.name = "Foot"
+	f.text = foot
+	f.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	f.add_theme_font_size_override(&"font_size", 16)
+	f.add_theme_color_override(&"font_color", Color(0.5, 0.38, 0.25))
+	v.add_child(f)
+	for n in [pill, t, d, f]:
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return b
+
+
+## เลือกแล้ว → เล่นบทนำ (ออฟฟิศ) หรือบทสั้นข้ามบทนำ (dialog_end ไปต่อ) · จดลง playlog/start.csv
+func _choose_intro(skip: bool) -> void:
+	if intro_layer:
+		intro_layer.queue_free()
+		intro_layer = null
+	_skip_chosen = skip
+	Playlog.append("start.csv", ["choice"], ["skip_intro" if skip else "watch_intro"])
+	if skip:
+		EventManager.show_dialog("บ้านยาย", PROLOGUE_SKIP_TEXT, Constant.BG_DIR + "bg_path_sunset.jpg")
+	else:
+		EventManager.show_dialog("ออฟฟิศ", Constant.PROLOUGE_TEXT, Constant.OFFICE_BG)
 	Global.on_start = false
 	showTutorial = false
 	EventManager.showUI()
 	self.hide()
-	EventManager.on_tutorial_finish.disconnect(tutorial_end)
 
 
 func _on_quit_button_pressed() -> void:
@@ -84,17 +217,8 @@ func _on_start_button_pressed() -> void:
 		$Menu/Start_Button.text = "เริ่มใหม่? กดอีกครั้ง"
 		$Menu/Start_Button.tooltip_text = "เซฟเดิมจะถูกแทนที่ด้วยเกมใหม่"
 		return
-	if Playlog.tester_build(): # [0.9.0 ขั้น A] บิลด์ผู้ทดสอบ: ถามรหัสก่อนเริ่ม
-		showTutorial = true
-		Playlog.ask_tester_id(func() -> void: Playlog.show_pre_form(_begin_new_game)) # [0.9.0 ขั้น B] แล้วหน้าแบบทดสอบก่อนเล่น
-		return
-	_begin_new_game()
-
-
-func _begin_new_game(pre_opened := false) -> void:
 	SaveGame.clear() # เริ่มใหม่ = ลบเซฟเดิม → เซฟใหม่สร้างเองตอนเข้าฉากแรก
 	DayLoop._reset_run()
-	GameState.form_pre_opened = pre_opened # [0.9.0] reset() ล้างแล้ว → ใส่หลังรีเซ็ต
 	EventManager.jump_event(EventManager.EventID.MAIN, 0) # เควสต์กลับขั้นแรก (กรณีกลับเมนูมาเริ่มใหม่)
 	EventManager.hideUI()
 	showTutorial = true
@@ -139,13 +263,6 @@ func _on_continue_button_pressed() -> void:
 		showTutorial = false
 		$Menu/Continue_Button.hide()
 		return
-	if Playlog.tester_build() and GameState.tester_id == "": # [0.9.0] เซฟเก่ายังไม่มีรหัส
-		Playlog.ask_tester_id(_enter_loaded.bind(loc))
-		return
-	_enter_loaded(loc)
-
-
-func _enter_loaded(loc: int) -> void:
 	EventManager.on_tutorial_finish.disconnect(tutorial_end)
 	EventManager.on_dialog_end.disconnect(dialog_end)
 	Global.on_start = false
@@ -154,14 +271,14 @@ func _enter_loaded(loc: int) -> void:
 	SceneRouter.go(loc)
 
 
-## [0.9.0 ขั้น A] ปุ่ม "ส่งออกข้อมูลการเล่น" มุมขวาล่าง (มีข้อมูลแล้ว หรือบิลด์ผู้ทดสอบ) + รหัสผู้ทดสอบ
+## [0.9.0] ปุ่ม "ส่งออกข้อมูลการเล่น" มุมขวาล่าง (มีข้อมูลการเล่นแล้วเท่านั้น)
 func _add_export_button() -> void:
-	if not (Playlog.has_data() or Playlog.tester_build()):
+	if not Playlog.has_data():
 		return
 	var b := Button.new()
 	b.name = "ExportButton"
 	b.text = "ส่งออกข้อมูลการเล่น"
-	b.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร เพื่อส่งให้ทีม"
+	b.tooltip_text = "รวมข้อมูลการเล่นเป็นไฟล์ zip ไว้ในโฟลเดอร์เอกสาร"
 	b.add_theme_font_size_override(&"font_size", 18)
 	b.custom_minimum_size = Vector2(250, 44)
 	b.position = Vector2(1152 - 250 - 16, 648 - 44 - 40)
@@ -170,14 +287,3 @@ func _add_export_button() -> void:
 		b.text = "ส่งออกแล้ว ✓"
 		b.tooltip_text = msg)
 	add_child(b)
-	var tid := SaveGame.saved_tester_id()
-	if tid != "" or Playlog.tester_build():
-		var l := Label.new()
-		l.name = "TesterTag"
-		l.text = "ผู้ทดสอบ %s" % (tid if tid != "" else "—")
-		l.add_theme_font_size_override(&"font_size", 14)
-		l.add_theme_color_override(&"font_color", Color(1, 0.93, 0.75))
-		l.add_theme_color_override(&"font_outline_color", Color(0.2, 0.12, 0.05))
-		l.add_theme_constant_override(&"outline_size", 4)
-		l.position = Vector2(1152 - 250 - 16, 648 - 36)
-		add_child(l)

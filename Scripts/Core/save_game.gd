@@ -14,7 +14,7 @@ const PATH := "user://save.json"
 ## [0.6.0] VERSION 7 = งานกลางเก็บเป็น { path · npc · device } (door · appointments · shelf.orders[].case) · helper_used_today
 ## [0.7.0] VERSION 8 = seed รายวัน (run_seed) · ความจำกันซ้ำ · อีเวนต์ (event_state · event_log · อีเวนต์วันนี้/การ์ด/ไฟดับ) · ร้านลดราคา + บัญชีดำ · ใบประกาศ (achievements · ach_stats)
 ## [0.8.0] VERSION 9 = ของขวัญสิ้นปี (gifts_received) · ตัวเลือกบทต้นเดือน/ทางแยกอยู่ใน story_flags (มีแล้ว)
-## [0.9.0] VERSION 10 = ผู้ทดสอบ (tester_id) · เวลาเล่นสะสม (playtime_sec) · เปิดฟอร์มก่อน/หลังเล่นแล้ว (form_pre · form_post)
+## [0.9.0] VERSION 10 = เวลาเล่นสะสม (playtime_sec)
 const VERSION := 10
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
@@ -58,10 +58,6 @@ static func info() -> Dictionary:
 		return { }
 	return { "shift": int(d.get("time", { }).get("shift", 1)), "money": int(d.get("game", { }).get("money", 0)) }
 
-
-## [0.9.0] รหัสผู้ทดสอบในเซฟ (เมนูหลักโชว์) · ไม่มีเซฟ/ไม่มีรหัส = ""
-static func saved_tester_id() -> String:
-	return String(_read().get("game", { }).get("tester_id", ""))
 
 
 static func save() -> bool:
@@ -109,7 +105,7 @@ static func save() -> bool:
 			"run_seed": GameState.run_seed, # [0.7.0]
 			"event_state": GameState.event_state, "event_log": GameState.event_log, "seller_blacklist": GameState.seller_blacklist,
 			"achievements": GameState.achievements, "ach_stats": GameState.ach_stats, "ach_pinned": GameState.ach_pinned, "gifts_received": GameState.gifts_received,
-			"tester_id": GameState.tester_id, "playtime_sec": roundi(GameState.playtime_sec), "form_pre": GameState.form_pre_opened, "form_post": GameState.form_post_opened, # [0.9.0]
+			"playtime_sec": roundi(GameState.playtime_sec), # [0.9.0]
 			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
 			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
@@ -197,10 +193,7 @@ static func load_into() -> int:
 	GameState.ach_stats = g.get("ach_stats", { })
 	GameState.ach_pinned = g.get("ach_pinned", [])
 	GameState.gifts_received = g.get("gifts_received", { })
-	GameState.tester_id = String(g.get("tester_id", "")) # [0.9.0] เซฟ v3–v9 ไม่มี = "" (บิลด์ผู้ทดสอบถามตอนเล่นต่อ)
-	GameState.playtime_sec = float(g.get("playtime_sec", 0))
-	GameState.form_pre_opened = bool(g.get("form_pre", false))
-	GameState.form_post_opened = bool(g.get("form_post", false))
+	GameState.playtime_sec = float(g.get("playtime_sec", 0)) # [0.9.0] เซฟ v3–v9 ไม่มี = 0
 	DayLoop.reseed_day()
 	GameState.request_log.clear()
 	for r in g.get("request_log", []):
