@@ -11,6 +11,7 @@ extends Node
 ##   บอทซื้อของ 2 นิสัย: "สั่งเมื่อมีงาน" (ปกติ/เก่ง · ปิดร้านแล้วสั่งออนไลน์ · เครื่องถึงนัดแต่ยังไม่มีของ → เดินไปตลาด 1 เทิร์น)
 ##   กับ "ตุนของ" (normal_stock · ซื้ออะไหล่ถูก ๆ เก็บไว้ล่วงหน้าที่ตลาด) — รายงานเทียบกันในตาราง
 ## ผล 15 พ.ย. 0.4.0 (เป้าเดิม · ค่าชดใช้ใหม่ · บอทซื้อชั้นเก็บอะไหล่ 14 ช่อง): ปกติ 10/10 seed ≥ 9/12 · มัธยฐาน 10 · ไม่มีร้านปิด
+## ผล 16 พ.ย. 0.5.0 (สอบเลื่อนยศ · ยศล็อกระดับงาน · XP 1000/3000/6500/11000 · ความสนิท · มิ้นลูกมือ): ปกติ 9/10 seed ≥ 9/12 · มัธยฐาน 10 · ไม่มีร้านปิด · ยศ 2/3/4/5 ราว ก.พ./เม.ย./มิ.ย.–ก.ค./ก.ย. · สนิท 1–5 คน ขาประจำ 1–3 คน · มิ้นได้ ≤ ฿546/ปี · เก่ง ฿29,594 > ปกติ ฿24,676 · แบ่งรันได้ด้วย BAL_LVS
 ##   สั่งเมื่อมีงาน กำไรเฉลี่ย ฿24,197 · ตุนของ ฿21,107 (เงินจม + เดินไปตลาดบ่อย) · เก่ง ฿31,391
 ## เปิด Test/balance_test.tscn → F6 → Output มีตารางรายเดือน + "T DONE fails=0" (ใช้เวลา ~1 นาที)
 
@@ -30,11 +31,21 @@ func _ready() -> void:
 	var demo := DayLoop.demo_shifts
 	DayLoop.demo_shifts = 0 # เล่นครบปี ไม่จบเดโม
 	var res := { }
-	for lv in [&"good", &"normal", &"normal_stock", &"idle"]:
+	# BAL_LVS=normal,good → เล่นเฉพาะระดับที่ระบุ (แบ่งรันได้ · ไม่ตรวจเกณฑ์ข้ามระดับ)
+	var lvs: Array = [&"good", &"normal", &"normal_stock", &"idle"]
+	if OS.has_environment("BAL_LVS"):
+		lvs = Array(OS.get_environment("BAL_LVS").split(",")).map(func(x: String) -> StringName: return StringName(x))
+	for lv in lvs:
 		res[lv] = []
 		for s in (NORMAL_SEEDS if lv in [&"normal", &"normal_stock"] else (SEEDS if lv == &"good" else [SEEDS[0]])):
 			res[lv].append(await play_year(lv, s))
 	_report(res)
+	if OS.has_environment("BAL_LVS"):
+		DayLoop.demo_shifts = demo
+		DayLoop._reset_run()
+		print("T DONE fails=", fails)
+		get_tree().quit()
+		return
 	var normal_hits: Array = res[&"normal"].map(func(r: Dictionary) -> int: return int(r.hits))
 	var good_profit := _avg(res[&"good"], &"profit")
 	var normal_profit := _avg(res[&"normal"], &"profit")
@@ -69,6 +80,9 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 	DayLoop._break_done = true
 	DayLoop.force_active = true # [0.4.0] ลูปร้านทำงานจริง (ไปตลาดระหว่างเปิดร้านเสีย 1 เทิร์น)
 	rng.seed = s * 7 + 1
+	rank_months = { }
+	helper_runs = 0
+	helper_money = 0
 	GameState.story_flags.clear()
 	GameState.ensure_starter_kit() # [0.4.0] ของติดตัวหลังบทสอน (ผู้เล่นจริงได้ก่อนเปิดร้าน)
 	var jobs := 0
@@ -78,6 +92,7 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 		guard += 1
 		jobs += await _play_day(lv)
 		var last_day := ts.shift >= TimeSystem.TOTAL_SHIFTS
+		_bot_exam(lv)
 		DayLoop.end_shift()
 		await get_tree().process_frame
 		if DialogScene.visible:
@@ -98,10 +113,21 @@ func play_year(lv: StringName, s: int) -> Dictionary:
 		hits += 1 if bool(r.reached) else 0
 		profit += int(r.profit)
 	DayLoop.quiet = false
+	# [0.5.0 ขั้น K] ความสนิทสิ้นปี · เดือนที่ถึงแต่ละยศ
+	var close := 0
+	var regular := 0
+	var heard := 0
+	for n in NpcBook.with_affinity():
+		var a := GameState.affinity(n.id)
+		close += 1 if a >= 60 else 0
+		regular += 1 if a >= 80 else 0
+		heard += (GameState.npc_stories_seen.get(n.id, []) as Array).size()
+	var rank_m := rank_months.duplicate()
+	var exams := GameState.learn_log.size() / maxi(GameState.economy.exam_questions, 1)
 	var returned := 0
 	for o: RepairShelf.Order in DayLoop.shelf.history:
 		returned += 1 if o.state == RepairShelf.State.RETURNED else 0
-	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned }
+	return { "level": lv, "seed": s, "months": rows.size(), "hits": hits, "closed": GameState.shop_closed, "profit": profit, "rows": rows, "jobs": jobs, "money": GameState.money, "rep": GameState.reputation, "shelf": GameState.shelf_slots, "storage": GameState.storage_slots, "returned": returned, "close": close, "regular": regular, "heard": heard, "rank_m": rank_m, "exams": exams, "helper": helper_runs, "helper_money": helper_money }
 
 
 ## 1 วันเปิดร้าน · คืนจำนวนงานที่ซ่อม
@@ -215,6 +241,13 @@ func _handle_door(lv: StringName) -> void:
 		var c: CustomerCase = j["case"]
 		if DayLoop.is_pickup(j):
 			DayLoop.door_handover()
+			_bot_story(lv)
+			continue
+		# [0.5.0 ขั้น K] ยศเชี่ยวชาญ: ฝากงานขมOS ให้มิ้นวันละงาน
+		if DayLoop.helper_button(j).get("visible", false):
+			var hr := DayLoop.door_helper()
+			helper_runs += 1
+			helper_money += int(hr.get("money", 0))
 			continue
 		if bool(j.get("phone", false)):
 			if not (DayLoop.door_can_appoint() and DayLoop.door_appoint()):
@@ -276,6 +309,37 @@ func _repair(c: CustomerCase, o: RepairShelf.Order, lv: StringName) -> void:
 	var damaged := lv != &"good" and rng.randf() < (float(OS.get_environment("BAL_DMG")) if OS.has_environment("BAL_DMG") else 0.03)
 	GameState.record_repair(c.part(), score, damaged, c.fee, c.level)
 	DayLoop._result_pending = false
+	_bot_story(lv)
+
+
+## [0.5.0 ขั้น K] เดือนที่บอทถึงยศ r · มิ้นทำงานกี่งาน/ได้เงินเท่าไร (ต่อ seed)
+var rank_months := { }
+var helper_runs := 0
+var helper_money := 0
+
+
+## ปิดร้านวันที่ XP ครบ → สอบ (เก่งตอบถูก 90% · ปกติ 70%) · ผ่านแล้วเลือกความสามารถทาง A
+func _bot_exam(lv: StringName) -> void:
+	if lv == &"idle" or not GameState.rank_ready():
+		return
+	var p_right := 0.9 if lv == &"good" else 0.7
+	for q: ExamQuestion in DayLoop.exam_begin():
+		DayLoop.exam_answer(q.correct_text() if rng.randf() < p_right else "ผิด")
+	if DayLoop.exam_finish():
+		rank_months[GameState.rank()] = ts.month()
+	while GameState.perk_pending() > 0:
+		var r := GameState.perk_pending()
+		GameState.choose_perk(r, StringName(GameState.perk_options(r)[0].id))
+
+
+## เรื่องส่วนตัวที่รอเล่น → ฟัง (ตอบใส่ใจ: เก่ง 90% · ปกติ 60%)
+func _bot_story(lv: StringName) -> void:
+	if DayLoop.pending_story.is_empty():
+		return
+	var st: NpcStory = DayLoop.pending_story["story"]
+	DayLoop.story_today = true
+	var good := rng.randf() < (0.9 if lv == &"good" else 0.6)
+	DayLoop.story_finish(st.good_choice if (good or st.good_choice == "") else "ตอบห้วน")
 
 
 func _set_ot() -> void:
@@ -332,12 +396,19 @@ func _report(res: Dictionary) -> void:
 					line += "%7s" % "-"
 			print(line + "   %2d/12   %s  %3d  %8d  %d/%d" % [r.hits, "ปิด" if r.closed else " - ", r.jobs, r.money, r.shelf, r.storage])
 	print("BAL (* = ไม่ถึงเป้า)")
+	print("BAL ===== [0.5.0] ยศ (เดือนที่ถึง ฝึกหัด/ประจำหมู่บ้าน/เชี่ยวชาญ/มือโปร) · ความสนิทสิ้นปี (สนิท ≥60 / ขาประจำ ≥80 จาก 9 คน) · เรื่องที่ฟัง · มิ้นทำงาน =====")
+	for lv in res:
+		for r: Dictionary in res[lv]:
+			var rm: Dictionary = r.get("rank_m", { })
+			print("BAL %-14s ยศ %s · สอบ %d ครั้ง · สนิท %d · ขาประจำ %d · ฟังเรื่อง %d/18 · มิ้น %d งาน ฿%d" % [
+				"%s#%d" % [lv, r.seed], "/".join([1, 2, 3, 4].map(func(k: int) -> String: return str(rm.get(k, "-")))),
+				int(r.get("exams", 0)), int(r.get("close", 0)), int(r.get("regular", 0)), int(r.get("heard", 0)), int(r.get("helper", 0)), int(r.get("helper_money", 0))])
 	# มัธยฐานกำไรรายเดือนของบอทปกติ (ร้านปิดไปแล้ว = ไม่นับเดือนนั้น) + 70% ไว้ใช้ตั้งเป้า
 	var med := "BAL %-14s" % "มัธยฐานปกติ"
 	var sug := "BAL %-14s" % "70% (ปัด 50)"
 	for m in 12:
 		var xs: Array[int] = []
-		for r: Dictionary in res[&"normal"]:
+		for r: Dictionary in res.get(&"normal", []):
 			if m < (r.rows as Array).size():
 				xs.append(int(r.rows[m].profit))
 		xs.sort()

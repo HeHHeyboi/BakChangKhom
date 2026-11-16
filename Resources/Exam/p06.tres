@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"p06"
+part = &"part_gpu"
+level = 3
+question = "ใช้ลมกระป๋องเป่าพัดลมการ์ดจอควรทำอย่างไร"
+choices = PackedStringArray("จับใบพัดไว้ไม่ให้หมุนเร็วเกิน", "เป่าให้ใบพัดหมุนแรงที่สุด", "เป่าตอนเปิดเครื่องอยู่")
+answer = 0
+explain = "ใบพัดหมุนเร็วเกินจากแรงลมทำให้แกนพัดลมเสียได้"

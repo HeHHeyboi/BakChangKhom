@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartCommon/tool_esd_strap.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i05"
+part = &"general"
+level = 1
+question = "อุปกรณ์ในภาพใช้ทำอะไร"
+choices = PackedStringArray("ปล่อยไฟฟ้าสถิตจากตัวช่างลงดิน", "วัดไฟของปลั๊ก", "ยึดสายไฟให้เป็นระเบียบ")
+answer = 0
+explain = "สายรัดข้อมือกันไฟฟ้าสถิตช่วยไม่ให้ชิปเสียตอนจับชิ้นส่วน"
+image = ExtResource("2_img")

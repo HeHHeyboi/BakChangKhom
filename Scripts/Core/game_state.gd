@@ -193,6 +193,12 @@ func reset() -> void:
 	hold_next_payment = false
 	satisfaction_history.clear()
 	xp = 0
+	rank_level = 0
+	exam_last_shift = -1
+	perks.clear()
+	level_three_stars.clear()
+	learn_log.clear()
+	exam_attempts.clear()
 	part_clears.clear()
 	story_flags.clear()
 	ending = &""
@@ -389,7 +395,7 @@ func pay_month_bill(month: int, slots_worked := 0) -> Dictionary:
 	var bill := {
 		"month": month,
 		"rent": e.month_value(e.bill_rent, month),
-		"power": e.month_value(e.power_base, month) + e.power_per_slot * maxi(slots_worked, 0),
+		"power": roundi((e.month_value(e.power_base, month) + e.power_per_slot * maxi(slots_worked, 0)) * (e.perk_power_mult if has_perk(&"power_saver") else 1.0)),
 		"water": e.bill_water,
 		"internet": e.bill_internet,
 		"prev_debt": debt,
@@ -521,6 +527,8 @@ func has_affinity(id: StringName) -> bool:
 func add_affinity(id: StringName, delta: int, reason: StringName = &"") -> int:
 	if delta == 0 or not has_affinity(id):
 		return 0
+	if delta > 0 and has_perk(&"sweet_talk"): # [ขั้น I] ปากหวาน
+		delta = ceili(delta * _econ().perk_affinity_mult)
 	var before := affinity(id)
 	var after := clampi(before + delta, 0, 100)
 	if after == before:
@@ -547,6 +555,34 @@ func affinity_gains(ch: int) -> Dictionary:
 		if int(r.ch) == ch:
 			out[StringName(r.id)] = int(out.get(StringName(r.id), 0)) + int(r.delta)
 	return out
+
+
+## หัวใจเป็นตัวอักษร "♥♥♡♡♡" (ปัดลง)
+func affinity_hearts_text(id: StringName) -> String:
+	var n := clampi(floori(affinity(id) / 20.0), 0, 5)
+	return "♥".repeat(n) + "♡".repeat(5 - n)
+
+
+## ขึ้นระดับถัดไปอีกกี่แต้ม (-1 = สูงสุดแล้ว)
+func affinity_to_next(id: StringName) -> int:
+	var e := _econ()
+	var t := affinity_tier(id)
+	return e.affinity_tiers[t] - affinity(id) if t < e.affinity_tiers.size() else -1
+
+
+## สรุปความสนิทที่ขึ้น/ลงในบท ch: "ลุงอำนวย ♥+16 · ครู ♥−3" (เรียงจากขึ้นมากสุด)
+func affinity_summary(ch: int) -> String:
+	var g := affinity_gains(ch)
+	var ids := g.keys()
+	ids.sort_custom(func(a, b) -> bool: return int(g[a]) > int(g[b]))
+	var parts := PackedStringArray()
+	for id in ids:
+		var d := int(g[id])
+		if d == 0:
+			continue
+		var n := NpcBook.by_id(id)
+		parts.append("%s ♥%s%d" % [n.display_name if n else String(id), "+" if d > 0 else "−", absi(d)])
+	return " · ".join(parts)
 
 
 ## จดว่ามาร้าน (shift = วันเปิดร้านที่มา)
@@ -590,8 +626,53 @@ func mark_story_seen(id: StringName, at: int) -> void:
 	npc_stories_seen[id] = arr
 
 
-## ยศช่าง 0–4 จาก XP
+## [0.5.0 ขั้น F] ยศช่าง 0–4 = ยศที่สอบผ่านแล้ว (rank_level) · XP ถึงเกณฑ์ = มีสิทธิ์สอบ (rank_ready) · สอบผ่าน → promote()
+var rank_level := 0
+## XP ครบเกณฑ์ยศถัดไปแล้ว รอสอบ (ยิงครั้งเดียวตอนข้ามเกณฑ์)
+signal rank_exam_ready(target: int)
+## [ขั้น G] ผลสอบรายข้อ { ch, day, target, attempt, qid, part, chosen, correct } — เซฟ + user://learn_log.csv
+var learn_log: Array[Dictionary] = []
+## ยศเป้าหมาย → สอบมาแล้วกี่ครั้ง
+var exam_attempts: Dictionary = { }
+## วันเปิดร้าน (shift) ที่สอบล่าสุด — สอบได้วันละครั้ง
+var exam_last_shift := -1
+## [ขั้น I] ความสามารถช่างที่เลือก: ยศ (1–4) → id
+var perks: Dictionary = { }
+## [ขั้น J] ระดับงาน → จำนวนงานที่ได้ ⭐⭐⭐ (มิ้นเรียนจากงานที่ขมทำดี)
+var level_three_stars: Dictionary = { }
+signal perk_chosen(rank: int, id: StringName)
+
+
+func has_perk(id: StringName) -> bool:
+	return perks.values().has(id) or perks.values().has(String(id))
+
+
+## ยศที่ยังไม่ได้เลือกความสามารถ (ต่ำสุดก่อน · 0 = ไม่มีค้าง)
+func perk_pending() -> int:
+	for r in range(1, rank_level + 1):
+		if not perks.has(r) and _econ().perk_options.has(r):
+			return r
+	return 0
+
+
+func perk_options(r: int) -> Array:
+	return _econ().perk_options.get(r, [])
+
+
+func choose_perk(r: int, id: StringName) -> bool:
+	if perks.has(r) or r > rank_level or not perk_options(r).any(func(o: Dictionary) -> bool: return String(o.id) == String(id)):
+		return false
+	perks[r] = id
+	perk_chosen.emit(r, id)
+	return true
+
+
 func rank() -> int:
+	return rank_level
+
+
+## ยศที่ XP ถึงเกณฑ์ (ไม่สนว่าสอบหรือยัง)
+func xp_rank() -> int:
 	var e := economy if economy else EconomyConfig.new()
 	var r := 0
 	for i in e.rank_xp.size():
@@ -600,16 +681,36 @@ func rank() -> int:
 	return r
 
 
-## เพิ่ม XP · ข้ามเกณฑ์ยศ → rank_up
+## XP ครบเกณฑ์ยศถัดไปแล้ว (สอบได้)
+func rank_ready() -> bool:
+	return xp_rank() > rank_level
+
+
+## สอบผ่าน → ขึ้นยศ 1 ขั้น (ไม่เกิน xp_rank) · ยิง rank_up (ป้าย "เลื่อนขั้น!")
+func promote() -> bool:
+	if not rank_ready():
+		return false
+	rank_level += 1
+	rank_up.emit(rank_level, rank_name())
+	return true
+
+
+## ตั้งยศตรง ๆ (เทสต์/บอท/โหลดเซฟเก่า) · XP ไม่พอก็เติมให้ถึงเกณฑ์
+func set_rank(r: int) -> void:
+	var e := economy if economy else EconomyConfig.new()
+	rank_level = clampi(r, 0, e.rank_xp.size() - 1)
+	xp = maxi(xp, e.rank_xp[rank_level])
+
+
+## เพิ่ม XP · ข้ามเกณฑ์ยศถัดไป → rank_exam_ready (ยังไม่เลื่อน ต้องสอบก่อน)
 func add_xp(gained: int) -> void:
 	if gained == 0:
 		return
-	var before := rank()
+	var was_ready := rank_ready()
 	xp = maxi(xp + gained, 0)
 	xp_changed.emit(xp, gained)
-	var after := rank()
-	if after > before:
-		rank_up.emit(after, rank_name())
+	if not was_ready and rank_ready():
+		rank_exam_ready.emit(rank_level + 1)
 
 
 ## XP ที่ต้องมีเพื่อขึ้นยศถัดไป (-1 = ยศสูงสุดแล้ว)
@@ -639,7 +740,50 @@ func level_unlocked(level: int) -> bool:
 	if level <= 2:
 		return true
 	var e := economy if economy else EconomyConfig.new()
-	return level_stars.get(level - 1, 0) >= e.unlock_stars_needed
+	return level_stars.get(level - 1, 0) >= e.unlock_stars_needed and rank_level >= _rank_for_level(level)
+
+
+## [0.5.0 ขั้น H] ยศขั้นต่ำของงานระดับนี้
+func _rank_for_level(level: int) -> int:
+	var e := _econ()
+	return e.rank_job_level[clampi(level, 1, e.rank_job_level.size()) - 1] if not e.rank_job_level.is_empty() else 0
+
+
+## ทำไมงานระดับนี้ยังล็อก ("" = ปลดแล้ว)
+func level_lock_reason(level: int) -> String:
+	if level_unlocked(level):
+		return ""
+	var e := _econ()
+	var why := PackedStringArray()
+	if level > 2 and level_stars.get(level - 1, 0) < e.unlock_stars_needed:
+		why.append("ทำ Lv%d ให้ได้ ⭐⭐ อีก %d งาน" % [level - 1, e.unlock_stars_needed - level_stars.get(level - 1, 0)])
+	if rank_level < _rank_for_level(level):
+		why.append("เป็น%s" % e.rank_names[_rank_for_level(level)])
+	return "ต้อง" + " และ".join(why)
+
+
+## [0.5.0 ขั้น H] สิ่งที่ยศนี้ปลด (การ์ดหลังสอบผ่าน)
+func rank_unlock_lines(r: int) -> PackedStringArray:
+	var e := _econ()
+	var out := PackedStringArray()
+	for lv in range(1, 6):
+		if _rank_for_level(lv) == r and r > 0:
+			out.append("งาน Lv%d %s" % [lv, CustomerCase.LEVEL_NAMES[lv - 1]])
+	var items := PackedStringArray()
+	for f in DirAccess.get_files_at("res://Resources/Shop/"):
+		var p := "res://Resources/Shop/" + f.trim_suffix(".remap")
+		if p.ends_with(".tres"):
+			var it := load(p) as ItemDef
+			if it and it.unlock_rank == r and r > 0:
+				items.append(it.display_name)
+	if not items.is_empty():
+		out.append("ซื้อ " + " · ".join(items))
+	if r == e.announce_rank:
+		out.append("ผู้ใหญ่บ้านประกาศเสียงตามสาย (ต้นเดือนลูกค้า +%d)" % e.announce_extra_visitors)
+	if r == e.helper_rank:
+		out.append("มิ้นเป็นลูกมือ (ฝากงานขมOS วันละ 1)")
+	out.append("ค่าอะไหล่ +%s%%" % String.num(e.part_markup(r) * 100.0, 1).trim_suffix(".0"))
+	return out
 
 
 func can_afford(cost: int) -> bool:
@@ -1140,10 +1284,14 @@ func record_repair(part_id: StringName, score: int, damaged := false, fee_overri
 			rep = e.rep_three_star if score >= e.three_star_score else e.rep_good
 		Grade.FAIL:
 			rep = e.rep_damaged if damaged else e.rep_fail
+			if damaged and has_perk(&"careful"): # [ขั้น I] ตาถึง
+				rep = int(rep / 2.0)
 	if not hold:
 		add_reputation(rep)
 	if level > 0 and grade == Grade.GOOD:
 		level_stars[level] = level_stars.get(level, 0) + 1
+		if score >= e.three_star_score:
+			level_three_stars[level] = int(level_three_stars.get(level, 0)) + 1
 	if grade != Grade.FAIL:
 		part_clears[part_id] = part_clears.get(part_id, 0) + 1
 

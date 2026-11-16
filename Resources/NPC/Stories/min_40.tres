@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 40
+title = "ทำไมมิ้นไม่ไปทำงานในเมือง"
+dialog = "res://Assets/Dialog/NPC/min_40.txt"
+good_choice = ""
+reward_item = &""
+flag = &""

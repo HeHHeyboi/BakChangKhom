@@ -212,7 +212,8 @@ class_name EconomyConfig extends Resource
 @export var help_target_mult := 0.7
 
 @export_group("ยศช่าง (GAME_REDESIGN 10.1)")
-@export var rank_xp: PackedInt32Array = [0, 500, 1500, 3500, 7000]
+## [0.5.0 ขั้น K] เลื่อนช้าลง (บอทปกติถึงยศ 2/3/4/5 ราว ก.พ./เม.ย./ก.ค./ต.ค.) · เดิม 500/1500/3500/7000
+@export var rank_xp: PackedInt32Array = [0, 1000, 3000, 6500, 11000]
 @export var rank_names: PackedStringArray = ["ช่างมือใหม่", "ช่างฝึกหัด", "ช่างประจำหมู่บ้าน", "ช่างเชี่ยวชาญ", "ช่างมือโปร"]
 
 @export_group("ลูกค้าประจำ + ความสนิท (0.5.0 · PLAN_0_5_0 ข้อ 2 · 8)")
@@ -226,8 +227,8 @@ class_name EconomyConfig extends Resource
 @export var affinity_recent_mult := 0.3
 ## ได้/เสียความสนิทตามเหตุการณ์ (ข้อ 2.4)
 @export var affinity_gain: Dictionary[StringName, int] = {
-	&"pass": 5, &"three_star": 3, &"on_time": 3, &"kept_appointment": 2, &"call_early": 1, &"story_good": 10, &"story_plain": 3,
-	&"fail": -4, &"damage": -8, &"late_day": -3, &"reject": -3, &"walk_out": -4, &"reclaimed": -10,
+	&"pass": 2, &"three_star": 1, &"on_time": 1, &"kept_appointment": 1, &"call_early": 1, &"story_good": 4, &"story_plain": 1,
+	&"fail": -3, &"damage": -6, &"late_day": -2, &"reject": -2, &"walk_out": -3, &"reclaimed": -8,
 }
 ## ระดับที่ลูกค้ารอหน้าประตูได้ +1 เทิร์น (คุ้นเคย)
 @export var affinity_patience_tier := 2
@@ -236,6 +237,38 @@ class_name EconomyConfig extends Resource
 @export var affinity_tip := 20
 ## ประวัติเครื่องที่จำต่อคน
 @export var npc_history_max := 5
+## [ขั้น E] ฟังเรื่องส่วนตัวใช้กี่เทิร์น
+@export var story_slots := 1
+## [ขั้น G] สอบเลื่อนยศ: ถามกี่ข้อ · ถูกกี่ข้อถึงผ่าน
+@export var exam_questions := 3
+@export var exam_pass := 2
+## [ขั้น H] ยศขั้นต่ำของงานแต่ละระดับ Lv1–Lv5 (0 = มือใหม่ · 1 = ฝึกหัด · 2 = ประจำหมู่บ้าน · 3 = เชี่ยวชาญ) · ใช้ร่วมกับดาว
+@export var rank_job_level: PackedInt32Array = [0, 0, 1, 2, 3]
+## [ขั้น H] ยศที่ผู้ใหญ่บ้านประกาศเสียงตามสาย: วันแรกของทุกบทลูกค้า +n
+@export var announce_rank := 2
+@export var announce_extra_visitors := 1
+## [ขั้น J] มิ้นเป็นลูกมือ: ยศที่ปลด · โอกาสผ่านพื้นฐาน + ต่อ ⭐⭐⭐ ที่ขมเคยได้ในงานระดับนั้น (สูงสุด) · ส่วนแบ่งค่าแรงที่ร้านได้ · วันละกี่งาน
+@export var helper_rank := 3
+@export var helper_base := 0.6
+@export var helper_per_star := 0.1
+@export var helper_max := 0.95
+@export var helper_fee_share := 0.7
+@export var helper_per_day := 1
+
+@export_group("ความสามารถช่าง (0.5.0 · PLAN_0_5_0 ข้อ 7)")
+## ยศ 1–4 → [ทาง A, ทาง B] { id, name, desc }
+@export var perk_options: Dictionary = {
+	1: [{ "id": "sweet_talk", "name": "ปากหวาน", "desc": "ความสนิทที่ได้ +25%" }, { "id": "patient", "name": "ใจเย็น", "desc": "ลูกค้าหน้าร้านรอได้ +1 เทิร์น" }],
+	2: [{ "id": "punctual", "name": "นัดแม่น", "desc": "ผ่อนผันเลยนัดได้ 3 วัน · ความพอใจที่เสียจากเลยนัดลดครึ่ง" }, { "id": "connected", "name": "มีเส้นสาย", "desc": "รถขายของมาบ่อยขึ้น (40%) · ของ 4 ชิ้น" }],
+	3: [{ "id": "power_saver", "name": "ประหยัดไฟ", "desc": "ค่าไฟ −15%" }, { "id": "careful", "name": "ตาถึง", "desc": "ทำของเสีย: ชื่อเสียงและความสนิทที่เสียลดครึ่ง" }],
+	4: [{ "id": "mentor", "name": "ครูช่าง", "desc": "มิ้นรับงานขมOS Lv2 ได้ · โอกาสผ่าน +10%" }, { "id": "beloved", "name": "ขวัญใจหมู่บ้าน", "desc": "คนที่สนิทขึ้นไปทิปเพิ่ม ฿20 · ฟังเรื่องส่วนตัวจบดีได้ของฝาก" }],
+}
+@export var perk_affinity_mult := 1.25
+@export var perk_late_grace_bonus := 1
+@export var perk_vendor_chance := 0.4
+@export var perk_vendor_items := 4
+@export var perk_power_mult := 0.85
+@export var perk_helper_bonus := 0.1
 
 
 func fee_for_level(level: int) -> int:

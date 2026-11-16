@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"g05"
+part = &"general"
+level = 2
+question = "น็อตที่ถอดออกมาระหว่างซ่อมควรเก็บอย่างไร"
+choices = PackedStringArray("ใส่ถ้วยแยกตามจุดที่ถอด", "วางรวมกันบนโต๊ะ", "ทิ้งไปแล้วซื้อใหม่")
+answer = 0
+explain = "แยกเก็บตามจุด ตอนประกอบกลับจะไม่สับสนและไม่หาย"

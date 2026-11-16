@@ -1,11 +1,13 @@
 class_name DoorCard extends PanelContainer
 ## [Claude 15 พ.ย. 2569 · 0.3.0 ขั้น C] การ์ดลูกค้าหน้าประตู (DoorLayer ชั้น 90 ใน day_loop.tscn) — แทนกระดานงาน
 ## ฉากนี้แสดงผลอย่างเดียว: DayLoop สร้าง view (DayLoop.door_view()) แล้วเรียก show_view() · กดปุ่มส่ง signal กลับ (กติกาอยู่ที่ DayLoop)
-## ปรับหน้าตาใน Editor ได้ (โหนดชื่อ %Title %Quota %Note %Front %Portrait %Name %Detail %PatienceBar %Accept %Appoint %Reject %Queue %Wait %Close)
+## ปรับหน้าตาใน Editor ได้ (โหนดชื่อ %Title %Quota %Note %Front %Portrait %Name %Bond %Detail %PatienceBar %Accept %Appoint %Reject %Queue %Wait %Close)
 
 signal accept_pressed
 signal appoint_pressed
 signal reject_pressed
+## [0.5.0] ยศเชี่ยวชาญ: ให้มิ้นทำงานขมOS แทน
+signal helper_pressed
 signal wait_pressed
 signal close_pressed
 signal hide_pressed
@@ -19,6 +21,7 @@ func _ready() -> void:
 	%Accept.pressed.connect(func() -> void: accept_pressed.emit())
 	%Appoint.pressed.connect(func() -> void: appoint_pressed.emit())
 	%Reject.pressed.connect(func() -> void: reject_pressed.emit())
+	%Helper.pressed.connect(func() -> void: helper_pressed.emit())
 	%Wait.pressed.connect(func() -> void: wait_pressed.emit())
 	%Close.pressed.connect(func() -> void: close_pressed.emit())
 	%HideButton.pressed.connect(func() -> void: hide_pressed.emit())
@@ -49,6 +52,10 @@ func show_view(v: Dictionary) -> void:
 
 func _show_front(f: Dictionary) -> void:
 	%Name.text = String(f.get("name", ""))
+	# [0.5.0] ความสนิท: หัวใจ · ระดับ · เคยซ่อม · มีเรื่องอยากเล่า (ขาจร/ยาย = ซ่อน)
+	var bond := String(f.get("bond", ""))
+	%Bond.text = bond
+	%Bond.visible = bond != ""
 	%Detail.text = String(f.get("detail", ""))
 	var tex = f.get("portrait")
 	%Portrait.texture = tex as Texture2D
@@ -72,6 +79,8 @@ func _show_front(f: Dictionary) -> void:
 	_apply_button(%Accept, f.get("accept", { }))
 	_apply_button(%Appoint, f.get("appoint", { }))
 	%Reject.disabled = bool(f.get("reject_disabled", false))
+	var hp: Dictionary = f.get("helper", { "visible": false })
+	_apply_button(%Helper, hp)
 	%Reject.visible = not bool(f.get("reject_hidden", false))
 
 

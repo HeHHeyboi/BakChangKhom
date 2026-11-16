@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"p04"
+part = &"part_gpu"
+level = 2
+question = "ใส่การ์ดจอแรง ๆ ต้องเช็กอะไรของ PSU"
+choices = PackedStringArray("กำลังวัตต์และสายไฟเลี้ยงการ์ดจอพอไหม", "สีของ PSU", "ยี่ห้อเดียวกับการ์ดจอไหม")
+answer = 0
+explain = "ไฟไม่พอการ์ดจอจะดับหรือเครื่องรีสตาร์ตเองตอนเล่นหนัก"

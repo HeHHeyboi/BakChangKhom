@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"g07"
+part = &"general"
+level = 3
+question = "ก่อนซ่อมเครื่องที่มีงานสำคัญของลูกค้า ควรทำอะไรก่อน"
+choices = PackedStringArray("สำรองข้อมูลไว้ก่อน", "ลบไฟล์ให้เครื่องเร็วขึ้น", "ล้างเครื่องใหม่ทันที")
+answer = 0
+explain = "ข้อมูลของลูกค้าหายแล้วเอาคืนยาก สำรองก่อนเสมอ"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"m06"
+part = &"part_mainboard"
+level = 2
+question = "พัดลมซีพียูไม่หมุน เครื่องมักมีอาการอย่างไร"
+choices = PackedStringArray("ร้อนจัดแล้วดับเอง", "สีจอเพี้ยน", "เมาส์ขยับเอง")
+answer = 0
+explain = "ซีพียูร้อนเกินระบบจะตัดเครื่องเพื่อป้องกันความเสียหาย"

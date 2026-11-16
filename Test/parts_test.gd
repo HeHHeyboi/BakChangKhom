@@ -44,16 +44,18 @@ func _ready() -> void:
 	var want := [0.02, 0.025, 0.05, 0.10, 0.10]
 	var ok := true
 	for r in e.rank_xp.size():
-		gs.xp = e.rank_xp[r]
+		gs.set_rank(r)
 		ok = ok and gs.rank() == r and is_equal_approx(e.part_markup(r), want[r])
 	_check(ok, "ค่าบวกอะไหล่ตามยศ: มือใหม่ 2% · ฝึกหัด 2.5% · ประจำหมู่บ้าน 5% · เชี่ยวชาญ/มือโปร 10%")
 	gs.xp = 0
+	gs.rank_level = 0
 	_check(gs.part_charge(450) == 459 and gs.part_charge(30) == 31 and gs.part_charge(0) == 0, "มือใหม่: ฿450 → ฿459 · ฿30 → ฿31 (ปัดขึ้น) · ของฟรีไม่เก็บ")
-	gs.xp = e.rank_xp[1]
+	gs.set_rank(1)
 	_check(gs.part_charge(200) == 205, "ฝึกหัด: ฿200 → ฿205")
-	gs.xp = e.rank_xp[3]
+	gs.set_rank(3)
 	_check(gs.part_charge(450) == 495 and gs.part_charge(900) == 990, "เชี่ยวชาญ: ฿450 → ฿495 · ฿900 → ฿990")
 	gs.xp = 0
+	gs.rank_level = 0
 
 	# D · ของสิ้นเปลือง
 	gs.buy(ipa, 1)

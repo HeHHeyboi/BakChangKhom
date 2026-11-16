@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"b06"
+part = &"part_bios"
+level = 4
+question = "ตั้งค่า BIOS ผิดจนเปิดไม่ขึ้น วิธีคืนค่าเริ่มต้นวิธีหนึ่งคืออะไร"
+choices = PackedStringArray("ถอดถ่าน CMOS ทิ้งไว้สักครู่", "เปลี่ยนจอใหม่", "ถอดแรมทิ้ง")
+answer = 0
+explain = "ไม่มีไฟเลี้ยง ค่า BIOS จะกลับเป็นค่าเริ่มต้น หรือใช้ Load Defaults"

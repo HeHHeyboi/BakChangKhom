@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"g06"
+part = &"general"
+level = 2
+question = "ลูกค้าได้ข้อความว่าได้รางวัลแต่ต้องโอนค่าธรรมเนียมก่อน ควรแนะนำว่าอะไร"
+choices = PackedStringArray("เป็นมิจฉาชีพ อย่าโอนและอย่ากดลิงก์", "รีบโอนก่อนหมดเวลา", "ส่งรหัส OTP ให้เขาตรวจ")
+answer = 0
+explain = "ได้รางวัลแต่ต้องจ่ายก่อน หรือขอรหัส OTP คือสัญญาณหลอกลวง"
+domain = "ความปลอดภัย"

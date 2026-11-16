@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f04"
+part = &"part_front_panel"
+level = 3
+question = "ปุ่ม Power SW กับ Reset SW ต่างกันอย่างไร"
+choices = PackedStringArray("Power เปิดปิดเครื่อง Reset เริ่มเครื่องใหม่", "เหมือนกันทุกอย่าง", "Reset ใช้ลบข้อมูล")
+answer = 0
+explain = "ต่อสลับกันจะกดปุ่มเปิดแล้วเครื่องรีเซ็ตแทน"

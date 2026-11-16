@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"r05"
+part = &"part_ram"
+level = 3
+question = "ใส่แรมสองแถวให้ทำงานแบบ Dual Channel ต้องใส่อย่างไร"
+choices = PackedStringArray("ใส่ช่องคู่ตามคู่มือเมนบอร์ด", "ใส่ติดกันสองช่องแรกเสมอ", "ใส่ช่องไหนก็ได้")
+answer = 0
+explain = "ช่องคู่มักเว้นช่อง หรือสีเดียวกัน ดูคู่มือเมนบอร์ดให้แน่ใจ"

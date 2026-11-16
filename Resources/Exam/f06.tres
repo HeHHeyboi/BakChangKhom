@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f06"
+part = &"part_front_panel"
+level = 3
+question = "ถ้าไม่แน่ใจตำแหน่งพิน Front Panel ควรทำอย่างไร"
+choices = PackedStringArray("ดูผังในคู่มือหรือที่พิมพ์บนเมนบอร์ด", "เสียบสุ่มไปเรื่อย ๆ", "ตัดสายทิ้ง")
+answer = 0
+explain = "เมนบอร์ดแต่ละรุ่นเรียงพินไม่เหมือนกัน ดูผังก่อนเสมอ"

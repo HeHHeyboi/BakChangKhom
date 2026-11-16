@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/UI/Items/item_cable_hdmi.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i11"
+part = &"part_bench"
+level = 1
+question = "สายในภาพใช้ต่ออะไร"
+choices = PackedStringArray("ส่งภาพจากเครื่องไปจอ", "จ่ายไฟให้เมนบอร์ด", "ต่อฮาร์ดดิสก์")
+answer = 0
+explain = "สาย HDMI ส่งภาพและเสียงไปจอ ถ้าหลวมจอจะไม่ขึ้น"
+image = ExtResource("2_img")

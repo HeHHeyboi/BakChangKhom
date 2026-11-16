@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartFrontPanel/fp_pin_header.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i09"
+part = &"part_front_panel"
+level = 3
+question = "ขาพินแบบในภาพมุมเมนบอร์ดใช้ต่อสายอะไร"
+choices = PackedStringArray("สายปุ่มเปิดเครื่องและไฟหน้าเครื่อง", "สายไฟเลี้ยงการ์ดจอ", "สายจอภาพ")
+answer = 0
+explain = "ขาพิน Front Panel ต้องต่อตามผังในคู่มือเมนบอร์ด"
+image = ExtResource("2_img")

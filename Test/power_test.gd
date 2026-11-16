@@ -51,18 +51,24 @@ func _ready() -> void:
 	ts.updateTime()
 	_check(ts.timeText.text == "3 เทิร์น", "เหลือ 1½ ชม. = 3 เทิร์น (%s)" % ts.timeText.text)
 	GameState.xp = 0
+	GameState.rank_level = 0
 	var ups := []
 	GameState.rank_up.connect(func(r, n): ups.append(n))
-	GameState.add_xp(450)
+	var x1: int = GameState.economy.rank_xp[1]
+	GameState.add_xp(x1 - 50)
 	await _frames(2)
 	var rb := EventManager.rank_box # แถบยศย้ายไปอยู่ที่ EventManager (HUD ของ autoload)
-	_check(rb.get_node("Rank").text == "ช่างมือใหม่" and is_equal_approx(rb.get_node("Bar").value, 0.9) and rb.get_node("Xp").text == "450/500 XP", "แถบยศ 450/500")
+	_check(rb.get_node("Rank").text == "ช่างมือใหม่" and is_equal_approx(rb.get_node("Bar").value, float(x1 - 50) / x1) and rb.get_node("Xp").text == "%d/%d XP" % [x1 - 50, x1], "แถบยศ %d/%d" % [x1 - 50, x1])
 	GameState.add_xp(100)
 	await _frames(2)
-	_check(ups == ["ช่างฝึกหัด"] and EventManager.rank_up_panel.visible, "ครบ 500 XP → เลื่อนขั้นเป็นช่างฝึกหัด + ป้าย")
+	_check(ups.is_empty() and GameState.rank_ready() and rb.get_node("Xp").text.contains("พร้อมสอบ"), "[0.5.0] ครบ %d XP → ยังไม่เลื่อน แถบบอก \"พร้อมสอบ\"" % x1)
+	GameState.promote()
+	await _frames(2)
+	_check(ups == ["ช่างฝึกหัด"] and EventManager.rank_up_panel.visible, "สอบผ่าน → เลื่อนขั้นเป็นช่างฝึกหัด + ป้าย")
 	await get_tree().create_timer(0.4).timeout
 	await _shot("hud")
 	GameState.xp = 0
+	GameState.rank_level = 0
 	ts.queue_free()
 	print("T DONE fails=%d" % fails)
 	get_tree().quit()

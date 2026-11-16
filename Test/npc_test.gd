@@ -50,21 +50,23 @@ func _ready() -> void:
 	var on_change := func(id: StringName, v: int, d: int, r: StringName) -> void: changes.append([id, v, d, r])
 	gs.affinity_tier_up.connect(on_up)
 	gs.affinity_changed.connect(on_change)
-	_check(gs.affinity_event(&"amnuay", &"pass") == e.affinity_gain[&"pass"] and gs.affinity(&"amnuay") == 25, "ซ่อมผ่าน +5 → 25")
+	var g := e.affinity_gain
+	_check(gs.affinity_event(&"amnuay", &"pass") == g[&"pass"] and gs.affinity(&"amnuay") == 20 + g[&"pass"], "ซ่อมผ่าน +%d → %d" % [g[&"pass"], 20 + g[&"pass"]])
 	_check(changes.size() == 1 and changes[0][3] == &"pass" and ups.is_empty(), "สัญญาณเปลี่ยนค่า 1 ครั้ง · ยังไม่ขึ้นระดับ")
-	gs.affinity_event(&"amnuay", &"story_good")
-	gs.affinity_event(&"amnuay", &"three_star", 2)
+	gs.add_affinity(&"amnuay", 41 - gs.affinity(&"amnuay"))
 	_check(gs.affinity(&"amnuay") == 41 and ups.size() == 1 and ups[0] == [&"amnuay", 2], "ถึง 41 → ขึ้นระดับคุ้นเคย (สัญญาณ 1 ครั้ง)")
-	_check(gs.affinity_event(&"amnuay", &"late_day", 2) == -6 and gs.affinity(&"amnuay") == 35 and ups.size() == 1, "เลยนัด 2 วัน −6 → 35 · ลดระดับไม่ยิงสัญญาณ")
+	var late2: int = g[&"late_day"] * 2
+	_check(gs.affinity_event(&"amnuay", &"late_day", 2) == late2 and gs.affinity(&"amnuay") == 41 + late2 and ups.size() == 1, "เลยนัด 2 วัน %d → %d · ลดระดับไม่ยิงสัญญาณ" % [late2, 41 + late2])
+	var amn := gs.affinity(&"amnuay")
 	gs.add_affinity(&"min", 999)
 	_check(gs.affinity(&"min") == 100 and gs.add_affinity(&"min", 5) == 0, "เพดาน 100")
 	gs.add_affinity(&"fai", -50)
-	_check(gs.affinity(&"fai") == 0 and gs.affinity_hearts(&"amnuay") == 2.0 and gs.affinity_hearts(&"min") == 5.0, "พื้น 0 · หัวใจ 35 → 2 ดวง · 100 → 5 ดวง")
+	_check(gs.affinity(&"fai") == 0 and gs.affinity_hearts(&"amnuay") == snappedf(amn / 20.0, 0.5) and gs.affinity_hearts(&"min") == 5.0, "พื้น 0 · หัวใจ %d → %.1f ดวง · 100 → 5 ดวง" % [amn, gs.affinity_hearts(&"amnuay")])
 	gs.affinity_tier_up.disconnect(on_up)
 	gs.affinity_changed.disconnect(on_change)
 	var ch := gs._ledger_when().x
 	var gains := gs.affinity_gains(ch)
-	_check(int(gains.get(&"amnuay", 0)) == 15 and int(gains.get(&"min", 0)) == 50, "สรุปที่ได้ในบท: ลุงอำนวย +15 · มิ้น +50")
+	_check(int(gains.get(&"amnuay", 0)) == amn - 20 and int(gains.get(&"min", 0)) == 50, "สรุปที่ได้ในบท: ลุงอำนวย %+d · มิ้น +50" % (amn - 20))
 
 	# E · มาร้านล่าสุด · ประวัติเครื่อง
 	gs.note_visit(&"teacher", 3)
@@ -83,8 +85,8 @@ func _ready() -> void:
 	gs.reset()
 	_check(gs.affinity(&"amnuay") == 20 and not gs.met(&"teacher"), "reset → ค่าเริ่ม")
 	SaveGame.load_into()
-	_check(gs.affinity(&"amnuay") == 35 and gs.affinity(&"min") == 100 and gs.met(&"teacher") and gs.story_seen(&"teacher", 40), "โหลด → ความสนิท · มาร้านล่าสุด · เรื่องที่ฟัง")
-	_check((gs.npc_history[&"teacher"] as Array).size() == e.npc_history_max and int(gs.affinity_gains(gs._ledger_when().x).get(&"amnuay", 0)) == 15, "โหลด → ประวัติเครื่อง · บันทึกความสนิท")
+	_check(gs.affinity(&"amnuay") == amn and gs.affinity(&"min") == 100 and gs.met(&"teacher") and gs.story_seen(&"teacher", 40), "โหลด → ความสนิท · มาร้านล่าสุด · เรื่องที่ฟัง")
+	_check((gs.npc_history[&"teacher"] as Array).size() == e.npc_history_max and int(gs.affinity_gains(gs._ledger_when().x).get(&"amnuay", 0)) == amn - 20, "โหลด → ประวัติเครื่อง · บันทึกความสนิท")
 	SaveGame.clear()
 	SaveGame.allow_in_tests = false
 

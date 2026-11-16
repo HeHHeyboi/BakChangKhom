@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 80
+title = "ชวนขมไปพูดที่ประชุมหมู่บ้าน"
+dialog = "res://Assets/Dialog/NPC/headman_80.txt"
+good_choice = ""
+reward_item = &""
+flag = &"npc_regular_headman"

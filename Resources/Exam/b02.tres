@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"b02"
+part = &"part_bios"
+level = 4
+question = "Boot Order ใน BIOS ใช้กำหนดอะไร"
+choices = PackedStringArray("ลำดับไดรฟ์ที่เครื่องจะเริ่มระบบ", "ความสว่างจอ", "ความเร็วพัดลม")
+answer = 0
+explain = "ตั้งผิดลำดับ เครื่องอาจไปบูตจากแฟลชไดรฟ์หรือหาระบบไม่เจอ"

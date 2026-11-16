@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"r04"
+part = &"part_ram"
+level = 2
+question = "ทำไมแรม DDR3 ใส่ในช่อง DDR4 ไม่ได้"
+choices = PackedStringArray("รอยบากอยู่คนละตำแหน่ง", "สีของแรมไม่เหมือนกัน", "DDR3 ยาวกว่าช่องมาก")
+answer = 0
+explain = "รอยบากกันใส่ผิดรุ่น ถ้าดันแรงอาจทำช่องแรมพัง"

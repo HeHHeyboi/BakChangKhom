@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"m05"
+part = &"part_mainboard"
+level = 2
+question = "เสารองเมนบอร์ดมีไว้ทำไม"
+choices = PackedStringArray("ยกเมนบอร์ดไม่ให้แตะเคสจนลัดวงจร", "ทำให้เครื่องดูสวย", "ช่วยลดเสียงพัดลม")
+answer = 0
+explain = "ใต้เมนบอร์ดมีจุดบัดกรีเยอะ แตะเคสโลหะแล้วไฟลัดได้"

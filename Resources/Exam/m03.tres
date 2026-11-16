@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"m03"
+part = &"part_mainboard"
+level = 2
+question = "ก่อนทาซิลิโคนใหม่ต้องทำอะไรกับซิลิโคนเก่า"
+choices = PackedStringArray("เช็ดออกด้วยแอลกอฮอล์ IPA ให้สะอาด", "ทาทับลงไปเลย", "ขูดออกด้วยไขควง")
+answer = 0
+explain = "ซิลิโคนเก่าแห้งแข็งแล้ว ต้องเช็ดออกก่อนจึงจะแนบสนิท"

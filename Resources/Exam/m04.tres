@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"m04"
+part = &"part_mainboard"
+level = 2
+question = "ใส่ซีพียูลงซ็อกเก็ตต้องดูอะไร"
+choices = PackedStringArray("สามเหลี่ยมมุมซีพียูตรงกับมุมซ็อกเก็ต", "ให้สีตรงกัน", "กดแรง ๆ ให้ลงไป")
+answer = 0
+explain = "ซีพียูลงได้ทางเดียว วางให้ตรงเครื่องหมายแล้วปิดก้านล็อกเบา ๆ"

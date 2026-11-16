@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://Scripts/Core/day_loop.gd" id="1_loop"]
+[ext_resource type="PackedScene" path="res://Scene/UI/perk_picker.tscn" id="ui_perk"]
 [ext_resource type="Script" path="res://Scripts/Resources/week_plan.gd" id="2_week"]
 [ext_resource type="Script" path="res://Scripts/Resources/customer_case.gd" id="3_case"]
 [ext_resource type="Resource" path="res://Resources/Week/week1.tres" id="w1"]
@@ -130,3 +131,8 @@ layer = 95
 layer = 92
 
 [node name="VendorPanel" parent="VendorLayer" instance=ExtResource("ui_vendor")]
+
+[node name="PerkLayer" type="CanvasLayer" parent="."]
+layer = 112
+
+[node name="PerkPicker" parent="PerkLayer" instance=ExtResource("ui_perk")]

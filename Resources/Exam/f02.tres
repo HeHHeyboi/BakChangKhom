@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f02"
+part = &"part_front_panel"
+level = 3
+question = "สาย Front Panel ต่อเข้าที่ไหน"
+choices = PackedStringArray("หัวพินมุมเมนบอร์ดตามผังในคู่มือ", "ช่อง USB หลังเครื่อง", "ช่องไฟของ PSU")
+answer = 0
+explain = "หัวพิน Front Panel มักอยู่มุมล่างของเมนบอร์ด มีผังพิมพ์ไว้"

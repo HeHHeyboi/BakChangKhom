@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f05"
+part = &"part_front_panel"
+level = 3
+question = "ช่อง USB หน้าเครื่องใช้ไม่ได้แต่ด้านหลังใช้ได้ ควรตรวจอะไร"
+choices = PackedStringArray("สาย USB หน้าเครื่องที่ต่อเข้าเมนบอร์ด", "เปลี่ยนเมาส์ใหม่", "ลงวินโดว์ใหม่")
+answer = 0
+explain = "USB หน้าเครื่องต่อผ่านสายแยกเข้าหัวพินบนเมนบอร์ด"

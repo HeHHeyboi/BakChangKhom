@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"e01"
+part = &"part_bench"
+level = 1
+question = "จอไม่ขึ้นแต่เครื่องเปิดติด ควรตรวจอะไรหลังเครื่องก่อน"
+choices = PackedStringArray("สายจอเสียบแน่นและถูกช่องไหม", "ถอดซีพียู", "เปลี่ยน PSU")
+answer = 0
+explain = "เริ่มจากสิ่งที่ง่ายที่สุดก่อน สายหลวมเป็นสาเหตุที่พบบ่อย"

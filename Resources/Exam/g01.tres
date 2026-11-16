@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"g01"
+part = &"general"
+level = 1
+question = "ก่อนเปิดฝาเครื่องคอมพิวเตอร์ต้องทำอะไรก่อน"
+choices = PackedStringArray("ถอดปลั๊กไฟออกก่อน", "เปิดเครื่องทิ้งไว้ให้อุ่น", "เช็ดเครื่องด้วยผ้าชุบน้ำ")
+answer = 0
+explain = "ถอดปลั๊กทุกครั้ง กันไฟดูดและกันชิ้นส่วนเสียหาย"

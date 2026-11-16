@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/TutorialAssembly/asm_gpu.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i08"
+part = &"part_gpu"
+level = 2
+question = "ชิ้นส่วนในภาพเสียบลงช่องใดบนเมนบอร์ด"
+choices = PackedStringArray("ช่อง PCIe", "ช่องแรม", "ช่อง SATA")
+answer = 0
+explain = "การ์ดจอใช้ช่อง PCIe ยาวที่สุดบนเมนบอร์ด แล้วล็อกตัวล็อกท้ายช่อง"
+image = ExtResource("2_img")

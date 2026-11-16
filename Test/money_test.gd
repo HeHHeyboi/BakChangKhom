@@ -190,6 +190,7 @@ func _ready() -> void:
 	_check(GameState.buy_block_reason(rack4) == "มีแล้ว", "ซื้อซ้ำไม่ได้ (มีแล้ว)")
 	_check(GameState.buy_block_reason(rack6).begins_with("ล็อก"), "ชั้นเหล็ก 6 เครื่องล็อกจนเป็นช่างฝึกหัด")
 	GameState.add_xp(GameState.economy.rank_xp[1] if GameState.economy.rank_xp.size() > 1 else 500)
+	GameState.promote() # [0.5.0] XP ครบต้องสอบก่อน — เทสต์นี้ข้ามสอบ
 	_check(GameState.rank() >= 1 and GameState.buy(rack6) == "" and GameState.shelf_slots == 6 and DayLoop.shelf.slots == 6 and GameState.buy_block_reason(rack4) == "มีแล้ว", "เป็นช่างฝึกหัด → ซื้อชั้นเหล็ก → 6 เครื่อง · ชั้นไม้ไม่ต้องซื้อแล้ว")
 
 	print("T DONE fails=", fails)

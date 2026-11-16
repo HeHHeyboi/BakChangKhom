@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"r01"
+part = &"part_ram"
+level = 1
+question = "เปิดเครื่องแล้วจอไม่ขึ้นแต่มีเสียงบี๊บซ้ำ ๆ มักเกี่ยวกับชิ้นส่วนใด"
+choices = PackedStringArray("แรม", "เมาส์", "ลำโพง")
+answer = 0
+explain = "เสียงบี๊บซ้ำตอนเปิดเครื่องมักบอกว่าแรมมีปัญหา ดูตารางเสียงบี๊บประกอบ"

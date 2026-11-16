@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"g08"
+part = &"general"
+level = 3
+question = "ทำไมควรลองซ่อมเครื่องเก่าก่อนซื้อใหม่ถ้าอาการไม่หนัก"
+choices = PackedStringArray("ประหยัดกว่าและลดขยะอิเล็กทรอนิกส์", "เครื่องเก่าเร็วกว่าเสมอ", "ซื้อใหม่ผิดกฎหมาย")
+answer = 0
+explain = "หลายอาการแก้ได้ด้วยการทำความสะอาดหรือเปลี่ยนชิ้นเล็ก ๆ"

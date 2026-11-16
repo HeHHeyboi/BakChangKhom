@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"b05"
+part = &"part_bios"
+level = 4
+question = "ก่อนกดบันทึกค่าใน BIOS ควรทำอะไร"
+choices = PackedStringArray("ตรวจค่าที่แก้ให้ถูกก่อนแล้วค่อยบันทึก", "กดบันทึกทุกหน้า", "ปิดเครื่องทันที")
+answer = 0
+explain = "ค่า BIOS ผิดอาจทำให้เครื่องเปิดไม่ขึ้น ตรวจก่อนบันทึก"

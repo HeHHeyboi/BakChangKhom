@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"e02"
+part = &"part_bench"
+level = 1
+question = "เครื่องมีช่องจอทั้งบนเมนบอร์ดและการ์ดจอ ควรเสียบสายจอที่ไหน"
+choices = PackedStringArray("ช่องของการ์ดจอ", "ช่องของเมนบอร์ด", "ช่องไหนก็ได้")
+answer = 0
+explain = "ใส่การ์ดจอแล้ว ภาพจะออกที่ช่องของการ์ดจอ"

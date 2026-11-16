@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartMainboard/mb_cpu_paste_large.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i03"
+part = &"part_mainboard"
+level = 1
+question = "ซิลิโคนบนซีพียูในภาพทาไว้เป็นอย่างไร"
+choices = PackedStringArray("มากเกินไป เสี่ยงล้นลงซ็อกเก็ต", "พอดีแล้ว", "น้อยเกินไป")
+answer = 0
+explain = "ทาแค่หยดขนาดเม็ดถั่วตรงกลาง ฮีตซิงก์กดแล้วจะกระจายเอง"
+image = ExtResource("2_img")

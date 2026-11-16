@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"r03"
+part = &"part_ram"
+level = 1
+question = "ใส่แรมกลับเข้าช่องให้ถูกต้องทำอย่างไร"
+choices = PackedStringArray("ให้รอยบากตรงแล้วกดจนตัวล็อกดีดขึ้น", "ใส่กลับด้านก็ได้", "กดเบา ๆ แค่ครึ่งร่อง")
+answer = 0
+explain = "แรมต้องลงเต็มร่องและล็อกสนิท ไม่งั้นเครื่องจะบี๊บอีก"

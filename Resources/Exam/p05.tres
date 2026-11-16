@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"p05"
+part = &"part_gpu"
+level = 2
+question = "จับการ์ดจอที่ถอดออกมาควรจับตรงไหน"
+choices = PackedStringArray("ขอบการ์ดและแผ่นเหล็กยึด", "ขาทองแดง", "ชิปตรงกลาง")
+answer = 0
+explain = "จับขอบกันเหงื่อและไฟฟ้าสถิตโดนวงจรกับขาสัมผัส"

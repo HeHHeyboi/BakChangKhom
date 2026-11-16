@@ -141,7 +141,7 @@ func _ready() -> void:
 	DayLoop._on_primary()
 	await _frames(3)
 	_check(DayLoop._card == DayLoop.Card.DOOR and DayLoop.door_queue.size() == 4 and DayLoop.door_card.visible and DayLoop.door_card.get_node("%Front").visible, "[0.3.0] กลับหน้าร้าน (ฉาก DoorCard) · ระหว่างงานเนื้อเรื่องลูกค้าไม่หมดความอดทน (%d คน)" % DayLoop.door_queue.size())
-	var job_text: String = _all_text(DayLoop.door_card)
+	var job_text: String = _all_text(DayLoop.door_card).replace(DayLoop.door_card.get_node("%Bond").text, "") # [0.5.0] บรรทัดความสนิทบอก "เคยซ่อม" ได้
 	_check(not job_text.contains("ทำความสะอาดแรม") and job_text.contains("อาการ") and job_text.contains("รอคิวอีก 3 คน"), "การ์ดหน้าประตูบอกอาการ ไม่บอก Part/ชื่องาน · บอกคิวที่รอ")
 	# [Claude 9 ต.ค.] กระดานสัปดาห์ 1 มี Lv1 (ขมOS) ปน → เลือกงาน Lv2 ใบแรก (ไม่มีก็เติมงาน)
 	var j2 := -1
@@ -161,7 +161,10 @@ func _ready() -> void:
 	DialogScene.dialog_end()
 	await _finish_minigame(85)
 	_check(ts.current_minute == 13 * 60 + 30, "11:00 + 3 ช่อง ข้ามพักเที่ยง → 13:30 (%s)" % TimeSystem.clock_text(ts.current_minute))
-	_check(GameState.level_unlocked(3), "ได้ ⭐⭐ Lv2 ครบ 2 งาน → ปลด Lv3")
+	_check(not GameState.level_unlocked(3) and GameState.level_lock_reason(3).contains("ช่างฝึกหัด"), "[0.5.0] ได้ ⭐⭐ Lv2 ครบแล้ว แต่ยังเป็นช่างมือใหม่ → Lv3 ยังล็อก (%s)" % GameState.level_lock_reason(3))
+	GameState.set_rank(1)
+	GameState.choose_perk(1, &"sweet_talk") # ไม่ให้หน้าเลือกความสามารถบังการ์ด
+	_check(GameState.level_unlocked(3), "ดาวครบ + เป็นช่างฝึกหัด → ปลด Lv3")
 	DayLoop._on_primary()
 	await _frames(2)
 	_check(DayLoop.walkouts.size() == 3 and DayLoop.door_queue.is_empty(), "[0.3.0] ซ่อม 3 เทิร์น → คนที่ยืนรอ 3 คนหมดความอดทน เดินกลับ (%s)" % [DayLoop.walkouts])

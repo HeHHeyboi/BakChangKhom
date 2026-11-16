@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"r02"
+part = &"part_ram"
+level = 1
+question = "ขาทองแดงของแรมสกปรก ควรทำความสะอาดด้วยอะไร"
+choices = PackedStringArray("ยางลบแล้วเช็ดด้วยแอลกอฮอล์ IPA", "น้ำเปล่ากับสบู่", "กระดาษทรายหยาบ")
+answer = 0
+explain = "ยางลบขัดคราบ แล้ว IPA เช็ดออกและระเหยเร็ว ไม่ทิ้งความชื้น"

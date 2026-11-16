@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/MiniGame/PartGpu/gpu_cable_messy.png" id="2_img"]
+
+[resource]
+script = ExtResource("1")
+id = &"i07"
+part = &"part_gpu"
+level = 2
+question = "สายในเคสแบบในภาพทำให้เกิดปัญหาอะไร"
+choices = PackedStringArray("ลมไหลไม่สะดวก เครื่องร้อนง่าย", "ไฟเข้ามากเกินไป", "จอภาพเปลี่ยนสี")
+answer = 0
+explain = "มัดสายด้วยเคเบิลไทและเดินสายชิดขอบเคส ลมจะไหลผ่านได้ดี"
+image = ExtResource("2_img")

@@ -132,6 +132,16 @@ theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
 theme_override_font_sizes/font_size = 17
 text = "ครู · Lv2 ปกติ ★★☆☆☆"
 
+[node name="Bond" type="Label" parent="Box/Front/Row/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "ความสนิทกับร้าน — ยิ่งสนิทยิ่งมาบ่อย รอได้นานขึ้น ให้ทิป และเล่าเรื่องของตัวเองให้ฟัง (ดูทุกคนได้ในแอป \"สมุดลูกค้า\" ในคอมของขม)"
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.72, 0.25, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "♥♥♡♡♡ รู้จัก · เคยซ่อม: ทำความสะอาดแรม (ม.ค.)"
+autowrap_mode = 3
+
 [node name="Detail" type="Label" parent="Box/Front/Row/Info"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -189,6 +199,14 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "ปฏิเสธ"
+
+[node name="Helper" type="Button" parent="Box/Front/Row/Buttons"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+tooltip_text = "ให้มิ้นทำงานขมOS นี้แทน (ไม่ใช้เวลาขม · ไม่นับโควตา · วันละ 1 งาน)"
+focus_mode = 0
+text = "ให้มิ้นทำ"
 
 [node name="Empty" type="Label" parent="Box"]
 unique_name_in_owner = true

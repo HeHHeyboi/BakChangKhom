@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NpcStory" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/npc_story.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+at = 60
+title = "อยากเรียนสายคอม"
+dialog = "res://Assets/Dialog/NPC/fai_60.txt"
+good_choice = ""
+reward_item = &""
+flag = &""

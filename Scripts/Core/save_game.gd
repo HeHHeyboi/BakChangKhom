@@ -93,6 +93,9 @@ static func save() -> bool:
 			"missed_months": GameState.missed_months, "debt_streak": GameState.debt_streak, "shop_closed": GameState.shop_closed, "help_mode": GameState.help_mode,
 			"ledger": GameState.ledger.map(func(e: Dictionary) -> Dictionary: return { "ch": e.ch, "day": e.day, "kind": String(e.kind), "amount": e.amount, "note": e.note }), # [0.2.0-C]
 			"npc": _npc_save(), # [0.5.0]
+			"rank_level": GameState.rank_level, "learn_log": GameState.learn_log, # [0.5.0 ขั้น F–G]
+			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
+			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
 		"time": { "shift": ts.shift if ts else 1, "worked": ts.worked_minutes_month if ts else 0 },
 		"loop": {
@@ -157,6 +160,21 @@ static func load_into() -> int:
 		if e is Dictionary:
 			GameState.ledger.append({ "ch": int(e.get("ch", 0)), "day": int(e.get("day", 0)), "kind": StringName(e.get("kind", "other")), "amount": int(e.get("amount", 0)), "note": String(e.get("note", "")) })
 	_npc_load(g.get("npc", { })) # [0.5.0] เซฟ v3–v5 ไม่มี = ค่าเริ่มของแต่ละคน
+	# [0.5.0 ขั้น F] เซฟเก่าไม่มียศที่สอบ → ใช้ยศตาม XP (ไม่ต้องสอบย้อนหลัง)
+	GameState.rank_level = int(g.get("rank_level", GameState.xp_rank()))
+	for r in g.get("learn_log", []):
+		if r is Dictionary:
+			GameState.learn_log.append(r)
+	GameState.exam_last_shift = int(g.get("exam_day", -1))
+	var att: Dictionary = g.get("exam_attempts", { })
+	for k in att:
+		GameState.exam_attempts[int(k)] = int(att[k])
+	var pk: Dictionary = g.get("perks", { })
+	for k in pk:
+		GameState.perks[int(k)] = StringName(pk[k])
+	var ts3: Dictionary = g.get("three_stars", { })
+	for k in ts3:
+		GameState.level_three_stars[int(k)] = int(ts3[k])
 	var inv: Dictionary = d.get("inventory", { })
 	GameState.storage_slots = int(inv.get("slots", GameState.STORAGE_START))
 	for e in inv.get("items", []):
@@ -310,3 +328,10 @@ static func _npc_load(n: Dictionary) -> void:
 	for r in n.get("log", []):
 		if r is Dictionary:
 			GameState.affinity_log.append({ "ch": int(r.get("ch", 0)), "id": String(r.get("id", "")), "delta": int(r.get("delta", 0)) })
+
+
+static func _keys_str(d: Dictionary) -> Dictionary:
+	var out := { }
+	for k in d:
+		out[str(k)] = d[k]
+	return out

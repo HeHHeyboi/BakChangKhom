@@ -66,13 +66,15 @@ func _on_money_changed(money: int, _delta: int) -> void:
 
 # ---------------------------------------------------------------- ยศช่าง (HUD) [ย้ายมาจาก TimeSystem]
 var _shown_xp := -1
+var _shown_rank := -1
 
 
 ## xp ถูกตั้งตรง ๆ ตอน reset/โหลดเซฟ (ไม่ยิง xp_changed) เลยต้องเช็กทุกเฟรม
 func _process(_delta: float) -> void:
-	if GameState.xp == _shown_xp:
+	if GameState.xp == _shown_xp and GameState.rank_level == _shown_rank:
 		return
 	_shown_xp = GameState.xp
+	_shown_rank = GameState.rank_level
 	update_rank()
 
 
@@ -84,8 +86,8 @@ func update_rank() -> void:
 	(rank_box.get_node(^"Bar") as ProgressBar).value = GameState.rank_progress()
 	var nxt := GameState.xp_next()
 	(rank_box.get_node(^"Xp") as Label).text = (
-		("%d/%d XP" % [GameState.xp, nxt])
-		if nxt > 0
+		("%d/%d XP · พร้อมสอบ" % [GameState.xp, nxt]) if GameState.rank_ready() # [0.5.0] XP ครบ → สอบกับปิ๊บตอนปิดร้าน
+		else ("%d/%d XP" % [GameState.xp, nxt]) if nxt > 0
 		else ("%d XP · ยศสูงสุด" % GameState.xp)
 	)
 

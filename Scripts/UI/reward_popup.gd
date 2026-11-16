@@ -11,6 +11,8 @@ class_name RewardPopup extends Control
 @export var good_color := Color(0.45, 0.9, 0.45)
 @export var bad_color := Color(1.0, 0.45, 0.4)
 @export var xp_color := Color(1.0, 0.85, 0.35)
+## [0.5.0] สีหัวใจความสนิท
+@export var heart_color := Color(1.0, 0.55, 0.7)
 @export var font_size := 26
 ## ตำแหน่งสำรองถ้าหา HUD ไม่เจอ
 @export var money_fallback := Vector2(300, 22)
@@ -25,7 +27,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 
-## ผลงานจาก GameState.record_repair: { money, reputation, xp, ... }
+## ผลงานจาก GameState.record_repair: { money, reputation, xp, ... } · [0.5.0] affinity + npc_name = ความสนิท
 func pop_result(r: Dictionary) -> void:
 	var money := int(r.get("money", 0))
 	var rep := int(r.get("reputation", 0))
@@ -41,6 +43,11 @@ func pop_result(r: Dictionary) -> void:
 		delay += stagger
 	if xp > 0:
 		pop("XP +%d" % xp, xp_color, at_rank + Vector2(60, 18), delay)
+		delay += stagger
+	# [0.5.0] ความสนิทลูกค้าประจำ: "♥ +8 ลุงอำนวย"
+	var aff := int(r.get("affinity", 0))
+	if aff != 0:
+		pop("♥ %s%d %s" % ["+" if aff > 0 else "−", absi(aff), String(r.get("npc_name", ""))], heart_color if aff > 0 else bad_color, at_money + Vector2(0, 68), delay)
 
 
 func pop(text: String, color: Color, at: Vector2, delay := 0.0) -> Label:

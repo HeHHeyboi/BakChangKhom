@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"p03"
+part = &"part_gpu"
+level = 2
+question = "ทำไมต้องจัดสายในเคสให้เรียบร้อย"
+choices = PackedStringArray("ให้ลมไหลผ่านสะดวก เครื่องเย็นลง", "ให้เครื่องหนักขึ้น", "ให้ไฟเข้ามากขึ้น")
+answer = 0
+explain = "สายระเกะระกะขวางทางลม ความร้อนจะสะสมในเคส"

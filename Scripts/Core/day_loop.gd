@@ -127,6 +127,9 @@ var job_reminder: JobReminder
 const REWARD_POPUP_SCENE := preload("res://Scene/UI/reward_popup.tscn")
 ## [0.3.0 ขั้น C–D] ฉากแยก: การ์ดหน้าประตู (DoorLayer 90) · ใบรับเครื่อง (WorkOrderLayer 91) · แผงชั้นวาง (ShelfLayer 95)
 const DOOR_CARD_SCENE := preload("res://Scene/UI/door_card.tscn")
+## [0.5.0 ขั้น I] หน้าเลื่อนยศ + เลือกความสามารถช่าง (PerkLayer ชั้น 112)
+const PERK_PICKER_SCENE := preload("res://Scene/UI/perk_picker.tscn")
+var perk_picker: PerkPicker
 const WORK_ORDER_SCENE := preload("res://Scene/UI/work_order_card.tscn")
 const SHELF_PANEL_SCENE := preload("res://Scene/UI/repair_shelf.tscn")
 ## [0.4.0 ขั้น J] รถขายของ (VendorLayer ชั้น 92)
@@ -241,6 +244,8 @@ func _connect() -> void:
 		[GameState.repair_recorded, _on_repair_recorded],
 		[GameState.shelf_slots_changed, _on_shelf_slots_changed],
 		[GameState.parts_arrived, _on_parts_arrived],
+		[GameState.affinity_tier_up, _on_affinity_tier_up],
+		[GameState.rank_exam_ready, func(_t: int) -> void: _exam_reminder()],
 		[SceneRouter.location_changed, _on_location_changed],
 	]
 	for l in links:
@@ -377,11 +382,51 @@ func _pick_case(pool: Array[CustomerCase]) -> CustomerCase:
 		best = pool.filter(func(c: CustomerCase) -> bool: return not _recent.has(c))
 	if best.is_empty():
 		best = pool
-	var c: CustomerCase = best[_rng.randi_range(0, best.size() - 1)]
+	var c := _pick_by_npc(best)
 	_recent.append(c)
 	while _recent.size() > RECENT_MEMORY:
 		_recent.pop_front()
 	return c
+
+
+## [0.5.0 ขั้น C] เลือกคนก่อน (น้ำหนักตามความสนิท · เพิ่งมาไม่นานลดลง) แล้วสุ่มเคสของคนนั้น — คนที่มีเคสเยอะไม่ได้มาบ่อยกว่าคนอื่น
+## ไม่เปลี่ยนสัดส่วนระดับงาน (เลือกระดับมาก่อนแล้ว) → ไม่กระทบรายได้
+func _pick_by_npc(cases: Array[CustomerCase]) -> CustomerCase:
+	var groups := { }
+	for c in cases:
+		if not groups.has(c.customer):
+			groups[c.customer] = []
+		(groups[c.customer] as Array).append(c)
+	var keys := groups.keys()
+	var weights: Array[float] = []
+	var total := 0.0
+	for k in keys:
+		var w := npc_weight(groups[k][0])
+		weights.append(w)
+		total += w
+	var pick: Array = groups[keys[0]]
+	var r := _rng.randf() * total
+	for i in keys.size():
+		r -= weights[i]
+		if r <= 0.0:
+			pick = groups[keys[i]]
+			break
+	return pick[_rng.randi_range(0, pick.size() - 1)]
+
+
+## น้ำหนักที่คนเจ้าของเคสจะเดินมาร้าน (ลูกค้าขาจร = 1)
+func npc_weight(c: CustomerCase) -> float:
+	var n := NpcBook.of_case(c)
+	if n == null:
+		return 1.0
+	var e := _econ()
+	var w := n.base_weight
+	if n.has_affinity:
+		w *= e.affinity_mult(GameState.affinity_tier(n.id))
+	var ts := _ts()
+	if ts and GameState.visited_recently(n.id, ts.shift):
+		w *= e.affinity_recent_mult
+	return maxf(w, 0.001)
 
 
 ## [0.3.0] เคสที่มีเจ้าของอยู่ในร้านแล้ว (ยืนหน้าประตู · นัดไว้ · เครื่องอยู่บนชั้น) — ไม่สุ่มซ้ำ
@@ -403,6 +448,8 @@ func is_case_busy(c: CustomerCase) -> bool:
 
 ## [0.3.0] ลูกค้า 1 คนหน้าประตู
 func door_entry(c: CustomerCase, phone := false, appointed := false, free := false, waited := 0) -> Dictionary:
+	var ts := _ts()
+	GameState.note_visit(npc_id(c), ts.shift if ts else 0) # [0.5.0] มาร้าน (ลดโอกาสมาซ้ำ 2 วัน)
 	return { "case": c, "phone": phone, "appointed": appointed, "free": free, "waited": waited }
 
 
@@ -438,7 +485,7 @@ func add_visitors(n: int, phone := false, waited := 0) -> int:
 		if pool.is_empty():
 			continue
 		var c := _pick_case(pool)
-		var cap_wait := maxi(c.patience_slots(e) - 1, 0) * TimeSystem.SLOT_MIN
+		var cap_wait := maxi(door_patience_slots(c) - 1, 0) * TimeSystem.SLOT_MIN
 		door_queue.append(door_entry(c, phone, false, false, clampi(waited, 0, cap_wait)))
 		added += 1
 	_board_dirty = true
@@ -460,10 +507,14 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	# [0.3.0] ลูกค้าที่ยังยืนหน้าประตูตอนปิดร้านเมื่อวันก่อน = กลับบ้าน · ล้างโควตา
 	walkouts.clear()
 	left_home.clear()
+	pending_story = { }
+	story_today = false
+	helper_used_today = 0
 	_auto_handover()
 	for j in door_queue:
 		left_home.append((j["case"] as CustomerCase).customer)
 		GameState.add_reputation(_econ().rep_left_unserved)
+		affinity_for(j["case"], &"walk_out")
 	door_queue.clear()
 	accepted_today = 0
 	# คิวแรกของวัน (ก่อนรอบ 08:30): คนที่นัดไว้ → งานเนื้อเรื่องที่ไม่บังคับ → คนเอาเครื่องมาลองใหม่
@@ -493,6 +544,10 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 func _plan_visitors(ts: TimeSystem) -> void:
 	var e := _econ()
 	visitors_today = e.visitors_for(ts.month(), GameState.reputation)
+	# [0.5.0 ขั้น H] ยศประจำหมู่บ้านขึ้นไป: ผู้ใหญ่บ้านประกาศเสียงตามสายวันแรกของเดือน
+	var announced := GameState.rank() >= e.announce_rank and ts.shift_in_week() == 1
+	if announced:
+		visitors_today += e.announce_extra_visitors
 	visitors_arrived = 0
 	visitor_waves.clear()
 	var counts := e.split_waves(visitors_today)
@@ -506,11 +561,14 @@ func _plan_visitors(ts: TimeSystem) -> void:
 		var ev := e.month_event(ts.month())
 		if ts.shift_in_week() == 1 and String(ev.name) != "":
 			visitor_toast.show_message("%s · %s" % [TimeSystem.MONTH_FULL[clampi(ts.month(), 1, 12) - 1], ev.name], String(ev.note))
+		if announced:
+			visitor_toast.show_message("ผู้ใหญ่บ้านประกาศเสียงตามสาย", "\"ใครคอมเสีย ไปร้านขมได้เด้อ\" · วันนี้ลูกค้า +%d" % e.announce_extra_visitors)
 		visitor_toast.show_message(
 			"วันนี้มีลูกค้า %d คน" % visitors_today,
 			"ชื่อเสียงร้าน %d (%s) · ทยอยมาตลอดวัน" % [GameState.reputation, e.rep_tier_names[clampi(tier, 0, e.rep_tier_names.size() - 1)]],
 		)
 	_check_waves(ts, false)
+	_exam_reminder()
 
 
 ## [0.2.5] ลูกค้ารอบที่ถึงเวลาแล้วเดินเข้าร้าน · เลยเวลาปิดร้านแล้ว = ไม่มา (ไม่หักชื่อเสียง)
@@ -590,13 +648,14 @@ func _tick_door(ts: TimeSystem) -> void:
 		if is_pickup(j):
 			continue
 		j["waited"] = int(j.get("waited", 0)) + dt
-		if int(j["waited"]) >= (j["case"] as CustomerCase).patience_slots(e) * TimeSystem.SLOT_MIN:
+		if int(j["waited"]) >= door_patience_slots(j["case"]) * TimeSystem.SLOT_MIN:
 			gone.append(j)
 	for j in gone:
 		door_queue.erase(j)
 		var who := (j["case"] as CustomerCase).customer
 		walkouts.append(who)
 		GameState.add_reputation(e.rep_door_walkout)
+		affinity_for(j["case"], &"walk_out")
 		if visitor_toast:
 			visitor_toast.show_message("%s รอนานเกินไป เดินกลับแล้ว" % who, "ชื่อเสียง %d" % e.rep_door_walkout)
 	if not gone.is_empty():
@@ -606,7 +665,7 @@ func _tick_door(ts: TimeSystem) -> void:
 ## [0.3.0] รอได้อีกกี่เทิร์น (ปัดลง)
 func door_patience_left(j: Dictionary) -> int:
 	var c: CustomerCase = j["case"]
-	return maxi(c.patience_slots(_econ()) - floori(int(j.get("waited", 0)) / float(TimeSystem.SLOT_MIN)), 0)
+	return maxi(door_patience_slots(c) - floori(int(j.get("waited", 0)) / float(TimeSystem.SLOT_MIN)), 0)
 
 
 func _on_week_ended(week: int) -> void:
@@ -665,6 +724,16 @@ func _on_repair_recorded(result: Dictionary) -> void:
 			result["money"] = paid["money"]
 			result["reputation"] = paid["reputation"]
 			result["satisfaction"] = paid["satisfaction"]
+			result["affinity"] = paid.get("affinity", 0)
+			result["npc_name"] = paid.get("npc_name", "")
+	# [0.5.0 ขั้น B] งานต่อหน้าลูกค้า (ขมOS · งานเนื้อเรื่อง) → ความสนิท + ทิปคนสนิทตอนนี้ · งานบนชั้นคิดตอนมารับ (_pay_pickup)
+	if c and order == null:
+		var aff := affinity_result(c, result)
+		result = result.duplicate()
+		result["affinity"] = aff["delta"]
+		result["npc_name"] = aff["name"]
+		if int(aff["tip"]) > 0:
+			result["money"] = int(result.get("money", 0)) + int(aff["tip"])
 	current_job = { }
 	last_result = result
 	_result_pending = true
@@ -740,6 +809,8 @@ func door_accept(promise := -1) -> bool:
 	var c: CustomerCase = j["case"]
 	if not bool(j.get("free", false)):
 		accepted_today += 1
+	if bool(j.get("appointed", false)):
+		affinity_for(c, &"kept_appointment") # [0.5.0] นัดแล้วรับจริง
 	_board_dirty = true
 	if promise >= 0 and c.takes_machine():
 		var ts := _ts()
@@ -782,8 +853,9 @@ func door_appoint() -> bool:
 func door_reject() -> bool:
 	if door_queue.is_empty() or _working or is_pickup(door_front()):
 		return false
-	door_queue.pop_front()
+	var rj: Dictionary = door_queue.pop_front()
 	GameState.add_reputation(_econ().rep_reject)
+	affinity_for(rj["case"], &"reject")
 	_board_dirty = true
 	return true
 
@@ -888,6 +960,11 @@ const TUTORIALS := {
 	"tut_part_pay": "res://Assets/Dialog/Tutorial/part_pay_first.txt",
 	"tut_damage_replace": "res://Assets/Dialog/Tutorial/damage_replace_first.txt",
 	"tut_vendor": "res://Assets/Dialog/Tutorial/vendor_first.txt",
+	# [0.5.0 ขั้น L] ลูกค้าประจำ + ยศ
+	"tut_affinity": "res://Assets/Dialog/Tutorial/affinity_first.txt",
+	"tut_story": "res://Assets/Dialog/Tutorial/story_first.txt",
+	"tut_exam": "res://Assets/Dialog/Tutorial/exam_first.txt",
+	"tut_helper": "res://Assets/Dialog/Tutorial/helper_first.txt",
 }
 
 
@@ -902,7 +979,7 @@ func _maybe_tutorial(want: Card) -> bool:
 		flag = "tut_shelf"
 	# [0.4.0 ขั้น K] อะไหล่: เครื่องรอของครั้งแรก · พัสดุมาครั้งแรก · ลูกค้ามารับพร้อมจ่ายค่าอะไหล่ครั้งแรก · ทำของเสียต้องชดใช้ · รถขายของ
 	if want in [Card.DOOR, Card.NONE] and (flag == "" or GameState.story_flags.get(flag, false)):
-		for f in _part_tutorials():
+		for f in _part_tutorials() + _npc_tutorials():
 			if not GameState.story_flags.get(f, false):
 				flag = f
 				break
@@ -1001,6 +1078,9 @@ func month_summary_text(rep: Dictionary, bill: Dictionary = { }) -> String:
 		lines.append("ลงทุน %s (ไม่นับในกำไร)" % b.call(int(rep.invest)))
 	if GameState.inventory_value() > 0:
 		lines.append("ของในคลังมูลค่า %s (ซื้อไว้ยังไม่ได้ใช้)" % b.call(GameState.inventory_value()))
+	var aff := GameState.affinity_summary(int(rep.get("m", 0)))
+	if aff != "":
+		lines.append("ความสนิทเดือนนี้: " + aff)
 	var result := ""
 	if bool(rep.get("over", false)):
 		result = "เกินเป้า!"
@@ -1287,6 +1367,9 @@ func _continue_after_summary() -> void:
 
 ## เริ่มเกมใหม่หลังฉากจบ: เงิน/คะแนน/เวลา กลับค่าเริ่มต้น
 func _reset_run() -> void:
+	exam = { }
+	pending_story = { }
+	story_today = false
 	_game_over = false
 	_working = false
 	_result_pending = false
@@ -1360,6 +1443,12 @@ func _process(delta: float) -> void:
 		return
 	# [0.3.0 ขั้น J] บทสอนสั้นครั้งแรก (หน้าประตู · ชั้นวาง · มารับเครื่อง)
 	if _maybe_tutorial(want):
+		return
+	# [0.5.0 ขั้น E] เรื่องส่วนตัวของลูกค้าประจำ (หลังส่งงาน/ส่งมอบเครื่อง)
+	if _maybe_story(want):
+		return
+	# [0.5.0 ขั้น I] เลื่อนยศแล้วยังไม่เลือกความสามารถ → หน้าเลือก (บังการ์ดจนกว่าจะเลือก)
+	if _maybe_perk():
 		return
 	# ลูกค้า forced เดินเข้ามาเองเมื่ออยู่ในร้านครบ forced_delay วินาที
 	if want == Card.JOB_FORCED and not arrived_today:
@@ -1691,7 +1780,8 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 	var c: CustomerCase = j["case"]
 	var phone := bool(j.get("phone", false))
 	var f := { }
-	f["name"] = "%s · %s %s%s" % [c.customer, c.level_name(), _stars(c.level), "  · นัดไว้" if bool(j.get("appointed", false)) else ""]
+	f["name"] = "%s · %s %s%s" % [npc_name(c), c.level_name(), _stars(c.level), "  · นัดไว้" if bool(j.get("appointed", false)) else ""]
+	f["bond"] = bond_line(c)
 	f["detail"] = "%sอาการ: %s\nมาเพราะ: %s\nใช้ %s · ค่าแรง ฿%d · %s" % [
 		("เครื่อง: %s\n" % c.device) if c.device != "" else "",
 		c.symptom,
@@ -1705,7 +1795,7 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 		f["detail"] += "\n" + pl
 	f["portrait"] = Global.getCharacterTexture(c.customer) if Global.hasCharacter(c.customer) else null
 	f["patience_left"] = door_patience_left(j)
-	f["patience_max"] = c.patience_slots(_econ())
+	f["patience_max"] = door_patience_slots(c)
 	f["phone"] = phone
 	var acc := { "text": "รับเครื่อง", "disabled": false, "visible": true, "tooltip": "" }
 	var st := door_accept_state(1 if c.takes_machine() else -1)
@@ -1734,6 +1824,7 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 		app["tooltip"] = "นัดไว้แล้ว เลื่อนอีกไม่ได้"
 	f["appoint"] = app
 	f["reject_disabled"] = _working
+	f["helper"] = helper_button(j)
 	return f
 
 
@@ -1746,7 +1837,8 @@ func _pickup_front_view(j: Dictionary) -> Dictionary:
 	var m := pickup_money(p)
 	var when := "ทันนัด ความพอใจ +%d" % int(p["sat_delta"]) if p["on_time"] else "ช้ากว่านัด %d วัน ค่าแรง ×%.2f ความพอใจ %d" % [int(p["late"]), float(p["mult"]), int(p["sat_delta"])]
 	return {
-		"name": "%s · มารับเครื่อง" % c.customer,
+		"name": "%s · มารับเครื่อง" % npc_name(c),
+		"bond": bond_line(c),
 		"detail": "%s%s\n%s\n%s" % [
 			("เครื่อง: %s\n" % c.device) if c.device != "" else "",
 			"งานไม่ผ่าน — คืนเครื่องตามสภาพ" if failed else "ซ่อมเสร็จแล้ว (คะแนน %d/100)" % int(o.result.get("score", 0)),
@@ -1838,6 +1930,11 @@ func _pay_pickup(p: Dictionary) -> Dictionary:
 		GameState.add_money(part_due, &"part_fee", String(o.result.get("part_name", "")))
 		paid["money"] = int(paid["money"]) + part_due
 	paid["part"] = part_due
+	# [0.5.0 ขั้น B] ความสนิทตอนมารับ: ผลงาน + ทันนัด/เลยนัด · ทิปคนสนิท
+	var aff := affinity_result(o.case, o.result, bool(p["on_time"]), int(p["late"]))
+	paid["affinity"] = aff["delta"]
+	paid["npc_name"] = aff["name"]
+	paid["money"] = int(paid["money"]) + int(aff["tip"])
 	_release_order(o)
 	var m := int(paid["money"])
 	paid["text"] = "%s มารับเครื่อง %s (%s)" % [
@@ -1873,6 +1970,7 @@ func _open_shelf_day(ts: TimeSystem) -> void:
 			shelf_news.append("%s มาเอาเครื่องคืน ไม่ได้ของชดใช้ — จ่ายค่าเสียหาย ฿%d" % [o.case.customer, pen])
 		_release_order(o)
 		GameState.add_reputation(e.rep_returned)
+		affinity_for(o.case, &"reclaimed")
 		GameState.satisfaction_history.append(e.returned_satisfaction)
 		shelf_news.append("%s มาเอาเครื่องคืน (ไม่ได้ซ่อม เลยนัด) ชื่อเสียง %d" % [o.case.customer, e.rep_returned])
 		_skip_note("%sรอไม่ไหว มาเอาเครื่องคืนแล้ว…" % o.case.customer)
@@ -1981,11 +2079,13 @@ func assign_parts(notify := true) -> PackedStringArray:
 func _plan_vendor(ts: TimeSystem) -> void:
 	vendor = { }
 	var e := _econ()
-	if ts == null or ts.shift_in_week() == 1 or e.vendor_chance <= 0.0 or _rng.randf() >= e.vendor_chance:
+	var chance := e.perk_vendor_chance if GameState.has_perk(&"connected") else e.vendor_chance # [0.5.0] มีเส้นสาย
+	if ts == null or ts.shift_in_week() == 1 or chance <= 0.0 or _rng.randf() >= chance:
 		return
+	var n_items := e.perk_vendor_items if GameState.has_perk(&"connected") else e.vendor_items
 	var pool: Array[ItemDef] = online_catalog().filter(func(it: ItemDef) -> bool: return it.kind == ItemDef.Kind.PART)
 	var ids: Array = []
-	while not pool.is_empty() and ids.size() < e.vendor_items:
+	while not pool.is_empty() and ids.size() < n_items:
 		var it: ItemDef = pool.pop_at(_rng.randi_range(0, pool.size() - 1))
 		ids.append(String(it.id))
 	if ids.is_empty():
@@ -2194,6 +2294,7 @@ func _order_damaged(o: RepairShelf.Order, result: Dictionary) -> bool:
 	o.sat_adjust -= _econ().damage_replace_sat
 	GameState.add_reputation(int(result.get("rep_due", _econ().rep_damaged)))
 	GameState.satisfaction_history.append(_econ().satisfaction_fail)
+	GameState.add_affinity(npc_id(o.case), int(_econ().affinity_gain.get(&"damage", 0) / (2.0 if GameState.has_perk(&"careful") else 1.0)), &"damage")
 	assign_parts(false)
 	shelf_news.append("ทำ%sของ%sเสีย — ต้องหา%sมาเปลี่ยนให้ก่อน" % [o.case.job_title if o.case.job_title != "" else "ของ", o.case.customer, it.display_name])
 	_board_dirty = true
@@ -2280,7 +2381,7 @@ func door_handover() -> bool:
 	var paid := _pay_pickup(p)
 	last_handover = { "order": o, "pickup": p, "paid": paid }
 	if reward_popup:
-		reward_popup.pop_result({ "money": paid["money"], "reputation": paid["reputation"] })
+		reward_popup.pop_result({ "money": paid["money"], "reputation": paid["reputation"], "affinity": paid.get("affinity", 0), "npc_name": paid.get("npc_name", "") })
 	if visitor_toast:
 		var failed := int(o.result.get("grade", 0)) == GameState.Grade.FAIL
 		var line := o.case.complain_text if failed else o.case.thanks_text
@@ -2434,6 +2535,7 @@ func shelf_call_early(o: RepairShelf.Order) -> bool:
 	if p.is_empty():
 		return false
 	door_queue.push_front(pickup_entry(p))
+	affinity_for(o.case, &"call_early")
 	if visitor_toast:
 		visitor_toast.show_message("โทรบอก%sแล้ว" % o.case.customer, "กำลังมารับเครื่องที่หน้าร้าน · ความพอใจ +%d" % _econ().early_call_sat_bonus)
 	_board_dirty = true
@@ -2720,6 +2822,7 @@ func _build_time_skip() -> void:
 	door_card.accept_pressed.connect(_on_door_accept)
 	door_card.appoint_pressed.connect(func() -> void: door_appoint())
 	door_card.reject_pressed.connect(func() -> void: door_reject())
+	door_card.helper_pressed.connect(func() -> void: door_helper())
 	door_card.wait_pressed.connect(wait_slot)
 	door_card.close_pressed.connect(close_shop)
 	door_card.hide_pressed.connect(func() -> void: set_cards_hidden(true))
@@ -2734,6 +2837,9 @@ func _build_time_skip() -> void:
 	vendor_panel = _ensure_ui(^"VendorLayer", 92, VENDOR_PANEL_SCENE) as VendorPanel
 	if not vendor_panel.buy_pressed.is_connected(vendor_buy):
 		vendor_panel.buy_pressed.connect(func(i: int) -> void: vendor_buy(i))
+	perk_picker = _ensure_ui(^"PerkLayer", 112, PERK_PICKER_SCENE) as PerkPicker
+	if not perk_picker.chosen.is_connected(_on_perk_chosen):
+		perk_picker.chosen.connect(_on_perk_chosen)
 	if not month_summary.continue_pressed.is_connected(_on_primary):
 		month_summary.continue_pressed.connect(_on_primary)
 
@@ -2881,3 +2987,516 @@ func _hide_button() -> Button:
 	b.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	b.pressed.connect(func(): set_cards_hidden(true))
 	return b
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น B] ลูกค้าประจำ + ความสนิท (PLAN_0_5_0 ข้อ 2.4)
+
+
+## id ของลูกค้าประจำจากเคส (&"" = ลูกค้าขาจร)
+static func npc_id(c: CustomerCase) -> StringName:
+	var n := NpcBook.of_case(c)
+	return n.id if n else &""
+
+
+## ชื่อบนการ์ด (น้องฝ้าย) · ขาจร = ชื่อในเคส
+static func npc_name(c: CustomerCase) -> String:
+	var n := NpcBook.of_case(c)
+	return n.display_name if n else (c.customer if c else "")
+
+
+## ลูกค้ารอหน้าประตูได้กี่เทิร์น · ระดับคุ้นเคยขึ้นไป +1
+func door_patience_slots(c: CustomerCase) -> int:
+	var e := _econ()
+	var n := c.patience_slots(e)
+	var id := npc_id(c)
+	if id != &"" and GameState.has_affinity(id) and GameState.affinity_tier(id) >= e.affinity_patience_tier:
+		n += 1
+	if GameState.has_perk(&"patient"): # [0.5.0] ใจเย็น
+		n += 1
+	return n
+
+
+## ความสนิทตามเหตุการณ์ของลูกค้าเคสนี้ · คืนส่วนต่าง
+func affinity_for(c: CustomerCase, event: StringName, times := 1) -> int:
+	var id := npc_id(c)
+	return GameState.affinity_event(id, event, times) if id != &"" else 0
+
+
+## ผลงานซ่อม → ความสนิท (ผ่าน/ไม่ผ่าน/ทำเสีย/⭐⭐⭐ + ทันนัด/เลยนัด) · จดประวัติเครื่อง · ทิปคนสนิท (เข้า ledger แล้ว)
+## คืน { delta, name, tip }
+func affinity_result(c: CustomerCase, result: Dictionary, on_time := false, late_days := 0) -> Dictionary:
+	var out := { "delta": 0, "name": npc_name(c), "tip": 0 }
+	var id := npc_id(c)
+	if id == &"" or not GameState.has_affinity(id):
+		return out
+	var e := _econ()
+	var gs := GameState
+	var failed := bool(result.get("gave_up", false)) or int(result.get("grade", GameState.Grade.PASS)) == GameState.Grade.FAIL
+	var d := 0
+	if bool(result.get("damaged", false)):
+		d += gs.add_affinity(id, int(e.affinity_gain.get(&"damage", 0) / (2.0 if gs.has_perk(&"careful") else 1.0)), &"damage")
+	elif failed:
+		d += gs.affinity_event(id, &"fail")
+	else:
+		var tier_before := gs.affinity_tier(id)
+		d += gs.affinity_event(id, &"pass")
+		if int(result.get("score", 0)) >= e.three_star_score:
+			d += gs.affinity_event(id, &"three_star")
+		if tier_before >= e.affinity_tip_tier and e.affinity_tip > 0:
+			var tip := e.affinity_tip * (2 if gs.has_perk(&"beloved") else 1) # [0.5.0] ขวัญใจหมู่บ้าน
+			gs.add_money(tip, &"tip", "ทิปจาก%s" % out["name"])
+			out["tip"] = tip
+	if on_time:
+		d += gs.affinity_event(id, &"on_time")
+	elif late_days > 0:
+		d += gs.affinity_event(id, &"late_day", late_days)
+	gs.add_npc_history(id, c.job_title + (" (ไม่ผ่าน)" if failed else ""))
+	out["delta"] = d
+	_queue_story(c)
+	return out
+
+
+## ขึ้นระดับความสนิท → ป้ายบอกว่าปลดอะไร
+func _on_affinity_tier_up(id: StringName, tier: int) -> void:
+	if visitor_toast == null or quiet:
+		return
+	var n := NpcBook.by_id(id)
+	if n == null:
+		return
+	var e := _econ()
+	var perks := {
+		1: "การ์ดหน้าร้านจะบอกว่าเคยซ่อมอะไร",
+		2: "รอหน้าร้านได้นานขึ้น 1 เทิร์น · มีเรื่องอยากเล่าให้ฟัง",
+		3: "ให้ทิปเพิ่มตอนงานผ่าน ฿%d · มีเรื่องอยากเล่าอีก" % e.affinity_tip,
+		4: "เป็นขาประจำของร้านแล้ว!",
+	}
+	visitor_toast.show_message("♥ %s: %s" % [n.display_name, e.affinity_tier_name(tier)], perks.get(tier, ""))
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น D] UI ความสนิท
+
+
+## บรรทัดความสนิทบนการ์ดหน้าประตู: "♥♥♡♡♡ รู้จัก · เคยซ่อม: ทำความสะอาดแรม (ม.ค.)" · ขาจร/ยาย = ""
+func bond_line(c: CustomerCase) -> String:
+	var id := npc_id(c)
+	if id == &"" or not GameState.has_affinity(id):
+		return ""
+	var e := _econ()
+	var tier := GameState.affinity_tier(id)
+	var line := "%s %s" % [GameState.affinity_hearts_text(id), e.affinity_tier_name(tier)]
+	var hist: Array = GameState.npc_history.get(id, [])
+	if tier >= 1 and not hist.is_empty():
+		var h: Dictionary = hist[-1]
+		line += " · เคยซ่อม: %s%s" % [String(h.text), (" (%s)" % TimeSystem.MONTH_NAME[clampi(int(h.ch), 1, 12) - 1]) if int(h.ch) > 0 else ""]
+	if next_story(id) != null:
+		line += "\n♥ มีเรื่องอยากเล่าให้ฟัง (ส่งงานเสร็จแล้วจะเล่า)"
+	return line
+
+
+## เรื่องส่วนตัวถัดไปที่ฟังได้แล้ว (ความสนิทถึง · ยังไม่ฟัง · ฟังเรื่องก่อนหน้าแล้ว) · null = ไม่มี
+func next_story(id: StringName) -> NpcStory:
+	var n := NpcBook.by_id(id)
+	if n == null or not n.has_affinity:
+		return null
+	for s in n.stories:
+		if s == null:
+			continue
+		if GameState.story_seen(id, s.at):
+			continue
+		return s if GameState.affinity(id) >= s.at else null
+	return null
+
+
+## ข้อมูลแอป "สมุดลูกค้า" (CustomerBookApp): รายการคนที่มีความสนิท เรียงคนที่เคยเจอก่อน แล้วตามความสนิท
+func customer_book_view() -> Dictionary:
+	var e := _econ()
+	var rows: Array[Dictionary] = []
+	for n in NpcBook.with_affinity():
+		var id := n.id
+		var met := GameState.met(id) or GameState.npc_history.has(id) or GameState.npc_affinity.has(id)
+		var r := { "id": String(id), "met": met, "name": n.display_name if met else "???", "aff": GameState.affinity(id) }
+		if met:
+			var tier := GameState.affinity_tier(id)
+			var nxt := GameState.affinity_to_next(id)
+			r["portrait"] = Global.getCharacterTexture(n.char_key) if Global.hasCharacter(n.char_key) else null
+			r["hearts"] = GameState.affinity_hearts_text(id)
+			r["tier"] = "%s (%d)" % [e.affinity_tier_name(tier), GameState.affinity(id)]
+			r["next"] = ("อีก %d แต้มถึง \"%s\"" % [nxt, e.affinity_tier_name(tier + 1)]) if nxt > 0 else "สนิทสุดแล้ว"
+			r["bio"] = n.bio
+			var hist := PackedStringArray()
+			for h in GameState.npc_history.get(id, []):
+				hist.append("%s%s" % [String(h.text), (" (%s)" % TimeSystem.MONTH_NAME[clampi(int(h.ch), 1, 12) - 1]) if int(h.ch) > 0 else ""])
+			r["history"] = ("เคยซ่อม: " + " · ".join(hist)) if not hist.is_empty() else "ยังไม่เคยซ่อมให้"
+			var heard := PackedStringArray()
+			for s in n.stories:
+				if s and GameState.story_seen(id, s.at):
+					heard.append(s.title)
+			r["stories"] = ("เรื่องที่เคยฟัง: " + " · ".join(heard)) if not heard.is_empty() else ""
+			r["story_ready"] = next_story(id) != null
+		else:
+			r["hint"] = "ยังไม่เคยมาร้าน"
+		rows.append(r)
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if a.met != b.met:
+			return a.met
+		return int(a.aff) > int(b.aff))
+	var met_n := rows.filter(func(r: Dictionary) -> bool: return r.met).size()
+	return { "title": "สมุดลูกค้า · รู้จักแล้ว %d/%d คน" % [met_n, rows.size()], "rows": rows }
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น E] เรื่องส่วนตัว (PLAN_0_5_0 ข้อ 4)
+
+## ตัวเลือกในไฟล์เรื่องส่วนตัว (Assets/Dialog/NPC/*.txt) ที่แปลว่า "ไว้ฟังครั้งหน้า"
+const STORY_BUSY := "ขอโทษนะ วันนี้ยุ่ง"
+## เรื่องที่รอเล่น { id, story } — ตั้งตอนคิดความสนิทหลังส่งงาน · เล่นเมื่อการ์ดว่าง (_maybe_story)
+var pending_story: Dictionary = { }
+## วันนี้ถามไปแล้ว 1 เรื่อง (ฟังหรือไม่ฟังก็นับ)
+var story_today := false
+
+
+func _queue_story(c: CustomerCase) -> void:
+	if story_today or not pending_story.is_empty() or c == null or c.forced:
+		return
+	var id := npc_id(c)
+	var s := next_story(id)
+	if s != null:
+		pending_story = { "id": id, "story": s }
+
+
+func _maybe_story(want: Card) -> bool:
+	if pending_story.is_empty() or quiet or _working or _result_pending or not _in_shop() or Global.in_minigame or DialogScene.visible:
+		return false
+	# ไม่เล่นตอนปิดร้านแล้ว (การ์ดปิดร้าน/เลยเวลา) — ค้างไว้ไม่ได้ข้ามวัน เล่าใหม่ครั้งหน้าที่มาส่งงาน
+	if want not in [Card.DOOR, Card.NONE] or _ts().current_minute >= TimeSystem.CLOSE:
+		return false
+	var s: NpcStory = pending_story["story"]
+	var n := NpcBook.by_id(pending_story["id"])
+	story_today = true
+	_working = true
+	_hide()
+	if EventManager.play_story_dialog("เรื่องของ%s · %s" % [n.display_name if n else "", s.title], s.dialog, "res://Assets/Background/bg_shop_open.jpg", DialogUtil.speakers_in(s.dialog)):
+		_wait_dialog(func() -> void:
+			_pending_cb = Callable()
+			_working = false
+			story_finish(DialogScene.last_choice))
+	else:
+		_working = false
+		pending_story = { }
+	return true
+
+
+## จบบทเรื่องส่วนตัว (choice = ตัวเลือกสุดท้ายที่กด) → ฟังแล้ว: จดว่าฟัง · ความสนิท (จบดี/ธรรมดา) · ของฝาก · ธง · เวลา story_slots เทิร์น
+## เลือก "ขอโทษนะ วันนี้ยุ่ง" = ไว้ครั้งหน้า (ไม่เสียอะไร) · คืน { heard, good, delta }
+func story_finish(choice: String) -> Dictionary:
+	if pending_story.is_empty():
+		return { }
+	var id: StringName = pending_story["id"]
+	var s: NpcStory = pending_story["story"]
+	pending_story = { }
+	var n := NpcBook.by_id(id)
+	var who := n.display_name if n else String(id)
+	if choice == STORY_BUSY:
+		if visitor_toast:
+			visitor_toast.show_message("ไว้ฟังเรื่องของ%sครั้งหน้า" % who, "")
+		return { "heard": false }
+	GameState.mark_story_seen(id, s.at)
+	var good := s.good_choice == "" or choice == s.good_choice
+	var d := GameState.affinity_event(id, &"story_good" if good else &"story_plain")
+	var gift := ""
+	if s.reward_item != &"":
+		var it := part_item(s.reward_item)
+		if it and GameState.give_item(it, 1, false):
+			gift = it.display_name
+	if gift == "" and good and GameState.has_perk(&"beloved"): # [0.5.0] ขวัญใจหมู่บ้าน: ของฝาก
+		var g := part_item(&"ipa90")
+		if g and GameState.give_item(g, 1, false):
+			gift = g.display_name
+	if s.flag != &"":
+		GameState.story_flags[s.flag] = true
+	var ts := _ts()
+	if ts and _econ().story_slots > 0:
+		ts.advance_minutes(_econ().story_slots * TimeSystem.SLOT_MIN)
+		ts.snap_to_slot()
+	if visitor_toast and not quiet:
+		visitor_toast.show_message("♥ ฟังเรื่องของ%sแล้ว (%s%d)" % [who, "+" if d >= 0 else "−", absi(d)], ("ได้%sเข้าคลัง" % gift) if gift != "" else ("ตอบได้ใส่ใจมาก" if good else "ครั้งหน้าลองตอบให้ใส่ใจกว่านี้นะ"))
+	_board_dirty = true
+	autosave.call_deferred()
+	return { "heard": true, "good": good, "delta": d }
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น F–G] สอบเลื่อนยศ — แอป "สอบช่าง" ในคอมของขม (RankExamApp · PLAN_0_5_0 ข้อ 5)
+# XP ครบ → ป้ายเตือนให้เปิดคอมไปสอบ · สอบได้วันละครั้ง · 3 ข้อ ถูก ≥ exam_pass = เลื่อนยศ (ปิดคอมแล้วขึ้นหน้าเลือกความสามารถ)
+
+## สอบที่กำลังทำ { target, questions: Array[ExamQuestion], orders: Array, i, right, attempt, last } · จบแล้ว = { done, passed, right, total, target }
+var exam: Dictionary = { }
+var _exam_rng := RandomNumberGenerator.new()
+
+
+## เริ่มสอบได้ไหม: XP ครบ · วันนี้ยังไม่ได้สอบ · ไม่ได้สอบค้างอยู่
+func exam_can_start() -> bool:
+	var ts := _ts()
+	return GameState.rank_ready() and (ts == null or GameState.exam_last_shift != ts.shift) and not exam_running()
+
+
+func exam_running() -> bool:
+	return not exam.is_empty() and not bool(exam.get("done", false))
+
+
+## เริ่มสอบ: สุ่มข้อตาม Part ที่ซ่อมผ่านแล้ว · นับว่าวันนี้สอบแล้ว · คืนรายการข้อ
+func exam_begin() -> Array[ExamQuestion]:
+	var e := _econ()
+	var ts := _ts()
+	var target := GameState.rank_level + 1
+	# สุ่มใหม่ทุกครั้งภายในคลังของยศนี้ · ไม่เอาข้อชุดที่แล้ว (สอบซ้ำจะได้ไม่เจอข้อเดิม)
+	var last_set := { }
+	if not GameState.learn_log.is_empty():
+		var lr: Dictionary = GameState.learn_log[-1]
+		for r in GameState.learn_log:
+			if int(r.get("target", 0)) == int(lr.get("target", 0)) and int(r.get("attempt", 0)) == int(lr.get("attempt", 0)):
+				last_set[StringName(r.get("qid", ""))] = true
+	var qs := RankExam.pick(target, e.exam_questions, _exam_rng, GameState.part_clears.keys(), last_set)
+	var orders: Array = []
+	for q in qs:
+		orders.append(RankExam.shuffled(q, _exam_rng))
+	GameState.exam_attempts[target] = int(GameState.exam_attempts.get(target, 0)) + 1
+	GameState.exam_last_shift = ts.shift if ts else 0
+	exam = { "target": target, "questions": qs, "orders": orders, "i": 0, "right": 0, "attempt": GameState.exam_attempts[target], "last": { }, "marks": [] }
+	return qs
+
+
+## ข้อปัจจุบันสำหรับแอป { i (เริ่ม 1), total, question, part, choices: ข้อความตามลำดับที่สลับแล้ว } · ว่าง = ไม่มีข้อ
+func exam_question_view() -> Dictionary:
+	if not exam_running():
+		return { }
+	var i := int(exam.i)
+	var qs: Array = exam.questions
+	if i >= qs.size():
+		return { }
+	var q: ExamQuestion = qs[i]
+	var opts := PackedStringArray()
+	for k in exam.orders[i]:
+		opts.append(q.choices[k])
+	return { "i": i + 1, "total": qs.size(), "question": q.question, "part": String(q.part), "choices": opts, "image": q.image, "domain": q.domain_name() }
+
+
+## ตอบข้อปัจจุบัน (ข้อความตัวเลือก) → จดลง learn_log + CSV · คืน { correct, answer, explain } (exam.last)
+func exam_answer(choice: String) -> bool:
+	if not exam_running() or int(exam.i) >= (exam.questions as Array).size():
+		return false
+	var q: ExamQuestion = exam.questions[int(exam.i)]
+	var ok := choice == q.correct_text()
+	var when := GameState._ledger_when()
+	var row := { "ch": when.x, "day": when.y, "target": int(exam.target), "attempt": int(exam.attempt), "qid": String(q.id), "part": String(q.part), "chosen": choice, "correct": ok }
+	GameState.learn_log.append(row)
+	if not quiet:
+		RankExam.append_csv(row)
+	exam["i"] = int(exam.i) + 1
+	if ok:
+		exam["right"] = int(exam.right) + 1
+	exam["last"] = { "correct": ok, "chosen": choice, "answer": q.correct_text(), "explain": q.explain }
+	(exam["marks"] as Array).append({ "domain": q.domain_name(), "correct": ok })
+	return ok
+
+
+## ตอบครบแล้วหรือยัง
+func exam_answered_all() -> bool:
+	return exam_running() and int(exam.i) >= (exam.questions as Array).size()
+
+
+## ครบทุกข้อ → ถูก ≥ exam_pass = เลื่อนยศ · คืน true = ผ่าน
+func exam_finish() -> bool:
+	if not exam_running():
+		return false
+	var right := int(exam.right)
+	var total := (exam.questions as Array).size()
+	var passed := right >= _econ().exam_pass
+	var target := int(exam.target)
+	# ใบแจ้งผลแยกหมวด (แบบข้อสอบใบรับรองช่าง): หมวด → [ถูก, ทั้งหมด]
+	var report := { }
+	for m: Dictionary in exam.get("marks", []):
+		var r: Array = report.get(m.domain, [0, 0])
+		r[1] += 1
+		if bool(m.correct):
+			r[0] += 1
+		report[m.domain] = r
+	exam = { "done": true, "passed": passed, "right": right, "total": total, "target": target, "report": report }
+	if passed:
+		GameState.promote()
+	autosave.call_deferred()
+	return passed
+
+
+## ประวัติสอบ (ใหม่สุดก่อน): "ช่างฝึกหัด ครั้งที่ 2 · ถูก 2/3 ผ่าน"
+func exam_history() -> PackedStringArray:
+	var e := _econ()
+	var groups := { }
+	var order: Array = []
+	for r in GameState.learn_log:
+		var k := "%d_%d" % [int(r.get("target", 0)), int(r.get("attempt", 0))]
+		if not groups.has(k):
+			groups[k] = [int(r.get("target", 0)), int(r.get("attempt", 0)), 0, 0]
+			order.append(k)
+		groups[k][3] += 1
+		if bool(r.get("correct", false)):
+			groups[k][2] += 1
+	var out := PackedStringArray()
+	for idx in range(order.size() - 1, -1, -1):
+		var g: Array = groups[order[idx]]
+		out.append("%s ครั้งที่ %d · ถูก %d/%d %s" % [e.rank_names[clampi(g[0], 0, e.rank_names.size() - 1)], g[1], g[2], g[3], "ผ่าน" if g[2] >= e.exam_pass else "ยังไม่ผ่าน"])
+	return out
+
+
+## หน้าแรกของแอปสอบช่าง (ตอนไม่ได้สอบอยู่) { state: max|wait|ready|done_today, title, sub, unlocks, button, history }
+func exam_app_view() -> Dictionary:
+	var e := _econ()
+	var gs := GameState
+	var v := { "rank": "%s · %d XP" % [gs.rank_name(), gs.xp], "history": exam_history(), "unlocks": PackedStringArray() }
+	var nxt := gs.rank_level + 1
+	if nxt >= e.rank_xp.size():
+		v.merge({ "state": "max", "title": "ยศสูงสุดแล้ว", "sub": "ไม่ต้องสอบเพิ่ม" })
+		return v
+	var n_pool := RankExam.pool(nxt, gs.part_clears.keys(), e.exam_questions).size()
+	var rules := "สุ่ม %d ข้อ (มีข้อดูภาพ) จาก %d ข้อ · ถูก %d ผ่าน · วันละครั้ง" % [e.exam_questions, n_pool, e.exam_pass]
+	v["unlocks"] = gs.rank_unlock_lines(nxt)
+	if not gs.rank_ready():
+		v.merge({ "state": "wait", "title": "สอบเป็น%s" % e.rank_names[nxt], "sub": "ต้องมี XP อีก %d (%d/%d)" % [e.rank_xp[nxt] - gs.xp, gs.xp, e.rank_xp[nxt]] })
+	elif not exam_can_start():
+		v.merge({ "state": "done_today", "title": "สอบเป็น%s" % e.rank_names[nxt], "sub": "วันนี้สอบแล้ว · สอบใหม่ได้วันเปิดร้านถัดไป" })
+	else:
+		v.merge({ "state": "ready", "title": "พร้อมสอบเป็น%s!" % e.rank_names[nxt], "sub": rules, "button": "เริ่มสอบ" })
+	return v
+
+
+## XP ครบ / เปิดร้านวันใหม่ที่ยังสอบได้ → ป้ายเตือนให้เปิดคอมไปสอบ
+func _exam_reminder() -> void:
+	if quiet or visitor_toast == null or not exam_can_start():
+		return
+	visitor_toast.show_message("XP ครบแล้ว! สอบเลื่อนยศได้", "เปิดคอมของขม → แอป \"สอบช่าง\" · ผ่านแล้วเป็น%s" % _econ().rank_names[GameState.rank_level + 1])
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น J] มิ้นเป็นลูกมือ (PLAN_0_5_0 ข้อ 6.1)
+
+var helper_used_today := 0
+
+
+## มิ้นทำงานนี้ได้ไหม: ยศเชี่ยวชาญ · งานขมOS Lv1 (ครูช่าง = Lv2 ด้วย) · ไม่ใช่งานเนื้อเรื่อง · วันละ helper_per_day งาน
+func helper_can(c: CustomerCase) -> bool:
+	var e := _econ()
+	if c == null or c.forced or GameState.rank() < e.helper_rank or helper_used_today >= e.helper_per_day:
+		return false
+	if c.part_id != CustomerCase.PART_DESKTOP:
+		return false
+	return c.level <= (2 if GameState.has_perk(&"mentor") else 1)
+
+
+## โอกาสที่มิ้นทำผ่าน = ฐาน + ต่อ ⭐⭐⭐ ที่ขมเคยได้ในงานระดับนี้ ("ขมสอนมิ้นมาแล้วกี่ครั้ง")
+func helper_chance(c: CustomerCase) -> float:
+	var e := _econ()
+	var stars := int(GameState.level_three_stars.get(c.level, 0))
+	var p := e.helper_base + e.helper_per_star * stars + (e.perk_helper_bonus if GameState.has_perk(&"mentor") else 0.0)
+	return clampf(p, 0.0, e.helper_max)
+
+
+func helper_button(j: Dictionary) -> Dictionary:
+	if j.is_empty() or is_pickup(j) or bool(j.get("phone", false)):
+		return { "visible": false }
+	var c: CustomerCase = j["case"]
+	if not helper_can(c):
+		return { "visible": false }
+	return {
+		"visible": true,
+		"text": "ให้มิ้นทำ\n(%d%%)" % roundi(helper_chance(c) * 100.0),
+		"disabled": _working,
+		"tooltip": "มิ้นทำแทน ไม่ใช้เวลาขม ไม่นับโควตา · ร้านได้ค่าแรง %d%% · ไม่ได้ XP\nโอกาสผ่านขึ้นกับว่าขมเคยทำงานระดับนี้ได้ 3 ดาวกี่ครั้ง (สอนมิ้นมาแล้ว)" % roundi(_econ().helper_fee_share * 100.0),
+	}
+
+
+## ให้มิ้นทำงานคนหน้าประตู → คืน { ok, money, affinity } (ว่าง = ทำไม่ได้)
+func door_helper() -> Dictionary:
+	var j := door_front()
+	if j.is_empty() or is_pickup(j) or _working:
+		return { }
+	var c: CustomerCase = j["case"]
+	if not helper_can(c):
+		return { }
+	door_queue.pop_front()
+	helper_used_today += 1
+	_board_dirty = true
+	var e := _econ()
+	var ok := _rng.randf() < helper_chance(c)
+	var id := npc_id(c)
+	var money := 0
+	var aff := 0
+	if ok:
+		money = roundi(_fee(c) * e.helper_fee_share)
+		GameState.add_money(money, &"fee", "มิ้นทำ: %s" % c.job_title)
+		GameState.satisfaction_history.append(e.satisfaction_pass)
+		if id != &"" and GameState.has_affinity(id):
+			aff = GameState.add_affinity(id, ceili(e.affinity_gain.get(&"pass", 0) / 2.0), &"helper")
+			GameState.add_npc_history(id, c.job_title + " (มิ้นทำ)")
+	else:
+		GameState.add_reputation(-1)
+		if id != &"" and GameState.has_affinity(id):
+			aff = GameState.add_affinity(id, floori(e.affinity_gain.get(&"fail", 0) / 2.0), &"helper")
+	if visitor_toast:
+		visitor_toast.show_message(
+			("มิ้นทำงานของ%sเสร็จ +฿%d" % [npc_name(c), money]) if ok else ("มิ้นทำงานของ%sไม่สำเร็จ ลูกค้ากลับไปก่อน" % npc_name(c)),
+			"ขมสอนมิ้นมาแล้ว %d ครั้ง · ทำงานระดับนี้ได้ 3 ดาวบ่อย ๆ มิ้นจะเก่งขึ้น" % int(GameState.level_three_stars.get(c.level, 0)))
+	if reward_popup:
+		reward_popup.pop_result({ "money": money, "reputation": 0 if ok else -1, "affinity": aff, "npc_name": npc_name(c) })
+	GameState.story_flags[&"helper_used"] = true
+	autosave.call_deferred()
+	return { "ok": ok, "money": money, "affinity": aff }
+
+
+# ---------------------------------------------------------------- [0.5.0 ขั้น H–I] หน้าเลื่อนยศ + ความสามารถช่าง
+
+
+## ข้อมูลหน้าเลือก (ยศที่ยังไม่ได้เลือกต่ำสุด)
+func perk_view() -> Dictionary:
+	var r := GameState.perk_pending()
+	if r <= 0:
+		return { }
+	var e := _econ()
+	return { "rank": r, "title": "เลื่อนยศเป็น%s!" % e.rank_names[r], "unlocks": GameState.rank_unlock_lines(r), "options": GameState.perk_options(r) }
+
+
+func _maybe_perk() -> bool:
+	if perk_picker == null:
+		return false
+	if perk_picker.visible:
+		_hide()
+		return true
+	if GameState.perk_pending() <= 0 or _working or not _in_shop() or Global.in_minigame or DialogScene.visible:
+		return false
+	if quiet: # บอท/เทสต์: เลือกทาง A ให้เอง
+		var r := GameState.perk_pending()
+		GameState.choose_perk(r, StringName(GameState.perk_options(r)[0].id))
+		return false
+	_hide()
+	perk_picker.show_view(perk_view())
+	return true
+
+
+func _on_perk_chosen(r: int, id: StringName) -> void:
+	if GameState.choose_perk(r, id) and visitor_toast:
+		for o: Dictionary in GameState.perk_options(r):
+			if String(o.id) == String(id):
+				visitor_toast.show_message("ความสามารถช่าง: %s" % o.name, String(o.desc))
+	_board_dirty = true
+	autosave.call_deferred()
+
+
+## [0.5.0 ขั้น L] บทสอนครั้งแรกของลูกค้าประจำ/ยศ ที่ถึงเงื่อนไขตอนนี้
+func _npc_tutorials() -> Array[String]:
+	var out: Array[String] = []
+	if GameState.affinity_log.any(func(r: Dictionary) -> bool: return int(r.delta) > 0):
+		out.append("tut_affinity")
+	if not pending_story.is_empty() and not _result_pending:
+		out.append("tut_story")
+	if GameState.rank_ready():
+		out.append("tut_exam")
+	var j := door_front()
+	if not j.is_empty() and helper_button(j).get("visible", false):
+		out.append("tut_helper")
+	return out

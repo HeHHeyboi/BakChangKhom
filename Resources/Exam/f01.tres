@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"f01"
+part = &"part_front_panel"
+level = 3
+question = "กดปุ่มเปิดเครื่องแล้วไม่ติดเลยทั้งที่ไฟเข้า ควรตรวจอะไรก่อน"
+choices = PackedStringArray("สาย Power SW ที่หัวพินหน้าเครื่อง", "การ์ดจอ", "แรม")
+answer = 0
+explain = "ถ้าสายปุ่มเปิดหลุด กดเท่าไรเมนบอร์ดก็ไม่รู้"

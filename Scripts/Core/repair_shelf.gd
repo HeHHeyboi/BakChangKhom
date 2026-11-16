@@ -158,7 +158,8 @@ func pickup(o: Order, today: int) -> Dictionary:
 		return { }
 	var late := o.late_days(today)
 	var mult := econ.promise_mult(o.promise) * maxf(1.0 - late * econ.late_pay_cut_per_day, 0.0)
-	var sat := (econ.on_time_sat_bonus if late == 0 else -late * econ.late_sat_per_day) + o.sat_adjust
+	var late_sat := econ.late_sat_per_day / (2 if GameState.has_perk(&"punctual") else 1) # [0.5.0] นัดแม่น
+	var sat := (econ.on_time_sat_bonus if late == 0 else -late * late_sat) + o.sat_adjust
 	o.state = State.PICKED
 	o.closed_on = today
 	_close(o)
@@ -206,7 +207,7 @@ func open_day(today: int) -> Dictionary:
 			picked.append(pickup(o, today))
 		elif o.state == State.WAITING:
 			var late := o.late_days(today)
-			if late > econ.late_grace_days:
+			if late > econ.late_grace_days + (econ.perk_late_grace_bonus if GameState.has_perk(&"punctual") else 0):
 				o.state = State.RETURNED
 				o.closed_on = today
 				_close(o)

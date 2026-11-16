@@ -85,6 +85,10 @@ func show_report(title: String, sub: String, rep: Dictionary, bill: Dictionary, 
 		notes.append("ลงทุนกับร้าน %s (ไม่นับในกำไร)" % _baht(inv))
 	if stock > 0:
 		notes.append("ของในคลังมูลค่า %s (ซื้อไว้ยังไม่ได้ใช้)" % _baht(stock))
+	# [0.5.0] ลูกค้าประจำที่สนิทขึ้น/ห่างลงเดือนนี้
+	var aff := GameState.affinity_summary(int(rep.get("m", 0)))
+	if aff != "":
+		notes.append("ความสนิทเดือนนี้: " + aff)
 	_invest.visible = not notes.is_empty()
 	_invest.text = "\n".join(notes)
 	# กำไรเทียบเป้า

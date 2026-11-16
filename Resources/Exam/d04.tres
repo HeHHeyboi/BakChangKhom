@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ExamQuestion" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/exam_question.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"d04"
+part = &"part_desktop"
+level = 2
+question = "ตั้งรหัส Wi-Fi ควรตั้งแบบไหน"
+choices = PackedStringArray("ยาวและผสมตัวอักษรกับตัวเลข", "12345678", "ชื่อร้าน")
+answer = 0
+explain = "รหัสสั้นหรือเดาง่าย คนอื่นแอบใช้เน็ตได้"
+domain = "ความปลอดภัย"
