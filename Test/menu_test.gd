@@ -49,6 +49,13 @@ func _ready() -> void:
 	await _shot("main_menu_stats")
 	sbtn.pressed.emit()
 	_check(not spanel.visible, "กดถ้วยอีกครั้ง → ปิดแผง")
+	var fbtn: Button = start.get_node_or_null("FormButton")
+	var fpanel: Control = start.get_node_or_null("FormPanel")
+	fbtn.pressed.emit()
+	_check(fpanel.visible and fpanel.find_child("Form_pre", true, false) != null and fpanel.find_child("Form_post", true, false) != null and Playlog.FORM_PRE.begins_with("https://forms.gle/") and (fpanel.find_child("QR", true, false) as TextureRect).texture != null and (fpanel.find_child("Link", true, false) as LinkButton).text.begins_with("forms.gle/"), "ปุ่มคลิปบอร์ด → แผงช่วยทดสอบ (QR + ลิงก์ใต้รูป ก่อน/หลังเล่น)")
+	await _shot("main_menu_form")
+	fbtn.pressed.emit()
+	_check(not fpanel.visible, "กดอีกครั้ง → ปิด")
 	# [0.9.0] ดู/ข้ามบทนำ = หน้าเลือกการ์ด 2 ใบ (ไม่ใช่ตัวเลือกในบท) · ทั้งสองทางมีบท
 	DialogScene.read_file(Constant.PROLOUGE_TEXT)
 	var lines: Array = DialogScene.DialogDict["dialog"]

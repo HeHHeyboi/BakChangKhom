@@ -13,6 +13,20 @@ const EXTRA := ["user://save.json", "user://achievements.cfg"]
 const SESSION_COLS := ["start", "seconds", "reason", "chapter", "date", "shift", "total_playtime", "money", "rank", "ending"]
 
 static var allow_in_tests := false
+## [0.9.5] ผู้ใช้ 16 พ.ย. (23:09): เปิดให้ผู้เล่นทั่วไปช่วยทดสอบ → ลิงก์ Google Form ก่อน/หลังเล่นอยู่ในเกม (ปุ่มคลิปบอร์ดในเมนูหลัก · ปุ่มส่งออกในเมนูพัก)
+## ไม่มีหน้ากรอกในเกม — เปิดเบราว์เซอร์ไปที่ฟอร์มเท่านั้น · เปลี่ยนลิงก์ได้ที่นี่
+## ผู้ใช้ 16 พ.ย. 23:23: ลิงก์แรกที่ส่งมาคือหลังเล่น (สลับแล้ว)
+const FORM_PRE := "https://forms.gle/iQYD4qArhurm9BHV9"
+const FORM_POST := "https://forms.gle/nTkEuW8qQEfJcN7b7"
+
+
+## เปิดฟอร์ม (&"pre" · &"post") ในเบราว์เซอร์ · จดว่าเปิดเมื่อไร (forms.csv)
+static func open_form(kind: StringName) -> String:
+	var url := FORM_PRE if kind == &"pre" else FORM_POST
+	if DisplayServer.get_name() != "headless":
+		OS.shell_open(url)
+	append("forms.csv", ["form"], [String(kind)])
+	return url
 
 var _in_game := false
 var _seg_start := ""

@@ -33,6 +33,7 @@ func _ready() -> void:
 	# [0.9.5] เมนูหลักเหลือแค่ปุ่มหลัก · ใบประกาศ + ส่งออกข้อมูลการเล่น + คำแนะนำ Esc ย้ายไปอยู่ในปุ่มถ้วยมุมขวาบน (_add_stats_button)
 	$Version.hide()
 	_add_stats_button()
+	_add_form_button() # [0.9.5] ช่วยทดสอบเกม (ฟอร์มก่อน/หลังเล่น)
 	for b in $Menu.get_children():
 		if b is Button:
 			_hover_bounce(b)
@@ -63,7 +64,7 @@ func _show_intro_choice() -> void:
 	add_child(intro_layer)
 	var dim := ColorRect.new()
 	dim.color = Color(0.06, 0.04, 0.02, 0.88)
-	for n in ["Menu", "Title", "Subtitle", "Logo", "Version", "VersionTag", "StatsButton", "StatsPanel"]: # เหลือแค่ภาพพื้นหลัง + ตัวละคร
+	for n in ["Menu", "Title", "Subtitle", "Logo", "Version", "VersionTag", "StatsButton", "StatsPanel", "FormButton", "FormPanel"]: # เหลือแค่ภาพพื้นหลัง + ตัวละคร
 		var c := get_node_or_null(NodePath(n)) as CanvasItem
 		if c:
 			c.hide()
@@ -330,3 +331,110 @@ func _add_stats_button() -> void:
 		if overlay.visible:
 			app.refresh(true))
 	add_child(t) # ปุ่มถ้วยอยู่บนสุด (กดซ้ำเพื่อปิด)
+
+
+## [0.9.5] ปุ่มคลิปบอร์ดกลม (ข้างถ้วย) → แผง "ช่วยทดสอบเกม": แบบทดสอบก่อนเล่น · หลังเล่น (เปิดเบราว์เซอร์ · Playlog.FORM_*)
+func _add_form_button() -> void:
+	var t := Button.new()
+	t.name = "FormButton"
+	t.icon = load("res://Assets/UI/Icons/icon_clipboard.png") as Texture2D
+	t.expand_icon = true
+	t.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.tooltip_text = "ช่วยทดสอบเกม"
+	t.custom_minimum_size = Vector2(60, 60)
+	t.size = Vector2(60, 60)
+	t.position = Vector2(1152 - 60 - 18 - 72, 18)
+	t.focus_mode = Control.FOCUS_NONE
+	for st in [&"normal", &"hover", &"pressed"]:
+		var rs := StyleBoxFlat.new()
+		rs.bg_color = Color(1, 0.95, 0.82) if st == &"normal" else Color(1, 0.86, 0.55)
+		rs.border_color = Color(0.45, 0.28, 0.12)
+		rs.set_border_width_all(3)
+		rs.set_corner_radius_all(30)
+		rs.set_content_margin_all(10)
+		t.add_theme_stylebox_override(st, rs)
+	var overlay := Control.new()
+	overlay.name = "FormPanel"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.hide()
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.5)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			overlay.hide())
+	overlay.add_child(dim)
+	var page := PanelContainer.new()
+	page.name = "Page"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 0.97, 0.9)
+	sb.border_color = Color(0.6, 0.42, 0.2)
+	sb.set_border_width_all(3)
+	sb.set_corner_radius_all(12)
+	sb.set_content_margin_all(18)
+	page.add_theme_stylebox_override(&"panel", sb)
+	page.custom_minimum_size = Vector2(560, 0)
+	page.position = Vector2(296, 70)
+	overlay.add_child(page)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override(&"separation", 10)
+	page.add_child(box)
+	var head := Label.new()
+	head.text = "ช่วยทดสอบเกม 🙏"
+	head.add_theme_font_size_override(&"font_size", 24)
+	head.add_theme_color_override(&"font_color", Color(0.45, 0.22, 0.05))
+	box.add_child(head)
+	var body := Label.new()
+	body.text = "บักช่างขมเป็นส่วนหนึ่งของโครงงานศึกษาการเรียนรู้ผ่านเกม หากท่านสะดวก รบกวนช่วยทำแบบทดสอบก่อนเริ่มเล่นและหลังเล่นจบ เพื่อนำผลไปพัฒนาเกมต่อไป\nสแกน QR ด้วยมือถือ หรือกดลิงก์ใต้รูปได้เลย ขอบคุณมากครับ 🙏\n(ไม่ทำแบบทดสอบก็เล่นได้ตามปกติ)"
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_theme_font_size_override(&"font_size", 17)
+	body.add_theme_color_override(&"font_color", Color(0.25, 0.16, 0.1))
+	box.add_child(body)
+	# [0.9.5] QR + ลิงก์ใต้ QR (สแกนด้วยมือถือ หรือกดลิงก์เปิดเบราว์เซอร์) · รูป QR สร้างจาก Playlog.FORM_* (Assets/UI/QR/ · เปลี่ยนลิงก์ต้องสร้าง QR ใหม่)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override(&"separation", 36)
+	box.add_child(row)
+	for f in [[&"pre", "แบบทดสอบก่อนเล่น", Playlog.FORM_PRE], [&"post", "แบบทดสอบหลังเล่น", Playlog.FORM_POST]]:
+		var col := VBoxContainer.new()
+		col.name = "Form_" + String(f[0])
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.add_theme_constant_override(&"separation", 4)
+		row.add_child(col)
+		var cap := Label.new()
+		cap.text = String(f[1])
+		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cap.add_theme_font_size_override(&"font_size", 18)
+		cap.add_theme_color_override(&"font_color", Color(0.45, 0.22, 0.05))
+		col.add_child(cap)
+		var qr := TextureRect.new()
+		qr.name = "QR"
+		qr.texture = load("res://Assets/UI/QR/form_%s.png" % String(f[0])) as Texture2D
+		qr.custom_minimum_size = Vector2(150, 150)
+		qr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		qr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		qr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		qr.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(qr)
+		var link := LinkButton.new()
+		link.name = "Link"
+		link.text = String(f[2]).trim_prefix("https://")
+		link.tooltip_text = "เปิดในเบราว์เซอร์"
+		link.underline = LinkButton.UNDERLINE_MODE_ALWAYS
+		link.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		link.add_theme_font_size_override(&"font_size", 15)
+		link.add_theme_color_override(&"font_color", Color(0.15, 0.35, 0.7))
+		link.add_theme_color_override(&"font_hover_color", Color(0.1, 0.25, 0.55))
+		link.pressed.connect(Playlog.open_form.bind(f[0]))
+		col.add_child(link)
+	var close := Button.new()
+	close.name = "Close"
+	close.text = "กลับ"
+	close.custom_minimum_size = Vector2(160, 38)
+	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	close.add_theme_font_size_override(&"font_size", 17)
+	close.pressed.connect(overlay.hide)
+	box.add_child(close)
+	t.pressed.connect(func() -> void: overlay.visible = not overlay.visible)
+	add_child(t)
