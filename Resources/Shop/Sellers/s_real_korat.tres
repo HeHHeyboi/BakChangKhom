@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_real_korat"
+display_name = "โคราชคอมพิวเตอร์ (ร้านทางการ)"
+fake = false
+discount = 0.18
+rating = "★ 4.8 · 2,315 รีวิว"
+signs = PackedStringArray("เปิดร้านมา 4 ปี", "มีที่อยู่หน้าร้านและเบอร์โทร", "รีวิวมีรูปจริงจากผู้ซื้อหลายคน")
+payment = "เก็บเงินปลายทางได้"

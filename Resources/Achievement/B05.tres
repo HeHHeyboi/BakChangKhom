@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B05"
+title = "เลิกงานตรงเวลา"
+desc = "ถึงเป้าในเดือนที่ไม่ล่วงเวลาเลย"
+category = 1
+hidden = false
+check = &"no_ot_month"
+target = 1
+skill = "ต้นทุนผันแปร"

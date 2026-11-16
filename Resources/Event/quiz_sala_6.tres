@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quiz_sala_6"
+kind = 2
+group = &"sala"
+question = "อยากเก็บรูปจากเว็บทำยังไง"
+choices = PackedStringArray("คลิกขวาที่รูปแล้วเลือกบันทึกรูป", "ถ่ายรูปจอด้วยมือถือเท่านั้น", "ทำไม่ได้")
+explain = "คลิกขวาที่รูปจะมีคำสั่งบันทึกรูป แต่รูปของคนอื่นควรขออนุญาตก่อนเอาไปใช้"

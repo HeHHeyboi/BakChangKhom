@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B08"
+title = "ช้อปเป็น"
+desc = "ซื้อของลดราคาจากร้านที่น่าเชื่อถือ"
+category = 1
+hidden = false
+check = &"stat"
+target = 1
+arg = &"real_bought"
+skill = "ดูความน่าเชื่อถือของร้าน"

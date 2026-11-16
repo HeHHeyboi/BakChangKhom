@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_real_ubon"
+display_name = "อุบลไอทีมาร์ท"
+fake = false
+discount = 0.15
+rating = "★ 4.7 · 980 รีวิว"
+signs = PackedStringArray("เปิดร้านมา 6 ปี", "ลดราคาช่วงเทศกาลเท่านั้น", "จ่ายผ่านระบบของแอปร้านค้า")
+payment = "จ่ายผ่านระบบแอป (มีประกันคืนเงิน)"

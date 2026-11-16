@@ -28,6 +28,18 @@ func _ready() -> void:
 		$Menu/Continue_Button.disabled = true
 		$Menu/Continue_Button.text = "เซฟเวอร์ชันเก่าใช้ไม่ได้ · เริ่มใหม่"
 		$Menu/Continue_Button.tooltip_text = "ระบบเวลาในเกมเปลี่ยนแล้ว เซฟจากเวอร์ชัน 0.1.x จึงโหลดไม่ได้"
+	# [0.7.0] ใบประกาศรวมทุกเซฟ (user://achievements.cfg)
+	var ach := get_node_or_null(^"/root/Achievements")
+	if ach and ach.profile_count() > 0:
+		var al := Label.new()
+		al.name = "AchievementCount"
+		al.text = "ใบประกาศที่เคยได้ (ทุกเซฟ) %d/%d" % [ach.profile_count(), ach.all().size()]
+		al.add_theme_font_size_override(&"font_size", 15)
+		al.add_theme_color_override(&"font_color", Color(1, 0.93, 0.75))
+		al.add_theme_color_override(&"font_outline_color", Color(0.2, 0.12, 0.05))
+		al.add_theme_constant_override(&"outline_size", 4)
+		al.position = Vector2(16, 612)
+		add_child(al)
 	for b in $Menu.get_children():
 		if b is Button:
 			_hover_bounce(b)

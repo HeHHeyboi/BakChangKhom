@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_fake_mega"
+display_name = "MegaPC Outlet ของแท้100%"
+fake = true
+discount = 0.5
+rating = "ยังไม่มีรีวิว"
+signs = PackedStringArray("ใช้รูปสินค้าจากเว็บอื่น", "ไม่มีข้อมูลร้านหรือเลขผู้เสียภาษี", "รับแต่โอนเข้าบัญชีชื่อคนละคนกับชื่อร้าน")
+payment = "โอนเข้าบัญชีส่วนตัวเท่านั้น"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"act_sala"
+kind = 3
+title = "คลาสคอมผู้สูงอายุที่ศาลา"
+note = "3 เทิร์น · ฿150 · ความสนิทผู้สูงอายุ"
+min_rank = 2
+speaker = "ผู้ใหญ่บ้าน"
+ask = "ผู้เฒ่าผู้แก่อยากเรียนคอมกันที่ศาลา ขมว่างไปสอนสักสามเทิร์นไหม มีค่าตอบแทนให้นิดหน่อย"
+question = "จะไปสอนไหม"
+choices = PackedStringArray("ไปสอน (3 เทิร์น · ฿150)", "วันนี้ไม่ว่าง")
+good_count = 0
+explain = "สอนคนอื่นคือการทวนความรู้ของตัวเอง"

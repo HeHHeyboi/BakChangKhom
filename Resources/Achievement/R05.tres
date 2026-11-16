@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"R05"
+title = "ใจกลาง"
+desc = "ตอบให้ทุกคนในกลุ่มเข้าใจตอนความเห็นไม่ตรงกัน 5 ครั้ง"
+category = 3
+hidden = false
+check = &"group_fair"
+target = 5
+skill = "สื่อสารกับคนหลายคน"

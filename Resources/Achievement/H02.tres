@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"H02"
+title = "ไม่เคยล่วงเวลา"
+desc = "ทั้งปีไม่ล่วงเวลาเลย"
+category = 5
+hidden = true
+check = &"no_ot_year"
+target = 1

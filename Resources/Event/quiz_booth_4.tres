@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quiz_booth_4"
+kind = 2
+group = &"booth"
+question = "น้ำหกใส่คีย์บอร์ดทำยังไงดี"
+choices = PackedStringArray("ถอดสายหรือปิดเครื่องแล้วคว่ำให้แห้งก่อนใช้", "เป่าไดร์ร้อนจัดทันที", "ใช้ต่อไปเลยเดี๋ยวก็แห้ง")
+explain = "ตัดไฟก่อนแล้วคว่ำให้น้ำไหลออกจนแห้งสนิท ความร้อนจัดทำให้พลาสติกเสียรูป"

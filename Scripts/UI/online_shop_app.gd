@@ -50,7 +50,8 @@ func refresh(force := false) -> void:
 			var w: PackedStringArray = dl.waiting_for(it.id)
 			if not w.is_empty():
 				waiting[it.id] = w
-	var h := [cart.hash(), GameState.money, GameState.used_slots(), GameState.pending_orders.size(), GameState.inventory.size(), waiting.hash(), _msg].hash()
+	var deals: Array = dl.deals_view() if dl and dl.has_method(&"deals_view") else []
+	var h := [cart.hash(), GameState.money, GameState.used_slots(), GameState.pending_orders.size(), GameState.inventory.size(), waiting.hash(), _msg, str(deals).hash()].hash()
 	if h == _last_hash and not force:
 		return
 	_last_hash = h
@@ -59,6 +60,11 @@ func refresh(force := false) -> void:
 	for n in %List.get_children():
 		%List.remove_child(n)
 		n.queue_free()
+	# [0.7.0 ขั้น I] ร้านอื่นที่ลดราคาวันนี้ (บางร้านปลอม) ขึ้นบนสุด
+	if not deals.is_empty():
+		%List.add_child(_head("ร้านอื่นลดราคาวันนี้ — ดูข้อมูลร้านก่อนซื้อ", true))
+		for i in deals.size():
+			%List.add_child(_deal_row(i, deals[i]))
 	# ของที่เครื่องรออยู่ขึ้นก่อน แล้วอะไหล่ · ของสิ้นเปลือง (ตามลำดับของ catalog)
 	var kind := -1
 	var first := items.filter(func(it: ItemDef) -> bool: return waiting.has(it.id))
@@ -162,6 +168,73 @@ func _row(it: ItemDef, wait: PackedStringArray) -> PanelContainer:
 	plus.pressed.connect(_add.bind(it, 1))
 	hb.add_child(plus)
 	return p
+
+
+## [0.7.0 ขั้น I] การ์ดร้านที่ลดราคา: ชื่อร้าน · ของ · ราคา · คะแนน · ข้อมูลร้าน · วิธีจ่าย · ปุ่มซื้อ/รายงาน
+func _deal_row(i: int, d: Dictionary) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.name = "Deal_%d" % i
+	if row_style:
+		var sb := row_style.duplicate() as StyleBox
+		if sb is StyleBoxFlat:
+			(sb as StyleBoxFlat).bg_color = Color(1, 0.94, 0.86) if not bool(d.blacklisted) else Color(0.9, 0.86, 0.84)
+		p.add_theme_stylebox_override(&"panel", sb)
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override(&"separation", 8)
+	p.add_child(hb)
+	var ic := TextureRect.new()
+	ic.texture = d.icon
+	ic.custom_minimum_size = Vector2(40, 40)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hb.add_child(ic)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override(&"separation", 0)
+	hb.add_child(info)
+	var t := Label.new()
+	t.text = "%s%s · %s ฿%d (ปกติ ฿%d)" % ["[บัญชีดำ] " if bool(d.blacklisted) else "", d.name, d.item, int(d.price), int(d.normal)]
+	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	t.add_theme_font_size_override(&"font_size", 14)
+	t.add_theme_color_override(&"font_color", Color(0.15, 0.12, 0.1))
+	info.add_child(t)
+	var sub := Label.new()
+	var lines := PackedStringArray([String(d.rating), "จ่าย: " + String(d.payment)])
+	for x in d.signs:
+		lines.append("• " + String(x))
+	if bool(d.blacklisted):
+		lines.append("บัญชีดำของร้านขม — เคยโกง/ถูกรายงานแล้ว")
+	sub.text = "\n".join(lines)
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.add_theme_font_size_override(&"font_size", 12)
+	sub.add_theme_color_override(&"font_color", font)
+	info.add_child(sub)
+	var bx := VBoxContainer.new()
+	hb.add_child(bx)
+	var done := String(d.done)
+	var buy := _button("ซื้อ ฿%d" % int(d.price) if done == "" else {"bought": "สั่งแล้ว", "scammed": "โดนโกง", "reported": "รายงานแล้ว"}.get(done, "-"), not bool(d.can_buy), true)
+	buy.name = "Buy"
+	buy.custom_minimum_size = Vector2(96, 28)
+	buy.pressed.connect(_on_deal.bind(i, true))
+	bx.add_child(buy)
+	var rep := _button("รายงานร้าน", done != "" or bool(d.blacklisted), false)
+	rep.name = "Report"
+	rep.custom_minimum_size = Vector2(96, 28)
+	rep.pressed.connect(_on_deal.bind(i, false))
+	bx.add_child(rep)
+	return p
+
+
+func _on_deal(i: int, buy: bool) -> void:
+	var dl := get_node_or_null(^"/root/DayLoop")
+	if dl == null:
+		return
+	var r: Dictionary = dl.deal_buy(i) if buy else dl.deal_report(i)
+	_msg = String(r.get("msg", ""))
+	var au := get_node_or_null(^"/root/Audio")
+	if au and bool(r.get("ok", false)):
+		au.sfx(&"coin" if buy and not bool(r.get("fake", false)) else &"click")
+	refresh(true)
 
 
 func _button(t: String, off: bool, primary: bool) -> Button:

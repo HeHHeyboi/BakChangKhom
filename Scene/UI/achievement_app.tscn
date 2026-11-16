@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/achievement_app.gd" id="1_app"]
+
+[sub_resource type="StyleBoxFlat" id="SB_row"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(1, 0.98, 0.92, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.65, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="AchievementApp" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+script = ExtResource("1_app")
+row_style = SubResource("SB_row")
+
+[node name="Head" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.2, 0.08, 1)
+theme_override_font_sizes/font_size = 15
+text = "ใบประกาศ"
+autowrap_mode = 3
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Note" type="Label" parent="."]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.5, 0.44, 1)
+theme_override_font_sizes/font_size = 12
+text = "ใบประกาศให้กับการทำงานแบบช่างที่ดี · วินิจฉัยก่อนลงมือ ปลอดภัย ซื่อตรง วางแผนเงิน ใส่ใจคน"
+autowrap_mode = 3

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cal_school"
+kind = 0
+title = "โรงเรียนจ้างซ่อมห้องคอม"
+note = "งานเหมา 3 เครื่อง ฿1,200 (ยศประจำหมู่บ้านขึ้นไป)"
+month = 9
+day = 3
+min_rank = 2
+speaker = "ผอ."
+ask = "ห้องคอมโรงเรียนมีเครื่องเสียสามเครื่อง ช่วยซ่อมให้ภายในวันนี้ได้ไหม ผมเหมาให้หนึ่งพันสองร้อยบาท ค่าอะไหล่โรงเรียนจ่ายเอง"
+question = "จะรับงานเหมาไหม"
+choices = PackedStringArray("รับงาน (วันนี้ไม่รับลูกค้าหน้าร้าน)", "วันนี้ขอเปิดร้านตามปกติ")
+good_count = 0
+explain = "งานเหมาต้องวางแผนเวลาให้ดี ซ่อมเครื่องที่ใช้เวลาน้อยก่อนจะได้ครบหลายเครื่อง"

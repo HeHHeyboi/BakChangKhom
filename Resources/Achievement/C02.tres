@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"C02"
+title = "ที่ปรึกษาประจำหมู่บ้าน"
+desc = "ตอบคำขอปรึกษาหรือขอให้ช่วยได้ดีครบ 10 เรื่อง"
+category = 2
+hidden = false
+check = &"req_good"
+target = 10
+skill = "ความรู้ไอทีในชีวิตประจำวัน"

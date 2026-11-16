@@ -128,7 +128,8 @@ func _ready() -> void:
 	var bill2 := GameState.pay_month_bill(4, 0)
 	_check(bill2.late_fee == ceili(d0 * 0.1) and bill2.prev_debt == d0, "เดือนต่อไปค่าปรับ 10%% ของยอดค้าง = ฿%d" % bill2.late_fee)
 	GameState.help_mode = true
-	_check(GameState.target_of(4) == roundi(750 * 0.7) and GameState.pay_month_bill(4, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿750 → ฿%d) · ไม่มีค่าปรับ" % roundi(750 * 0.7))
+	var t4 := GameState.economy.target_for(4) # [0.7.0] อ่านเป้าจริง (เป้าปรับตามบอททุกเวอร์ชัน)
+	_check(GameState.target_of(4) == roundi(t4 * 0.7) and GameState.pay_month_bill(4, 0).late_fee == 0, "โหมดช่วย: เป้า ×0.7 (฿%d → ฿%d) · ไม่มีค่าปรับ" % [t4, roundi(t4 * 0.7)])
 	GameState.help_mode = false
 	GameState.debt = 0
 	ts.set_shift(13)

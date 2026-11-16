@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"D02"
+title = "บูธงานบุญ"
+desc = "ออกบูธตรวจเครื่องฟรีที่งานบุญบั้งไฟ"
+category = 4
+hidden = false
+check = &"stat"
+target = 1
+arg = &"booth"
+reward_text = "ธงงานบุญในร้าน"
+skill = "บริการชุมชน"

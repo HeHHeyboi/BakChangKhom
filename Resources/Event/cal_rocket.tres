@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cal_rocket"
+kind = 0
+title = "บุญบั้งไฟ"
+note = "เลือกได้ · ออกบูธตรวจเครื่องฟรี หรือเปิดร้านตามปกติ"
+month = 6
+day = 3
+speaker = "ผู้ใหญ่บ้าน"
+ask = "งานบุญปีนี้คนมาเยอะ ขมไปตั้งบูธตรวจเครื่องฟรีให้ชาวบ้านไหม ไม่ได้ค่าแรงนะ แต่คนจะรู้จักร้านมากขึ้น"
+question = "วันนี้จะทำอะไร"
+choices = PackedStringArray("ไปออกบูธตรวจเครื่องฟรี (ถึง 15:30)", "เปิดร้านตามปกติ")
+good_count = 0
+explain = "บริการชุมชนไม่ได้เงินทันที แต่คนรู้จักและไว้ใจร้านมากขึ้น"

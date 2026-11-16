@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B02"
+title = "ครบปี"
+desc = "ถึงเป้ากำไรอย่างน้อย 10 จาก 12 เดือน"
+category = 1
+hidden = false
+check = &"months_hit"
+target = 10
+reward_text = "ป้ายร้านสีทอง"
+skill = "วางแผนระยะยาว"

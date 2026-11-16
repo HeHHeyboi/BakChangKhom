@@ -259,6 +259,10 @@ func _report_repair() -> void:
 		level = order.level
 		if order.part_id != String(id):
 			push_warning("%s: งานลูกค้า %s เป็น %s แต่มินิเกมนี้คือ %s" % [name, order.id, order.part_id, id])
+	if self_bonus() > 0 and not gave_up: # [0.7.0] ใบประกาศ "ไม่ง้อคำใบ้"
+		var ach := get_node_or_null(^"/root/Achievements")
+		if ach:
+			ach.bump("no_hint")
 	gs.record_repair(id, mini(final_score() + self_bonus(), 100) if not gave_up else final_score(), repair_damaged(), fee, level, gave_up)
 
 

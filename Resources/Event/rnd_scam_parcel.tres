@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_scam_parcel"
+kind = 1
+group = &"scam"
+title = "โทรศัพท์จากคนแปลกหน้า"
+note = "ระวังมิจฉาชีพ"
+months = PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+weight = 0.8
+cooldown_days = 8
+ask = "สายเข้าบอกว่าพัสดุของร้านติดด่านศุลกากร ต้องโอนค่าปรับวันนี้ไม่งั้นโดนดำเนินคดี"
+question = "ขมจะทำยังไง"
+choices = PackedStringArray("วางสายแล้วเช็กเลขพัสดุในเว็บขนส่งเอง", "บอกว่าจะไปติดต่อที่ไปรษณีย์ด้วยตัวเอง", "โอนค่าปรับให้รีบจบเรื่อง")
+good_count = 2
+explain = "มิจฉาชีพชอบเร่งให้กลัวแล้วรีบโอน หน่วยงานจริงไม่ให้โอนเข้าบัญชีส่วนตัว"
+explain_bad = "มิจฉาชีพชอบเร่งให้กลัวแล้วรีบโอน หน่วยงานจริงไม่ให้โอนเข้าบัญชีส่วนตัว (เสียเงินไป ฿300)"

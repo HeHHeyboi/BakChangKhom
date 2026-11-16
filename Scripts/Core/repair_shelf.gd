@@ -58,6 +58,7 @@ class Order extends RefCounted:
 			"postponed": postponed, "sat_adjust": sat_adjust,
 			"key": key, "replace_part": String(replace_part),
 			"inspected": inspected, "partial": partial,
+			"contract": case.has_meta("contract"), # [0.7.0] งานเหมาโรงเรียน
 		}
 
 	static func from_dict(d: Dictionary) -> Order:
@@ -78,6 +79,8 @@ class Order extends RefCounted:
 		o.replace_part = StringName(d.get("replace_part", ""))
 		o.inspected = bool(d.get("inspected", false))
 		o.partial = d.get("partial", { }) if d.get("partial") is Dictionary else { }
+		if bool(d.get("contract", false)):
+			c.set_meta("contract", true)
 		return o
 
 
@@ -173,6 +176,8 @@ func pickup(o: Order, today: int) -> Dictionary:
 	o.state = State.PICKED
 	o.closed_on = today
 	_close(o)
+	if late == 0: # [0.7.0] ใบประกาศ "นัดแล้วมา"
+		GameState.ach_stats["on_time"] = int(GameState.ach_stats.get("on_time", 0)) + 1
 	return { "order": o, "late": late, "mult": mult, "sat_delta": sat, "on_time": late == 0 }
 
 

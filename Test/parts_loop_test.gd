@@ -182,6 +182,7 @@ func _ready() -> void:
 	var came := 0
 	for k in 200:
 		ts.shift = 2 + (k % 3)
+		GameState.run_seed = 1000 + k # [0.7.0] seed รายวัน — สุ่มคนละเกม
 		DayLoop._plan_vendor(ts)
 		if not DayLoop.vendor.is_empty():
 			came += 1

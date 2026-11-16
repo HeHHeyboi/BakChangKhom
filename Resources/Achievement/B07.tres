@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B07"
+title = "นักช้อปตาไว"
+desc = "รายงานร้านออนไลน์ปลอมได้ 3 ครั้ง"
+category = 1
+hidden = false
+check = &"stat"
+target = 3
+arg = &"fake_reported"
+skill = "ซื้อของออนไลน์อย่างปลอดภัย"

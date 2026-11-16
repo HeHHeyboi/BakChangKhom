@@ -201,7 +201,9 @@ var _board_dirty := true
 var _skip_overlay: ColorRect
 var _skip_clock: Label
 var _skip_caption: Label
-var _rng := RandomNumberGenerator.new()
+## [0.7.0 ขั้น A] ตัวสุ่มรายวันแยกเรื่อง — seed = (GameState.run_seed · วันที่ · ชื่อเรื่อง) → โหลดเซฟต้นวันได้ผลเดิม · การกดเรื่องหนึ่งไม่เลื่อนผลอีกเรื่อง
+var _rngs: Dictionary = { }
+var _rng_shift := -1
 
 var _panel: PanelContainer
 var _title: Label
@@ -218,7 +220,6 @@ const HIDEABLE := [Card.DOOR, Card.JOB_FORCED, Card.RESULT, Card.SHIFT_END]
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_rng.randomize()
 	_build_ui()
 	_validate()
 	_connect.call_deferred()
@@ -410,19 +411,19 @@ func _pick_by_npc(cases: Array[CustomerCase], waiting := { }) -> CustomerCase:
 		total += w
 	var pick: Array = groups[keys[0]]
 	var who: String = keys[0]
-	var r := _rng.randf() * total
+	var r := rng(&"visitors").randf() * total
 	for i in keys.size():
 		r -= weights[i]
 		if r <= 0.0:
 			pick = groups[keys[i]]
 			who = keys[i]
 			break
-	var c: CustomerCase = pick[_rng.randi_range(0, pick.size() - 1)]
+	var c: CustomerCase = pick[rng(&"visitors").randi_range(0, pick.size() - 1)]
 	if c.is_generic():
 		var n := NpcBook.of_name(who)
 		var dev := ""
 		if n and not n.devices.is_empty():
-			dev = n.devices[_rng.randi_range(0, n.devices.size() - 1)]
+			dev = n.devices[rng(&"visitors").randi_range(0, n.devices.size() - 1)]
 		c = c.instance_for(n, dev)
 		if c.use_scenario:
 			roll_scenario(c)
@@ -438,7 +439,7 @@ func roll_scenario(c: CustomerCase) -> Dictionary:
 	var ts := _ts()
 	var part := c.part()
 	var recent: Array = scenario_recent.get(part, [])
-	var r := ScenarioBook.roll(part, _rng, recent, GameState.rank(), ts.month() if ts else 1)
+	var r := ScenarioBook.roll(part, rng(&"scenario"), recent, GameState.rank(), ts.month() if ts else 1)
 	if r.is_empty():
 		return r
 	c.apply_scenario(r, _econ())
@@ -569,7 +570,7 @@ func add_visitors(n: int, phone := false, waited := 0, at_minute := -1) -> int:
 				total += x
 			if total <= 0.0:
 				break
-			var r := _rng.randf() * total
+			var r := rng(&"visitors").randf() * total
 			var lv := 1
 			for i in 5:
 				r -= w[i]
@@ -587,7 +588,7 @@ func add_visitors(n: int, phone := false, waited := 0, at_minute := -1) -> int:
 		door_queue.append(door_entry(c, phone, false, false, clampi(waited, 0, cap_wait)))
 		added += 1
 	# [0.6.0 ขั้น G] คำขอ (ปรึกษา/ช่วย) = คนที่เดินมาเพิ่ม ไม่แทนลูกค้างานซ่อม · วันละไม่เกิน request_daily_max · โทรเข้าไม่มีคำขอ
-	if not phone and added > 0 and requests_spawned_today < e.request_daily_max and door_queue.size() < e.board_max and _rng.randf() < e.request_share:
+	if not phone and added > 0 and requests_spawned_today < e.request_daily_max and door_queue.size() < e.board_max and rng(&"request").randf() < request_share_today():
 		var rc := _pick_request()
 		if rc:
 			requests_spawned_today += 1
@@ -601,11 +602,36 @@ func add_visitors(n: int, phone := false, waited := 0, at_minute := -1) -> int:
 ## [0.6.0] นาทีที่ใช้เช็กช่วงเวลาของคนตอนสุ่ม · -1 = นาฬิกาตอนนี้ · -2 = ไม่เช็ก (โทรเข้า)
 var _visit_minute := -1
 
+# ---------------------------------------------------------------- ตัวสุ่มรายวัน (0.7.0 ขั้น A)
+
+
+## ตัวสุ่มของเรื่อง purpose ในวันนี้ (visitors · scenario · request · debate · vendor · helper · event · …)
+func rng(purpose: StringName) -> RandomNumberGenerator:
+	var ts := _ts()
+	var sh := ts.shift if ts else 0
+	if sh != _rng_shift:
+		_rngs.clear()
+		_rng_shift = sh
+	if not _rngs.has(purpose):
+		var r := RandomNumberGenerator.new()
+		r.seed = hash([GameState.run_seed, sh, String(purpose)])
+		_rngs[purpose] = r
+	return _rngs[purpose]
+
+
+## เริ่มตัวสุ่มของวันใหม่ (ต้นวัน · หลังโหลดเซฟ · เทสต์)
+func reseed_day() -> void:
+	_rngs.clear()
+	_rng_shift = -1
+
+
 # ---------------------------------------------------------------- สัญญาณเวลา
 
 
 func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	var ts := _ts()
+	reseed_day()
+	_close_contract() # [0.7.0] งานเหมาเมื่อวาน
 	_result_pending = false
 	_close_requested = false
 	_ot_this_shift = false
@@ -645,9 +671,13 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 	_deliver_parcels(ts)
 	_open_shelf_day(ts)
 	assign_parts()
+	_plan_events(ts) # [0.7.0] ก่อนรถขายของ/รอบลูกค้า
+	_plan_deals(ts) # [0.7.0 ขั้น I] ร้านออนไลน์ลดราคา/ร้านปลอม
 	_plan_vendor(ts)
 	_door_tick = ts.current_minute
 	_plan_visitors(ts)
+	if quiet: # [0.7.0] บอท: การ์ดตอนเปิดร้าน (บูธ · งานเหมา · แข่ง · ยายไม่สบาย) ตัดสินทันที
+		_tick_events(ts)
 	_board_dirty = true
 	autosave.call_deferred()
 
@@ -655,7 +685,7 @@ func _on_shift_started(_month: int, week: int, shift_in_week: int) -> void:
 ## [0.2.5] ลูกค้าวันนี้ = ฐานของเดือน + โบนัสชื่อเสียง → แบ่งเป็นรอบ (08:30 · 11:00 · 14:00) · รอบแรกเข้าทันที
 func _plan_visitors(ts: TimeSystem) -> void:
 	var e := _econ()
-	visitors_today = e.visitors_for(ts.month(), GameState.reputation)
+	visitors_today = maxi(e.min_visitors, e.visitors_for(ts.month(), GameState.reputation) + event_visitor_mod()) # [0.7.0] อีเวนต์
 	# [0.5.0 ขั้น H] ยศประจำหมู่บ้านขึ้นไป: ผู้ใหญ่บ้านประกาศเสียงตามสายวันแรกของเดือน
 	var announced := GameState.rank() >= e.announce_rank and ts.shift_in_week() == 1
 	if announced:
@@ -733,6 +763,7 @@ func _on_clock_changed(_minute: int) -> void:
 	_tick_door(_ts())
 	_check_waves(_ts())
 	_check_vendor(_ts())
+	_tick_events(_ts()) # [0.7.0]
 
 
 ## [0.3.0] "ยืนรอหน้าประตู · วันนี้รับได้อีก 2 คน" / "วันนี้คิวเต็มแล้ว นัดวันถัดไปได้"
@@ -975,7 +1006,7 @@ func _add_group_second(c: CustomerCase, first: RepairShelf.Order, promise: int) 
 
 ## ความเห็นไม่ตรงกัน: เลือกคำตอบ → ความสนิทแต่ละคน · then = ทำต่อหลังตัดสิน (บทลูกค้า)
 func _start_debate(c: CustomerCase, then: Callable = Callable()) -> void:
-	var d: Dictionary = GROUP_DEBATES[_rng.randi_range(0, GROUP_DEBATES.size() - 1)]
+	var d: Dictionary = GROUP_DEBATES[rng(&"debate").randi_range(0, GROUP_DEBATES.size() - 1)]
 	var opts := [["fair", d.fair], ["a", d.side_a], ["b", d.side_b]]
 	opts.shuffle()
 	debate_state = { "case": c, "debate": d, "choices": opts, "then": then, "answered": false }
@@ -1043,10 +1074,752 @@ func debate_finish() -> void:
 
 
 func _on_card_picked(t: String) -> void:
-	if not debate_state.is_empty():
+	if not event_state.is_empty():
+		_request_card.show_answer(event_answer(t))
+	elif not debate_state.is_empty():
 		_request_card.show_answer(debate_answer(t))
 	else:
 		_request_card.show_answer(request_answer(t))
+
+
+# ---------------------------------------------------------------- [0.7.0 ขั้น B–H] อีเวนต์ (PLAN_0_7_0 ข้อ 2–3)
+## ข้อมูล Resources/Event/*.tres (ShopEvent) · เลือกด้วย EventDirector ตอนเปิดร้าน (ก่อนรถขายของ/รอบลูกค้า)
+## ผลของแต่ละอีเวนต์อยู่ในส่วนนี้ตาม id · การ์ดตัวเลือกใช้ RequestCard (ชั้น 95) · บอท (quiet) เลือกเองผ่าน bot_event_pick
+
+## อีเวนต์ของวันนี้ (ปฏิทิน + สุ่ม + กิจกรรม)
+var today_events: Array[ShopEvent] = []
+## การ์ดที่รอขึ้น [{ id, minute }] เรียงตามเวลา
+var event_cards: Array[Dictionary] = []
+## การ์ดที่เปิดอยู่ { ev, quiz: Array[ShopEvent], step, good, answered, choices, decided }
+var event_state: Dictionary = { }
+## ไฟดับวันนี้ (นาทีเริ่ม · จบ) · x < 0 = ไม่มี
+var outage := Vector2i(-1, -1)
+var _outage_told := 0
+## วันนี้ออกบูธ/รับงานเหมา/ไปแข่ง (ไม่มีลูกค้าหน้าร้านช่วงนั้น)
+var booth_today := false
+var contract_today := false
+## วันนี้มีร้านออนไลน์ลดแรง (ร้านปลอมขึ้นแน่ · ขั้น I)
+var fake_sale_today := false
+## บอท: Callable(ev: ShopEvent, choices: Array) -> String · ไม่ตั้ง = ตัวเลือกแรก (ตัวเลือกที่ดี/ทำกิจกรรม)
+var bot_event_pick := Callable()
+## ผลแข่งล่าสุด { place, seconds, mistakes } (เทสต์/การ์ด)
+var last_race: Dictionary = { }
+var _race_start := 0
+const HEAT_SCENARIOS := { &"mb_m1_paste": 2.0, &"mb_m2_clip": 2.0, &"gpu_g1_dust": 2.0, &"gpu_g5_fan": 2.0 }
+
+
+func event_has(id: StringName) -> bool:
+	for e in today_events:
+		if e.id == id:
+			return true
+	return false
+
+
+func _event_by_prefix(p: String) -> ShopEvent:
+	for e in today_events:
+		if String(e.id).begins_with(p):
+			return e
+	return null
+
+
+## เปิดร้าน: เลือกอีเวนต์ของวัน + เตรียมผล (เรียกก่อน _plan_vendor/_plan_visitors)
+func _plan_events(ts: TimeSystem) -> void:
+	today_events.clear()
+	event_cards.clear()
+	event_state = { }
+	outage = Vector2i(-1, -1)
+	_outage_told = 0
+	booth_today = false
+	contract_today = false
+	fake_sale_today = false
+	ScenarioBook.bias = { }
+	ScenarioBook.flood_open = bool(GameState.story_flags.get("after_storm", false))
+	if ts == null:
+		return
+	var m := ts.month()
+	var d := ts.shift_in_week()
+	var st: Dictionary = GameState.event_state
+	var has_day := false
+	for e in EventDirector.calendar(m, d):
+		if e.min_rank > GameState.rank():
+			if visitor_toast and not quiet and e.id == &"cal_school":
+				visitor_toast.show_message(e.title, "โรงเรียนจ้างร้านในอำเภอแทน (ต้องยศช่างประจำหมู่บ้าน)")
+			continue
+		today_events.append(e)
+		if e.day > 0:
+			has_day = true
+	var r := EventDirector.roll_random(m, d, ts.shift, rng(&"event"), st, GameState.rank(), _event_ok, has_day)
+	if r:
+		today_events.append(r)
+	var sala := EventDirector.by_id(&"act_sala")
+	if sala and r == null and not has_day and _sala_offer_ok(ts):
+		today_events.append(sala)
+		st["sala_offered"] = m
+	for e in today_events:
+		if e.kind != ShopEvent.Kind.CALENDAR or e.day > 0:
+			EventDirector.mark(st, e, ts.shift)
+		_event_setup(e, ts)
+		_log_event(e, "", ts)
+	event_cards.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.minute) < int(b.minute))
+
+
+## เงื่อนไขในเกมของอีเวนต์สุ่ม
+func _event_ok(e: ShopEvent) -> bool:
+	match e.id:
+		&"rnd_sweets":
+			return _sweets_npc() != &""
+		&"rnd_rats":
+			return not GameState.upgrades.has(&"storage_drawer") and _cable_in_stock() != &""
+		&"rnd_kids":
+			return NpcBook.all().any(func(n: CustomerNPC) -> bool: return n.is_student() and int(GameState.npc_affinity.get(n.id, 0)) > 0)
+		&"rnd_fake_sale":
+			return true
+	return true
+
+
+func _sala_offer_ok(ts: TimeSystem) -> bool:
+	return ts.month() >= 7 and ts.shift_in_week() >= 2 and GameState.rank() >= 2 and int(GameState.event_state.get("sala_offered", 0)) != ts.month()
+
+
+## ตั้งค่าผลของอีเวนต์ตอนเปิดร้าน
+func _event_setup(e: ShopEvent, ts: TimeSystem) -> void:
+	var er := rng(&"event")
+	match e.id:
+		&"cal_summer":
+			ScenarioBook.bias = HEAT_SCENARIOS.duplicate()
+		&"cal_rocket", &"cal_school", &"cal_race", &"act_sala":
+			event_cards.append({ "id": e.id, "minute": TimeSystem.OPEN })
+		&"rnd_grandma":
+			event_cards.append({ "id": e.id, "minute": TimeSystem.OPEN })
+		&"cal_storm":
+			event_cards.append({ "id": e.id, "minute": _econ().storm_card_minute })
+		&"rnd_power_dip":
+			var s := TimeSystem.WORK_START + 30 + er.randi_range(0, 11) * TimeSystem.SLOT_MIN # 09:30–15:00
+			if s >= 12 * 60 and s < 13 * 60:
+				s = 13 * 60
+			outage = Vector2i(s, s + 60)
+		&"rnd_kids":
+			event_cards.append({ "id": e.id, "minute": 16 * 60 })
+		&"rnd_sweets":
+			var id := _sweets_npc()
+			var n := NpcBook.by_id(id)
+			if n:
+				var dd := GameState.add_affinity(id, _econ().sweets_affinity, &"sweets")
+				GameState.event_state["sweets"] = int(GameState.event_state.get("sweets", 0)) + 1
+				if visitor_toast and not quiet:
+					visitor_toast.show_message("%sเอาขนมมาฝาก" % n.display_name, "\"ขอบใจที่ซ่อมให้ดีนะ\" · ♥ +%d" % dd)
+		&"rnd_rats":
+			var cid := _cable_in_stock()
+			if cid != &"" and GameState.take_item(cid):
+				GameState.event_state["rats"] = int(GameState.event_state.get("rats", 0)) + 1
+				if visitor_toast and not quiet:
+					var it := part_item(cid)
+					visitor_toast.show_message("หนูกัดสายในคลัง", "%s เสีย 1 ชิ้น · ตู้ลิ้นชักกันหนูได้" % (it.display_name if it else String(cid)))
+		&"rnd_fake_sale":
+			fake_sale_today = true
+		_:
+			if String(e.id).begins_with("rnd_scam_"):
+				event_cards.append({ "id": e.id, "minute": 10 * 60 + er.randi_range(0, 9) * TimeSystem.SLOT_MIN })
+	if not quiet and visitor_toast and e.kind != ShopEvent.Kind.ACTIVITY and not String(e.id).begins_with("rnd_scam_") and e.id not in [&"rnd_sweets", &"rnd_rats"]:
+		var note := e.note
+		if e.id == &"rnd_power_dip":
+			note = "%s–%s · %s" % [TimeSystem.clock_text(outage.x), TimeSystem.clock_text(outage.y), e.note]
+		if e.kind == ShopEvent.Kind.CALENDAR and e.day == 0 and ts.shift_in_week() != 1:
+			return # อีเวนต์ทั้งเดือนบอกแค่วันแรก
+		visitor_toast.show_message(e.title, note)
+
+
+func _sweets_npc() -> StringName:
+	var best := &""
+	for n in NpcBook.all():
+		if n.has_affinity and int(GameState.npc_affinity.get(n.id, 0)) >= 40 and GameState.npc_history.has(n.id):
+			best = n.id
+			break
+	return best
+
+
+func _cable_in_stock() -> StringName:
+	for id in [&"cable_hdmi", &"cable_sata"]:
+		if GameState.count_item(id) > 0:
+			return id
+	return &""
+
+
+## ลูกค้าต่อวันเพิ่ม/ลดจากอีเวนต์
+func event_visitor_mod() -> int:
+	var n := 0
+	var e := _econ()
+	for ev in today_events:
+		match ev.id:
+			&"cal_songkran":
+				n += e.songkran_extra_visitors
+			&"cal_school_open":
+				n += 1
+			&"rnd_rain":
+				n -= 1
+			&"cal_rival":
+				if GameState.reputation < e.rival_rep_threshold:
+					n -= 1
+	return n
+
+
+## โอกาสคำขอวันนี้ (สงกรานต์ ×2)
+func request_share_today() -> float:
+	return _econ().request_share * (2.0 if event_has(&"cal_songkran") else 1.0)
+
+
+## ไฟดับอยู่ตอนนี้ไหม
+func outage_now() -> bool:
+	var ts := _ts()
+	return ts != null and outage.x >= 0 and ts.current_minute >= outage.x and ts.current_minute < outage.y
+
+
+func _tick_events(ts: TimeSystem) -> void:
+	if ts == null:
+		return
+	if outage.x >= 0 and visitor_toast and not quiet:
+		if _outage_told == 0 and ts.current_minute >= outage.x and ts.current_minute < outage.y:
+			_outage_told = 1
+			visitor_toast.show_message("ไฟดับ!", "ซ่อมเครื่องไม่ได้ถึง %s · คุยกับลูกค้า/รับเครื่องได้" % TimeSystem.clock_text(outage.y))
+		elif _outage_told == 1 and ts.current_minute >= outage.y:
+			_outage_told = 2
+			visitor_toast.show_message("ไฟมาแล้ว", "ซ่อมต่อได้")
+	if quiet:
+		while not event_cards.is_empty() and int(event_cards[0].minute) <= ts.current_minute and event_state.is_empty():
+			var c: Dictionary = event_cards.pop_front()
+			_event_auto(EventDirector.by_id(c.id))
+
+
+## การ์ดอีเวนต์ที่ถึงเวลาแล้ว (เรียกจาก _process หลังเรื่องส่วนตัว)
+func _maybe_event(want: Card) -> bool:
+	if event_cards.is_empty() or not event_state.is_empty() or quiet or _working or _result_pending or not _in_shop() or Global.in_minigame or DialogScene.visible:
+		return false
+	if want not in [Card.DOOR, Card.NONE, Card.JOB_FORCED]:
+		return false
+	var ts := _ts()
+	if ts == null or int(event_cards[0].minute) > ts.current_minute or ts.current_minute >= TimeSystem.CLOSE:
+		return false
+	var c: Dictionary = event_cards.pop_front()
+	return event_open(EventDirector.by_id(c.id))
+
+
+## เปิดการ์ดอีเวนต์ (เทสต์เรียกตรงได้) · คืน false = ไม่มีการ์ด
+func event_open(e: ShopEvent) -> bool:
+	if e == null:
+		return false
+	var quiz: Array[ShopEvent] = []
+	match e.id:
+		&"rnd_kids":
+			var pool := EventDirector.quiz(&"kids")
+			if not pool.is_empty():
+				quiz.append(pool[rng(&"event").randi_range(0, pool.size() - 1)])
+	var choices: Array = Array(e.choices)
+	if e.good_count > 0:
+		choices.shuffle()
+	event_state = { "ev": e, "quiz": quiz, "step": 0 if not e.choices.is_empty() else 1, "good": 0, "answered": false, "choices": choices, "decided": "" }
+	if quiet:
+		return true
+	_working = true
+	_hide()
+	if not is_instance_valid(_request_card):
+		_request_card = RequestCard.new()
+		add_child(_request_card)
+		_request_card.picked.connect(_on_card_picked)
+		_request_card.done.connect(_on_request_card_done)
+	_request_card.show()
+	_request_card.show_question(event_view())
+	return true
+
+
+func event_view() -> Dictionary:
+	if event_state.is_empty():
+		return { }
+	var e: ShopEvent = event_state.ev
+	var step := int(event_state.step)
+	var quiz: Array = event_state.quiz
+	var who := e.speaker if e.speaker != "" else "ปิ๊บ"
+	var portrait: Texture2D = Global.getCharacterTexture(who) if Global.hasCharacter(who) else null
+	if String(e.id).begins_with("rnd_scam_"):
+		who = "สายจากเบอร์แปลก"
+		portrait = null
+	var steps := quiz.size() + (0 if e.choices.is_empty() else 1)
+	if step == 0:
+		return { "kind": "อีเวนต์", "title": e.title, "who": who, "ask": e.ask, "portrait": portrait, "question": e.question, "choices": event_state.choices, "step": 1, "steps": steps }
+	var q: ShopEvent = quiz[step - 1]
+	var ch: Array = Array(q.choices)
+	ch.shuffle()
+	event_state["choices"] = ch
+	var ask := ""
+	match e.group if e.group != &"" else e.id:
+		&"rnd_kids":
+			ask = "เด็ก ๆ ยืนดูขมซ่อมแล้วถามขึ้นมา"
+		&"cal_rocket":
+			ask = "ชาวบ้านต่อคิวมาถามที่บูธ"
+		&"act_sala":
+			ask = "ผู้เฒ่าผู้แก่ที่ศาลาถาม"
+	return { "kind": e.title, "title": q.question, "who": who, "ask": ask, "portrait": portrait, "question": q.question, "choices": ch, "step": step if e.choices.is_empty() else step + 1, "steps": steps }
+
+
+## ตอบการ์ด → { correct, answer, explain, more, text }
+func event_answer(text: String) -> Dictionary:
+	if event_state.is_empty() or bool(event_state.answered):
+		return { }
+	event_state["answered"] = true
+	var e: ShopEvent = event_state.ev
+	var step := int(event_state.step)
+	if step == 0:
+		event_state["decided"] = text
+		var res := _event_decide(e, text)
+		res["more"] = not (event_state.quiz as Array).is_empty()
+		return res
+	var q: ShopEvent = (event_state.quiz as Array)[step - 1]
+	var good := q.is_good(text)
+	if good:
+		event_state["good"] = int(event_state.good) + 1
+	return { "correct": good, "answer": q.choices[0], "explain": q.explain, "more": step < (event_state.quiz as Array).size() }
+
+
+## ตัวเลือกหลักของอีเวนต์ → ผล + ข้อความ (และเตรียมคำถามต่อ)
+func _event_decide(e: ShopEvent, text: String) -> Dictionary:
+	var i := Array(e.choices).find(text)
+	var go := i == 0
+	var ts := _ts()
+	var econ := _econ()
+	var st: Dictionary = GameState.event_state
+	_log_event(e, text, ts)
+	match e.id:
+		&"cal_rocket":
+			if go:
+				booth_today = true
+				st["booth"] = int(st.get("booth", 0)) + 1
+				_clear_day_visitors(econ.booth_end_minute)
+				var pool := EventDirector.quiz(&"booth")
+				pool.shuffle()
+				event_state["quiz"] = pool.slice(0, mini(econ.booth_questions, pool.size()))
+				return { "correct": true, "answer": text, "text": "ไปตั้งบูธที่งานบุญ · ลูกค้าหน้าร้านช่วงนี้รู้ว่าขมไปงานบุญ", "explain": e.explain }
+			return { "correct": true, "answer": text, "text": "เปิดร้านตามปกติ", "explain": "ไว้ปีหน้าค่อยไปออกบูธนะ" }
+		&"act_sala":
+			if go:
+				st["sala"] = int(st.get("sala", 0)) + 1
+				var pool := EventDirector.quiz(&"sala")
+				pool.shuffle()
+				event_state["quiz"] = pool.slice(0, mini(econ.sala_questions, pool.size()))
+				return { "correct": true, "answer": text, "text": "ไปสอนที่ศาลา", "explain": e.explain }
+			return { "correct": true, "answer": text, "text": "ไว้คราวหน้า", "explain": "ผู้ใหญ่บ้านจะมาชวนใหม่เดือนหน้า" }
+		&"cal_school":
+			if go:
+				contract_today = true
+				_start_contract(ts)
+				return { "correct": true, "answer": text, "text": "รับงานเหมา · เครื่องโรงเรียน %d เครื่องขึ้นชั้นแล้ว" % econ.contract_machines, "explain": e.explain }
+			return { "correct": true, "answer": text, "text": "เปิดร้านตามปกติ", "explain": "ผอ. ไปจ้างร้านในอำเภอแทน" }
+		&"cal_race":
+			if go:
+				st["race_joined"] = int(st.get("race_joined", 0)) + 1
+				_clear_day_visitors(TimeSystem.OPEN + econ.race_slots * TimeSystem.SLOT_MIN)
+				return { "correct": true, "answer": text, "text": "ไปแข่ง · ประกอบให้ถูกขั้นตอนและเร็วที่สุด", "explain": e.explain }
+			return { "correct": true, "answer": text, "text": "เปิดร้านตามปกติ", "explain": "ปีหน้าค่อยไปแข่งนะ" }
+		&"cal_storm":
+			GameState.story_flags["after_storm"] = true
+			ScenarioBook.flood_open = true
+			outage = Vector2i(econ.storm_outage.x, econ.storm_outage.y)
+			_outage_told = 0
+			if i == 0:
+				st["storm_safe"] = true
+				return { "correct": true, "answer": text, "explain": e.explain }
+			var hit := _storm_damage()
+			return { "correct": false, "answer": e.choices[0], "explain": e.explain_bad + ((" · %s" % hit) if hit != "" else "") }
+		&"rnd_grandma":
+			return { "correct": true, "answer": text, "text": "พายายไปอนามัย", "explain": "ยายแค่เป็นหวัด หมอให้ยามาแล้ว · ร้านเปิด 11:00" }
+	if String(e.id).begins_with("rnd_scam_"):
+		if e.is_good(text):
+			st["scam_safe"] = int(st.get("scam_safe", 0)) + 1
+			return { "correct": true, "answer": text, "explain": e.explain }
+		st["scam_lost"] = int(st.get("scam_lost", 0)) + 1
+		GameState.add_money(-econ.scam_loss, &"scam", "โดนมิจฉาชีพ")
+		return { "correct": false, "answer": e.choices[0], "explain": e.explain_bad }
+	return { "correct": true, "answer": text, "explain": e.explain }
+
+
+## จบการ์ด → ผลท้าย (เวลา · เงิน · ความสนิท) แล้วคืนการ์ดหน้าประตู
+func event_finish() -> void:
+	if event_state.is_empty():
+		return
+	var e: ShopEvent = event_state.ev
+	var good := int(event_state.good)
+	var decided := String(event_state.decided)
+	var go := not e.choices.is_empty() and Array(e.choices).find(decided) == 0
+	event_state = { }
+	if is_instance_valid(_request_card):
+		_request_card.hide()
+	var ts := _ts()
+	var econ := _econ()
+	var st: Dictionary = GameState.event_state
+	match e.id:
+		&"cal_rocket":
+			if go:
+				GameState.add_reputation(econ.booth_rep)
+				var touched := PackedStringArray()
+				for n in NpcBook.all():
+					if n.has_affinity and not n.is_group() and (GameState.npc_affinity.has(n.id) and int(GameState.npc_affinity[n.id]) > 0):
+						GameState.add_affinity(n.id, 1 + (1 if good >= econ.booth_questions else 0), &"booth")
+						touched.append(n.display_name)
+				st["booth_good"] = int(st.get("booth_good", 0)) + good
+				await _event_time_to(econ.booth_end_minute)
+				_toast("กลับจากงานบุญ", "ชื่อเสียงร้าน +%d · ♥ ชาวบ้าน %d คน · ตอบดี %d ข้อ" % [econ.booth_rep, touched.size(), good])
+		&"act_sala":
+			if go:
+				await _event_spend(econ.sala_slots)
+				GameState.add_money(econ.sala_fee, &"fee", "สอนคอมที่ศาลา")
+				for id in [&"amnuay", &"headman"]:
+					if good > 0:
+						GameState.add_affinity(id, good, &"sala")
+				GameState.add_reputation(1)
+				_toast("สอนคอมที่ศาลาเสร็จ", "+฿%d · ตอบคำถามดี %d ข้อ" % [econ.sala_fee, good])
+		&"cal_race":
+			if go:
+				await _start_race()
+		&"rnd_grandma":
+			_clear_day_visitors(econ.grandma_open_minute, true)
+			await _event_time_to(econ.grandma_open_minute)
+		&"rnd_kids":
+			await _event_spend(1)
+			if good > 0:
+				for n in NpcBook.all():
+					if n.is_student() and not n.is_group() and int(GameState.npc_affinity.get(n.id, 0)) > 0:
+						GameState.add_affinity(n.id, 1, &"kids")
+				st["kids_good"] = int(st.get("kids_good", 0)) + 1
+	_working = false
+	_board_dirty = true
+	_achievements_check()
+
+
+## บอท: เลือกเองทันที
+func _event_auto(e: ShopEvent) -> void:
+	if e == null:
+		return
+	event_open(e)
+	if event_state.is_empty():
+		return
+	while not event_state.is_empty():
+		var choices: Array = event_state.choices if int(event_state.step) == 0 else Array((event_state.quiz as Array)[int(event_state.step) - 1].choices)
+		var pick: String = String(bot_event_pick.call(event_state.ev, choices, int(event_state.step))) if bot_event_pick.is_valid() else String(choices[0] if int(event_state.step) > 0 or (event_state.ev as ShopEvent).good_count == 0 else _first_good(event_state.ev))
+		var r := event_answer(pick)
+		if bool(r.get("more", false)):
+			event_state["step"] = int(event_state.step) + 1
+			event_state["answered"] = false
+		else:
+			await event_finish()
+
+
+func _first_good(e: ShopEvent) -> String:
+	return e.choices[0] if not e.choices.is_empty() else ""
+
+
+func _achievements_check() -> void:
+	var a := get_node_or_null(^"/root/Achievements")
+	if a:
+		a.check_all()
+
+
+## ไม่มีลูกค้าหน้าร้านถึง minute (บูธ · งานเหมา · แข่ง · ยายไม่สบาย) — คนที่นัดไว้เลื่อนไปวันถัดไปไม่เสียความสนิท · คนมารับเครื่องยังรอได้
+func _clear_day_visitors(until_minute: int, merge := false) -> void:
+	var keep: Array[Dictionary] = []
+	var moved := 0
+	for j in door_queue:
+		if is_pickup(j):
+			keep.append(j)
+		elif bool(j.get("appointed", false)):
+			appointments.append({ "case": j["case"], "free": bool(j.get("free", false)) })
+		elif merge and not (j["case"] as CustomerCase).is_request():
+			moved += 1
+	door_queue = keep
+	for w in visitor_waves.duplicate():
+		if int(w.minute) < until_minute:
+			visitor_waves.erase(w)
+			moved += int(w.count)
+	if merge and moved > 0:
+		visitor_waves.push_front({ "minute": until_minute, "count": moved })
+	_board_dirty = true
+
+
+func _event_time_to(minute: int) -> void:
+	var ts := _ts()
+	if ts == null or ts.current_minute >= minute:
+		return
+	if quiet:
+		ts.set_clock(minute)
+	else:
+		await time_skip(minute - ts.current_minute, time_skip_seconds)
+	_door_tick = ts.current_minute
+
+
+func _event_spend(slots: int) -> void:
+	var ts := _ts()
+	if ts:
+		ts.advance_minutes(slots * TimeSystem.SLOT_MIN)
+
+
+func _toast(title: String, note: String) -> void:
+	if visitor_toast and not quiet:
+		visitor_toast.show_message(title, note)
+
+
+## พายุ: ไม่ถอดปลั๊ก → เครื่องบนชั้น 1 เครื่อง PSU เสีย (ค่าเสียหาย + ความสนิท) · คืนข้อความ
+func _storm_damage() -> String:
+	var econ := _econ()
+	var cands: Array = shelf.orders.filter(func(o: RepairShelf.Order) -> bool: return o.state == RepairShelf.State.WAITING) if shelf else []
+	GameState.event_state["storm_hit"] = true
+	if cands.is_empty():
+		GameState.add_money(-econ.storm_damage / 2, &"damage", "ปลั๊กพ่วงในร้านเสียตอนพายุ")
+		return "ปลั๊กพ่วงในร้านไหม้ เสีย ฿%d" % (econ.storm_damage / 2)
+	var o: RepairShelf.Order = cands[rng(&"event").randi_range(0, cands.size() - 1)]
+	GameState.add_money(-econ.storm_damage, &"damage", "ชดใช้ PSU เครื่อง%s" % o.case.customer)
+	var id := npc_id(o.case)
+	if id != &"":
+		GameState.add_affinity(id, -econ.storm_affinity_loss, &"storm")
+	return "PSU เครื่องของ%sเสีย ชดใช้ ฿%d" % [o.case.customer, econ.storm_damage]
+
+
+# ---- งานเหมาโรงเรียน (ก.ย.)
+
+
+func _start_contract(ts: TimeSystem) -> void:
+	var econ := _econ()
+	_clear_day_visitors(TimeSystem.CLOSE)
+	var who := NpcBook.by_id(&"director")
+	var paths := ["res://Resources/Customers/any_ram.tres", "res://Resources/Customers/any_gpu.tres", "res://Resources/Customers/any_mainboard.tres"]
+	var fee := maxi(1, roundi(econ.contract_fee / float(econ.contract_machines) / maxf(econ.promise_mult(0), 0.01)))
+	var saved_slots := shelf.slots
+	shelf.slots = shelf.used() + econ.contract_machines
+	for k in econ.contract_machines:
+		var base: CustomerCase = load(paths[k % paths.size()]) if ResourceLoader.exists(paths[k % paths.size()]) else null
+		if base == null:
+			continue
+		# อะไหล่: โรงเรียนเตรียมไว้ไม่ทัน → เอาเฉพาะสถานการณ์ที่ไม่ต้องเปลี่ยนชิ้น (ซ่อมจบในวันเดียวได้)
+		var c: CustomerCase = null
+		for tries in 8:
+			c = base.instance_for(who) if who else base.duplicate()
+			if not c.use_scenario:
+				break
+			var r := roll_scenario(c)
+			if r.is_empty() or (r.scenario as RepairScenario).needs_part == &"":
+				break
+		c.device = "คอมห้องเรียนเครื่องที่ %d" % (k + 1)
+		c.set_meta("base_device", c.device)
+		c.set_meta("contract", true)
+		c.fee = fee
+		shelf.add(c, ts.shift if ts else 1, 0)
+	shelf.slots = saved_slots
+	assign_parts()
+	GameState.event_state["contract_day"] = ts.shift if ts else 0
+
+
+## วันถัดจากงานเหมา: เครื่องที่ยังไม่ได้ซ่อม โรงเรียนรับคืน (ไม่เสียความสนิท) · ครบทุกเครื่อง = ผอ. ♥
+func _close_contract() -> void:
+	if shelf == null:
+		return
+	var left := 0
+	var done := 0
+	for o: RepairShelf.Order in shelf.orders.duplicate():
+		if not o.case.has_meta("contract"):
+			continue
+		if o.state == RepairShelf.State.WAITING:
+			GameState.release(o.key)
+			o.state = RepairShelf.State.RETURNED
+			shelf._close(o)
+			left += 1
+	for o: RepairShelf.Order in shelf.history:
+		if o.case.has_meta("contract") and o.state == RepairShelf.State.PICKED and not o.case.has_meta("contract_counted"):
+			o.case.set_meta("contract_counted", true)
+			done += 1
+	if left > 0 or done > 0:
+		GameState.event_state["contract_done"] = maxi(int(GameState.event_state.get("contract_done", 0)), done)
+		if left == 0 and done >= _econ().contract_machines:
+			GameState.affinity_event(&"director", &"request_good")
+		if left > 0:
+			day_skip_notes.append("โรงเรียนรับเครื่องที่ยังไม่เสร็จ %d เครื่องกลับไปแล้ว" % left)
+
+
+# ---- แข่งประกอบคอม (ต.ค.)
+
+
+## เปิดฉากประกอบคอมโหมดแข่ง · บอท = ได้ที่ race_bot_place
+func _start_race() -> void:
+	var econ := _econ()
+	var ts := _ts()
+	var place := 0
+	var secs := 0.0
+	var pts := 0
+	if quiet or race_auto_place >= 0:
+		place = race_auto_place if race_auto_place >= 0 else econ.race_bot_place
+	else:
+		var m: TutorialAssembly = load("res://Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn").instantiate()
+		m.start_phase = TutorialAssembly.PhaseState.BUILD
+		m.race_mode = true
+		_race_start = Time.get_ticks_msec()
+		_minigame = m # watchdog เห็นว่ายังเล่นอยู่
+		SceneRouter.push_node(m)
+		Global.in_minigame = true
+		var score: Dictionary = await m.minigame_finished
+		_minigame = null
+		secs = (Time.get_ticks_msec() - _race_start) / 1000.0
+		for k in score:
+			pts += int(score[k])
+		place = race_place(secs + pts * econ.race_penalty_per_point)
+	last_race = { "place": place, "seconds": secs, "points": pts }
+	var st: Dictionary = GameState.event_state
+	if place > 0:
+		st["race_best"] = place if int(st.get("race_best", 0)) == 0 else mini(int(st.race_best), place)
+	if ts and ts.current_minute < TimeSystem.OPEN + econ.race_slots * TimeSystem.SLOT_MIN:
+		ts.set_clock(TimeSystem.OPEN + econ.race_slots * TimeSystem.SLOT_MIN)
+		_door_tick = ts.current_minute
+	if place >= 1 and place <= econ.race_prize.size():
+		GameState.add_money(econ.race_prize[place - 1], &"tip", "รางวัลแข่งประกอบคอม")
+		GameState.add_reputation(econ.race_rep[place - 1] if place - 1 < econ.race_rep.size() else 0)
+		_toast("ได้ที่ %d แข่งประกอบคอม!" % place, "รางวัล ฿%d · เวลา %.0f วินาที" % [econ.race_prize[place - 1], secs])
+	else:
+		_toast("แข่งประกอบคอมจบแล้ว", "ปีนี้ยังไม่ติดอันดับ · เวลา %.0f วินาที" % secs)
+
+
+## เทสต์ตั้งที่ได้เอง (-1 = เล่นจริง)
+var race_auto_place := -1
+
+
+func race_place(total_seconds: float) -> int:
+	var lim := _econ().race_place_seconds
+	for i in lim.size():
+		if total_seconds <= lim[i]:
+			return i + 1
+	return 0
+
+
+func _log_event(e: ShopEvent, choice: String, ts: TimeSystem) -> void:
+	var row := { "ch": ts.month() if ts else 0, "day": ts.shift_in_week() if ts else 0, "id": String(e.id), "choice": choice }
+	GameState.event_log.append(row)
+	if GameState.event_log.size() > 300:
+		GameState.event_log.pop_front()
+	if not quiet:
+		EventDirector.append_csv(row)
+
+
+# ---------------------------------------------------------------- [0.7.0 ขั้น I] ร้านออนไลน์ลดราคา / ร้านปลอม (PLAN_0_7_0 ข้อ 4)
+## บางวันมีร้านอื่นขึ้นในแอปร้านออนไลน์พร้อมของลดราคา 1 ชิ้น · ร้านปลอม = โอนแล้วเงินหาย ร้านขึ้นบัญชีดำ (GameState.seller_blacklist)
+## กด "รายงานร้าน" = ร้านปลอมขึ้นบัญชีดำ + นับว่าดูออก (Achievement B07) · ร้านจริง = ปิ๊บบอกว่าร้านนี้ดูน่าเชื่อถือ
+
+const SELLER_DIR := "res://Resources/Shop/Sellers/"
+static var _sellers: Array[OnlineSeller] = []
+## ดีลวันนี้ [{ seller (id), item (id), price, done ("" · bought · reported · scammed) }] — เซฟ
+var deals_today: Array[Dictionary] = []
+
+
+static func sellers() -> Array[OnlineSeller]:
+	if _sellers.is_empty():
+		for f in DirAccess.get_files_at(SELLER_DIR):
+			var p := SELLER_DIR + f.trim_suffix(".remap")
+			if p.ends_with(".tres"):
+				var s := load(p) as OnlineSeller
+				if s:
+					_sellers.append(s)
+		_sellers.sort_custom(func(a: OnlineSeller, b: OnlineSeller) -> bool: return String(a.id) < String(b.id))
+	return _sellers
+
+
+static func seller_by_id(id: StringName) -> OnlineSeller:
+	for s in sellers():
+		if s.id == id:
+			return s
+	return null
+
+
+func _plan_deals(ts: TimeSystem) -> void:
+	deals_today.clear()
+	if ts == null:
+		return
+	var e := _econ()
+	var r := rng(&"shop")
+	var roll := r.randf()
+	if ts.month() < e.deal_from_month or (roll >= e.deal_chance and not fake_sale_today):
+		return
+	var fake := fake_sale_today or r.randf() < e.deal_fake_share
+	var pool: Array[OnlineSeller] = sellers().filter(func(s: OnlineSeller) -> bool: return s.fake == fake)
+	var items: Array[ItemDef] = online_catalog().filter(func(it: ItemDef) -> bool: return it.kind == ItemDef.Kind.PART and GameState.rank() >= it.unlock_rank)
+	if pool.is_empty() or items.is_empty():
+		return
+	var s: OnlineSeller = pool[r.randi_range(0, pool.size() - 1)]
+	var it: ItemDef = items[r.randi_range(0, items.size() - 1)]
+	var price := maxi(1, roundi(it.online_cost() * (1.0 - s.discount)))
+	if fake:
+		price = mini(price, e.fake_deal_max) # โดนโกงครั้งหนึ่งไม่เกินนี้ (ไม่ให้เกมพัง)
+	deals_today.append({ "seller": String(s.id), "item": String(it.id), "price": price, "done": "" })
+	var st: Dictionary = GameState.event_state
+	if fake:
+		st["fake_seen"] = int(st.get("fake_seen", 0)) + 1
+
+
+## ให้แอปแสดง [{ name, item, price, normal, rating, signs, payment, blacklisted, done, can_buy }]
+func deals_view() -> Array:
+	var out: Array = []
+	for d in deals_today:
+		var s := seller_by_id(StringName(d.seller))
+		var it := part_item(StringName(d.item))
+		if s == null or it == null:
+			continue
+		var bl := GameState.seller_blacklist.has(String(s.id))
+		out.append({
+			"name": s.display_name, "item": it.display_name, "icon": it.icon, "price": int(d.price), "normal": it.online_cost(),
+			"rating": s.rating, "signs": s.signs, "payment": s.payment, "blacklisted": bl, "done": String(d.done),
+			"can_buy": String(d.done) == "" and not bl and GameState.money >= int(d.price) and GameState.rank() >= it.unlock_rank,
+		})
+	return out
+
+
+## ซื้อดีล i → { ok, fake, msg }
+func deal_buy(i: int) -> Dictionary:
+	if i < 0 or i >= deals_today.size():
+		return { "ok": false, "msg": "" }
+	var d: Dictionary = deals_today[i]
+	var s := seller_by_id(StringName(d.seller))
+	var it := part_item(StringName(d.item))
+	if s == null or it == null or String(d.done) != "" or GameState.seller_blacklist.has(String(s.id)):
+		return { "ok": false, "msg": "ซื้อไม่ได้" }
+	var price := int(d.price)
+	if GameState.money < price:
+		return { "ok": false, "msg": "เงินไม่พอ" }
+	var st: Dictionary = GameState.event_state
+	if s.fake:
+		d["done"] = "scammed"
+		GameState.add_money(-price, &"scam", "โอนให้ร้านออนไลน์ปลอม %s" % s.display_name)
+		GameState.seller_blacklist[String(s.id)] = { "why": "scammed", "lost": price }
+		st["fake_bought"] = int(st.get("fake_bought", 0)) + 1
+		_achievements_check()
+		return { "ok": true, "fake": true, "msg": "โอน ฿%d แล้ว… ร้านปิดแชตหนีไป ของไม่มาแน่นอน · \"%s\" ขึ้นบัญชีดำของร้านแล้ว · สังเกต %s" % [price, s.display_name, s.signs[0] if not s.signs.is_empty() else "สัญญาณเตือน"] }
+	if GameState.slots_needed(it, 1) > GameState.storage_slots - GameState.used_slots():
+		return { "ok": false, "msg": "คลังเต็ม" }
+	d["done"] = "bought"
+	var ts := _ts()
+	GameState.pending_orders.append({ "id": it.id, "path": it.resource_path, "qty": 1, "cost": price, "slots": GameState.slots_needed(it, 1), "arrive": (ts.shift if ts else 1) + maxi(_econ().online_delay_days, 1) })
+	GameState.add_money(-price, &"buy", "สั่งออนไลน์ (ลดราคา): %s" % it.display_name)
+	GameState.inventory_changed.emit()
+	st["real_bought"] = int(st.get("real_bought", 0)) + 1
+	return { "ok": true, "fake": false, "msg": "สั่ง %s ราคา ฿%d จากร้านที่น่าเชื่อถือ · ของมาวันเปิดร้านถัดไป" % [it.display_name, price] }
+
+
+## รายงานร้าน i → { ok, fake, msg }
+func deal_report(i: int) -> Dictionary:
+	if i < 0 or i >= deals_today.size() or String(deals_today[i].done) != "":
+		return { "ok": false, "msg": "" }
+	var d: Dictionary = deals_today[i]
+	var s := seller_by_id(StringName(d.seller))
+	if s == null:
+		return { "ok": false, "msg": "" }
+	if not s.fake:
+		return { "ok": true, "fake": false, "msg": "ปิ๊บ: ร้านนี้ดูน่าเชื่อถือนะ (%s) · ลดราคาไม่ได้แปลว่าปลอมเสมอไป ดูหลาย ๆ อย่างประกอบกัน" % ", ".join(s.signs.slice(0, 2)) }
+	d["done"] = "reported"
+	GameState.seller_blacklist[String(s.id)] = { "why": "reported", "lost": 0 }
+	var st: Dictionary = GameState.event_state
+	st["fake_reported"] = int(st.get("fake_reported", 0)) + 1
+	_achievements_check()
+	return { "ok": true, "fake": true, "msg": "ปิ๊บ: ตาไวมาก! ร้านนี้ปลอมแน่ ๆ · %s · ขึ้นบัญชีดำแล้ว" % " · ".join(s.signs) }
 
 
 # ---------------------------------------------------------------- [0.6.0 ขั้น G] ขอคำปรึกษา / ขอให้ช่วย (PLAN_0_6_0 ข้อ 5)
@@ -1087,14 +1860,14 @@ func _pick_request() -> CustomerCase:
 		ws.append(npc_weight_of(k))
 		total += ws.back()
 	var who: String = keys[0]
-	var x := _rng.randf() * total
+	var x := rng(&"request").randf() * total
 	for i in keys.size():
 		x -= ws[i]
 		if x <= 0.0:
 			who = keys[i]
 			break
 	var list: Array = groups[who]
-	var req: RequestTask = list[_rng.randi_range(0, list.size() - 1)]
+	var req: RequestTask = list[rng(&"request").randi_range(0, list.size() - 1)]
 	_recent_requests.append(req.id)
 	while _recent_requests.size() > 6:
 		_recent_requests.pop_front()
@@ -1159,6 +1932,14 @@ func request_answer(text: String) -> Dictionary:
 
 
 func _on_request_card_done() -> void:
+	if not event_state.is_empty():
+		if bool(event_state.answered) and int(event_state.step) < (event_state.quiz as Array).size():
+			event_state["step"] = int(event_state.step) + 1
+			event_state["answered"] = false
+			_request_card.show_question(event_view())
+		else:
+			event_finish()
+		return
 	if not debate_state.is_empty():
 		debate_finish()
 		return
@@ -1261,6 +2042,8 @@ func job_fit(c: CustomerCase) -> StringName:
 	var ts := _ts()
 	if ts == null:
 		return &"no"
+	if outage_now() and not c.is_request(): # [0.7.0] ไฟดับ — คุย/ปรึกษาได้ ซ่อมไม่ได้
+		return &"power"
 	var need := job_slots(c) * TimeSystem.SLOT_MIN
 	if need <= ts.remaining_work_minutes(false):
 		return &"ok"
@@ -1504,6 +2287,9 @@ const TUTORIALS := {
 	"tut_request": "res://Assets/Dialog/Tutorial/request_first.txt",
 	"tut_group": "res://Assets/Dialog/Tutorial/group_first.txt",
 	"tut_tool": "res://Assets/Dialog/Tutorial/tool_first.txt",
+	"tut_event": "res://Assets/Dialog/Tutorial/event_first.txt", # [0.7.0]
+	"tut_deal": "res://Assets/Dialog/Tutorial/deal_first.txt",
+	"tut_achievement": "res://Assets/Dialog/Tutorial/achievement_first.txt",
 }
 
 
@@ -1936,6 +2722,11 @@ func _reset_run() -> void:
 	walkouts.clear()
 	left_home.clear()
 	_recent.clear()
+	today_events.clear()
+	event_cards.clear()
+	event_state = { }
+	outage = Vector2i(-1, -1)
+	deals_today.clear()
 	scenario_recent.clear()
 	_recent_requests.clear()
 	request_state = { }
@@ -1989,6 +2780,9 @@ func _process(delta: float) -> void:
 		return
 	# [0.5.0 ขั้น E] เรื่องส่วนตัวของลูกค้าประจำ (หลังส่งงาน/ส่งมอบเครื่อง)
 	if _maybe_story(want):
+		return
+	# [0.7.0] การ์ดอีเวนต์ (บูธ · พายุ · มิจฉาชีพ · …)
+	if _maybe_event(want):
 		return
 	# [0.5.0 ขั้น I] เลื่อนยศแล้วยังไม่เลือกความสามารถ → หน้าเลือก (บังการ์ดจนกว่าจะเลือก)
 	if _maybe_perk():
@@ -2364,6 +3158,10 @@ func _door_front_view(j: Dictionary) -> Dictionary:
 			acc["tooltip"] = "ชั้นวางเต็ม %d/%d — ซ่อมเครื่องบนชั้นให้ลูกค้ามารับก่อน" % [shelf.used(), shelf.slots]
 		&"phone":
 			acc["visible"] = false
+		&"power":
+			acc["text"] = "ไฟดับ\nรอไฟมา"
+			acc["disabled"] = true
+			acc["tooltip"] = "ไฟดับถึง %s · รับเครื่องขึ้นชั้นหรือนัดวันได้" % TimeSystem.clock_text(outage.y)
 		_:
 			acc["text"] = "เทิร์นไม่พอ"
 			acc["disabled"] = true
@@ -2629,13 +3427,14 @@ func _plan_vendor(ts: TimeSystem) -> void:
 	vendor = { }
 	var e := _econ()
 	var chance := e.perk_vendor_chance if GameState.has_perk(&"connected") else e.vendor_chance # [0.5.0] มีเส้นสาย
-	if ts == null or ts.shift_in_week() == 1 or chance <= 0.0 or _rng.randf() >= chance:
+	var roll := rng(&"vendor").randf()
+	if ts == null or ((ts.shift_in_week() == 1 or chance <= 0.0 or roll >= chance) and not event_has(&"cal_cny")): # [0.7.0] หลังตรุษจีนมาแน่
 		return
 	var n_items := e.perk_vendor_items if GameState.has_perk(&"connected") else e.vendor_items
 	var pool: Array[ItemDef] = online_catalog().filter(func(it: ItemDef) -> bool: return it.kind == ItemDef.Kind.PART)
 	var ids: Array = []
 	while not pool.is_empty() and ids.size() < n_items:
-		var it: ItemDef = pool.pop_at(_rng.randi_range(0, pool.size() - 1))
+		var it: ItemDef = pool.pop_at(rng(&"vendor").randi_range(0, pool.size() - 1))
 		ids.append(String(it.id))
 	if ids.is_empty():
 		return
@@ -3182,7 +3981,7 @@ func _app_row(i: int, o: RepairShelf.Order, today: int) -> Dictionary:
 		var rs := app_repair_state(o)
 		actions.append({
 			"id": &"repair",
-			"text": "รอของ" if rs == &"no_part" else ("ไปซ่อม" if rs == &"ok" else ("ไปซ่อม (ล่วงเวลา)" if rs == &"ot" else ("เทิร์นไม่พอ" if rs == &"no" else "ไปซ่อม"))),
+			"text": "รอของ" if rs == &"no_part" else "ไฟดับ" if rs == &"power" else ("ไปซ่อม" if rs == &"ok" else ("ไปซ่อม (ล่วงเวลา)" if rs == &"ot" else ("เทิร์นไม่พอ" if rs == &"no" else "ไปซ่อม"))),
 			"disabled": rs not in [&"ok", &"ot"],
 			"tooltip": "ปิดคอมแล้วเปิดเครื่องนี้ซ่อมเลย" if rs in [&"ok", &"ot"] else ("สั่งอะไหล่ในแอปร้านออนไลน์ หรือซื้อที่ตลาด" if rs == &"no_part" else "ทำงานที่ค้างอยู่ให้เสร็จก่อน"),
 		})
@@ -3980,7 +4779,7 @@ func door_helper() -> Dictionary:
 	helper_used_today += 1
 	_board_dirty = true
 	var e := _econ()
-	var ok := _rng.randf() < helper_chance(c)
+	var ok := rng(&"helper").randf() < helper_chance(c)
 	var id := npc_id(c)
 	var money := 0
 	var aff := 0
@@ -4065,4 +4864,11 @@ func _npc_tutorials() -> Array[String]:
 		out.append("tut_group")
 	if GameState.has_tool(&"multimeter"):
 		out.append("tut_tool")
+	# [0.7.0 ขั้น M] อีเวนต์ · ร้านลดราคา · ใบประกาศ
+	if today_events.any(func(e: ShopEvent) -> bool: return e.kind != ShopEvent.Kind.QUIZ and not String(e.id).begins_with("rnd_scam_")):
+		out.append("tut_event")
+	if not deals_today.is_empty():
+		out.append("tut_deal")
+	if not GameState.achievements.is_empty():
+		out.append("tut_achievement")
 	return out

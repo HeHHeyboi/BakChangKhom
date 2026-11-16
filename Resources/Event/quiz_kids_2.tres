@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quiz_kids_2"
+kind = 2
+group = &"kids"
+question = "ซิลิโคนที่ทาบนซีพียูมีไว้ทำไม"
+choices = PackedStringArray("ช่วยส่งความร้อนจากซีพียูไปที่ฮีตซิงก์", "ทาไว้ให้ติดแน่น", "กันน้ำเข้า")
+explain = "ผิวโลหะมีร่องเล็ก ๆ ซิลิโคนเติมช่องว่างให้ความร้อนผ่านไปได้ดี"

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cnw1askytwsbe" path="res://Scene/caution_button.tscn" id="3_uj64w"]
 [ext_resource type="Script" uid="uid://cwpxqyxdgbtjd" path="res://Scripts/Room/door.gd" id="8_ubegv"]
 [ext_resource type="Script" uid="uid://dn5iw3elrf84n" path="res://Scripts/Room/shop_pc.gd" id="9_pc"]
+[ext_resource type="Script" path="res://Scripts/Room/wall_certificates.gd" id="10_wall"]
 
 [node name="Room" type="Control" unique_id=346166324]
 layout_mode = 3
@@ -46,6 +47,14 @@ mouse_default_cursor_shape = 2
 ignore_texture_size = true
 script = ExtResource("8_ubegv")
 label_text = "ออกไปหน้าบ้าน"
+
+[node name="WallCertificates" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 866.0
+offset_top = 200.0
+offset_right = 914.0
+offset_bottom = 340.0
+script = ExtResource("10_wall")
 
 [node name="Event" parent="." unique_id=22790592 instance=ExtResource("3_uj64w")]
 layout_mode = 0

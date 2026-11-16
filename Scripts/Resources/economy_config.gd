@@ -105,7 +105,7 @@ class_name EconomyConfig extends Resource
 	"ใกล้ปีใหม่ คนซื้อคอมให้ลูกหลานเป็นของขวัญ ลูกค้า +1 ต่อวัน",
 ]
 ## ลูกค้าเพิ่ม/ลดต่อวันจากเทศกาล (บวกกับฐาน board_new_per_shift + โบนัสชื่อเสียง)
-@export var month_visitor_bonus: PackedInt32Array = [0, 1, 0, 1, 1, -1, -1, -1, 0, 1, -1, 1]
+@export var month_visitor_bonus: PackedInt32Array = [0, 1, 0, 1, 1, -1, 0, -1, 0, 1, 0, 1] # [0.7.0] ก.ค. ฝน · พ.ย. คู่แข่ง ย้ายไปเป็นอีเวนต์
 
 @export_group("หน้าประตู + ใบรับเครื่อง + ชั้นวาง (0.3.0 · PLAN_0_3_0 ข้อ 2–4)")
 ## รับลูกค้าใหม่ได้กี่คนต่อวัน (ลูกค้าที่นัดไว้นับโควตาของวันที่เขามา · งานเนื้อเรื่องไม่นับ)
@@ -194,7 +194,9 @@ class_name EconomyConfig extends Resource
 ##   ของเดิม [200, 300, 500, 800, 850, 900, 1300, 1300, 1550, 1600, 2000, 2000] บอทปกติได้ 2–3 เท่าตั้งแต่ พ.ค.
 ##   มัธยฐานบอทปกติ 10 seed: [434, 792, 982, 1072, 1616, 1772, 2862, 3482, 3242, 3782, 2502, 3440] → ~65–70% ปรับให้ขึ้นทีละขั้น
 ## [0.6.0 ขั้น N] ปรับตามบอท ≈ 70% มัธยฐาน (ตรวจเครื่องก่อนรู้อะไหล่ = เครื่องรอบนชั้นนานขึ้น · อะไหล่ใช้บ่อยขึ้น เงินหมุนข้ามเดือน) · เดิม 250/450/650/750/1150/1250/1800/2100/2200/2300/2000/2400
-@export var month_target: PackedInt32Array = [250, 200, 650, 750, 900, 1250, 1450, 1800, 2100, 1900, 1900, 2250]
+## [0.7.0 ขั้น L] อีเวนต์ + seed รายวัน · วัดบอทปกติ 30 seed (201–230) มัธยฐานกำไร [371, 364, 681, 864, 1126, 1574, 1741, 2509, 2553, 1917, 3024, 2741]
+##   ≈ 70% ปัดให้ขึ้นเป็นขั้น (ต.ค. ไปแข่ง 4 เทิร์น · มิ.ย. บูธ = กำไรน้อยลง) · เดิม 250/200/650/750/900/1250/1450/1800/2100/1900/1900/2250
+@export var month_target: PackedInt32Array = [250, 200, 550, 650, 800, 1100, 1250, 1750, 1800, 1500, 2000, 2000]
 
 @export_group("ผลสิ้นเดือน (Docs/ROADMAP_1_0_0.md ข้อ 5.3 · 8.1 E–F)")
 ## ค่าปรับยอดค้างชำระ (สัดส่วนของยอดค้าง) บวกในบิลเดือนถัดไป · โหมดช่วยไม่มีค่าปรับ
@@ -415,3 +417,46 @@ func affinity_tier_name(tier: int) -> String:
 
 func affinity_mult(tier: int) -> float:
 	return affinity_visit_mult[clampi(tier, 0, affinity_visit_mult.size() - 1)] if not affinity_visit_mult.is_empty() else 1.0
+
+
+# ---------------------------------------------------------------- [0.7.0] อีเวนต์ (PLAN_0_7_0 ข้อ 2–3)
+@export_group("อีเวนต์ 0.7.0")
+## สงกรานต์ ลูกค้าเพิ่ม
+@export var songkran_extra_visitors := 2
+## ร้านคู่แข่ง (พ.ย.): ชื่อเสียงต่ำกว่านี้ ลูกค้า −1/วัน
+@export var rival_rep_threshold := 60
+## บูธงานบุญ: กลับร้านกี่โมง · ชื่อเสียง · จำนวนคำถาม
+@export var booth_end_minute := 15 * 60 + 30
+@export var booth_rep := 3
+@export var booth_questions := 4
+## คลาสศาลา
+@export var sala_slots := 3
+@export var sala_fee := 150
+@export var sala_questions := 3
+## พายุ: การ์ดกี่โมง · ไฟดับ (นาทีเริ่ม จบ) · ค่าชดใช้ PSU · ความสนิทที่เสีย
+@export var storm_card_minute := 12 * 60 + 30
+@export var storm_outage := Vector2i(13 * 60, 15 * 60 + 30)
+@export var storm_damage := 300
+@export var storm_affinity_loss := 3
+## มิจฉาชีพ: เสียเงินเมื่อหลงเชื่อ
+@export var scam_loss := 300
+## ขนมฝาก: ความสนิท
+@export var sweets_affinity := 1
+## ยายไม่สบาย: ร้านเปิดกี่โมง
+@export var grandma_open_minute := 11 * 60
+## งานเหมาโรงเรียน: เครื่อง · ค่าเหมารวม
+@export var contract_machines := 3
+@export var contract_fee := 1200
+## แข่งประกอบคอม: เทิร์นที่ใช้ · เวลา (วินาที) ของที่ 1/2/3 · หักเวลาต่อคะแนนที่โดนหัก · รางวัล · ชื่อเสียง · บอทได้ที่
+@export var race_slots := 4
+@export var race_place_seconds: PackedFloat32Array = [150.0, 210.0, 300.0]
+@export var race_penalty_per_point := 2.0
+@export var race_prize: PackedInt32Array = [800, 300, 100]
+@export var race_rep: PackedInt32Array = [3, 2, 1]
+@export var race_bot_place := 2
+## ร้านออนไลน์ลดราคา: เริ่มเดือน · โอกาสต่อวัน · สัดส่วนที่เป็นร้านปลอม (วันที่มีอีเวนต์ "ลดแรง" = ปลอมแน่)
+@export var deal_from_month := 2
+@export var deal_chance := 0.25
+@export var deal_fake_share := 0.6
+## ร้านปลอมตั้งราคาไม่เกินนี้ (เงินที่เสียต่อครั้ง)
+@export var fake_deal_max := 600

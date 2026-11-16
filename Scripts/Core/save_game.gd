@@ -12,7 +12,8 @@ const PATH := "user://save.json"
 ## [0.4.0] VERSION 5 = อะไหล่ผูกกับงาน: ราคาทุนในคลัง (items[].cost) · พัสดุออนไลน์ (inventory.pending) · ใบรับเครื่องมีรหัส/ของชดใช้ (shelf.orders[].key · replace_part) · สต็อกตลาดรอบ 2 สัปดาห์ (inventory.week = รอบ)
 ## [0.5.0] VERSION 6 = ลูกค้าประจำ: ความสนิท · ประวัติเครื่อง · มาร้านล่าสุด · เรื่องส่วนตัวที่ฟังแล้ว (game.npc)
 ## [0.6.0] VERSION 7 = งานกลางเก็บเป็น { path · npc · device } (door · appointments · shelf.orders[].case) · helper_used_today
-const VERSION := 7
+## [0.7.0] VERSION 8 = seed รายวัน (run_seed) · ความจำกันซ้ำ · อีเวนต์ (event_state · event_log · อีเวนต์วันนี้/การ์ด/ไฟดับ) · ร้านลดราคา + บัญชีดำ · ใบประกาศ (achievements · ach_stats)
+const VERSION := 8
 ## เซฟเก่าที่ยังโหลดได้ (v3 = 0.2.5: กระดานงาน "board" → แปลงเป็นคนยืนหน้าประตู · ไม่มีชั้นวาง = ชั้นว่าง)
 const MIN_VERSION := 3
 ## เทสต์อื่น (ซีนใน res://Test/) ไม่บันทึกทับเซฟของผู้เล่น · save_test ตั้งเป็น true
@@ -98,6 +99,9 @@ static func save() -> bool:
 			"npc": _npc_save(), # [0.5.0]
 			"rank_level": GameState.rank_level, "learn_log": GameState.learn_log, # [0.5.0 ขั้น F–G]
 			"scenario_log": GameState.scenario_log, "request_log": GameState.request_log, "group_fair": GameState.group_fair_count, # [0.6.0]
+			"run_seed": GameState.run_seed, # [0.7.0]
+			"event_state": GameState.event_state, "event_log": GameState.event_log, "seller_blacklist": GameState.seller_blacklist,
+			"achievements": GameState.achievements, "ach_stats": GameState.ach_stats, "ach_pinned": GameState.ach_pinned,
 			"exam_attempts": _keys_str(GameState.exam_attempts), "exam_day": GameState.exam_last_shift,
 			"perks": _keys_str(GameState.perks), "three_stars": _keys_str(GameState.level_three_stars), # [0.5.0 ขั้น I–J]
 		},
@@ -112,6 +116,12 @@ static func save() -> bool:
 			"last_bill": _plain(DayLoop._last_bill),
 			# [0.2.5] ลูกค้าทยอยมา
 			"waves": DayLoop.visitor_waves.duplicate(true), "visitors_today": DayLoop.visitors_today, "visitors_arrived": DayLoop.visitors_arrived,
+			# [0.7.0 ขั้น A] ความจำกันซ้ำ (งาน · สถานการณ์ · คำขอ) — ไม่งั้นโหลดเซฟแล้วสุ่มได้ผลต่าง
+			"recent": DayLoop._recent.map(func(c: CustomerCase) -> String: return c.resource_path).filter(func(x: String) -> bool: return x != ""),
+			"scenario_recent": DayLoop.scenario_recent.duplicate(true), "recent_requests": DayLoop._recent_requests.map(func(x) -> String: return String(x)),
+			# [0.7.0] อีเวนต์ของวันนี้ (โหลดกลางวันแล้วไม่หาย)
+			"events_today": DayLoop.today_events.map(func(e: ShopEvent) -> String: return String(e.id)), "event_cards": DayLoop.event_cards.map(func(c: Dictionary) -> Dictionary: return { "id": String(c.id), "minute": int(c.minute) }),
+			"outage": [DayLoop.outage.x, DayLoop.outage.y], "booth": DayLoop.booth_today, "contract": DayLoop.contract_today, "fake_sale": DayLoop.fake_sale_today, "deals": DayLoop.deals_today,
 		},
 		"quest": { "task": ev.currentTask if ev else 0, "done": ev.isDone if ev else false },
 		# [13 ต.ค.] คลังของ (STORAGE_SHOP_ECO)
@@ -167,6 +177,18 @@ static func load_into() -> int:
 	# [0.5.0 ขั้น F] เซฟเก่าไม่มียศที่สอบ → ใช้ยศตาม XP (ไม่ต้องสอบย้อนหลัง)
 	GameState.rank_level = int(g.get("rank_level", GameState.xp_rank()))
 	GameState.group_fair_count = int(g.get("group_fair", 0))
+	if int(g.get("run_seed", 0)) != 0: # [0.7.0] เซฟเก่าไม่มี = ใช้ค่าที่สุ่มใน reset()
+		GameState.run_seed = int(g.run_seed)
+	GameState.event_state = g.get("event_state", { })
+	GameState.event_log.clear()
+	for r in g.get("event_log", []):
+		if r is Dictionary:
+			GameState.event_log.append(r)
+	GameState.seller_blacklist = g.get("seller_blacklist", { })
+	GameState.achievements = g.get("achievements", { })
+	GameState.ach_stats = g.get("ach_stats", { })
+	GameState.ach_pinned = g.get("ach_pinned", [])
+	DayLoop.reseed_day()
 	GameState.request_log.clear()
 	for r in g.get("request_log", []):
 		if r is Dictionary:
@@ -258,6 +280,40 @@ static func load_into() -> int:
 		DayLoop.visitor_waves.append({ "minute": int(w.get("minute", 0)), "count": int(w.get("count", 0)) })
 	DayLoop.visitors_today = int(l.get("visitors_today", 0))
 	DayLoop.visitors_arrived = int(l.get("visitors_arrived", 0))
+	# [0.7.0 ขั้น A] ความจำกันซ้ำ
+	DayLoop._recent.clear()
+	for pth in l.get("recent", []):
+		var rc: Resource = load(String(pth)) if ResourceLoader.exists(String(pth)) else null
+		if rc is CustomerCase:
+			DayLoop._recent.append(rc)
+	DayLoop.scenario_recent.clear()
+	var sr: Dictionary = l.get("scenario_recent", { })
+	for k in sr:
+		DayLoop.scenario_recent[StringName(k)] = (sr[k] as Array).map(func(x) -> StringName: return StringName(x))
+	DayLoop._recent_requests.clear()
+	for x in l.get("recent_requests", []):
+		DayLoop._recent_requests.append(StringName(x))
+	# [0.7.0] อีเวนต์ของวันนี้
+	DayLoop.today_events.clear()
+	for id in l.get("events_today", []):
+		var ev := EventDirector.by_id(StringName(id))
+		if ev:
+			DayLoop.today_events.append(ev)
+	DayLoop.event_cards.clear()
+	for c in l.get("event_cards", []):
+		if c is Dictionary:
+			DayLoop.event_cards.append({ "id": StringName(c.get("id", "")), "minute": int(c.get("minute", 0)) })
+	var ou: Array = l.get("outage", [-1, -1])
+	DayLoop.outage = Vector2i(int(ou[0]), int(ou[1])) if ou.size() >= 2 else Vector2i(-1, -1)
+	DayLoop.booth_today = bool(l.get("booth", false))
+	DayLoop.contract_today = bool(l.get("contract", false))
+	DayLoop.fake_sale_today = bool(l.get("fake_sale", false))
+	DayLoop.deals_today.clear()
+	for dl in l.get("deals", []):
+		if dl is Dictionary:
+			DayLoop.deals_today.append(dl)
+	ScenarioBook.bias = DayLoop.HEAT_SCENARIOS.duplicate() if DayLoop.event_has(&"cal_summer") else { }
+	ScenarioBook.flood_open = bool(GameState.story_flags.get("after_storm", false))
 	DayLoop.ot_this_week = int(l.get("ot_this_week", 0))
 	DayLoop._parts_seen.clear()
 	for k in l.get("parts_seen", []):

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cal_race"
+kind = 0
+title = "แข่งประกอบคอมระดับอำเภอ"
+note = "เลือกได้ · ไปแข่ง (ช่วงเช้า) หรือเปิดร้านตามปกติ"
+month = 10
+day = 3
+speaker = "ครู"
+ask = "อำเภอจัดแข่งประกอบคอม ใครประกอบได้ถูกต้องและเร็วที่สุดได้รางวัล ขมไปลงแข่งไหม"
+question = "จะไปแข่งไหม"
+choices = PackedStringArray("ไปแข่ง (ใช้เวลา 4 เทิร์น)", "ไม่ไป เปิดร้านตามปกติ")
+good_count = 0
+explain = "แข่งประกอบคอมดูทั้งความเร็วและความถูกต้อง ทำผิดขั้นตอนถูกหักเวลา"

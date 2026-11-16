@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_rain"
+kind = 1
+title = "ฝนตกหนักทั้งวัน"
+note = "ลูกค้า −1"
+months = PackedInt32Array(6, 7, 8, 9)
+weight = 3
+boost_months = PackedInt32Array(7)

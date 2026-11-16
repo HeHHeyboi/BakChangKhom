@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_grandma"
+kind = 1
+title = "ยายไม่สบาย"
+note = "เช้านี้พายายไปอนามัย ร้านเปิด 11:00"
+months = PackedInt32Array(3, 4, 5, 6, 7, 8, 9, 10, 11)
+weight = 1.5
+once = true
+speaker = "ยาย"
+ask = "ขมเอ๊ย ยายรู้สึกตัวรุม ๆ ตั้งแต่เมื่อคืน"
+question = "จะทำยังไง"
+choices = PackedStringArray("พายายไปอนามัยก่อน (ร้านเปิด 11:00)")
+good_count = 0
+explain = "ครอบครัวสำคัญกว่างาน ลูกค้าที่มาเช้าจะกลับมาใหม่ตอนสายนะ"

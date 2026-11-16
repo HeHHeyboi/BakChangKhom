@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"A08"
+title = "นักสืบอาการ"
+desc = "วินิจฉัยสาเหตุถูกตั้งแต่ครั้งแรก 10 งาน"
+category = 0
+hidden = false
+check = &"diag_first"
+target = 10
+skill = "วินิจฉัยก่อนลงมือ"

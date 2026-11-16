@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"A10"
+title = "ดูก่อนลงมือ"
+desc = "ข้ามขั้นที่เคสนั้นไม่จำเป็น 5 งาน"
+category = 0
+hidden = false
+check = &"skip_ok"
+target = 5
+skill = "ไม่ทำเกินจำเป็น"

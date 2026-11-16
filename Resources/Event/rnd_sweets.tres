@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_sweets"
+kind = 1
+title = "ลูกค้าเก่าเอาขนมมาฝาก"
+note = "งานดีคนจำได้"
+weight = 3

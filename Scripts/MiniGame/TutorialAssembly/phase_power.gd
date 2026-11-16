@@ -38,6 +38,11 @@ func _on_clicked(p: Item2D) -> void:
 	tw.tween_property(p, "scale", Vector2.ONE, 0.08)
 	(node("PowerLed") as Item2D).set_state("on")
 	PhaseUI.set_check(_rail_checks[0], true)
+	if owner.race_mode: # [0.7.0] แข่ง: ไฟติด = ประกอบถูก จบเลย
+		_stage = Stage.DONE
+		await wait(0.6)
+		finish()
+		return
 	cam(&"Monitor")
 	await wait(0.8)
 	if not visible:

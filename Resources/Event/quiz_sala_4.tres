@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quiz_sala_4"
+kind = 2
+group = &"sala"
+question = "ไฟล์ที่ดาวน์โหลดมาไปอยู่ที่ไหน"
+choices = PackedStringArray("โฟลเดอร์ดาวน์โหลด", "หายไปแล้ว", "อยู่ในถังขยะ")
+explain = "ไฟล์ที่ดาวน์โหลดจากเว็บจะไปอยู่ในโฟลเดอร์ดาวน์โหลดเป็นค่าเริ่มต้น"

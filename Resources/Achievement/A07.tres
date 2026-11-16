@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"A07"
+title = "เซียนไบออส"
+desc = "ได้ 3 ดาวงานไบออส 3 ครั้ง"
+category = 0
+hidden = false
+check = &"part_three"
+target = 3
+arg = &"part_bios"
+skill = "การตั้งค่าไบออส"

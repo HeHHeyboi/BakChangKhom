@@ -188,7 +188,29 @@ func _ready() -> void:
 	reset()
 
 
+## [0.7.0 ขั้น A] seed ของเกมนี้ (สุ่มครั้งเดียวตอนเริ่มเกมใหม่ · เข้าเซฟ) · seed_override ≠ 0 = เทสต์/บอทกำหนดเอง
+var run_seed := 1
+var seed_override := 0
+## [0.7.0 ขั้น B] สถานะอีเวนต์ { last: {key: shift} · done: {id: true} · ตัวนับ (booth · scam_safe · …) } · ประวัติ — เซฟ
+var event_state: Dictionary = { }
+var event_log: Array[Dictionary] = []
+## [0.7.0 ขั้น I] บัญชีดำร้านออนไลน์ { seller id: { why (scammed · reported), lost } } — เซฟ
+var seller_blacklist: Dictionary = { }
+## [0.7.0 ขั้น J] ใบประกาศที่ได้ { id: { month, day } } · ตัวนับของใบประกาศ (passes · three_<part> · safe_best · no_hint · on_time) — เซฟ
+var achievements: Dictionary = { }
+var ach_stats: Dictionary = { }
+## ใบประกาศที่เลือกติดผนังร้าน (สูงสุด 3) — เซฟ
+var ach_pinned: Array = []
+
+
 func reset() -> void:
+	run_seed = seed_override if seed_override != 0 else randi_range(1, 2147483646)
+	event_state = { }
+	event_log.clear()
+	seller_blacklist = { }
+	achievements = { }
+	ach_stats = { }
+	ach_pinned = []
 	money = economy.start_money
 	hold_next_payment = false
 	satisfaction_history.clear()
@@ -268,6 +290,7 @@ const MONEY_KINDS := {
 	&"ot_power": "ค่าไฟล่วงเวลา",
 	&"buy": "ซื้ออะไหล่/ของ",
 	&"invest": "ลงทุน",
+	&"scam": "โดนโกง", # [0.7.0] มิจฉาชีพ · ร้านออนไลน์ปลอม
 	&"other": "อื่น ๆ",
 }
 

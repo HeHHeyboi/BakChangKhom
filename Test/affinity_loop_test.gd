@@ -226,7 +226,7 @@ func _ready() -> void:
 
 
 func _share(who: String) -> float:
-	DayLoop._rng.seed = 7
+	DayLoop.reseed_day()
 	DayLoop._recent.clear()
 	var pool := DayLoop._cases_of_level(2)
 	var hit := 0

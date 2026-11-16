@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B04"
+title = "จ่ายตรงเวลา"
+desc = "จ่ายบิลครบไม่ค้างทั้ง 12 เดือน"
+category = 1
+hidden = false
+check = &"bills_clean"
+target = 12
+skill = "วินัยการเงิน"

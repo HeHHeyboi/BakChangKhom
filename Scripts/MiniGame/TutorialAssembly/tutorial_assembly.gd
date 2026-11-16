@@ -37,6 +37,8 @@ const DESKTOP_SCENE := "res://Scene/MiniGame/Desktop/desktop_window.tscn"
 const OS_TOUR := "res://Resources/Desktop/Free/os_tour.tres"
 
 @export var start_phase: PhaseState
+## [0.7.0] โหมดแข่งประกอบคอม (ต.ค.) — กดข้ามไม่ได้ · เปิดเครื่องติดแล้วจบเลย (ไม่เปิดขมOS/การ์ดสรุป)
+var race_mode := false
 
 var _layers: Dictionary = { } # socket_type → TextureRect
 ## ขมOS ที่เปิดอยู่ (tour) · null = ไม่ได้เปิด
@@ -52,7 +54,7 @@ func _ready() -> void:
 	if pib: # [10 ต.ค.] กล่องคำใบ้ลงไปอยู่แถบโต๊ะล่าง ไม่บัง PSU ที่มุมล่างของเคส
 		pib.toast_top = 424.0
 		pib.toast_box.position.y = 424.0
-	skippable = true # [Claude 5 ต.ค. 2569] ข้ามได้ตอนเป็น Tutorial/เควสต์ · งานลูกค้าข้ามไม่ได้ (PartMinigame เช็ก work_order)
+	skippable = not race_mode # [Claude 5 ต.ค. 2569] ข้ามได้ตอนเป็น Tutorial/เควสต์ · งานลูกค้าข้ามไม่ได้ (PartMinigame เช็ก work_order)
 	_build_layers()
 	super._ready()
 
@@ -186,7 +188,7 @@ func _first_phase() -> int:
 
 # override PartMinigame._last_phase
 func _last_phase() -> int:
-	return PhaseState.SUMMARY
+	return PhaseState.POWER_TEST if race_mode else PhaseState.SUMMARY
 
 ## override Phase._debug_phase_name
 func _debug_phase_name(phase: int) -> String:
@@ -214,7 +216,8 @@ func _debug_prepare(phase: int) -> void:
 
 
 func _on_minigame_finished(_score: Dictionary) -> void:
-	GameState.ensure_starter_kit() # [13 ต.ค.] จบหรือกดข้ามบทสอน → ได้ของติดตัวเข้าคลัง
+	if not race_mode:
+		GameState.ensure_starter_kit() # [13 ต.ค.] จบหรือกดข้ามบทสอน → ได้ของติดตัวเข้าคลัง
 	Global.in_minigame = false
 	Global.cur_pib = null
 	EventManager.minigame_end()

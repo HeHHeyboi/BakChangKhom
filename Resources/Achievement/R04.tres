@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"R04"
+title = "พี่ขมของน้อง ๆ"
+desc = "บิว ต้นกล้า แพรว สนิทถึงขั้นสนิททุกคน"
+category = 3
+hidden = false
+check = &"gang_all"
+target = 3
+reward_text = "ภาพวาดเด็ก ๆ ติดผนัง"

@@ -56,8 +56,14 @@ static func _load() -> void:
 			(_by_part[s.part] as Array).append(s)
 
 
+## [0.7.0] ตัวคูณน้ำหนักตามอีเวนต์ { scenario id: ×n } (หน้าร้อน = เคสความร้อน ×2) · DayLoop ตั้งทุกเช้า
+static var bias: Dictionary = { }
+## [0.7.0] สภาพ "เคยโดนน้ำท่วม" เปิดหลังพายุ ส.ค. (หรือตั้งแต่ ก.ย.)
+static var flood_open := false
+
+
 static func _w(s: RepairScenario) -> float:
-	return s.weight * (part_weight_mult if s.needs_part != &"" else 1.0)
+	return s.weight * (part_weight_mult if s.needs_part != &"" else 1.0) * float(bias.get(s.id, 1.0))
 
 
 ## สุ่ม { scenario, trait, condition } · recent = id ที่เพิ่งเจอของ Part นี้ (เก่า → ใหม่) · rank = ยศผู้เล่น
@@ -79,7 +85,7 @@ static func roll(part: StringName, rng: RandomNumberGenerator, recent: Array = [
 			pick = s
 			break
 	var conds := CONDITIONS.duplicate()
-	if month < 8:
+	if month < 8 or (month == 8 and not flood_open):
 		conds.erase(&"flood")
 	return {
 		"scenario": pick,

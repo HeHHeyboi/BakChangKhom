@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_fake_lazshop"
+display_name = "LazadaShop-th.shop"
+fake = true
+discount = 0.55
+rating = "★ 5.0 · 6 รีวิว (เขียนเหมือนกันหมด)"
+signs = PackedStringArray("ชื่อเว็บสะกดแปลก ๆ ไม่ใช่เว็บร้านค้าที่รู้จัก", "รีวิวสั้น ๆ ข้อความซ้ำกันทุกอัน", "ไม่มีที่อยู่หรือเบอร์โทรร้าน")
+payment = "โอนเข้าบัญชีส่วนตัวเท่านั้น"

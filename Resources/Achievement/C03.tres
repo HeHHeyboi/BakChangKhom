@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"C03"
+title = "นัดแล้วมา"
+desc = "ซ่อมเสร็จทันนัดให้ลูกค้ามารับ 15 เครื่อง"
+category = 2
+hidden = false
+check = &"on_time"
+target = 15
+skill = "รักษาคำพูด"

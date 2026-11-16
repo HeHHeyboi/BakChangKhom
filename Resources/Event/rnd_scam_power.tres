@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_scam_power"
+kind = 1
+group = &"scam"
+title = "โทรศัพท์จากคนแปลกหน้า"
+note = "ระวังมิจฉาชีพ"
+months = PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+weight = 0.8
+cooldown_days = 8
+ask = "สายเข้าอ้างเป็นการไฟฟ้า บอกว่าค้างค่าไฟ จะตัดไฟภายในหนึ่งชั่วโมง ให้แอดไลน์แล้วกดลิงก์จ่ายเงิน"
+question = "ขมจะทำยังไง"
+choices = PackedStringArray("วางสายแล้วดูบิลจริงหรือโทรเบอร์การไฟฟ้าเอง", "บอกว่าจ่ายตามบิลที่ร้านสะดวกซื้อแล้ว", "แอดไลน์แล้วกดลิงก์จ่ายเลย")
+good_count = 2
+explain = "ลิงก์จากคนแปลกหน้าอาจเป็นแอปดูดเงิน ดูยอดค้างจากบิลจริงหรือแอปทางการเท่านั้น"
+explain_bad = "ลิงก์จากคนแปลกหน้าอาจเป็นแอปดูดเงิน ดูยอดค้างจากบิลจริงหรือแอปทางการเท่านั้น (เสียเงินไป ฿300)"

@@ -86,6 +86,16 @@ ICONS = {
 <path d="M42 31h7l5 5h-12z" fill="{METAL}" stroke-width="2"/><path d="M8 22l4-10h18l4 10" fill="{GREEN}"/>
 <path d="M18 12v-6l-6 -2" fill="none" stroke-width="2.5"/><path d="M12 2l-5 4h-3v4h3l5 4z" fill="{GOLD}" stroke-width="2"/>
 <circle cx="14" cy="47" r="6" fill="{METAL}"/><circle cx="48" cy="47" r="6" fill="{METAL}"/>''',
+    # [0.7.0] ใบประกาศ/ถ้วยรางวัล (Achievement)
+    "trophy": f'''<path d="M18 10h28v14a14 14 0 0 1-28 0z" fill="{GOLD}"/>
+<path d="M18 14h-8v4a9 9 0 0 0 9 9M46 14h8v4a9 9 0 0 1-9 9" fill="none"/>
+<path d="M28 37h8v9h-8z" fill="{GOLD}" stroke-width="3"/><rect x="18" y="46" width="28" height="10" rx="2" fill="{BROWN}"/>
+<path d="M25 15v8" stroke="#fff6d6" stroke-width="3" fill="none"/>''',
+    # [0.7.0] ธงแดง (รายงานร้านปลอม · สัญญาณเตือน)
+    "flag": f'''<path d="M16 6v54" stroke-width="5"/><path d="M18 9c10-5 18 5 30 0v24c-12 5-20-5-30 0z" fill="{RED}"/>''',
+    # [0.7.0] ปฏิทิน (อีเวนต์)
+    "calendar": f'''<rect x="8" y="12" width="48" height="44" rx="5" fill="{CREAM}"/><rect x="8" y="12" width="48" height="12" rx="5" fill="{RED}"/>
+<path d="M20 6v12M44 6v12" stroke-width="4"/><g stroke-width="0" fill="{INK}"><rect x="16" y="30" width="8" height="7"/><rect x="28" y="30" width="8" height="7"/><rect x="40" y="30" width="8" height="7"/><rect x="16" y="42" width="8" height="7"/><rect x="28" y="42" width="8" height="7" fill="{ORANGE}"/></g>''',
 }
 
 os.makedirs(OUT, exist_ok=True)

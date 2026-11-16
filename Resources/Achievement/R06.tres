@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"R06"
+title = "ฟังทุกเรื่อง"
+desc = "ฟังเรื่องส่วนตัวของลูกค้าครบ 10 เรื่อง"
+category = 3
+hidden = false
+check = &"stories"
+target = 10

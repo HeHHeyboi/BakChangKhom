@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_scam_relative"
+kind = 1
+group = &"scam"
+title = "โทรศัพท์จากคนแปลกหน้า"
+note = "ระวังมิจฉาชีพ"
+months = PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+weight = 0.8
+cooldown_days = 8
+ask = "ไลน์จากรูปโปรไฟล์ญาติ บอกว่าเปลี่ยนเบอร์ใหม่ ขอยืมเงินด่วนสามพันบาท ให้โอนเข้าบัญชีคนอื่น"
+question = "ขมจะทำยังไง"
+choices = PackedStringArray("โทรหาญาติที่เบอร์เดิมเพื่อถามให้แน่", "ถามเรื่องที่รู้กันแค่ในครอบครัวก่อน", "โอนให้เลย ญาติเดือดร้อน")
+good_count = 2
+explain = "บัญชีไลน์ถูกปลอมได้ง่าย ก่อนโอนเงินโทรถามเจ้าตัวที่เบอร์เดิมเสมอ"
+explain_bad = "บัญชีไลน์ถูกปลอมได้ง่าย ก่อนโอนเงินโทรถามเจ้าตัวที่เบอร์เดิมเสมอ (เสียเงินไป ฿300)"

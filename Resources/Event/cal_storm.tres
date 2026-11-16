@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cal_storm"
+kind = 0
+title = "พายุเข้า"
+note = "บ่ายนี้ไฟอาจดับ · ฟังปิ๊บ"
+month = 8
+day = 2
+speaker = ""
+ask = "ฟ้าร้องดังมากเลยขม ลมแรงด้วย ท่าทางพายุจะเข้าแล้ว"
+question = "จะทำยังไงกับเครื่องในร้าน"
+choices = PackedStringArray("ถอดปลั๊กเครื่องลูกค้าและปลั๊กพ่วงทั้งหมด", "ปิดเครื่องอย่างเดียวพอ ปลั๊กเสียบไว้ได้", "ไม่เป็นไรหรอก เดี๋ยวก็หยุด")
+good_count = 1
+explain = "ฟ้าผ่าทำให้ไฟกระชากเข้ามาตามสายไฟได้แม้ปิดเครื่องแล้ว ถอดปลั๊กออกจึงปลอดภัยที่สุด"
+explain_bad = "ไฟกระชากตอนฟ้าผ่าเข้ามาตามสายไฟได้แม้ปิดเครื่อง ครั้งหน้าถอดปลั๊กออกเลยนะ"

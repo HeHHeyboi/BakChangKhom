@@ -26,6 +26,11 @@ const EXAM_APP_SCENE := preload("res://Scene/UI/rank_exam_app.tscn")
 const EXAM_APP_NAME := "สอบช่าง"
 const EXAM_APP_SIZE := Vector2(430, 400)
 const EXAM_APP_POS := Vector2(205, 72)
+## [0.7.0 ขั้น J] แอปใบประกาศ (Achievement)
+const ACH_APP_SCENE := preload("res://Scene/UI/achievement_app.tscn")
+const ACH_APP_NAME := "ใบประกาศ"
+const ACH_APP_SIZE := Vector2(470, 450)
+const ACH_APP_POS := Vector2(205, 88)
 ## ข้อมูลเครื่อง (DesktopTask)
 @export var task: DesktopTask = preload("res://Resources/Desktop/Free/khom_pc.tres")
 
@@ -52,7 +57,8 @@ func open_pc() -> Node:
 			m.add_custom_app(WORK_APP_NAME, Icons.tex(&"clipboard"), WORK_APP_SCENE, WORK_APP_SIZE, WORK_APP_POS)
 			m.add_custom_app(SHOP_APP_NAME, Icons.tex(&"cart"), SHOP_APP_SCENE, SHOP_APP_SIZE, SHOP_APP_POS)
 			m.add_custom_app(BOOK_APP_NAME, Icons.tex(&"book"), BOOK_APP_SCENE, BOOK_APP_SIZE, BOOK_APP_POS)
-			m.add_custom_app(EXAM_APP_NAME, Icons.tex(&"star"), EXAM_APP_SCENE, EXAM_APP_SIZE, EXAM_APP_POS), CONNECT_ONE_SHOT)
+			m.add_custom_app(EXAM_APP_NAME, Icons.tex(&"star"), EXAM_APP_SCENE, EXAM_APP_SIZE, EXAM_APP_POS)
+			m.add_custom_app(ACH_APP_NAME, Icons.tex(&"trophy"), ACH_APP_SCENE, ACH_APP_SIZE, ACH_APP_POS), CONNECT_ONE_SHOT)
 	Global.in_minigame = true
 	SceneRouter.push_node(m)
 	return m

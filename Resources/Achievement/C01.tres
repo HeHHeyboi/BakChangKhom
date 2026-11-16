@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"C01"
+title = "ขวัญใจหมู่บ้าน"
+desc = "ชื่อเสียงร้านถึง 80"
+category = 2
+hidden = false
+check = &"rep"
+target = 80

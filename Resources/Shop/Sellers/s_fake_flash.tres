@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_fake_flash"
+display_name = "Flash Deal คอมถูก"
+fake = true
+discount = 0.65
+rating = "★ 4.9 · 12 รีวิว"
+signs = PackedStringArray("เปิดร้านเมื่อสัปดาห์ก่อน", "ราคาถูกผิดปกติ", "บอกว่า \"โอนก่อนได้ราคานี้ ปลายทางไม่ได้\"")
+payment = "โอนก่อนเท่านั้น"

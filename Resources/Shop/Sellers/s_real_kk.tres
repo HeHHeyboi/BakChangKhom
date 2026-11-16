@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_real_kk"
+display_name = "ขอนแก่นอะไหล่คอม"
+fake = false
+discount = 0.2
+rating = "★ 4.9 · 1,420 รีวิว"
+signs = PackedStringArray("ร้านมีหน้าร้านจริง", "รับประกันสินค้า 1 ปี", "ตอบแชตในแอปร้านค้าไม่พาไปที่อื่น")
+payment = "เก็บเงินปลายทางได้"

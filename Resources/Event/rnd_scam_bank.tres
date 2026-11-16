@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ShopEvent" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/shop_event.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rnd_scam_bank"
+kind = 1
+group = &"scam"
+title = "โทรศัพท์จากคนแปลกหน้า"
+note = "ระวังมิจฉาชีพ"
+months = PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+weight = 0.8
+cooldown_days = 8
+ask = "สายเข้าจากเบอร์แปลก บอกว่าเป็นธนาคาร บัญชีของขมถูกระงับ ให้บอกรหัส OTP ที่เพิ่งส่งไปเพื่อยืนยันตัวตน"
+question = "ขมจะทำยังไง"
+choices = PackedStringArray("วางสายแล้วโทรหาธนาคารเองจากเบอร์หลังบัตร", "บอกว่าจะไปติดต่อที่สาขาเอง", "บอกรหัส OTP ไปให้จบ ๆ")
+good_count = 2
+explain = "ธนาคารไม่เคยขอรหัส OTP ทางโทรศัพท์ ถ้าสงสัยให้ติดต่อธนาคารจากเบอร์ทางการเอง"
+explain_bad = "ธนาคารไม่เคยขอรหัส OTP ทางโทรศัพท์ ถ้าสงสัยให้ติดต่อธนาคารจากเบอร์ทางการเอง (เสียเงินไป ฿300)"

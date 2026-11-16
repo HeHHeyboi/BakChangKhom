@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B06"
+title = "ลงทุนเป็น"
+desc = "ซื้ออัปเกรดร้าน 2 ชิ้น"
+category = 1
+hidden = false
+check = &"upgrades"
+target = 2
+skill = "ค่าใช้จ่ายกับการลงทุน"

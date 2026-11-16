@@ -119,6 +119,27 @@ func _ready() -> void:
 		await _wait(0.2)
 	_check(opened and not is_instance_valid(os2) and m2.os_tour == null, "กด \"ข้ามการแนะนำ\" ได้")
 	m2.queue_free()
+	# [0.7.0] โหมดแข่ง: กดข้ามไม่ได้ · เปิดเครื่องติด = จบเลย ไม่เปิดขมOS
+	var m3: TutorialAssembly = load("res://Scene/MiniGame/TutorialAssembly/tutorial_assembly.tscn").instantiate()
+	m3.race_mode = true
+	m3.start_phase = TutorialAssembly.PhaseState.BUILD
+	var fin := [false]
+	m3.minigame_finished.connect(func(_s: Dictionary) -> void: fin[0] = true)
+	add_child(m3)
+	await _wait(0.8)
+	_check(not m3.skippable, "โหมดแข่ง กดข้ามไม่ได้")
+	m3.debug_jump(TutorialAssembly.PhaseState.POWER_TEST)
+	await _wait(1.0)
+	m3.stage.press_part(m3.find_child("PowerButton", true, false))
+	for i in 40:
+		if fin[0]:
+			break
+		if is_instance_valid(m3) and is_instance_valid(m3.pib) and m3.pib.dialog_panel.visible:
+			m3.pib._on_dialog_panel_pressed()
+		await _wait(0.15)
+	_check(fin[0] and (not is_instance_valid(m3) or m3.os_tour == null), "โหมดแข่ง: เปิดเครื่องติดแล้วจบ ไม่เปิดขมOS")
+	if is_instance_valid(m3):
+		m3.queue_free()
 	QteRunner.auto_result = -1
 	print("T DONE fails=", fails)
 	get_tree().quit()

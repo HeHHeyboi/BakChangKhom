@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"A02"
+title = "ครบเครื่อง"
+desc = "ซ่อมผ่านครบทั้ง 5 Part"
+category = 0
+hidden = false
+check = &"parts_all"
+target = 5
+reward_text = "ฉายา ช่างครบเครื่อง"
+skill = "ภาพรวมฮาร์ดแวร์"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"R03"
+title = "ขาประจำ"
+desc = "ลูกค้าคนใดก็ได้สนิทถึง 100"
+category = 3
+hidden = false
+check = &"aff_max"
+target = 100

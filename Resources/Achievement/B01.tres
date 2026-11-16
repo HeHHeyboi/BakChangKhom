@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"B01"
+title = "เดือนแรกรอด"
+desc = "ถึงเป้ากำไรเดือนมกราคม"
+category = 1
+hidden = false
+check = &"month1"
+target = 1
+skill = "กำไร = รายรับ − รายจ่าย"

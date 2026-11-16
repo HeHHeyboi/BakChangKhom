@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="OnlineSeller" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/online_seller.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"s_fake_superit"
+display_name = "SuperIT-Sale ลดล้างสต็อก"
+fake = true
+discount = 0.6
+rating = "ยังไม่มีรีวิว"
+signs = PackedStringArray("ร้านเพิ่งเปิดเมื่อ 3 วันก่อน", "ราคาถูกกว่าร้านอื่นเกินครึ่ง", "เร่งว่า \"เหลือ 1 ชิ้น หมดใน 10 นาที\"", "ทักแชตแล้วให้ไปคุยต่อในไลน์ส่วนตัว")
+payment = "โอนเข้าบัญชีส่วนตัวเท่านั้น"

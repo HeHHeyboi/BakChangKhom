@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Achievement" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Resources/achievement.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"A09"
+title = "เจอมาหมดแล้ว"
+desc = "เจอสถานการณ์ซ่อมครบ 25 แบบ"
+category = 0
+hidden = false
+check = &"scen_all"
+target = 25
